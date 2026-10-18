@@ -120,10 +120,13 @@ def test_incomplete_wheel(tmp_path: Path, missing: str) -> None:
     check_wheel(wheel, "0.0.0")
 
 
-def test_wrong_wheel_version(tmp_path: Path) -> None:
+@pytest.mark.parametrize("name, version", [("astrology", "9.0.0"), ("other", "0.0.0")])
+def test_wrong_wheel_identity(tmp_path: Path, name: str, version: str) -> None:
   wheel = tmp_path / "test.whl"
   with ZipFile(wheel, "w") as archive:
-    archive.writestr("a.dist-info/METADATA", "Name: astrology\nVersion: 9.0.0\n")
+    for path in ("astrology/__init__.py", "astrology/py.typed", "a.dist-info/licenses/LICENSE"):
+      archive.writestr(path, "")
+    archive.writestr("a.dist-info/METADATA", f"Name: {name}\nVersion: {version}\n")
   with pytest.raises(ValueError, match="identity"):
     check_wheel(wheel, "0.0.0")
 

@@ -39,7 +39,7 @@ uv run python -m sphinx -E -a -n -W -b html -c docs . build/docs
 ```
 
 打开 `build/docs/docs/index.html`，可进入两种语言。当前共用搜索索引使用英文词干处理；
-中文分词由[文档议题](https://github.com/0xf3cd/astrology/issues/2)追踪。
+中文分词由[文档议题](https://github.com/0xf3cd/astrology/issues/2#issuecomment-6246614148)追踪。
 
 按上面的 `uv sync` 从本仓安装开发包，本地分发名／版本为 `astrology`／`0.0.0`。
 PyPI 的 `astrology` 属于另一个无关项目；首次发布前须确定发布名。

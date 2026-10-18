@@ -22,6 +22,23 @@ def consumer(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
   return package
 
 
+def test_import_outside_consumer_rejected(consumer: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+  monkeypatch.setattr(sys, "prefix", str(consumer.parent / "other-environment"))
+  with pytest.raises(ValueError, match="outside the consumer environment"):
+    installed_check.main(version("astrology"))
+
+
+def test_wrong_installed_version_rejected(consumer: Path) -> None:
+  with pytest.raises(ValueError, match="Installed version"):
+    installed_check.main("unrelated-version")
+
+
+def test_missing_installed_typing_marker_rejected(consumer: Path) -> None:
+  (consumer / "py.typed").unlink()
+  with pytest.raises(ValueError, match=r"missing py\.typed"):
+    installed_check.main(version("astrology"))
+
+
 @pytest.mark.parametrize("module", ["celestial_calendar", "celestial_calendar._binding"])
 def test_loaded_astronomy_rejected(
   consumer: Path, monkeypatch: pytest.MonkeyPatch, module: str

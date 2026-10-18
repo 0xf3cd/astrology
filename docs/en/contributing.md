@@ -50,7 +50,7 @@ uv run python -m sphinx -E -a -n -W -b html -c docs . build/docs
 
 Open `build/docs/docs/index.html` for both language entries. The current combined
 search index uses English stemming; Chinese word segmentation is tracked in
-[the documentation issue](https://github.com/0xf3cd/astrology/issues/2).
+[the documentation issue](https://github.com/0xf3cd/astrology/issues/2#issuecomment-6246614148).
 
 Install this development package from the checkout using `uv sync` above. Its
 local distribution name/version is `astrology` / `0.0.0`. The PyPI name
