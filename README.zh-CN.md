@@ -6,7 +6,8 @@
 [celestial-calendar](https://github.com/0xf3cd/celestial-calendar) 提供；本仓记录占星规则、
 出处和流派变体，并组织可复现的星盘结果。
 
-目前已建立项目边界与 issue 路线，尚未实现排盘 API 或可安装包。
+目前已有可构建的开发包、质量检查和双语设计文档，尚未实现排盘与知识查询 API。
+运行检查见[参与开发](docs/zh-CN/contributing.md)。
 
 ## 首版目标
 
@@ -24,6 +25,7 @@
 
 - [仓库结构与计算边界](docs/zh-CN/architecture.md)
 - [知识组织与双语文档](docs/zh-CN/knowledge.md)
+- [开发与审阅约定](docs/zh-CN/contributing.md)
 
 首版也要支持独立查知识：无需先排盘或加载原生天文库，就能找到概念、规则变体和出处。
 来源状态、适用前提和展示资格分别记录。
