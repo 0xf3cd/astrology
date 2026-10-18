@@ -28,15 +28,26 @@ variants, chart composition, and serialization.
 ## Python
 
 Use complete type annotations, snake_case modules and functions, PascalCase types,
-and two-space indentation. Prefer immutable value types and ordinary functions.
-Public input checks must work under `python -O`. Follow neighbouring code once it
-exists; avoid introducing a framework to support hypothetical backends.
+and two-space indentation. Inputs, configuration, rules, and results are immutable
+by default; frozen dataclasses must also isolate mutable members and caller-owned
+data. Prefer ordinary pure functions and declarative tables for data-shaped rules.
+Keep I/O, native initialization, caches, and other effects explicit at their
+owning boundary. Avoid global mutable configuration and silent substitutions.
 
-The first implementation issue establishes the Python support range, packaging,
-and one documented lint/type/test entry point. Until then, do not describe tooling
-or a public API as already available.
+Definitions belong to their domain; entry points compose them. Add shared
+abstractions only for concrete callers. Names and types carry meaning; comments
+explain reasons or constraints. Public input checks must work under `python -O`.
+
+Python 3.11–3.14 is supported. Use `uv sync --locked`, then
+`uv run --locked python tools/check.py` for the same checks as CI. Configuration
+and pinned tool versions live in `pyproject.toml` and `uv.lock`. Change both when
+updating dependencies and verify the minimum and maximum Python versions.
+The development package has no chart or knowledge-query API yet.
 
 ## Knowledge and documentation
+
+Use English for PR and issue titles/bodies, comments, and review replies. English
+is the primary documentation language; maintain matching Chinese pages.
 
 The repository is also a knowledge base. Concepts, source records, rule variants,
 and statements need stable, language-independent identities. Knowledge queries
@@ -62,6 +73,12 @@ bilingual paths above. Create source modules only when they contain functionalit
 Test domain boundaries and independently sourced reference cases with explicit
 configuration and tolerances. A serialization round trip checks preservation;
 recomputation and external references check different properties.
+
+Run the complete check command before submitting. Demonstrate that new checks
+reject representative defects. Review source fidelity, aliasing, unnecessary
+abstractions, translation meaning, and gaps in the tested domain separately from
+automated results. Record commands actually executed and unresolved limits in
+the PR. Contribution guides in `docs/en/` and `docs/zh-CN/` explain these checks.
 
 Use synthetic or appropriately anonymized examples. Public files and discussions
 must contain only project-relevant information. Commit through the maintainer's

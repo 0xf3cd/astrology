@@ -6,8 +6,9 @@ A Python library in development for reproducible Western astrology charts. It us
 [celestial-calendar](https://github.com/0xf3cd/celestial-calendar) for astronomy and
 keeps astrological rules, their sources, and their variants in this repository.
 
-The repository currently contains the project scope and issue roadmap. A chart API
-and installable package have not been implemented yet.
+The repository supplies a buildable development package, quality checks, and
+bilingual design documentation. Chart and knowledge-query APIs are not yet
+implemented. See [Contributing](docs/en/contributing.md) to run the checks.
 
 ## First release
 
@@ -21,7 +22,7 @@ time and location:
   requested geometry is undefined.
 - Derive signs, two-dimensional longitude house placement, and the five major
   aspects with configurable orbs and local applying/separating status.
-- Return immutable structured results, a text view, and a versioned serialization
+- Return immutable structured results, a text table, and a versioned serialization
   that retains inputs, configuration, astronomical values, and model identities.
 
 See the [v0.1.0 milestone](https://github.com/0xf3cd/astrology/milestone/1) for
@@ -31,6 +32,7 @@ delivery tasks and acceptance criteria.
 
 - [Repository structure and calculation boundaries](docs/en/architecture.md)
 - [Knowledge organization and bilingual documentation](docs/en/knowledge.md)
+- [Development and review conventions](docs/en/contributing.md)
 
 Knowledge browsing is a first-release goal in its own right: readers should be
 able to find a concept, its rule variants, and its sources without creating a
