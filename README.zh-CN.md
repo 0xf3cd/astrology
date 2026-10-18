@@ -21,7 +21,7 @@
 
 交付任务与验收见 [v0.1.0 milestone](https://github.com/0xf3cd/astrology/milestone/1)。
 
-## 设计入口
+## 设计边界
 
 - [仓库结构与计算边界](docs/zh-CN/architecture.md)
 - [知识组织与双语文档](docs/zh-CN/knowledge.md)
@@ -37,7 +37,7 @@
 
 - [技术与展示](https://github.com/0xf3cd/astrology/milestone/2)：行运与返照、关系盘、
   流派规则、更多对象，以及星盘视图。
-- [专门技术与历史研究](https://github.com/0xf3cd/astrology/milestone/3)：主限、推运、
+- [进阶技术与历史研究](https://github.com/0xf3cd/astrology/milestone/3)：主限、推运、
   不确定出生时间、历史输入、空间落宫与有来源的解释知识。
 
 这些 milestone 记录方向，不设发布日期。每种技术在实现前须明确其定义、出处与参考案例。

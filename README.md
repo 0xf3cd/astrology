@@ -22,7 +22,7 @@ time and location:
   requested geometry is undefined.
 - Derive signs, two-dimensional longitude house placement, and the five major
   aspects with configurable orbs and local applying/separating status.
-- Return immutable structured results, a text view, and a versioned serialization
+- Return immutable structured results, a text table, and a versioned serialization
   that retains inputs, configuration, astronomical values, and model identities.
 
 See the [v0.1.0 milestone](https://github.com/0xf3cd/astrology/milestone/1) for

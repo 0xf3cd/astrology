@@ -17,7 +17,9 @@ def main(expected_version: str) -> None:
     raise ValueError("Installed version differs from the built version")
   if not origin.with_name("py.typed").is_file():
     raise ValueError("Installed package is missing py.typed")
-  if any(name == "celestial" or name.startswith("celestial.") for name in sys.modules):
+  if any(
+    name == "celestial_calendar" or name.startswith("celestial_calendar.") for name in sys.modules
+  ):
     raise ValueError("Import initialized the astronomy adapter")
   print(f"Installed astrology {metadata.version}; optimized={sys.flags.optimize}")
 

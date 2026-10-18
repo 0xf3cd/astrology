@@ -25,9 +25,10 @@ def test_valid_documents(docs: Path) -> None:
   check_documents(docs)
 
 
-def test_missing_counterpart(docs: Path) -> None:
-  (docs / "docs/zh-CN/index.md").unlink()
-  with pytest.raises(ValueError, match="Missing language counterpart"):
+@pytest.mark.parametrize("language", ["en", "zh-CN"])
+def test_missing_counterpart(docs: Path, language: str) -> None:
+  (docs / f"docs/{language}/index.md").unlink()
+  with pytest.raises(ValueError, match=rf"Missing language counterpart: docs/{language}/index.md"):
     check_documents(docs)
 
 
@@ -95,6 +96,16 @@ def test_executed_examples(word: str) -> None:
   )
 
 
+def test_document_word_in_doctest_group() -> None:
+  check_examples(
+    "".join(
+      f"Document: docs/{language}/contributing\n"
+      "1 item passed all tests:\n   2 tests in Document: group\n2 tests in 1 item.\n"
+      for language in ("en", "zh-CN")
+    )
+  )
+
+
 @pytest.mark.parametrize(
   "missing", ["astrology/__init__.py", "astrology/py.typed", "a.dist-info/licenses/LICENSE"]
 )
@@ -114,4 +125,14 @@ def test_wrong_wheel_version(tmp_path: Path) -> None:
   with ZipFile(wheel, "w") as archive:
     archive.writestr("a.dist-info/METADATA", "Name: astrology\nVersion: 9.0.0\n")
   with pytest.raises(ValueError, match="identity"):
+    check_wheel(wheel, "0.0.0")
+
+
+@pytest.mark.parametrize("count", [0, 2])
+def test_wheel_metadata_count(tmp_path: Path, count: int) -> None:
+  wheel = tmp_path / "test.whl"
+  with ZipFile(wheel, "w") as archive:
+    for index in range(count):
+      archive.writestr(f"{index}.dist-info/METADATA", "Name: astrology\nVersion: 0.0.0\n")
+  with pytest.raises(ValueError, match="one METADATA"):
     check_wheel(wheel, "0.0.0")

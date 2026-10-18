@@ -6,6 +6,9 @@ Start with the relevant issue and the [architecture](architecture.md). An issue
 defines the feature's scope and acceptance cases. Keep changes small enough to
 explain and review as one behavior.
 
+Use English for pull requests, issues, comments, and review replies, including
+their titles. Documentation is English-first, with matching Chinese pages.
+
 ## Run the checks
 
 Install [uv](https://docs.astral.sh/uv/getting-started/installation/), then run from
@@ -25,8 +28,10 @@ The command checks Ruff lint/two-space formatting, strict mypy, pytest in normal
 and optimized modes, document pairs/local links, fresh strict HTML/doctest builds,
 and an isolated wheel install. `python -m build` builds the wheel through the
 sdist. The installed consumer runs outside the checkout, with isolated Python
-imports, in normal and optimized modes. Temporary builds use `SCRATCH` when set,
-otherwise the system temporary directory, and are removed on exit.
+imports, in normal and optimized modes. Temporary HTML, doctest reports,
+distributions, and consumer environments use `SCRATCH` when set, otherwise the
+system temporary directory, and are removed on exit. Build metadata and tool
+caches may remain in ignored checkout directories.
 
 Tool versions are locked in `uv.lock`. Sphinx 8.2.3 serves Python 3.11; Sphinx
 9.1.0 serves newer Python versions. Coverage is reported to locate gaps; this
@@ -37,8 +42,20 @@ For local formatting, run `uv run ruff format .`. A failed command stops the
 check run; fix its cause and rerun. Dependency changes must update the lock and
 pass both Python endpoints. Keep suppressions narrow and explain their reason.
 
-The local distribution is named `astrology`, version `0.0.0`; it is not published
-and the name is not reserved on PyPI. Confirm its installed development identity:
+To keep HTML for inspection, build it into the ignored `build/` directory:
+
+```sh
+uv run python -m sphinx -E -a -n -W -b html -c docs . build/docs
+```
+
+Open `build/docs/docs/index.html` for both language entries. The current combined
+search index uses English stemming; Chinese word segmentation is tracked in
+[the documentation issue](https://github.com/0xf3cd/astrology/issues/2).
+
+Install this development package from the checkout using `uv sync` above. Its
+local distribution name/version is `astrology` / `0.0.0`. The PyPI name
+`astrology` belongs to an unrelated project; choose a publishing name before the
+first release. Confirm the installed development identity:
 
 ```{doctest}
 >>> from importlib.metadata import version

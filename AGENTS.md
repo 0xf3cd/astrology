@@ -46,6 +46,9 @@ The development package has no chart or knowledge-query API yet.
 
 ## Knowledge and documentation
 
+Use English for PR and issue titles/bodies, comments, and review replies. English
+is the primary documentation language; maintain matching Chinese pages.
+
 The repository is also a knowledge base. Concepts, source records, rule variants,
 and statements need stable, language-independent identities. Knowledge queries
 must work without a chart or native astronomy initialization. Keep source status,

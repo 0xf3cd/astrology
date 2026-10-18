@@ -73,10 +73,10 @@ Represent positions, axes/house geometry, and astrological classifications
 separately. A complete natal calculation may require all requested components;
 future partial-chart entry points must state their own success contract.
 
-celestial v0.8 provides a strict fourteen-object snapshot with rates and houses.
+celestial v0.8.0 provides a strict fourteen-object snapshot with rates and houses.
 The first adapter can use it within its joint domain. Selecting seven output
 objects does not widen that domain. Genuine independent positions and house
-queries are candidate celestial v0.10 work.
+queries are candidate celestial v0.10.0 work.
 
 If requested Placidus geometry is unavailable, report that result explicitly.
 Any future fallback requires an explicit policy and must record both requested

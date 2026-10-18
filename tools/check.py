@@ -33,8 +33,13 @@ def document_errors(root: Path) -> tuple[str, ...]:
   )
   if not all(page_sets):
     errors.append("Both documentation languages must contain pages")
-  for missing in sorted(page_sets[0] ^ page_sets[1]):
-    errors.append(f"Missing language counterpart: {missing}")
+  for directory, existing, counterparts in (
+    (language_roots[0], page_sets[0], page_sets[1]),
+    (language_roots[1], page_sets[1], page_sets[0]),
+  ):
+    for missing in sorted(counterparts - existing):
+      path = (directory / missing).relative_to(root).as_posix()
+      errors.append(f"Missing language counterpart: {path}")
 
   parser = MarkdownIt("commonmark")
   pages = (root / "README.md", root / "README.zh-CN.md", *sorted((root / "docs").rglob("*.md")))
@@ -63,10 +68,10 @@ def check_documents(root: Path = ROOT) -> None:
 
 
 def check_examples(report: str) -> None:
-  """Require executed examples in both languages. 要求两种语言均有已执行的例子。"""
+  """Require executed bilingual contribution examples. 要求双语贡献指南均有已执行的例子。"""
   for language in ("en", "zh-CN"):
     marker = f"Document: docs/{language}/contributing\n"
-    section = report.partition(marker)[2].split("Document:")[0]
+    section = re.split(r"(?m)^Document: ", report.partition(marker)[2], maxsplit=1)[0]
     if not re.search(r"(?m)^[1-9]\d* tests? in \d+ items?\.$", section):
       raise ValueError(f"No executed documentation examples for {language}")
 
@@ -117,6 +122,8 @@ def main() -> None:
     ("-m", "ruff", "format", "--check", "."),
     ("-m", "mypy"),
     ("-m", "pytest", "--cov", "--cov-report=term-missing"),
+    # Pytest rewrites test assertions under -O; this notice concerns other modules.
+    # pytest 在 -O 下仍重写测试断言；此提示针对其他模块。
     (
       "-O",
       "-m",
