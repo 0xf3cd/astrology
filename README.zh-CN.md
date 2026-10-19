@@ -2,11 +2,13 @@
 
 [English](README.md) | [简体中文](README.zh-CN.md)
 
-开发中的 Python 西方占星排盘与知识库。天文计算由
+开发中的 Python 西方占星排盘与知识库。天文计算将由
 [celestial-calendar](https://github.com/0xf3cd/celestial-calendar) 提供；本仓记录占星规则、
 出处和流派变体，并组织可复现的星盘结果。
 
-目前已有可构建的开发包、质量检查和双语设计文档，尚未实现排盘与知识查询 API。
+开发包提供不可变的[出生记录与现代时刻解析](docs/zh-CN/birth.md)、
+[排盘请求配置](docs/zh-CN/configuration.md)、质量检查和双语 [API 文档](docs/zh-CN/reference.md)。
+尚未实现排盘与知识查询 API；导入包不会导入或初始化天文库。
 运行检查见[参与开发](docs/zh-CN/contributing.md)。
 
 ## 首版目标

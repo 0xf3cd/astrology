@@ -73,35 +73,35 @@ def test_command_failure_propagates(tmp_path: Path) -> None:
   assert caught.value.returncode == 7
 
 
+def valid_example_report() -> str:
+  return "".join(
+    f"Document: docs/{language}/{page}\n2 tests in 1 items.\n"
+    for language in ("en", "zh-CN")
+    for page in ("contributing", "birth", "configuration")
+  )
+
+
 @pytest.mark.parametrize("language", ["en", "zh-CN"])
+@pytest.mark.parametrize("page", ["contributing", "birth", "configuration"])
 @pytest.mark.parametrize("count", [None, 0])
-def test_examples_cannot_be_empty(language: str, count: int | None) -> None:
-  report = ""
-  for current in ("en", "zh-CN"):
-    if current == language and count is None:
-      continue
-    report += f"Document: docs/{current}/contributing\n"
-    report += f"{count if current == language else 2} tests in 1 item.\n"
-  with pytest.raises(ValueError, match=language):
+def test_examples_cannot_be_empty(language: str, page: str, count: int | None) -> None:
+  section = f"Document: docs/{language}/{page}\n2 tests in 1 items.\n"
+  replacement = "" if count is None else section.replace("2 tests", "0 tests")
+  report = valid_example_report().replace(section, replacement)
+  with pytest.raises(ValueError, match=f"{language}/{page}"):
     check_examples(report)
 
 
 @pytest.mark.parametrize("word", ["item", "items"])
 def test_executed_examples(word: str) -> None:
-  check_examples(
-    "".join(
-      f"Document: docs/{language}/contributing\n2 tests in 1 {word}.\n"
-      for language in ("en", "zh-CN")
-    )
-  )
+  check_examples(valid_example_report().replace("items.", f"{word}."))
 
 
 def test_document_word_in_doctest_group() -> None:
   check_examples(
-    "".join(
-      f"Document: docs/{language}/contributing\n"
-      "1 item passed all tests:\n   2 tests in Document: group\n2 tests in 1 item.\n"
-      for language in ("en", "zh-CN")
+    valid_example_report().replace(
+      "2 tests in 1 items.\n",
+      "1 item passed all tests:\n   2 tests in Document: group\n2 tests in 1 item.\n",
     )
   )
 

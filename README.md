@@ -2,13 +2,15 @@
 
 [English](README.md) | [简体中文](README.zh-CN.md)
 
-A Python library in development for reproducible Western astrology charts. It uses
+A Python library in development for reproducible Western astrology charts. It will use
 [celestial-calendar](https://github.com/0xf3cd/celestial-calendar) for astronomy and
 keeps astrological rules, their sources, and their variants in this repository.
 
-The repository supplies a buildable development package, quality checks, and
-bilingual design documentation. Chart and knowledge-query APIs are not yet
-implemented. See [Contributing](docs/en/contributing.md) to run the checks.
+The development package provides immutable [birth records and modern time
+resolution](docs/en/birth.md), [requested chart configuration](docs/en/configuration.md),
+quality checks, and bilingual [API documentation](docs/en/reference.md). Chart and
+knowledge-query APIs are not yet implemented. Astronomy is not imported or
+initialized by the package. See [Contributing](docs/en/contributing.md) to run the checks.
 
 ## First release
 

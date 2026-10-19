@@ -26,8 +26,9 @@ same command on Linux 3.11/3.14 and macOS/Windows 3.14. Use
 
 The command checks Ruff lint/two-space formatting, strict mypy, pytest in normal
 and optimized modes, document pairs/local links, fresh strict HTML/doctest builds,
-and an isolated wheel install. `python -m build` builds the wheel through the
-sdist. The installed consumer runs outside the checkout, with isolated Python
+and an isolated wheel install with its declared runtime dependencies. `python -m
+build` builds the wheel through the sdist. The installed consumer exercises birth,
+timezone provenance and configuration outside the checkout, with isolated Python
 imports, in normal and optimized modes. Temporary HTML, doctest reports,
 distributions, and consumer environments use `SCRATCH` when set, otherwise the
 system temporary directory, and are removed on exit. Build metadata and tool
@@ -35,8 +36,8 @@ caches may remain in ignored checkout directories.
 
 Tool versions are locked in `uv.lock`. Sphinx 8.2.3 serves Python 3.11; Sphinx
 9.1.0 serves newer Python versions. Coverage is reported to locate gaps; this
-foundation has no numerical algorithms to certify. Tests currently exercise the
-development checks. Add domain tests with each feature.
+package has no astronomical algorithms to certify. Tests exercise birth/time and
+configuration contracts as well as development checks. Add domain tests with each feature.
 
 For local formatting, run `uv run ruff format .`. A failed command stops the
 check run; fix its cause and rerun. Dependency changes must update the lock and

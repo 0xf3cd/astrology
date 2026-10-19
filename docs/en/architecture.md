@@ -2,9 +2,11 @@
 
 [简体中文](../zh-CN/architecture.md) · [Project](../../README.md) · [Knowledge](knowledge.md)
 
-This is the initial design, not a description of an implemented API. The first
-target is a reproducible modern tropical, geocentric natal chart, with independent
-access to its underlying knowledge.
+Birth records, modern time resolution, and requested configuration are implemented;
+their contracts are in the [birth](birth.md) and [configuration](configuration.md)
+guides. The remaining layout below is planned. The first complete-chart target is
+a reproducible modern tropical, geocentric natal chart, with independent access
+to its underlying knowledge.
 
 ## Organization
 
