@@ -7,8 +7,9 @@
 出处和流派变体，并组织可复现的星盘结果。
 
 开发包提供不可变的[出生记录与现代时刻解析](docs/zh-CN/birth.md)、
-[排盘请求配置](docs/zh-CN/configuration.md)、质量检查和双语 [API 文档](docs/zh-CN/reference.md)。
-尚未实现排盘与知识查询 API；导入包不会导入或初始化天文库。
+[排盘请求配置](docs/zh-CN/configuration.md)、独立[知识目录](docs/zh-CN/knowledge.md)、
+质量检查和双语 [API 文档](docs/zh-CN/reference.md)。
+尚未实现排盘计算；导入包不会导入或初始化天文库。
 运行检查见[参与开发](docs/zh-CN/contributing.md)。
 
 ## 首版目标
@@ -46,4 +47,5 @@
 
 ## 许可证
 
-[MIT](LICENSE)。
+项目代码、译文及原作说明采用 [MIT](LICENSE)。历史引文保留其
+[来源记录](docs/zh-CN/knowledge.md#从来源查到定义)注明的转载状态。

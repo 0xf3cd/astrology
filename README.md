@@ -8,9 +8,10 @@ keeps astrological rules, their sources, and their variants in this repository.
 
 The development package provides immutable [birth records and modern time
 resolution](docs/en/birth.md), [requested chart configuration](docs/en/configuration.md),
-quality checks, and bilingual [API documentation](docs/en/reference.md). Chart and
-knowledge-query APIs are not yet implemented. Astronomy is not imported or
-initialized by the package. See [Contributing](docs/en/contributing.md) to run the checks.
+an independent [knowledge catalog](docs/en/knowledge.md), quality checks, and bilingual
+[API documentation](docs/en/reference.md). Chart calculation is not yet implemented.
+Astronomy is not imported or initialized by the package.
+See [Contributing](docs/en/contributing.md) to run the checks.
 
 ## First release
 
@@ -60,4 +61,6 @@ needs a named definition, sources, and reference cases before implementation.
 
 ## License
 
-[MIT](LICENSE).
+[MIT](LICENSE) covers project code, translations and authored explanations.
+Historical excerpts retain the reproduction status recorded in their
+[source records](docs/en/knowledge.md#follow-a-source-to-a-definition).

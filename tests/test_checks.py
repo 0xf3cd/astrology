@@ -3,14 +3,25 @@
 import os
 import subprocess
 import sys
+import tarfile
 from collections.abc import Sequence
+from io import BytesIO
 from pathlib import Path
 from zipfile import ZipFile
 
 import pytest
 
+from astrology.knowledge import load_catalog
 from tools import check as checker
-from tools.check import check_documents, check_examples, check_wheel, document_errors, run
+from tools.check import (
+  PACKAGE_FILES,
+  check_documents,
+  check_examples,
+  check_sdist,
+  check_wheel,
+  document_errors,
+  run,
+)
 
 
 @pytest.fixture
@@ -76,16 +87,31 @@ def test_command_failure_propagates(tmp_path: Path) -> None:
   assert caught.value.returncode == 7
 
 
+def test_direct_script_import_path() -> None:
+  source = """
+import runpy
+import sys
+from pathlib import Path
+root = Path(sys.argv[1]).resolve()
+sys.path[:] = [str(root / 'tools'), *(p for p in sys.path if p and Path(p).resolve() != root)]
+runpy.run_path(str(root / 'tools/check.py'), run_name='script_startup_probe')
+"""
+  result = subprocess.run(
+    [sys.executable, "-c", source, str(checker.ROOT)], capture_output=True, text=True
+  )
+  assert result.returncode == 0, result.stdout + result.stderr
+
+
 def valid_example_report() -> str:
   return "".join(
     f"Document: docs/{language}/{page}\n2 tests in 1 items.\n"
     for language in ("en", "zh-CN")
-    for page in ("contributing", "birth", "configuration")
+    for page in ("contributing", "birth", "configuration", "knowledge")
   )
 
 
 @pytest.mark.parametrize("language", ["en", "zh-CN"])
-@pytest.mark.parametrize("page", ["contributing", "birth", "configuration"])
+@pytest.mark.parametrize("page", ["contributing", "birth", "configuration", "knowledge"])
 @pytest.mark.parametrize("count", [None, 0])
 def test_examples_cannot_be_empty(language: str, page: str, count: int | None) -> None:
   section = f"Document: docs/{language}/{page}\n2 tests in 1 items.\n"
@@ -109,13 +135,11 @@ def test_document_word_in_doctest_group() -> None:
   )
 
 
-@pytest.mark.parametrize(
-  "missing", ["astrology/__init__.py", "astrology/py.typed", "a.dist-info/licenses/LICENSE"]
-)
+@pytest.mark.parametrize("missing", [*PACKAGE_FILES, "a.dist-info/licenses/LICENSE"])
 def test_incomplete_wheel(tmp_path: Path, missing: str) -> None:
   wheel = tmp_path / "test.whl"
   with ZipFile(wheel, "w") as archive:
-    for path in ("astrology/__init__.py", "astrology/py.typed", "a.dist-info/licenses/LICENSE"):
+    for path in (*PACKAGE_FILES, "a.dist-info/licenses/LICENSE"):
       if path != missing:
         archive.writestr(path, "")
     archive.writestr("a.dist-info/METADATA", "Name: astrology\nVersion: 0.0.0\n")
@@ -158,6 +182,12 @@ def test_main_keeps_required_validation_stages(monkeypatch: pytest.MonkeyPatch) 
   monkeypatch.setattr(checker, "check_documents", lambda: commands.append(("documents",)))
   monkeypatch.setattr(checker, "check_api_html", lambda directory: commands.append(("api_html",)))
   monkeypatch.setattr(
+    checker, "check_catalog_html", lambda directory: commands.append(("catalog_html",))
+  )
+  monkeypatch.setattr(
+    checker, "check_search_html", lambda directory: commands.append(("search_html",))
+  )
+  monkeypatch.setattr(
     checker, "check_distribution", lambda directory: commands.append(("distribution",))
   )
   checker.main()
@@ -174,6 +204,8 @@ def test_main_keeps_required_validation_stages(monkeypatch: pytest.MonkeyPatch) 
   )
   assert ("documents",) in commands
   assert ("api_html",) in commands
+  assert ("catalog_html",) in commands
+  assert ("search_html",) in commands
   assert ("distribution",) in commands
 
 
@@ -188,9 +220,11 @@ def test_distribution_keeps_dependency_install_and_both_consumer_modes(
     if "build" in command:
       artifacts = Path(command[-1])
       artifacts.mkdir(parents=True)
-      (artifacts / "astrology.tar.gz").touch()
+      with tarfile.open(artifacts / "astrology.tar.gz", "w:gz") as archive:
+        for name in PACKAGE_FILES:
+          archive.addfile(tarfile.TarInfo("astrology/src/" + name), BytesIO())
       with ZipFile(artifacts / "astrology.whl", "w") as archive:
-        for name in ("astrology/__init__.py", "astrology/py.typed", "a.dist-info/licenses/LICENSE"):
+        for name in (*PACKAGE_FILES, "a.dist-info/licenses/LICENSE"):
           archive.writestr(name, "")
         archive.writestr("a.dist-info/METADATA", "Name: astrology\nVersion: 0.0.0\n")
 
@@ -212,7 +246,23 @@ def test_distribution_keeps_dependency_install_and_both_consumer_modes(
   consumers = [
     command for command in commands if str(tmp_path / "tools/installed_check.py") in command
   ]
-  assert len(consumers) == 2
+  assert len(consumers) == 4
   assert all(command[0] == str(python) for command in consumers)
-  assert all("-I" in command and command[-1] == "0.0.0" for command in consumers)
-  assert ["-O" in command for command in consumers] == [False, True]
+  assert all("-I" in command and "0.0.0" in command for command in consumers)
+  assert all(load_catalog().version in command for command in consumers)
+  assert ["-O" in command for command in consumers] == [False, False, True, True]
+  assert ["--knowledge-only" in command for command in consumers] == [True, False, True, False]
+
+
+@pytest.mark.parametrize("missing", [None, *PACKAGE_FILES])
+def test_sdist_resource_contents(tmp_path: Path, missing: str | None) -> None:
+  sdist = tmp_path / "package.tar.gz"
+  with tarfile.open(sdist, "w:gz") as archive:
+    for name in PACKAGE_FILES:
+      if name != missing:
+        archive.addfile(tarfile.TarInfo("astrology/src/" + name), BytesIO())
+  if missing is None:
+    check_sdist(sdist)
+  else:
+    with pytest.raises(ValueError, match="Sdist is missing"):
+      check_sdist(sdist)

@@ -28,8 +28,10 @@ The command checks Ruff lint/two-space formatting, strict mypy, pytest in normal
 and optimized modes, document pairs/local links, fresh strict HTML/doctest builds,
 and an isolated wheel install with its declared runtime dependencies. `python -m
 build` builds the wheel through the sdist. The installed consumer exercises birth,
-timezone provenance and configuration outside the checkout, with isolated Python
-imports, in normal and optimized modes. Temporary HTML, doctest reports,
+timezone provenance and configuration outside the checkout. A separate knowledge-only
+consumer lists, looks up, filters and resolves citations without time/native
+initialization. Both use isolated imports in normal and optimized modes; wheel
+and sdist checks require the actual corpus resources. Temporary HTML, doctest reports,
 distributions, and consumer environments use `SCRATCH` when set, otherwise the
 system temporary directory, and are removed on exit. Build metadata and tool
 caches may remain in ignored checkout directories.
@@ -50,8 +52,13 @@ uv run python -m sphinx -E -a -n -W -b html -c docs . build/docs
 ```
 
 Open `build/docs/docs/index.html` for both language entries. The current combined
-search index uses English stemming; Chinese word segmentation is tracked in
-[the documentation issue](https://github.com/0xf3cd/astrology/issues/2#issuecomment-6246614148).
+search index keeps English stemming and uses matching Python/JavaScript Chinese
+character-bigram tokenization. See [search limits](knowledge.md#translation-revisions-and-search).
+The gate checks the actual generated search index and emitted splitter/stemmer
+contract, per-page language/counterpart navigation, complete catalog anchors and
+current translations. A successful build alone is insufficient. Independent
+verification can execute the generated JavaScript query/index code; a Python
+tokenizer unit test does not prove browser behavior.
 
 Install this development package from the checkout using `uv sync` above. Its
 local distribution name/version is `astrology` / `0.0.0`. The PyPI name
@@ -109,6 +116,9 @@ Update both language pages when behavior changes. Public docstring summaries and
 contracts are bilingual; identifiers, signatures, units, and defaults have one
 source. Execute examples and inspect the generated pages. Automated coverage can
 detect a missing translation file, but cannot establish semantic equivalence.
+The catalog checks also reject stale text revisions, missing record descriptions,
+unknown references and duplicate IDs. Both language views have executable examples;
+source and translation review checks that conditions and limits retain their meaning.
 
 ## Review evidence
 

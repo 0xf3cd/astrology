@@ -1,10 +1,12 @@
 """Installed-consumer rejection cases. 安装后消费者的拒绝用例。"""
 
+import json
 import sys
 from collections.abc import Sequence
 from datetime import UTC, date, datetime, timedelta
 from importlib import import_module
 from importlib.metadata import version
+from importlib.resources import files
 from pathlib import Path
 from types import ModuleType, SimpleNamespace
 from typing import Literal, cast
@@ -21,10 +23,18 @@ def consumer(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
   package.mkdir()
   (package / "__init__.py").touch()
   (package / "py.typed").touch()
+  corpus = files("astrology.knowledge").joinpath("catalog.json").read_bytes()
+  knowledge = package / "knowledge"
+  knowledge.mkdir()
+  (knowledge / "catalog.json").write_bytes(corpus)
   monkeypatch.setattr(astrology, "__file__", str(package / "__init__.py"))
-  for name in ("birth", "config"):
+  for name in ("birth", "config", "knowledge", "knowledge.catalog", "knowledge.records"):
     monkeypatch.setattr(import_module(f"astrology.{name}"), "__file__", str(package / f"{name}.py"))
   monkeypatch.setattr(sys, "prefix", str(tmp_path))
+  monkeypatch.setattr(installed_check, "files", lambda package: knowledge)
+  monkeypatch.setattr(
+    import_module("astrology.knowledge.catalog"), "files", lambda package: knowledge
+  )
   return package
 
 
@@ -39,7 +49,16 @@ def test_wrong_installed_version_rejected(consumer: Path) -> None:
     installed_check.main("unrelated-version")
 
 
-@pytest.mark.parametrize("module", ["astrology.birth", "astrology.config"])
+@pytest.mark.parametrize(
+  "module",
+  [
+    "astrology.birth",
+    "astrology.config",
+    "astrology.knowledge",
+    "astrology.knowledge.catalog",
+    "astrology.knowledge.records",
+  ],
+)
 def test_submodule_outside_consumer_rejected(
   consumer: Path, monkeypatch: pytest.MonkeyPatch, module: str
 ) -> None:
@@ -54,7 +73,9 @@ def test_missing_installed_typing_marker_rejected(consumer: Path) -> None:
     installed_check.main(version("astrology"))
 
 
-@pytest.mark.parametrize("module", ["celestial_calendar", "celestial_calendar._binding"])
+@pytest.mark.parametrize(
+  "module", ["celestial_calendar", "celestial_calendar._binding", "astrology.celestial"]
+)
 def test_loaded_astronomy_rejected(
   consumer: Path, monkeypatch: pytest.MonkeyPatch, module: str
 ) -> None:
@@ -211,3 +232,77 @@ def test_installed_consumer_rejects_configuration_defects(
   monkeypatch.setattr(astrology, "ChartConfig", incorrect)
   with pytest.raises(ValueError, match=r"mutable input alias|substituted"):
     installed_check.main(version("astrology"))
+
+
+def test_knowledge_resource_outside_consumer_rejected(
+  consumer: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+  monkeypatch.setattr(installed_check, "files", lambda package: consumer.parent.parent)
+  with pytest.raises(ValueError, match="resource is outside"):
+    installed_check._check_knowledge()
+
+
+def test_missing_installed_corpus_rejected(consumer: Path) -> None:
+  (consumer / "knowledge/catalog.json").unlink()
+  with pytest.raises(FileNotFoundError):
+    installed_check._check_knowledge()
+
+
+def test_self_consistent_changed_corpus_version_rejected(consumer: Path) -> None:
+  path = consumer / "knowledge/catalog.json"
+  data = json.loads(path.read_text(encoding="utf-8"))
+  expected = data["version"]
+  installed_check._check_knowledge(expected)
+  data["version"] = "different-but-self-consistent"
+  path.write_text(json.dumps(data), encoding="utf-8")
+  with pytest.raises(ValueError, match="differs from the source corpus"):
+    installed_check._check_knowledge(expected)
+
+
+def test_knowledge_only_does_not_run_birth_consumer(
+  consumer: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+  def forbidden() -> None:
+    pytest.fail("Knowledge-only consumer reached birth calculations")
+
+  monkeypatch.setattr(installed_check, "_check_birth_and_configuration", forbidden)
+  monkeypatch.setattr(installed_check, "_check_knowledge", lambda expected: None)
+  monkeypatch.setattr(
+    sys,
+    "modules",
+    {
+      name: module
+      for name, module in sys.modules.items()
+      if not name.startswith(("tzdata", "zoneinfo", "celestial", "ctypes"))
+    },
+  )
+  installed_check.main(version("astrology"), knowledge_only=True)
+
+
+@pytest.mark.parametrize(
+  "defect",
+  [
+    "alias",
+    "translation",
+    "source_condition",
+    "prerequisite_status",
+    "output_eligibility",
+    "verification",
+  ],
+)
+def test_installed_knowledge_defects(consumer: Path, defect: str) -> None:
+  path = consumer / "knowledge/catalog.json"
+  data = json.loads(path.read_text(encoding="utf-8"))
+  if defect == "alias":
+    data["concepts"][0]["en_aliases"] = ["different"]
+  elif defect == "translation":
+    del data["entries"][-1]["citations"][0]["excerpt"]["zh"]
+  elif defect == "source_condition":
+    data["entries"][-1]["citations"][0]["excerpt"]["en"] = "Truncated quotation."
+  elif defect == "verification":
+    data["sources"][-1]["verification"] = "unverified"
+  else:
+    data["entries"][-1][defect] = "complete" if defect == "prerequisite_status" else "eligible"
+  path.write_text(json.dumps(data), encoding="utf-8")
+  with pytest.raises(ValueError):
+    installed_check._check_knowledge()

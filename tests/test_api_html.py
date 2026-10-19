@@ -1,21 +1,30 @@
 """Rendered API checks must reject green builds with absent signatures."""
 
 from enum import Enum
+from inspect import isfunction
 from pathlib import Path
 
 import pytest
 
 import astrology
+from astrology import knowledge
 from tools.check import check_api_html
 
 
 @pytest.fixture
 def api_html(tmp_path: Path) -> Path:
-  names = set(astrology.__all__)
-  for name in astrology.__all__:
-    value = getattr(astrology, name)
-    if isinstance(value, type) and issubclass(value, Enum):
-      names.update(value.__members__)
+  names = set(astrology.__all__) | set(knowledge.__all__)
+  for module in (astrology, knowledge):
+    for name in module.__all__:
+      value = getattr(module, name)
+      if isinstance(value, type) and issubclass(value, Enum):
+        names.update(value.__members__)
+      if isinstance(value, type):
+        names.update(
+          name
+          for name, member in vars(value).items()
+          if not name.startswith("_") and (isfunction(member) or isinstance(member, property))
+        )
   for language, counterpart in (("en", "zh-CN"), ("zh-CN", "en")):
     directory = tmp_path / "docs" / language
     directory.mkdir(parents=True)
@@ -36,7 +45,18 @@ def test_complete_rendered_views(api_html: Path) -> None:
 
 
 @pytest.mark.parametrize("language", ["en", "zh-CN"])
-@pytest.mark.parametrize("name", ["BirthRecord", "SUN"])
+@pytest.mark.parametrize(
+  "name",
+  [
+    "BirthRecord",
+    "SUN",
+    "Catalog",
+    "TranslationStatus",
+    "load_catalog",
+    "lookup",
+    "chart_applicability",
+  ],
+)
 def test_missing_public_signature_or_enum_is_rejected(
   api_html: Path, language: str, name: str
 ) -> None:
