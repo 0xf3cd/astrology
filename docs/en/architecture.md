@@ -2,9 +2,10 @@
 
 [简体中文](../zh-CN/architecture.md) · [Project](../../README.md) · [Knowledge](knowledge.md)
 
-Birth records, modern time resolution, and requested configuration are implemented;
-their contracts are in the [birth](birth.md) and [configuration](configuration.md)
-guides. The remaining layout below is planned. The first complete-chart target is
+Birth records, modern time resolution, requested configuration and independent
+knowledge are implemented; their contracts are in the [birth](birth.md),
+[configuration](configuration.md) and [knowledge](knowledge.md) guides. The remaining
+layout below is planned. The first complete-chart target is
 a reproducible modern tropical, geocentric natal chart, with independent access
 to its underlying knowledge.
 
@@ -104,9 +105,10 @@ aspects, and undefined house geometry.
 
 ## Delivery order
 
-Birth/configuration values are implemented. The small independent knowledge catalog
-is next; then compose positions and houses, add aspects, and complete serialization,
-text output, bilingual documentation, and installed-package verification.
+Birth/configuration values and the independent knowledge catalog are implemented.
+Next compose positions and houses, add aspects, and complete serialization and
+text output, extending bilingual documentation and installed-package verification
+with those features.
 
 The [v0.1.0 milestone](https://github.com/0xf3cd/astrology/milestone/1) owns task
 status. The source layout can evolve as these concrete implementations reveal

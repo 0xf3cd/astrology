@@ -6,20 +6,44 @@ import os
 import re
 import subprocess
 import sys
+import tarfile
 import tempfile
 import tomllib
 from collections.abc import Sequence
 from enum import Enum
 from html.parser import HTMLParser
+from inspect import isfunction
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
 from zipfile import ZipFile
 
+if __package__ in (None, ""):
+  # Direct script invocation puts tools/, not the repository root, on sys.path.
+  sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
 from markdown_it import MarkdownIt
 
 import astrology
+from astrology import knowledge
+from astrology.knowledge import Concept, Entry, RuleVariant, Source, load_catalog
+from astrology.knowledge.records import Language
+from tools.catalog_docs import (
+  catalog_anchor,
+  check_catalog_data,
+  configuration_reference,
+  localized_texts,
+)
+from tools.docs_search import check_search_html
 
 ROOT = Path(__file__).resolve().parents[1]
+PACKAGE_FILES = (
+  "astrology/__init__.py",
+  "astrology/py.typed",
+  "astrology/knowledge/__init__.py",
+  "astrology/knowledge/records.py",
+  "astrology/knowledge/catalog.py",
+  "astrology/knowledge/catalog.json",
+)
 
 
 def run(command: Sequence[str], *, cwd: Path = ROOT) -> None:
@@ -77,7 +101,7 @@ def check_examples(report: str) -> None:
   要求双语开发指南与 API 指南均有已执行的例子。
   """
   for language in ("en", "zh-CN"):
-    for page in ("contributing", "birth", "configuration"):
+    for page in ("contributing", "birth", "configuration", "knowledge"):
       marker = f"Document: docs/{language}/{page}\n"
       section = re.split(r"(?m)^Document: ", report.partition(marker)[2], maxsplit=1)[0]
       if not re.search(r"(?m)^[1-9]\d* tests? in \d+ items?\.$", section):
@@ -123,11 +147,18 @@ def check_api_html(directory: Path) -> None:
 
   要求两种语言视图均渲染公开签名和枚举成员。
   """
-  expected = set(astrology.__all__)
-  for name in astrology.__all__:
-    value = getattr(astrology, name)
-    if isinstance(value, type) and issubclass(value, Enum):
-      expected.update(value.__members__)
+  expected = set(astrology.__all__) | set(knowledge.__all__)
+  for module in (astrology, knowledge):
+    for name in module.__all__:
+      value = getattr(module, name)
+      if isinstance(value, type) and issubclass(value, Enum):
+        expected.update(value.__members__)
+      if isinstance(value, type):
+        expected.update(
+          name
+          for name, member in vars(value).items()
+          if not name.startswith("_") and (isfunction(member) or isinstance(member, property))
+        )
   for language, counterpart in (("en", "zh-CN"), ("zh-CN", "en")):
     page = directory / "docs" / language / "reference.html"
     if not page.is_file():
@@ -155,10 +186,137 @@ def check_wheel(wheel: Path, expected_version: str) -> None:
     metadata = Parser().parsestr(archive.read(metadata_paths[0]).decode("utf-8"))
     if metadata["Name"] != "astrology" or metadata["Version"] != expected_version:
       raise ValueError("Wheel identity differs from project metadata")
-    if "astrology/py.typed" not in names or "astrology/__init__.py" not in names:
-      raise ValueError("Wheel is missing the package or typing marker")
+    if missing := set(PACKAGE_FILES) - set(names):
+      raise ValueError(f"Wheel is missing package resources: {sorted(missing)}")
     if not any(name.endswith(".dist-info/licenses/LICENSE") for name in names):
       raise ValueError("Wheel is missing its license")
+
+
+def check_sdist(sdist: Path) -> None:
+  """Require the complete package and corpus in the source distribution.
+
+  要求源码分发包包含完整包及语料。
+  """
+  with tarfile.open(sdist) as archive:
+    names = {name.partition("/")[2] for name in archive.getnames()}
+  if missing := {"src/" + name for name in PACKAGE_FILES} - names:
+    raise ValueError(f"Sdist is missing package resources: {sorted(missing)}")
+
+
+class _CatalogHtml(_ApiHtml):
+  """Read record-local text and anchors from rendered sections, not directive source."""
+
+  def __init__(self) -> None:
+    super().__init__()
+    self.records: dict[str, list[str]] = {}
+    self.text: list[str] = []
+    self._sections: list[list[str] | None] = []
+
+  def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+    super().handle_starttag(tag, attrs)
+    if tag == "section":
+      self._sections.append(None)
+    identifier = dict(attrs).get("id")
+    if identifier and identifier.startswith("catalog-") and self._sections:
+      block: list[str] = []
+      self.records[identifier] = block
+      self._sections[-1] = block
+
+  def handle_endtag(self, tag: str) -> None:
+    super().handle_endtag(tag)
+    if tag == "section" and self._sections:
+      self._sections.pop()
+
+  def handle_data(self, data: str) -> None:
+    super().handle_data(data)
+    self.text.append(data)
+    for section in self._sections:
+      if section is not None:
+        section.append(data)
+
+
+def check_catalog_html(directory: Path) -> None:
+  """Check complete rendered records, text, versions and bilingual navigation.
+
+  检查完整渲染的记录、文本、版本及双语导航。
+  """
+  catalog = load_catalog()
+  check_catalog_data(catalog)
+
+  def content(value: str) -> str:
+    typography = str.maketrans({"\u2018": "'", "\u2019": "'", "\u201c": '"', "\u201d": '"'})
+    return " ".join(value.translate(typography).split())
+
+  code_version = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"][
+    "version"
+  ]
+  languages: tuple[Language, ...] = ("en", "zh-CN")
+  for language in languages:
+    counterpart = "zh-CN" if language == "en" else "en"
+    page = directory / "docs" / language / "catalog.html"
+    parser = _CatalogHtml()
+    parser.feed(page.read_text(encoding="utf-8"))
+    if parser.language != language or f"../{counterpart}/catalog.html" not in parser.links:
+      raise ValueError(f"Incorrect catalog language or counterpart navigation: {language}")
+    text = content("".join(parser.text))
+    if f"code={code_version}" not in text or f"corpus={catalog.version}" not in text:
+      raise ValueError("Missing code/corpus version in generated catalog")
+    for group in (catalog.concepts, catalog.variants, catalog.sources, catalog.entries):
+      for record in group:
+        anchor = catalog_anchor(record.identifier, language)
+        if anchor not in parser.records:
+          raise ValueError(f"Missing rendered catalog record: {record.identifier} ({language})")
+        block = content("".join(parser.records[anchor]))
+        for path, value in localized_texts(record):
+          selected = value.text(language)
+          if selected is None or content(selected) not in block:
+            raise ValueError(
+              f"Missing rendered catalog text: {record.identifier}/{path} ({language})"
+            )
+        required = [record.identifier]
+        if isinstance(record, Concept):
+          required.extend(
+            (*record.en_aliases, *record.zh_aliases, *record.related, f"kind={record.kind}")
+          )
+        elif isinstance(record, RuleVariant):
+          required.extend(record.concept_ids)
+        elif isinstance(record, Source):
+          required.extend(
+            (
+              record.title,
+              record.author,
+              record.edition,
+              f"language={record.language}",
+              f"source_verification={record.verification}",
+            )
+          )
+          if record.url not in parser.links:
+            raise ValueError(f"Missing rendered source link: {record.identifier}")
+        elif isinstance(record, Entry):
+          required.extend(
+            (
+              *record.concept_ids,
+              *record.rule_ids,
+              f"prerequisites={record.prerequisite_status}",
+              f"output={record.output_eligibility}",
+              f"chart={record.chart_applicability}",
+            )
+          )
+          for citation in record.citations:
+            required.extend((citation.source_id, citation.locator))
+            if citation.excerpt is not None:
+              required.extend(
+                (citation.excerpt.en, citation.excerpt.translation_credit or "[missing]")
+              )
+        if isinstance(record, (Concept, RuleVariant)) and record.configuration is not None:
+          required.extend(
+            (configuration_reference(record.configuration), record.configuration.value)
+          )
+        if any(content(value) not in block for value in required):
+          raise ValueError(f"Missing rendered catalog metadata: {record.identifier} ({language})")
+    for target in parser.links:
+      if target.startswith("#catalog-") and target[1:] not in parser.records:
+        raise ValueError(f"Dangling rendered catalog link: {target}")
 
 
 def check_distribution(directory: Path) -> None:
@@ -170,12 +328,24 @@ def check_distribution(directory: Path) -> None:
   if len(wheels) != 1 or len(tuple(artifacts.glob("*.tar.gz"))) != 1:
     raise ValueError("Expected one wheel and one sdist")
   check_wheel(wheels[0], metadata["version"])
+  check_sdist(next(artifacts.glob("*.tar.gz")))
 
   environment = directory / "consumer"
   run(("uv", "venv", "--python", sys.executable, str(environment)))
   python = environment / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
   run(("uv", "pip", "install", "--python", str(python), str(wheels[0])))
   for mode in ((), ("-O",)):
+    run(
+      (
+        str(python),
+        *mode,
+        "-I",
+        str(ROOT / "tools/installed_check.py"),
+        metadata["version"],
+        "--knowledge-only",
+      ),
+      cwd=directory,
+    )
     run(
       (str(python), *mode, "-I", str(ROOT / "tools/installed_check.py"), metadata["version"]),
       cwd=directory,
@@ -226,6 +396,8 @@ def main() -> None:
         )
       )
     check_api_html(directory / "html")
+    check_catalog_html(directory / "html")
+    check_search_html(directory / "html")
     results = (directory / "doctest/output.txt").read_text(encoding="utf-8")
     check_examples(results)
     check_distribution(directory)

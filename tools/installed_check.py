@@ -1,20 +1,87 @@
 """Verify the installed package in isolation. 隔离验证已安装的包。"""
 
+import json
 import sys
 from datetime import UTC, date, datetime, time, timedelta
 from importlib import import_module
 from importlib.metadata import distribution, version
+from importlib.resources import files
 from pathlib import Path
 from typing import Literal
 
 import astrology
+from astrology.knowledge import Catalog, OutputEligibility, PrerequisiteStatus, SourceVerification
 
 
 def _check_native_isolation() -> None:
   if any(
-    name == "celestial_calendar" or name.startswith("celestial_calendar.") for name in sys.modules
+    name in ("celestial_calendar", "astrology.celestial") or name.startswith("celestial_calendar.")
+    for name in sys.modules
   ):
     raise ValueError("Import initialized the astronomy adapter")
+
+
+def _check_knowledge() -> None:
+  before = set(sys.modules)
+  resource = files("astrology.knowledge").joinpath("catalog.json")
+  if not Path(str(resource)).resolve().is_relative_to(Path(sys.prefix).resolve()):
+    raise ValueError("Knowledge resource is outside the consumer environment")
+  data = json.loads(resource.read_text(encoding="utf-8"))
+  catalog = astrology.load_catalog()
+  if not catalog.version or catalog.version != data["version"]:
+    raise ValueError("Installed corpus version differs from its resource")
+  if (
+    catalog.lookup("Sol") != catalog.lookup("日轮")
+    or catalog.lookup("日轮")[0].identifier != "body.sun"
+  ):
+    raise ValueError("Installed bilingual lookup did not preserve identity")
+  if not catalog.list_concepts() or not catalog.list_variants(concept_id="body.sun"):
+    raise ValueError("Installed knowledge listing is empty")
+  if not catalog.filter_sources(verification=SourceVerification.VERIFIED):
+    raise ValueError("Installed source filtering lost verified sources")
+  entry = catalog.entry("entry.equinoctial_example")
+  if catalog.filter_entries(source_id="source.ptolemy.ashmand1822")[-1] != entry:
+    raise ValueError("Installed entry filtering lost the worked source example")
+  citation, source = catalog.citations(entry.identifier)[0]
+  if source.verification is not SourceVerification.VERIFIED or citation.excerpt is None:
+    raise ValueError("Installed citations lost source verification or original text")
+  if citation.excerpt.zh is None or not citation.excerpt.en.endswith(
+    "makes the day and night equal."
+  ):
+    raise ValueError("Installed source example lost a translation or source condition")
+  if (
+    entry.prerequisite_status is not PrerequisiteStatus.UNRESOLVED
+    or entry.output_eligibility is not OutputEligibility.REFERENCE_ONLY
+    or entry.chart_applicability != "not_assessed"
+  ):
+    raise ValueError(
+      "Installed retrieval collapsed editorial states or claimed chart applicability"
+    )
+  aliases = ["isolated alias"]
+  from dataclasses import replace
+
+  concept = replace(catalog.concepts[0], en_aliases=aliases)
+  aliases.clear()
+  if tuple(concept.en_aliases) != ("isolated alias",):
+    raise ValueError("Installed knowledge retained a caller-owned alias list")
+  try:
+    Catalog(
+      catalog.version,
+      (*catalog.concepts, catalog.concepts[0]),
+      catalog.variants,
+      catalog.sources,
+      catalog.entries,
+    )
+  except ValueError:
+    pass
+  else:
+    raise ValueError("Installed catalog accepted duplicate identities")
+  if any(
+    name.startswith(("tzdata", "zoneinfo", "celestial", "ctypes"))
+    for name in set(sys.modules) - before
+  ):
+    raise ValueError("Knowledge query initialized time or native machinery")
+  _check_native_isolation()
 
 
 def _check_birth_and_configuration() -> None:
@@ -81,13 +148,19 @@ def _check_birth_and_configuration() -> None:
     raise ValueError("Installed configuration substituted the requested house system")
 
 
-def main(expected_version: str) -> None:
+def main(expected_version: str, *, knowledge_only: bool = False) -> None:
   """Check installed identity, public API, provenance and native isolation.
 
   检查安装包身份、公开 API、来源元数据及原生库隔离。
   """
   metadata = distribution("astrology")
-  for module in (astrology, import_module("astrology.birth"), import_module("astrology.config")):
+  for module in (
+    astrology,
+    *(
+      import_module("astrology." + name)
+      for name in ("birth", "config", "knowledge", "knowledge.catalog", "knowledge.records")
+    ),
+  ):
     origin = Path(str(module.__file__)).resolve()
     if not origin.is_relative_to(Path(sys.prefix).resolve()):
       raise ValueError(f"Imported {module.__name__} from outside the consumer environment")
@@ -96,10 +169,16 @@ def main(expected_version: str) -> None:
   if not Path(str(astrology.__file__)).with_name("py.typed").is_file():
     raise ValueError("Installed package is missing py.typed")
   _check_native_isolation()
+  _check_knowledge()
+  if knowledge_only:
+    if any(name.startswith(("tzdata", "zoneinfo", "celestial", "ctypes")) for name in sys.modules):
+      raise ValueError("Knowledge-only consumer loaded time or native machinery")
+    print(f"Installed knowledge corpus; optimized={sys.flags.optimize}")
+    return
   _check_birth_and_configuration()
   _check_native_isolation()
   print(f"Installed astrology {metadata.version}; optimized={sys.flags.optimize}")
 
 
 if __name__ == "__main__":
-  main(sys.argv[1])
+  main(sys.argv[1], knowledge_only="--knowledge-only" in sys.argv[2:])

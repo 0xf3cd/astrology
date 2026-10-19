@@ -34,7 +34,7 @@ where = ["src"]
 namespaces = false
 
 [tool.setuptools.package-data]
-astrology = ["py.typed"]
+astrology = ["py.typed", "knowledge/catalog.json"]
 
 [tool.ruff]
 target-version = "py311"

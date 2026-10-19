@@ -1,6 +1,6 @@
-"""Birth-input and requested-configuration values, without native astronomy initialization.
+"""Birth inputs, requested configuration and independent knowledge, without native astronomy.
 
-出生输入与请求配置值，不初始化原生天文库。
+出生输入、请求配置与独立知识查询，不初始化原生天文库。
 """
 
 from astrology.birth import (
@@ -26,12 +26,14 @@ from astrology.config import (
   MajorAspect,
   NodeDefinition,
 )
+from astrology.knowledge import Catalog, load_catalog
 
 __all__ = [
   "AmbiguousBirthTimeError",
   "AspectRule",
   "BirthRecord",
   "Body",
+  "Catalog",
   "ChartConfig",
   "FixedOffset",
   "HistoricalTimeError",
@@ -45,6 +47,7 @@ __all__ = [
   "NonexistentBirthTimeError",
   "ResolvedBirth",
   "TimePrecision",
+  "load_catalog",
   "prepare_natal_input",
   "resolve_birth_time",
 ]
