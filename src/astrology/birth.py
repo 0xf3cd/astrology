@@ -263,6 +263,8 @@ def _load_iana_zone(key: str) -> tuple[tzinfo, str, str]:
     raise RuntimeError("Installed tzdata does not expose its package and IANA versions")
   resource = files("tzdata.zoneinfo").joinpath(*key.split("/"))
   try:
+    if not resource.is_file():
+      raise ValueError("Timezone resource is not a file")
     with resource.open("rb") as stream:
       zone = ZoneInfo.from_file(stream, key=key)
   except (OSError, ValueError) as exc:

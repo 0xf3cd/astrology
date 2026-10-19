@@ -228,6 +228,28 @@ def test_unknown_zone_path_errors_are_input_errors(key: str) -> None:
     resolve_birth_time(birth_at("2026-01-01T12:00:00", IanaTimezone(key)))
 
 
+@pytest.mark.parametrize("is_file", [False, True])
+def test_directory_keys_do_not_hide_real_resource_permission_errors(
+  monkeypatch: pytest.MonkeyPatch, is_file: bool
+) -> None:
+  import importlib.resources
+
+  class PermissionDeniedResource:
+    def joinpath(self, *parts: str) -> "PermissionDeniedResource":
+      return self
+
+    def is_file(self) -> bool:
+      return is_file
+
+    def open(self, mode: str) -> None:
+      raise PermissionError(13, "Resource cannot be opened")
+
+  monkeypatch.setattr(importlib.resources, "files", lambda package: PermissionDeniedResource())
+  expected = PermissionError if is_file else ValueError
+  with pytest.raises(expected):
+    resolve_birth_time(birth_at("2026-01-01T12:00:00", IanaTimezone("America")))
+
+
 def test_iana_resolution_bypasses_default_zone_constructor(monkeypatch: pytest.MonkeyPatch) -> None:
   import zoneinfo
 
