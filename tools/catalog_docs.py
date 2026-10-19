@@ -26,9 +26,9 @@ def localized_texts(value: object, path: str = "catalog") -> Iterator[tuple[str,
 
 
 def check_catalog_data(catalog: Catalog) -> None:
-  """Check complete config coverage and current bilingual corpus text.
+  """Check config coverage, node ownership and current bilingual corpus text.
 
-  检查配置定义的完整覆盖及语料的当前双语文本。
+  检查配置覆盖、交点定义归属及语料的当前双语文本。
   """
   expected = {(type(member), member.name) for enum in CONFIGURATION_TYPES for member in enum}
   actual = [

@@ -10,5 +10,5 @@ algorithms. The historical variant has no executable implementation.
 The [knowledge guide](knowledge.md) explains queries, source scope, translation
 revisions and search limits. Original excerpts, project translations and authored
 statements are labeled separately. Retrieval never establishes chart applicability.
-The guide's [status legend](knowledge.md#status-has-several-dimensions) explains the
-machine-readable labels below.
+The guide explains the [source, prerequisite, output and chart states](knowledge.md#status-has-several-dimensions)
+and [translation revisions](knowledge.md#translation-revisions-and-search) shown below.

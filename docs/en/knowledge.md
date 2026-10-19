@@ -112,10 +112,9 @@ old revision, without an English fallback counted as Chinese:
 The required-translation check rejects missing/stale text in the built-in corpus.
 Constructors and reference rendering can still represent those states explicitly.
 
-Documentation search keeps English stemming and splits Han runs into overlapping
-adjacent-character pairs. Python indexing and emitted JavaScript queries use this
-same character-bigram algorithm, not dictionary segmentation, exact phrase search
-or semantic alias expansion. Single-character queries only find single-character
+Documentation search uses English word stems and Chinese character pairs, not
+dictionary segmentation, exact phrase search or semantic alias expansion.
+Single-character queries only find single-character
 index entries, such as the explicit aliases `日` and `月`. Arbitrary single-character
 substring matching is not supported. Use `Catalog.lookup()` for exact identity lookup.
 
@@ -136,6 +135,7 @@ substring matching is not supported. Use `Catalog.lookup()` for exact identity l
 4. State prerequisites, exceptions and limits. Select source verification,
    prerequisite completeness and output eligibility independently. Retrieval must
    leave chart applicability `not_assessed` even when one condition is computable.
+   Leave unsupported interpretations out of the default corpus.
 5. Add boundary/source tests, run the [complete checks](contributing.md) and inspect
    both generated language pages. Checks cover current translations, complete
    config/catalog/API references and installed resources. Semantic review still
@@ -166,24 +166,23 @@ source's wording and locator, and document reproduction rights for included mate
 
 ## Status has several dimensions
 
-The knowledge design in [bazi](https://github.com/0xf3cd/bazi) already separates
-these questions in `knowledge.py` and `context_matching.py`:
+This catalog uses `verified` / `unverified` for source inspection,
+`complete` / `unresolved` for prerequisite representation, and
+`eligible` / `reference_only` for editorial output eligibility. `eligible` does
+not mean that a chart satisfies the prerequisites. Retrieval leaves chart
+applicability `not_assessed`, regardless of the other fields. The questions are:
 
 1. Has the stated source been checked?
 2. Are the entry's prerequisites understood and represented?
 3. Is the entry eligible for the default output?
 4. Does a particular chart satisfy the represented prerequisites?
 
-This catalog uses `verified` / `unverified` for source inspection,
-`complete` / `unresolved` for prerequisite representation, and
-`eligible` / `reference_only` for editorial output eligibility. `eligible` does
-not mean that a chart satisfies the prerequisites. Retrieval leaves chart
-applicability `not_assessed`, regardless of the other fields.
-
 An eventual matcher must distinguish satisfied, not satisfied, and unknown.
 Matching part of a condition must remain partial evidence. For example, a
 calculated aspect alone cannot establish a statement that also requires sect and
 dignity when those conditions have not been evaluated.
+
+Related design: [bazi](https://github.com/0xf3cd/bazi).
 
 ## Bilingual surfaces
 
@@ -199,12 +198,10 @@ dignity when those conditions have not been evaluated.
   than silently replaced with text in another language.
 - Original excerpts remain in their source language. A reader may choose a
   translation without losing access to that original.
+- The generated [catalog](catalog.md) identifies its code and corpus versions and
+  is labeled as development documentation. Checks and semantic review are described
+  in [contributing](contributing.md).
 
 Language labels must not change calculation. Distinct definitions must not be
 collapsed merely because a translation gives them the same display name. Search
 should support both languages and aliases while returning stable identities.
-
-The generated [catalog](catalog.md) identifies its code and corpus versions and
-is labeled as development documentation. See [contributing](contributing.md) for
-the checks and required semantic review. A graph database or general rule engine
-requires an actual query need; it is not a prerequisite for browsing this corpus.

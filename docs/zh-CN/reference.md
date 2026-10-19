@@ -28,7 +28,7 @@
 
 ## 独立知识查询
 
-字段职责及文本／状态区分见[记录指南](knowledge.md#记录与归属)。
+字段职责见[记录指南](knowledge.md#记录与归属)。
 
 ```{eval-rst}
 .. automodule:: astrology.knowledge

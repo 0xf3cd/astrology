@@ -48,11 +48,13 @@ class Catalog:
   Equal display names are allowed and lookup returns every matching identity.
   Records can retain missing/stale translations without treating them as current.
   Malformed string IDs raise ValueError; non-string IDs raise TypeError.
+  Unknown well-formed IDs raise KeyError.
 
   经核验的不可变记录；构造不做 I/O 或排盘。复制全部记录序列；重复标识、悬空链接、
   不一致的配置链接及不同概念共享别名均抛出 TypeError 或 ValueError。
   允许显示名称相同，查询返回所有命中的身份；缺译及旧译可保留，但不算当前译文。
   格式不合法的字符串标识抛出 ValueError，非字符串标识抛出 TypeError。
+  格式正确但未知的标识抛出 KeyError。
   """
 
   version: str
@@ -116,7 +118,7 @@ class Catalog:
         aliases[key] = concept.identifier
 
   def concept(self, identifier: str) -> Concept:
-    """Get a concept by exact ID; unknown IDs raise KeyError. 按精确标识取概念，未知标识抛出 KeyError。"""
+    """Get a concept by exact ID; see Catalog for ID errors. 按精确标识取概念，标识错误规则见 Catalog。"""
     _identifier(identifier)
     for item in self.concepts:
       if item.identifier == identifier:
@@ -124,7 +126,7 @@ class Catalog:
     raise KeyError(identifier)
 
   def variant(self, identifier: str) -> RuleVariant:
-    """Get a variant by exact ID; unknown IDs raise KeyError. 按精确标识取变体，未知标识抛出 KeyError。"""
+    """Get a variant by exact ID; see Catalog for ID errors. 按精确标识取变体，标识错误规则见 Catalog。"""
     _identifier(identifier)
     for item in self.variants:
       if item.identifier == identifier:
@@ -132,7 +134,7 @@ class Catalog:
     raise KeyError(identifier)
 
   def source(self, identifier: str) -> Source:
-    """Get an edition record; unknown IDs raise KeyError. 取来源版本记录，未知标识抛出 KeyError。"""
+    """Get an edition record; see Catalog for ID errors. 取来源版本记录，标识错误规则见 Catalog。"""
     _identifier(identifier)
     for item in self.sources:
       if item.identifier == identifier:
@@ -140,9 +142,9 @@ class Catalog:
     raise KeyError(identifier)
 
   def entry(self, identifier: str) -> Entry:
-    """Get a statement, not a chart conclusion; unknown IDs raise KeyError.
+    """Get a statement, not a chart conclusion; see Catalog for ID errors.
 
-    取陈述而非命盘结论，未知标识抛出 KeyError。
+    取陈述而非命盘结论，标识错误规则见 Catalog。
     """
     _identifier(identifier)
     for item in self.entries:
@@ -160,9 +162,9 @@ class Catalog:
     return tuple(item for item in self.concepts if kind is None or item.kind is kind)
 
   def list_variants(self, *, concept_id: str | None = None) -> tuple[RuleVariant, ...]:
-    """List definitions, optionally for a concept; unknown IDs raise KeyError.
+    """List definitions, optionally for a concept; see Catalog for ID errors.
 
-    列定义，可限定概念；未知标识抛出 KeyError。
+    列定义，可限定概念；标识错误规则见 Catalog。
     """
     if concept_id is not None:
       self.concept(concept_id)
@@ -206,10 +208,10 @@ class Catalog:
   ) -> tuple[Entry, ...]:
     """Apply all requested editorial filters without evaluating prerequisites.
 
-    Unknown concept/source IDs raise KeyError; raw status strings raise TypeError.
+    ID errors follow Catalog; raw status strings raise TypeError.
     Source verification must be inspected on Source, not inferred from this result.
 
-    同时应用所选整理筛选，不判断前提。未知概念或来源标识抛出 KeyError，
+    同时应用所选整理筛选，不判断前提。标识错误规则见 Catalog，
     字符串状态抛出 TypeError。来源查核状态须查 Source，不从查询结果推断。
     """
     if concept_id is not None:
@@ -241,9 +243,9 @@ class Catalog:
     )
 
   def citations(self, entry_id: str) -> tuple[tuple[Citation, Source], ...]:
-    """Resolve an entry's citations to editions; unknown IDs raise KeyError.
+    """Resolve an entry's citations to editions; see Catalog for ID errors.
 
-    将条目引用解析至版本记录，未知标识抛出 KeyError。
+    将条目引用解析至版本记录，标识错误规则见 Catalog。
     """
     return tuple(
       (citation, self.source(citation.source_id)) for citation in self.entry(entry_id).citations

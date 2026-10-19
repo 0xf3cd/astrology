@@ -149,9 +149,12 @@ def _check_birth_and_configuration() -> None:
 def main(
   expected_version: str, *, expected_corpus_version: str | None = None, knowledge_only: bool = False
 ) -> None:
-  """Check installed identity, public API, provenance and native isolation.
+  """Check installed identity, API and isolation; compare a supplied corpus version.
 
-  检查安装包身份、公开 API、来源元数据及原生库隔离。
+  None skips corpus comparison. CLI: CODE_VERSION CORPUS_VERSION [--knowledge-only].
+
+  检查安装包身份、API 及隔离，并比较传入的语料版本。None 跳过语料版本比较。
+  CLI 参数顺序：CODE_VERSION CORPUS_VERSION [--knowledge-only]。
   """
   metadata = distribution("astrology")
   for module in (
