@@ -115,7 +115,7 @@ class BirthRecord:
   date labels remain storable without Julian-calendar conversion.
   Source keys and values must be plain strings, not mutable subclasses.
 
-  延伸公历记录，保留缺失字段并复制来源元数据。钟点须无时区且 fold=0；比所声明精度更小的
+  公历（proleptic Gregorian）记录，保留缺失字段并复制来源元数据。钟点须无时区且 fold=0；比所声明精度更小的
   钟点字段须为零，precision=None 表示未声明，不代表推定精度。历史日期标签仍可保存，
   但不转换儒略历。
   来源键值须为普通字符串，不接纳可变子类。
@@ -178,13 +178,13 @@ class ResolvedBirth:
 
   UTC requires tzinfo=datetime.UTC and fold=0, at or after 1972-01-01T00:00:00Z.
   IANA results carry both data versions; fixed offsets carry neither. Construction
-  checks shape and wall=UTC+offset preservation, without loading timezone data to
-  authenticate supplied offsets, folds or versions. resolve_birth_time validates
-  the actual candidate and reads its data versions.
+  checks shape and preservation of the recorded clock as UTC plus offset, without
+  loading timezone data to authenticate supplied offsets, folds or versions.
+  resolve_birth_time validates the actual candidate and reads its data versions.
 
   保留原始记录，另存 UTC、偏移、消歧选择和数据来源。UTC 须使用 tzinfo=datetime.UTC、fold=0，
   且不早于 1972-01-01T00:00:00Z。IANA 结果记录两种数据版本，固定偏移不记录版本。
-  构造时检查形状及本地钟点=UTC+偏移的保真，不加载时区数据核实所提供偏移、fold 或版本；
+  构造时检查形状，并确认 UTC 加偏移仍为原始钟点，不加载时区数据核实所提供偏移、fold 或版本；
   resolve_birth_time 负责校验实际候选并读取数据版本。
   """
 
@@ -302,12 +302,12 @@ def resolve_birth_time(record: BirthRecord, *, fold: Literal[0, 1] | None = None
 
   IANA folds require 0 (earlier) or 1 (later); gaps and irrelevant choices fail.
   Read pinned tzdata only here. UTC before 1972 or outside datetime's range fails.
-  Unknown keys/unusable TZif raise ValueError. Missing packages, invalid version
-  metadata and resource-permission failures remain environment errors.
+  Unknown keys/malformed timezone data raise ValueError. Missing packages, invalid
+  version metadata and remaining resource I/O failures are environment errors.
 
   解析已知钟点和时区，不要求地点，也不改变记录。IANA 重叠时刻须选 0（较早）或 1（较晚）；
   空缺时刻和无关选择均报错。仅在此处读取钉版 tzdata；早于 1972 或超出 datetime 范围的 UTC 报错。
-  未知标识或不可用的 TZif 抛出 ValueError；包缺失、版本元数据无效及资源权限故障仍属环境错误。
+  未知标识或格式错误的时区数据抛出 ValueError；包缺失、版本元数据无效及其余资源 I/O 故障仍属环境错误。
   """
   if type(record) is not BirthRecord:
     raise TypeError("record must be a BirthRecord")

@@ -6,7 +6,7 @@
 
 ## 保留已知信息
 
-`BirthRecord` 保存延伸公历 `datetime.date`、可缺省的无时区 `datetime.time`、时区输入、地点、
+`BirthRecord` 保存公历（proleptic Gregorian）`datetime.date`、可缺省的无时区 `datetime.time`、时区输入、地点、
 所声明的钟点精度及来源元数据。仅接纳 `calendar="gregorian"`，不执行历法转换，包括儒略历转换。
 未知钟点或地点保持为 `None`。
 
@@ -36,6 +36,8 @@ MissingBirthDataError
 形状无效时，构造函数抛出 `ValueError`。解析时按包内时区标识列表检查精确匹配和大小写；
 未知标识抛出 `ValueError`。
 IANA 数据通过 `ZoneInfo.from_file` 显式读取自已安装的钉版 `tzdata`，结果不由系统时区数据库或标识缓存决定。
+
+TZif 是 `ZoneInfo.from_file` 读取的二进制时区数据文件格式。
 
 ```{doctest}
 >>> from astrology import (
@@ -109,7 +111,7 @@ True
 现代解析接纳不早于 `1972-01-01T00:00:00Z`、且在 Python datetime 可表示范围内的 UTC。
 下限针对解析后的时刻，不是当地年份：1972 年的当地日期可能落到不支持的 1971 年 UTC；
 1971 年末的当地钟点也可能表示首个受支持的 UTC 时刻。早于下限一天以上的钟点，不加载 IANA 数据便报错；
-其余钟点若两个探测得到的 UTC 时刻均早于下限，则在 fold/gap 分类前报错。
+其余钟点若以 `fold=0` 和 `fold=1` 换算得到的 UTC 均早于下限，则在 fold/gap 分类前报错。
 不能删除不受支持的候选，把有歧义的钟点伪装成唯一时刻。选中的时刻必须满足下限。
 
 较早的公历记录仍可保存。解析较早时刻需要未来显式的历史时间合同（含 UT1）；本 API 不外推 UTC，
@@ -119,7 +121,7 @@ True
 | 错误 | 含义 |
 |---|---|
 | `TypeError` | 运行时类型错误，不静默转换字符串或布尔值 |
-| `ValueError` | 范围、形状、精度、历法或元数据无效，标识未知，TZif 不可用，结果不一致，UTC 越界，或给出了无关的 fold |
+| `ValueError` | 范围、形状、精度、历法或元数据无效，标识未知，时区数据文件不可用，`ResolvedBirth` 字段不一致，UTC 越界，或给出了无关的 fold |
 | `MissingBirthDataError` | 缺少必需钟点／时区，或完整输入所需的地点 |
 | `AmbiguousBirthTimeError` | 需要显式选择 fold |
 | `NonexistentBirthTimeError` | 记录的本地钟点处于空缺中 |
@@ -129,7 +131,7 @@ True
 输入来源元数据复制为只读的普通字符串映射，带可变属性的字符串子类会被拒绝；输入和结果值均被冻结。
 
 环境故障另行处理：`tzdata` 包缺失时抛出导入错误，版本元数据缺失或无效时抛出 `RuntimeError`，
-资源权限故障保留为 `OSError` 的子类。这些故障不属于出生信息缺失或无效。
+其余未另行分类的资源 I/O 故障（如权限错误）保留为 `OSError` 的子类。这些故障不属于出生信息缺失或无效。
 
 算法遵循 [Python zoneinfo 数据来源合同](https://docs.python.org/3.11/library/zoneinfo.html#data-sources)
 和 [PEP 495 的 fold 与 gap 语义](https://peps.python.org/pep-0495/)。

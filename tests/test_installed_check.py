@@ -156,7 +156,8 @@ def test_installed_consumer_rejects_fixed_offset_faults(
     return cast(astrology.ResolvedBirth, SimpleNamespace(**attributes))
 
   monkeypatch.setattr(astrology, "resolve_birth_time", incorrect)
-  with pytest.raises(ValueError, match=r"UTC date rollover|timezone-database provenance"):
+  message = "UTC date rollover" if defect == "utc" else "timezone-database provenance"
+  with pytest.raises(ValueError, match=message):
     installed_check.main(version("astrology"))
 
 

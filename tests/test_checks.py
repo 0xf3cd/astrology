@@ -1,5 +1,6 @@
 """Failures the development checks must catch. 开发检查必须发现的失败。"""
 
+import os
 import subprocess
 import sys
 from collections.abc import Sequence
@@ -166,7 +167,11 @@ def test_main_keeps_required_validation_stages(monkeypatch: pytest.MonkeyPatch) 
     "html",
     "doctest",
   ]
-  assert all("-E" in command and "-W" in command for command in commands if "sphinx" in command)
+  assert all(
+    {"-E", "-a", "-n", "-W", "--keep-going"}.issubset(command)
+    for command in commands
+    if "sphinx" in command
+  )
   assert ("documents",) in commands
   assert ("api_html",) in commands
   assert ("distribution",) in commands
@@ -193,10 +198,21 @@ def test_distribution_keeps_dependency_install_and_both_consumer_modes(
   monkeypatch.setattr(checker, "run", capture)
   checker.check_distribution(tmp_path)
   install = next(command for command in commands if command[:3] == ("uv", "pip", "install"))
-  assert "--no-deps" not in install
+  environment = tmp_path / "consumer"
+  python = environment / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
+  assert ("uv", "venv", "--python", sys.executable, str(environment)) in commands
+  assert install == (
+    "uv",
+    "pip",
+    "install",
+    "--python",
+    str(python),
+    str(tmp_path / "artifacts/astrology.whl"),
+  )
   consumers = [
     command for command in commands if str(tmp_path / "tools/installed_check.py") in command
   ]
   assert len(consumers) == 2
+  assert all(command[0] == str(python) for command in consumers)
   assert all("-I" in command and command[-1] == "0.0.0" for command in consumers)
   assert ["-O" in command for command in consumers] == [False, True]

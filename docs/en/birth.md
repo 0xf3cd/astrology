@@ -45,6 +45,8 @@ package's zone-key list; an unknown key raises `ValueError`. IANA data is read e
 the installed, pinned `tzdata` package with `ZoneInfo.from_file`; the system
 timezone database and key cache do not select the result.
 
+TZif is the binary timezone-data file format read by `ZoneInfo.from_file`.
+
 ```{doctest}
 >>> from astrology import (
 ...   AmbiguousBirthTimeError, IanaTimezone, Location, TimePrecision,
@@ -125,8 +127,8 @@ representable datetime range. The cutoff concerns the *resolved instant*, not
 the local year: a 1972 local date can resolve into unsupported 1971 UTC, while a
 late 1971 local clock can represent the first supported UTC instant. Clocks more
 than one day before the cutoff fail without loading IANA data. For IANA resolution,
-if both probed UTC instants precede the cutoff, resolution fails before fold/gap
-classification. Candidates are never removed to turn an ambiguous
+if the UTC values obtained with `fold=0` and `fold=1` both precede the cutoff,
+resolution fails before fold/gap classification. Candidates are never removed to turn an ambiguous
 clock into an apparently unique one. The selected instant must meet the cutoff.
 
 Older Gregorian records remain storable. Resolving earlier instants needs a
@@ -138,7 +140,7 @@ to the future adapter, not this record type.
 | Error | Meaning |
 |---|---|
 | `TypeError` | Wrong runtime type; strings and booleans are not silently converted |
-| `ValueError` | Invalid range, shape, precision, calendar, metadata, unknown key, unusable TZif, inconsistent result, UTC overflow, or irrelevant fold |
+| `ValueError` | Invalid range, shape, precision, calendar or metadata; unknown key; unusable timezone data file; inconsistent `ResolvedBirth` fields; UTC overflow; irrelevant fold |
 | `MissingBirthDataError` | A required clock/timezone, or complete-input location, is absent |
 | `AmbiguousBirthTimeError` | An explicit fold choice is required |
 | `NonexistentBirthTimeError` | The recorded local clock falls in a gap |
@@ -150,8 +152,8 @@ mutable string subclasses are rejected. Result and input values are frozen.
 
 Environment failures remain separate: a missing `tzdata` package raises an import
 error, missing/invalid version metadata raises `RuntimeError`, and resource
-permission failures propagate as `OSError` subclasses. These are not missing or
-invalid birth information.
+I/O failures not otherwise classified, such as permission errors, propagate as
+`OSError` subclasses. These are not missing or invalid birth information.
 
 The algorithm follows the [Python zoneinfo data-source contract](https://docs.python.org/3.11/library/zoneinfo.html#data-sources)
 and [PEP 495's fold and gap semantics](https://peps.python.org/pep-0495/).

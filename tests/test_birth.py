@@ -4,6 +4,7 @@ import subprocess
 import sys
 from dataclasses import FrozenInstanceError, replace
 from datetime import UTC, date, datetime, time, timedelta, timezone
+from errno import EINVAL, EIO, EISDIR, ENAMETOOLONG, ENOENT, ENOTDIR
 from importlib import import_module, metadata
 from pathlib import Path
 from typing import Any, cast
@@ -226,15 +227,12 @@ def test_timezone_key_type_and_unknown_identity() -> None:
 
 
 @pytest.mark.parametrize("key", ["UTC/Child", "x" * 5000])
-def test_unknown_zone_path_errors_are_input_errors(key: str) -> None:
+def test_unlisted_zone_keys_are_input_errors(key: str) -> None:
   with pytest.raises(ValueError, match="Unknown IANA"):
     resolve_birth_time(birth_at("2026-01-01T12:00:00", IanaTimezone(key)))
 
 
-@pytest.mark.parametrize("is_file", [False, True])
-def test_resource_permission_errors_are_not_classified_by_is_file(
-  monkeypatch: pytest.MonkeyPatch, is_file: bool
-) -> None:
+def test_resource_permission_errors_propagate(monkeypatch: pytest.MonkeyPatch) -> None:
   import importlib.resources
 
   original_files = importlib.resources.files
@@ -242,9 +240,6 @@ def test_resource_permission_errors_are_not_classified_by_is_file(
   class PermissionDeniedResource:
     def joinpath(self, *parts: str) -> "PermissionDeniedResource":
       return self
-
-    def is_file(self) -> bool:
-      return is_file
 
     def open(self, mode: str) -> None:
       raise PermissionError(13, "Resource cannot be opened")
@@ -258,6 +253,58 @@ def test_resource_permission_errors_are_not_classified_by_is_file(
   )
   with pytest.raises(PermissionError):
     resolve_birth_time(birth_at("2026-01-01T12:00:00", IanaTimezone("UTC")))
+
+
+@pytest.mark.parametrize("error_number", [ENOENT, ENOTDIR, EISDIR, ENAMETOOLONG, EINVAL, EIO])
+def test_admitted_timezone_resource_errors(
+  monkeypatch: pytest.MonkeyPatch, error_number: int
+) -> None:
+  import importlib.resources
+
+  original_files = importlib.resources.files
+
+  class UnreadableResource:
+    def joinpath(self, *parts: str) -> "UnreadableResource":
+      return self
+
+    def open(self, mode: str) -> None:
+      raise OSError(error_number, "Resource cannot be read")
+
+  monkeypatch.setattr(
+    importlib.resources,
+    "files",
+    lambda package: (
+      UnreadableResource() if package == "tzdata.zoneinfo" else original_files(package)
+    ),
+  )
+  record = birth_at("2026-01-01T12:00:00", IanaTimezone("UTC"))
+  if error_number == EIO:
+    with pytest.raises(OSError) as io_error:
+      resolve_birth_time(record)
+    assert io_error.value.errno == EIO
+  else:
+    with pytest.raises(ValueError, match="Unknown IANA") as input_error:
+      resolve_birth_time(record)
+    cause = input_error.value.__cause__
+    assert isinstance(cause, OSError)
+    assert cause.errno == error_number
+
+
+def test_unknown_directory_key_is_rejected_before_resource_lookup(
+  monkeypatch: pytest.MonkeyPatch,
+) -> None:
+  import importlib.resources
+
+  original_files = importlib.resources.files
+
+  def permission_failing_backend(package: Any) -> Any:
+    if package == "tzdata.zoneinfo":
+      raise PermissionError(13, "Directory resource must not be reached")
+    return original_files(package)
+
+  monkeypatch.setattr(importlib.resources, "files", permission_failing_backend)
+  with pytest.raises(ValueError, match="Unknown IANA"):
+    resolve_birth_time(birth_at("2026-01-01T12:00:00", IanaTimezone("America")))
 
 
 @pytest.mark.parametrize("content", ["valid", "empty", "wrong", "truncated"])
@@ -492,6 +539,18 @@ def test_missing_or_invalid_data_versions_are_not_fabricated(
     monkeypatch.delattr(import_module("tzdata"), attribute)
   else:
     monkeypatch.setattr(import_module("tzdata"), attribute, value)
+  with pytest.raises(RuntimeError, match="package and IANA versions"):
+    resolve_birth_time(birth_at("2026-04-05T12:00:00", IanaTimezone("Australia/Lord_Howe")))
+
+
+@pytest.mark.parametrize("attribute", ["__version__", "IANA_VERSION"])
+def test_data_versions_reject_string_subclasses(
+  monkeypatch: pytest.MonkeyPatch, attribute: str
+) -> None:
+  class MetadataText(str):
+    pass
+
+  monkeypatch.setattr(import_module("tzdata"), attribute, MetadataText("version"))
   with pytest.raises(RuntimeError, match="package and IANA versions"):
     resolve_birth_time(birth_at("2026-04-05T12:00:00", IanaTimezone("Australia/Lord_Howe")))
 
