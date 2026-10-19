@@ -9,11 +9,15 @@ import sys
 import tempfile
 import tomllib
 from collections.abc import Sequence
+from enum import Enum
+from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
 from zipfile import ZipFile
 
 from markdown_it import MarkdownIt
+
+import astrology
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -68,12 +72,75 @@ def check_documents(root: Path = ROOT) -> None:
 
 
 def check_examples(report: str) -> None:
-  """Require executed bilingual contribution examples. 要求双语贡献指南均有已执行的例子。"""
+  """Require executed bilingual development and API-guide examples.
+
+  要求双语开发指南与 API 指南均有已执行的例子。
+  """
   for language in ("en", "zh-CN"):
-    marker = f"Document: docs/{language}/contributing\n"
-    section = re.split(r"(?m)^Document: ", report.partition(marker)[2], maxsplit=1)[0]
-    if not re.search(r"(?m)^[1-9]\d* tests? in \d+ items?\.$", section):
-      raise ValueError(f"No executed documentation examples for {language}")
+    for page in ("contributing", "birth", "configuration"):
+      marker = f"Document: docs/{language}/{page}\n"
+      section = re.split(r"(?m)^Document: ", report.partition(marker)[2], maxsplit=1)[0]
+      if not re.search(r"(?m)^[1-9]\d* tests? in \d+ items?\.$", section):
+        raise ValueError(f"No executed documentation examples for {language}/{page}")
+
+
+class _ApiHtml(HTMLParser):
+  """Read rendered Sphinx signature names, not names embedded in raw directive text."""
+
+  def __init__(self) -> None:
+    super().__init__()
+    self.names: set[str] = set()
+    self.links: set[str] = set()
+    self.language: str | None = None
+    self._name_depth = 0
+    self._name_parts: list[str] = []
+
+  def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+    attributes = dict(attrs)
+    if tag == "html":
+      self.language = attributes.get("lang")
+    if tag == "a" and (target := attributes.get("href")):
+      self.links.add(target)
+    if self._name_depth:
+      self._name_depth += 1
+    elif tag == "span" and "sig-name" in (attributes.get("class") or "").split():
+      self._name_depth = 1
+      self._name_parts = []
+
+  def handle_endtag(self, tag: str) -> None:
+    if self._name_depth:
+      self._name_depth -= 1
+      if self._name_depth == 0:
+        self.names.add("".join(self._name_parts).strip())
+
+  def handle_data(self, data: str) -> None:
+    if self._name_depth:
+      self._name_parts.append(data)
+
+
+def check_api_html(directory: Path) -> None:
+  """Require rendered public signatures and enum members in both language views.
+
+  要求两种语言视图均渲染公开签名和枚举成员。
+  """
+  expected = set(astrology.__all__)
+  for name in astrology.__all__:
+    value = getattr(astrology, name)
+    if isinstance(value, type) and issubclass(value, Enum):
+      expected.update(value.__members__)
+  for language, counterpart in (("en", "zh-CN"), ("zh-CN", "en")):
+    page = directory / "docs" / language / "reference.html"
+    if not page.is_file():
+      raise ValueError(f"Missing API HTML for {language}")
+    parser = _ApiHtml()
+    parser.feed(page.read_text(encoding="utf-8"))
+    missing = expected - parser.names
+    if missing:
+      raise ValueError(f"Missing rendered API names for {language}: {', '.join(sorted(missing))}")
+    if parser.language != language:
+      raise ValueError(f"Incorrect API HTML language for {language}")
+    if f"../{counterpart}/reference.html" not in parser.links:
+      raise ValueError(f"Missing API HTML counterpart navigation for {language}")
 
 
 def check_wheel(wheel: Path, expected_version: str) -> None:
@@ -107,7 +174,7 @@ def check_distribution(directory: Path) -> None:
   environment = directory / "consumer"
   run(("uv", "venv", "--python", sys.executable, str(environment)))
   python = environment / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
-  run(("uv", "pip", "install", "--python", str(python), "--no-deps", str(wheels[0])))
+  run(("uv", "pip", "install", "--python", str(python), str(wheels[0])))
   for mode in ((), ("-O",)):
     run(
       (str(python), *mode, "-I", str(ROOT / "tools/installed_check.py"), metadata["version"]),
@@ -158,6 +225,7 @@ def main() -> None:
           str(directory / builder),
         )
       )
+    check_api_html(directory / "html")
     results = (directory / "doctest/output.txt").read_text(encoding="utf-8")
     check_examples(results)
     check_distribution(directory)

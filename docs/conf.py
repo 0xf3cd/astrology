@@ -6,7 +6,9 @@ from sphinx.application import Sphinx
 
 project = "astrology"
 release = metadata.version("astrology")
-extensions = ["myst_parser", "sphinx.ext.doctest"]
+extensions = ["myst_parser", "sphinx.ext.doctest", "sphinx.ext.autodoc", "sphinx.ext.intersphinx"]
+intersphinx_mapping = {"python": ("https://docs.python.org/3.11", None)}
+autodoc_typehints = "description"
 root_doc = "docs/index"
 exclude_patterns = [
   ".venv/**",

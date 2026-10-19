@@ -1,12 +1,15 @@
 """Failures the development checks must catch. 开发检查必须发现的失败。"""
 
+import os
 import subprocess
 import sys
+from collections.abc import Sequence
 from pathlib import Path
 from zipfile import ZipFile
 
 import pytest
 
+from tools import check as checker
 from tools.check import check_documents, check_examples, check_wheel, document_errors, run
 
 
@@ -73,35 +76,35 @@ def test_command_failure_propagates(tmp_path: Path) -> None:
   assert caught.value.returncode == 7
 
 
+def valid_example_report() -> str:
+  return "".join(
+    f"Document: docs/{language}/{page}\n2 tests in 1 items.\n"
+    for language in ("en", "zh-CN")
+    for page in ("contributing", "birth", "configuration")
+  )
+
+
 @pytest.mark.parametrize("language", ["en", "zh-CN"])
+@pytest.mark.parametrize("page", ["contributing", "birth", "configuration"])
 @pytest.mark.parametrize("count", [None, 0])
-def test_examples_cannot_be_empty(language: str, count: int | None) -> None:
-  report = ""
-  for current in ("en", "zh-CN"):
-    if current == language and count is None:
-      continue
-    report += f"Document: docs/{current}/contributing\n"
-    report += f"{count if current == language else 2} tests in 1 item.\n"
-  with pytest.raises(ValueError, match=language):
+def test_examples_cannot_be_empty(language: str, page: str, count: int | None) -> None:
+  section = f"Document: docs/{language}/{page}\n2 tests in 1 items.\n"
+  replacement = "" if count is None else section.replace("2 tests", "0 tests")
+  report = valid_example_report().replace(section, replacement)
+  with pytest.raises(ValueError, match=f"{language}/{page}"):
     check_examples(report)
 
 
 @pytest.mark.parametrize("word", ["item", "items"])
 def test_executed_examples(word: str) -> None:
-  check_examples(
-    "".join(
-      f"Document: docs/{language}/contributing\n2 tests in 1 {word}.\n"
-      for language in ("en", "zh-CN")
-    )
-  )
+  check_examples(valid_example_report().replace("items.", f"{word}."))
 
 
 def test_document_word_in_doctest_group() -> None:
   check_examples(
-    "".join(
-      f"Document: docs/{language}/contributing\n"
-      "1 item passed all tests:\n   2 tests in Document: group\n2 tests in 1 item.\n"
-      for language in ("en", "zh-CN")
+    valid_example_report().replace(
+      "2 tests in 1 items.\n",
+      "1 item passed all tests:\n   2 tests in Document: group\n2 tests in 1 item.\n",
     )
   )
 
@@ -139,3 +142,77 @@ def test_wheel_metadata_count(tmp_path: Path, count: int) -> None:
       archive.writestr(f"{index}.dist-info/METADATA", "Name: astrology\nVersion: 0.0.0\n")
   with pytest.raises(ValueError, match="one METADATA"):
     check_wheel(wheel, "0.0.0")
+
+
+def test_main_keeps_required_validation_stages(monkeypatch: pytest.MonkeyPatch) -> None:
+  commands: list[tuple[str, ...]] = []
+
+  def capture(command: Sequence[str], *, cwd: Path = checker.ROOT) -> None:
+    commands.append(tuple(command))
+    if "-b" in command and command[command.index("-b") + 1] == "doctest":
+      directory = Path(command[-1])
+      directory.mkdir(parents=True)
+      (directory / "output.txt").write_text(valid_example_report(), encoding="utf-8")
+
+  monkeypatch.setattr(checker, "run", capture)
+  monkeypatch.setattr(checker, "check_documents", lambda: commands.append(("documents",)))
+  monkeypatch.setattr(checker, "check_api_html", lambda directory: commands.append(("api_html",)))
+  monkeypatch.setattr(
+    checker, "check_distribution", lambda directory: commands.append(("distribution",))
+  )
+  checker.main()
+  assert any(command[:3] == (sys.executable, "-m", "pytest") for command in commands)
+  assert any(command[:4] == (sys.executable, "-O", "-m", "pytest") for command in commands)
+  assert [command[command.index("-b") + 1] for command in commands if "-b" in command] == [
+    "html",
+    "doctest",
+  ]
+  assert all(
+    {"-E", "-a", "-n", "-W", "--keep-going"}.issubset(command)
+    for command in commands
+    if "sphinx" in command
+  )
+  assert ("documents",) in commands
+  assert ("api_html",) in commands
+  assert ("distribution",) in commands
+
+
+def test_distribution_keeps_dependency_install_and_both_consumer_modes(
+  tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+  (tmp_path / "pyproject.toml").write_text('[project]\nversion = "0.0.0"\n', encoding="utf-8")
+  commands: list[tuple[str, ...]] = []
+
+  def capture(command: Sequence[str], *, cwd: Path = checker.ROOT) -> None:
+    commands.append(tuple(command))
+    if "build" in command:
+      artifacts = Path(command[-1])
+      artifacts.mkdir(parents=True)
+      (artifacts / "astrology.tar.gz").touch()
+      with ZipFile(artifacts / "astrology.whl", "w") as archive:
+        for name in ("astrology/__init__.py", "astrology/py.typed", "a.dist-info/licenses/LICENSE"):
+          archive.writestr(name, "")
+        archive.writestr("a.dist-info/METADATA", "Name: astrology\nVersion: 0.0.0\n")
+
+  monkeypatch.setattr(checker, "ROOT", tmp_path)
+  monkeypatch.setattr(checker, "run", capture)
+  checker.check_distribution(tmp_path)
+  install = next(command for command in commands if command[:3] == ("uv", "pip", "install"))
+  environment = tmp_path / "consumer"
+  python = environment / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
+  assert ("uv", "venv", "--python", sys.executable, str(environment)) in commands
+  assert install == (
+    "uv",
+    "pip",
+    "install",
+    "--python",
+    str(python),
+    str(tmp_path / "artifacts/astrology.whl"),
+  )
+  consumers = [
+    command for command in commands if str(tmp_path / "tools/installed_check.py") in command
+  ]
+  assert len(consumers) == 2
+  assert all(command[0] == str(python) for command in consumers)
+  assert all("-I" in command and command[-1] == "0.0.0" for command in consumers)
+  assert ["-O" in command for command in consumers] == [False, True]
