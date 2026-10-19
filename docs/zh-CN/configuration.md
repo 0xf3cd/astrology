@@ -15,6 +15,9 @@
 Meeus 五项真交点定义的数学升降交点。定义是各交点标识的一部分，不是精度开关，也不是可互换的模型。
 同一请求可显式选择两种定义。
 
+这些是请求标识；[适配器功能](https://github.com/0xf3cd/astrology/issues/3)将对应到精确的天文定义和模型。
+本层不实现交点公式。
+
 ```{doctest}
 >>> from astrology import Body, ChartConfig, HouseSystem, LunarNode
 >>> objects = [Body.SUN, Body.MOON, LunarNode.MEAN_ASCENDING]
@@ -31,11 +34,12 @@ Meeus 五项真交点定义的数学升降交点。定义是各交点标识的�
 ```
 
 对象和规则序列按原顺序复制为元组，调用方随后修改列表不会改变请求。
-重复对象或重复相位标识会被拒绝，不静默合并。显示字符串不是枚举实例，不作隐式转换。
+重复对象或重复相位标识会被拒绝，不静默合并。`"sun"` 这样的枚举值字符串不是枚举实例，不作隐式转换。
 
 ## 提供相位规则，但不执行判断
 
-`MajorAspect` 标识合相、六合、刑相、三合和冲相。`AspectRule` 保存调用方提供的
+`MajorAspect` 标识合相（conjunction）、六分相（sextile）、四分相（square）、三分相（trine）和对分相（opposition）。
+角度及求值规则归[相位功能](https://github.com/0xf3cd/astrology/issues/4)。`AspectRule` 保存调用方提供的
 有限、非负 `orb_degrees`，单位为度。本层只保存请求，不计算相位，不选择流派的容许度政策，
 也不判断入相／出相运动。
 

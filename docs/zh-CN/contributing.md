@@ -21,8 +21,8 @@ CI 在 Linux 3.11／3.14 和 macOS／Windows 3.14 上运行同一命令。
 本地验证下限时使用 `uv sync --locked --python 3.11`。
 
 该命令检查 Ruff lint／两空格格式、严格 mypy、普通与优化模式下的 pytest、文档对页／本地链接、
-每次重新读取的严格 HTML／doctest 构建及带声明运行依赖的隔离 wheel 安装。
-`python -m build` 经 sdist 构建 wheel；安装消费在仓外以隔离导入验证出生、时区来源与配置，分别运行普通与优化模式。
+从头生成的严格 HTML／doctest 构建及带声明运行依赖的隔离 wheel 安装。
+`python -m build` 经 sdist 构建 wheel；安装后的消费者程序在仓外以隔离导入验证出生、时区来源与配置，分别运行普通与优化模式。
 临时 HTML、doctest 报告、分发包和消费者环境优先使用 `SCRATCH`，否则使用系统临时目录，
 退出时删除。构建元数据和工具缓存可能保留在仓内已忽略的目录中。
 

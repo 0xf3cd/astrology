@@ -20,6 +20,9 @@ mean or Meeus five-term true definition. The definition is part of each node's
 identity, not an accuracy flag or an interchangeable model. Both definitions
 may be selected explicitly in one request.
 
+These are requested identities; the [adapter feature](https://github.com/0xf3cd/astrology/issues/3)
+will bind them to the astronomical definitions and models. No node formula is implemented here.
+
 ```{doctest}
 >>> from astrology import Body, ChartConfig, HouseSystem, LunarNode
 >>> objects = [Body.SUN, Body.MOON, LunarNode.MEAN_ASCENDING]
@@ -37,12 +40,13 @@ may be selected explicitly in one request.
 
 Object and rule sequences are copied into tuples, preserving order. Source lists
 can change without changing the request. Duplicate objects or duplicate aspect
-identities are rejected rather than silently merged. Raw display strings are
-not enum instances and are not implicitly converted.
+identities are rejected rather than silently merged. Enum value strings such as
+`"sun"` are not enum instances and are not implicitly converted.
 
 ## Supply aspect rules without evaluating them
 
 `MajorAspect` names conjunction, sextile, square, trine, and opposition.
+The [aspect feature](https://github.com/0xf3cd/astrology/issues/4) owns their angles and evaluation rules.
 `AspectRule` carries a caller-supplied finite nonnegative `orb_degrees` value.
 This foundation stores requests; it does not calculate aspects, choose a
 tradition's orb policy, or classify applying/separating motion.

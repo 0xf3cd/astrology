@@ -7,10 +7,11 @@ synthetic; these APIs prepare inputs, not charts.
 
 ## Preserve what is known
 
-`BirthRecord` stores a Gregorian `datetime.date`, an optional naive
+`BirthRecord` stores a proleptic Gregorian `datetime.date`, an optional naive
 `datetime.time`, timezone input, location, stated clock precision, and source
 metadata. `calendar="gregorian"` is the only admitted calendar; no calendar
-conversion is performed. A missing clock or location stays `None`.
+conversion, including Julian-calendar conversion, is performed. A missing clock
+or location stays `None`.
 
 ```{doctest}
 >>> from datetime import date, time, timedelta
@@ -20,9 +21,9 @@ conversion is performed. A missing clock or location stays `None`.
 (None, None, None)
 >>> try:
 ...   prepare_natal_input(unknown)
-... except MissingBirthDataError:
-...   print("Missing required birth data")
-Missing required birth data
+... except MissingBirthDataError as exc:
+...   print(type(exc).__name__)
+MissingBirthDataError
 ```
 
 There is no noon or location substitution. `TimePrecision` records hour, minute,
@@ -37,8 +38,10 @@ endpoints are valid *record* values, not promises of available house geometry.
 
 ## Choose an ambiguous instant
 
-`IanaTimezone` stores a normalized relative lookup key. Resolution, not record
-construction, checks whether the key exists. IANA data is read explicitly from
+`IanaTimezone` requires a plain string with nonempty slash-separated segments of
+ASCII letters, digits, `_`, `+`, or `-`. Malformed shapes raise `ValueError` at
+construction. Resolution checks the exact, case-sensitive identity against the
+package's zone-key list; an unknown key raises `ValueError`. IANA data is read explicitly from
 the installed, pinned `tzdata` package with `ZoneInfo.from_file`; the system
 timezone database and key cache do not select the result.
 
@@ -57,9 +60,9 @@ timezone database and key cache do not select the result.
 'synthetic'
 >>> try:
 ...   resolve_birth_time(record)
-... except AmbiguousBirthTimeError:
-...   print("Choose fold=0 or fold=1")
-Choose fold=0 or fold=1
+... except AmbiguousBirthTimeError as exc:
+...   print(type(exc).__name__)
+AmbiguousBirthTimeError
 >>> earlier = prepare_natal_input(record, fold=0)
 >>> later = prepare_natal_input(record, fold=1)
 >>> (earlier.utc.isoformat(), later.utc.isoformat())
@@ -76,8 +79,10 @@ booleans, and values other than the integers 0 and 1 are not fold choices.
 
 `ResolvedBirth` retains the original record separately from UTC, the actual
 offset, fold choice, IANA key, package version, and IANA release. Its constructor
-checks consistency but does not authenticate manually supplied version strings;
-`resolve_birth_time` reads the actual versions during resolution.
+checks shape and preservation of the recorded clock as UTC plus offset. It does
+not load timezone rules to authenticate manually supplied offsets, folds, or
+versions. Use `resolve_birth_time` to validate the actual candidate and read its
+data versions.
 
 ```{doctest}
 >>> from importlib import import_module
@@ -118,10 +123,11 @@ IANA database. Time resolution itself does not require a location;
 Modern resolution admits UTC at or after `1972-01-01T00:00:00Z`, within Python's
 representable datetime range. The cutoff concerns the *resolved instant*, not
 the local year: a 1972 local date can resolve into unsupported 1971 UTC, while a
-late 1971 local clock can represent the first supported UTC instant. Wholly
-earlier clocks fail before DST classification; candidates are never removed to
-turn an ambiguous clock into an apparently unique one. The selected instant
-must meet the cutoff.
+late 1971 local clock can represent the first supported UTC instant. Clocks more
+than one day before the cutoff fail without loading IANA data. For IANA resolution,
+if both probed UTC instants precede the cutoff, resolution fails before fold/gap
+classification. Candidates are never removed to turn an ambiguous
+clock into an apparently unique one. The selected instant must meet the cutoff.
 
 Older Gregorian records remain storable. Resolving earlier instants needs a
 future explicit historical-time/UT1 contract; this API does not extrapolate UTC,
@@ -132,7 +138,7 @@ to the future adapter, not this record type.
 | Error | Meaning |
 |---|---|
 | `TypeError` | Wrong runtime type; strings and booleans are not silently converted |
-| `ValueError` | Invalid range, shape, precision, calendar, metadata, or irrelevant fold |
+| `ValueError` | Invalid range, shape, precision, calendar, metadata, unknown key, unusable TZif, inconsistent result, UTC overflow, or irrelevant fold |
 | `MissingBirthDataError` | A required clock/timezone, or complete-input location, is absent |
 | `AmbiguousBirthTimeError` | An explicit fold choice is required |
 | `NonexistentBirthTimeError` | The recorded local clock falls in a gap |
@@ -141,6 +147,11 @@ to the future adapter, not this record type.
 All four named errors subclass `ValueError`. Validation remains active under
 `python -O`. Input source metadata is a copied read-only mapping of plain strings;
 mutable string subclasses are rejected. Result and input values are frozen.
+
+Environment failures remain separate: a missing `tzdata` package raises an import
+error, missing/invalid version metadata raises `RuntimeError`, and resource
+permission failures propagate as `OSError` subclasses. These are not missing or
+invalid birth information.
 
 The algorithm follows the [Python zoneinfo data-source contract](https://docs.python.org/3.11/library/zoneinfo.html#data-sources)
 and [PEP 495's fold and gap semantics](https://peps.python.org/pep-0495/).

@@ -45,9 +45,10 @@ and timezone information. Store the resolved instant and the choices used to
 resolve it separately. An explicit offset and an IANA timezone are distinct input
 forms; timezone attachment alone does not detect a DST gap or choose a fold.
 
-The first complete-chart entry point requires a known time and location. Unknown
-time remains representable and is rejected by that entry point rather than
-replaced with noon. Historical inputs need their own calendar and time-scale
+The current `prepare_natal_input` validates known time, timezone and location;
+it does not calculate a chart. The future complete-chart entry point will require
+that input. Unknown time remains representable and is rejected by preparation
+rather than replaced with noon. Historical inputs need their own calendar and time-scale
 contract, including the difference between pre-1972 UT1 and modern UTC.
 
 ## Astronomy and astrology
@@ -103,8 +104,8 @@ aspects, and undefined house geometry.
 
 ## Delivery order
 
-Establish birth/configuration values and a small independent knowledge catalog;
-then compose positions and houses, add aspects, and complete serialization,
+Birth/configuration values are implemented. The small independent knowledge catalog
+is next; then compose positions and houses, add aspects, and complete serialization,
 text output, bilingual documentation, and installed-package verification.
 
 The [v0.1.0 milestone](https://github.com/0xf3cd/astrology/milestone/1) owns task

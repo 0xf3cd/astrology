@@ -2,11 +2,13 @@
 
 import subprocess
 import sys
+from collections.abc import Sequence
 from pathlib import Path
 from zipfile import ZipFile
 
 import pytest
 
+from tools import check as checker
 from tools.check import check_documents, check_examples, check_wheel, document_errors, run
 
 
@@ -139,3 +141,62 @@ def test_wheel_metadata_count(tmp_path: Path, count: int) -> None:
       archive.writestr(f"{index}.dist-info/METADATA", "Name: astrology\nVersion: 0.0.0\n")
   with pytest.raises(ValueError, match="one METADATA"):
     check_wheel(wheel, "0.0.0")
+
+
+def test_main_keeps_required_validation_stages(monkeypatch: pytest.MonkeyPatch) -> None:
+  commands: list[tuple[str, ...]] = []
+
+  def capture(command: Sequence[str], *, cwd: Path = checker.ROOT) -> None:
+    commands.append(tuple(command))
+    if "-b" in command and command[command.index("-b") + 1] == "doctest":
+      directory = Path(command[-1])
+      directory.mkdir(parents=True)
+      (directory / "output.txt").write_text(valid_example_report(), encoding="utf-8")
+
+  monkeypatch.setattr(checker, "run", capture)
+  monkeypatch.setattr(checker, "check_documents", lambda: commands.append(("documents",)))
+  monkeypatch.setattr(checker, "check_api_html", lambda directory: commands.append(("api_html",)))
+  monkeypatch.setattr(
+    checker, "check_distribution", lambda directory: commands.append(("distribution",))
+  )
+  checker.main()
+  assert any(command[:3] == (sys.executable, "-m", "pytest") for command in commands)
+  assert any(command[:4] == (sys.executable, "-O", "-m", "pytest") for command in commands)
+  assert [command[command.index("-b") + 1] for command in commands if "-b" in command] == [
+    "html",
+    "doctest",
+  ]
+  assert all("-E" in command and "-W" in command for command in commands if "sphinx" in command)
+  assert ("documents",) in commands
+  assert ("api_html",) in commands
+  assert ("distribution",) in commands
+
+
+def test_distribution_keeps_dependency_install_and_both_consumer_modes(
+  tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+  (tmp_path / "pyproject.toml").write_text('[project]\nversion = "0.0.0"\n', encoding="utf-8")
+  commands: list[tuple[str, ...]] = []
+
+  def capture(command: Sequence[str], *, cwd: Path = checker.ROOT) -> None:
+    commands.append(tuple(command))
+    if "build" in command:
+      artifacts = Path(command[-1])
+      artifacts.mkdir(parents=True)
+      (artifacts / "astrology.tar.gz").touch()
+      with ZipFile(artifacts / "astrology.whl", "w") as archive:
+        for name in ("astrology/__init__.py", "astrology/py.typed", "a.dist-info/licenses/LICENSE"):
+          archive.writestr(name, "")
+        archive.writestr("a.dist-info/METADATA", "Name: astrology\nVersion: 0.0.0\n")
+
+  monkeypatch.setattr(checker, "ROOT", tmp_path)
+  monkeypatch.setattr(checker, "run", capture)
+  checker.check_distribution(tmp_path)
+  install = next(command for command in commands if command[:3] == ("uv", "pip", "install"))
+  assert "--no-deps" not in install
+  consumers = [
+    command for command in commands if str(tmp_path / "tools/installed_check.py") in command
+  ]
+  assert len(consumers) == 2
+  assert all("-I" in command and command[-1] == "0.0.0" for command in consumers)
+  assert ["-O" in command for command in consumers] == [False, True]

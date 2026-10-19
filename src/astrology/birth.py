@@ -33,7 +33,7 @@ class NonexistentBirthTimeError(ValueError):
 
 
 class HistoricalTimeError(ValueError):
-  """The instant needs the future historical-time contract. 该时刻需要未来的历史时标合同。"""
+  """The instant needs the future historical-time contract. 该时刻需要未来的历史时间合同。"""
 
 
 class TimePrecision(StrEnum):
@@ -72,9 +72,13 @@ class Location:
 
 @dataclass(frozen=True, slots=True)
 class IanaTimezone:
-  """A plain-string IANA key; existence is checked only during explicit resolution.
+  """An ASCII key with nonempty slash-separated letter/digit/_+- segments.
 
-  普通字符串形式的 IANA 标识；仅在显式解析时检查其是否存在。
+  Require a plain string and valid shape at construction; check exact case and
+  existence against the packaged keys only during explicit resolution.
+
+  ASCII 标识，各非空段仅含字母、数字或 _+-，以斜线分隔。构造时要求普通字符串及有效形状；
+  仅在显式解析时按包内标识检查大小写和是否存在。
   """
 
   key: str
@@ -104,14 +108,16 @@ class FixedOffset:
 
 @dataclass(frozen=True, slots=True)
 class BirthRecord:
-  """A Gregorian civil record, retaining missing fields and copied source metadata.
+  """A proleptic Gregorian record, retaining missing fields and copied source metadata.
 
-  The clock must be naive with fold=0. Precision constrains smaller clock fields;
-  None means unstated, not an assumed accuracy. Historical dates remain storable.
+  The clock must be naive with fold=0. Fields smaller than the stated precision
+  must be zero; precision=None means unstated, not an assumed accuracy. Historical
+  date labels remain storable without Julian-calendar conversion.
   Source keys and values must be plain strings, not mutable subclasses.
 
-  公历民用记录，保留缺失字段并复制来源元数据。钟点须无时区且 fold=0；精度约束更小的钟点字段，
-  None 表示未声明，不代表推定精度。历史日期仍可保存。
+  延伸公历记录，保留缺失字段并复制来源元数据。钟点须无时区且 fold=0；比所声明精度更小的
+  钟点字段须为零，precision=None 表示未声明，不代表推定精度。历史日期标签仍可保存，
+  但不转换儒略历。
   来源键值须为普通字符串，不接纳可变子类。
   """
 
@@ -170,13 +176,16 @@ class BirthRecord:
 class ResolvedBirth:
   """A preserved record and separate UTC, offset, choice, and data provenance.
 
-  UTC is canonical and at or after 1972-01-01T00:00:00Z. IANA results carry both
-  data versions; fixed offsets carry neither. Construction checks consistency,
-  not the truth of supplied version identifiers; resolve_birth_time reads them.
+  UTC requires tzinfo=datetime.UTC and fold=0, at or after 1972-01-01T00:00:00Z.
+  IANA results carry both data versions; fixed offsets carry neither. Construction
+  checks shape and wall=UTC+offset preservation, without loading timezone data to
+  authenticate supplied offsets, folds or versions. resolve_birth_time validates
+  the actual candidate and reads its data versions.
 
-  保留原始记录，另存 UTC、偏移、消歧选择和数据来源。UTC 使用规范表示且不早于
-  1972-01-01T00:00:00Z。IANA 结果记录两种数据版本，固定偏移不记录版本。构造时检查一致性，
-  不核实所提供版本标识的真实性；resolve_birth_time 负责读取实际版本。
+  保留原始记录，另存 UTC、偏移、消歧选择和数据来源。UTC 须使用 tzinfo=datetime.UTC、fold=0，
+  且不早于 1972-01-01T00:00:00Z。IANA 结果记录两种数据版本，固定偏移不记录版本。
+  构造时检查形状及本地钟点=UTC+偏移的保真，不加载时区数据核实所提供偏移、fold 或版本；
+  resolve_birth_time 负责校验实际候选并读取数据版本。
   """
 
   record: BirthRecord
@@ -254,21 +263,29 @@ def _require_modern_utc(instant: datetime) -> None:
 def _load_iana_zone(key: str) -> tuple[tzinfo, str, str]:
   from importlib import import_module
   from importlib.resources import files
+  from struct import error as StructError
   from zoneinfo import ZoneInfo
 
   data = import_module("tzdata")
   package_version = getattr(data, "__version__", None)
   iana_version = getattr(data, "IANA_VERSION", None)
-  if not isinstance(package_version, str) or not isinstance(iana_version, str):
+  if (
+    type(package_version) is not str
+    or not package_version
+    or type(iana_version) is not str
+    or not iana_version
+  ):
     raise RuntimeError("Installed tzdata does not expose its package and IANA versions")
+  if key not in files("tzdata").joinpath("zones").read_text(encoding="utf-8").splitlines():
+    raise ValueError(f"Unknown IANA timezone: {key!r}")
   resource = files("tzdata.zoneinfo").joinpath(*key.split("/"))
   try:
-    if not resource.is_file():
-      raise ValueError("Timezone resource is not a file")
     with resource.open("rb") as stream:
       zone = ZoneInfo.from_file(stream, key=key)
-  except (OSError, ValueError) as exc:
-    if isinstance(exc, OSError) and exc.errno not in (
+  except (ValueError, StructError) as exc:
+    raise ValueError(f"Invalid TZif data for IANA timezone: {key!r}") from exc
+  except OSError as exc:
+    if exc.errno not in (
       ENOENT,
       ENOTDIR,
       EISDIR,
@@ -285,9 +302,12 @@ def resolve_birth_time(record: BirthRecord, *, fold: Literal[0, 1] | None = None
 
   IANA folds require 0 (earlier) or 1 (later); gaps and irrelevant choices fail.
   Read pinned tzdata only here. UTC before 1972 or outside datetime's range fails.
+  Unknown keys/unusable TZif raise ValueError. Missing packages, invalid version
+  metadata and resource-permission failures remain environment errors.
 
   解析已知钟点和时区，不要求地点，也不改变记录。IANA 重叠时刻须选 0（较早）或 1（较晚）；
   空缺时刻和无关选择均报错。仅在此处读取钉版 tzdata；早于 1972 或超出 datetime 范围的 UTC 报错。
+  未知标识或不可用的 TZif 抛出 ValueError；包缺失、版本元数据无效及资源权限故障仍属环境错误。
   """
   if type(record) is not BirthRecord:
     raise TypeError("record must be a BirthRecord")

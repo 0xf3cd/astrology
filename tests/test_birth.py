@@ -5,6 +5,7 @@ import sys
 from dataclasses import FrozenInstanceError, replace
 from datetime import UTC, date, datetime, time, timedelta, timezone
 from importlib import import_module, metadata
+from pathlib import Path
 from typing import Any, cast
 
 import pytest
@@ -220,6 +221,8 @@ def test_timezone_key_type_and_unknown_identity() -> None:
   directory = IanaTimezone("America")
   with pytest.raises(ValueError, match="Unknown IANA"):
     resolve_birth_time(birth_at("2026-01-01T12:00:00", directory))
+  with pytest.raises(ValueError, match="Unknown IANA"):
+    resolve_birth_time(birth_at("2026-01-01T12:00:00", IanaTimezone("europe/paris")))
 
 
 @pytest.mark.parametrize("key", ["UTC/Child", "x" * 5000])
@@ -229,10 +232,12 @@ def test_unknown_zone_path_errors_are_input_errors(key: str) -> None:
 
 
 @pytest.mark.parametrize("is_file", [False, True])
-def test_directory_keys_do_not_hide_real_resource_permission_errors(
+def test_resource_permission_errors_are_not_classified_by_is_file(
   monkeypatch: pytest.MonkeyPatch, is_file: bool
 ) -> None:
   import importlib.resources
+
+  original_files = importlib.resources.files
 
   class PermissionDeniedResource:
     def joinpath(self, *parts: str) -> "PermissionDeniedResource":
@@ -244,10 +249,65 @@ def test_directory_keys_do_not_hide_real_resource_permission_errors(
     def open(self, mode: str) -> None:
       raise PermissionError(13, "Resource cannot be opened")
 
-  monkeypatch.setattr(importlib.resources, "files", lambda package: PermissionDeniedResource())
-  expected = PermissionError if is_file else ValueError
-  with pytest.raises(expected):
-    resolve_birth_time(birth_at("2026-01-01T12:00:00", IanaTimezone("America")))
+  monkeypatch.setattr(
+    importlib.resources,
+    "files",
+    lambda package: (
+      PermissionDeniedResource() if package == "tzdata.zoneinfo" else original_files(package)
+    ),
+  )
+  with pytest.raises(PermissionError):
+    resolve_birth_time(birth_at("2026-01-01T12:00:00", IanaTimezone("UTC")))
+
+
+@pytest.mark.parametrize("content", ["valid", "empty", "wrong", "truncated"])
+def test_timezone_resource_parse_failures(
+  tmp_path: Path, monkeypatch: pytest.MonkeyPatch, content: str
+) -> None:
+  import importlib.resources
+
+  original_files = importlib.resources.files
+  valid = original_files("tzdata.zoneinfo").joinpath("UTC").read_bytes()
+  data = {"valid": valid, "empty": b"", "wrong": b"not TZif", "truncated": valid[:40]}[content]
+  (tmp_path / "UTC").write_bytes(data)
+  monkeypatch.setattr(
+    importlib.resources,
+    "files",
+    lambda package: tmp_path if package == "tzdata.zoneinfo" else original_files(package),
+  )
+  record = birth_at("2026-01-01T12:00:00", IanaTimezone("UTC"))
+  if content == "valid":
+    assert resolve_birth_time(record).utc == datetime(2026, 1, 1, 12, tzinfo=UTC)
+  else:
+    with pytest.raises(ValueError, match="Invalid TZif"):
+      resolve_birth_time(record)
+
+
+@pytest.mark.parametrize("key", ["Europe/Paris", "europe/paris"])
+def test_key_identity_is_independent_of_filesystem_case(
+  monkeypatch: pytest.MonkeyPatch, key: str
+) -> None:
+  import importlib.resources
+
+  original_files = importlib.resources.files
+
+  class CaseInsensitiveRoot:
+    def joinpath(self, *parts: str) -> Any:
+      return original_files("tzdata.zoneinfo").joinpath("Europe", "Paris")
+
+  monkeypatch.setattr(
+    importlib.resources,
+    "files",
+    lambda package: (
+      CaseInsensitiveRoot() if package == "tzdata.zoneinfo" else original_files(package)
+    ),
+  )
+  record = birth_at("2026-01-01T12:00:00", IanaTimezone(key))
+  if key == "Europe/Paris":
+    assert resolve_birth_time(record).timezone_key == key
+  else:
+    with pytest.raises(ValueError, match="Unknown IANA"):
+      resolve_birth_time(record)
 
 
 def test_iana_resolution_bypasses_default_zone_constructor(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -423,10 +483,41 @@ def test_resolved_value_rejects_missing_clock_and_inconsistent_offset() -> None:
     replace(result, utc=datetime.max.replace(tzinfo=UTC), utc_offset=timedelta(hours=1))
 
 
-def test_missing_iana_version_is_not_fabricated(monkeypatch: pytest.MonkeyPatch) -> None:
-  monkeypatch.setattr(import_module("tzdata"), "IANA_VERSION", None)
+@pytest.mark.parametrize("attribute", ["__version__", "IANA_VERSION"])
+@pytest.mark.parametrize("value", [None, 42, ""])
+def test_missing_or_invalid_data_versions_are_not_fabricated(
+  monkeypatch: pytest.MonkeyPatch, attribute: str, value: object
+) -> None:
+  if value is None:
+    monkeypatch.delattr(import_module("tzdata"), attribute)
+  else:
+    monkeypatch.setattr(import_module("tzdata"), attribute, value)
   with pytest.raises(RuntimeError, match="package and IANA versions"):
     resolve_birth_time(birth_at("2026-04-05T12:00:00", IanaTimezone("Australia/Lord_Howe")))
+
+
+def test_manual_iana_result_preserves_claims_without_reloading_data(
+  monkeypatch: pytest.MonkeyPatch,
+) -> None:
+  result = resolve_birth_time(birth_at("2026-04-05T12:00:00", IanaTimezone("Australia/Lord_Howe")))
+
+  def forbidden(key: str) -> None:
+    raise RuntimeError("Value construction must not resolve timezone rules")
+
+  monkeypatch.setattr("astrology.birth._load_iana_zone", forbidden)
+  manual = replace(
+    result,
+    utc=datetime(2026, 4, 5, 12, tzinfo=UTC),
+    utc_offset=timedelta(0),
+    fold=1,
+    tzdata_version="preserved-package-version",
+    iana_version="preserved-iana-version",
+  )
+  assert manual.record is result.record
+  assert manual.utc + manual.utc_offset == datetime(2026, 4, 5, 12, tzinfo=UTC)
+  assert manual.fold == 1
+  assert result.fold is None
+  assert result.utc == datetime(2026, 4, 5, 1, 30, tzinfo=UTC)
 
 
 def test_import_alone_does_not_load_timezone_data_or_astronomy() -> None:

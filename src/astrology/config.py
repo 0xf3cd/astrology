@@ -70,7 +70,7 @@ class LunarNode(StrEnum):
 class MajorAspect(StrEnum):
   """The five admitted aspect identities; calculation belongs to the aspect feature.
 
-  首版接纳的五种相位标识；计算归后续相位功能。
+  接纳的五种相位标识；计算归后续相位功能。
   """
 
   CONJUNCTION = "conjunction"
@@ -109,11 +109,12 @@ class ChartConfig:
   """Requested choices only, preserving order in isolated immutable tuples.
 
   Select a house system, nonempty unique objects, and explicit unique aspect rules.
+  An empty aspect sequence is allowed.
   Only tropical/geocentric is admitted. No orb or house defaults, effective-model
   claims, computation, or fallback are supplied.
 
   仅保存请求选择，按原顺序存入隔离的不可变元组。宫制、非空且不重复的对象及不重复的显式相位规则
-  均须给出；仅支持热带黄道和地心。不提供容许度或宫制默认值、实际模型声明、计算或替代策略。
+  均须给出，相位序列可以为空；仅支持热带黄道和地心。不提供容许度或宫制默认值、实际模型声明、计算或替代策略。
   """
 
   house_system: HouseSystem

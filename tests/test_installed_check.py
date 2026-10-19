@@ -2,7 +2,7 @@
 
 import sys
 from collections.abc import Sequence
-from datetime import UTC, date, datetime
+from datetime import UTC, date, datetime, timedelta
 from importlib import import_module
 from importlib.metadata import version
 from pathlib import Path
@@ -123,6 +123,40 @@ def test_installed_consumer_rejects_automatic_fold_choice(
 
   monkeypatch.setattr(astrology, "resolve_birth_time", chooses_first)
   with pytest.raises(ValueError, match="ambiguous input"):
+    installed_check.main(version("astrology"))
+
+
+@pytest.mark.parametrize("defect", ["utc", "provenance"])
+def test_installed_consumer_rejects_fixed_offset_faults(
+  consumer: Path, monkeypatch: pytest.MonkeyPatch, defect: str
+) -> None:
+  original = astrology.resolve_birth_time
+
+  def incorrect(
+    record: astrology.BirthRecord, *, fold: Literal[0, 1] | None = None
+  ) -> astrology.ResolvedBirth:
+    result = original(record, fold=fold)
+    if not isinstance(record.timezone, astrology.FixedOffset):
+      return result
+    attributes = {
+      name: getattr(result, name)
+      for name in (
+        "utc",
+        "timezone_source",
+        "timezone_key",
+        "fold",
+        "tzdata_version",
+        "iana_version",
+      )
+    }
+    if defect == "utc":
+      attributes["utc"] = result.utc + timedelta(minutes=1)
+    else:
+      attributes["tzdata_version"] = "unexpected-database-version"
+    return cast(astrology.ResolvedBirth, SimpleNamespace(**attributes))
+
+  monkeypatch.setattr(astrology, "resolve_birth_time", incorrect)
+  with pytest.raises(ValueError, match=r"UTC date rollover|timezone-database provenance"):
     installed_check.main(version("astrology"))
 
 
