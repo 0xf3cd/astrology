@@ -36,7 +36,8 @@ including under `python -O`.
 `lookup()` normalizes NFC, trims and case-folds, then matches exact names/aliases.
 It returns an immutable tuple: `()` for no match, several distinct identities for
 ambiguous display names. Select `language="en"` or `language="zh-CN"` to restrict
-lookup; omission searches both. Unknown IDs in getters/filters raise `KeyError`.
+lookup; omission searches both. Unknown well-formed IDs in getters/filters raise
+`KeyError`; malformed strings raise `ValueError`, non-string IDs `TypeError`.
 Entry filters combine all selected criteria; they never evaluate prerequisites.
 
 ## Follow a source to a definition
@@ -65,7 +66,7 @@ True
 ```
 
 The citation locates Book I, chapter XIV, printed pp. 34–35 (PDF pages 72–73)
-of Ashmand's translation through the paraphrase attributed to Proclus. The
+of Ashmand's English translation of the paraphrase attributed to Proclus. The
 {ref}`catalog example <catalog-en-entry-equinoctial-example>` preserves the complete
 English sentence and a separately credited project Chinese translation. The
 historical equal-day/night rationale is retained, not endorsed as an observed
@@ -90,9 +91,8 @@ API. The catalog does not consume it or promote the entry to applicable:
 'not_assessed'
 ```
 
-All built-in entries are reference-only. Even `eligible` would mean editorial
-output eligibility, not a satisfied chart. This package has no matcher or
-chart-evidence store; future matching must retain unknown and partial evidence.
+All built-in entries are reference-only. This package has no matcher or
+chart-evidence store.
 
 ## Translation revisions and search
 
@@ -115,9 +115,8 @@ Constructors and reference rendering can still represent those states explicitly
 Documentation search keeps English stemming and splits Han runs into overlapping
 adjacent-character pairs. Python indexing and emitted JavaScript queries use this
 same character-bigram algorithm, not dictionary segmentation, exact phrase search
-or semantic alias expansion. Acceptance cases include `太阳`, `日轮`, `牡羊座`,
-`平均北交点` and `普拉西度制`. Single-character queries only find indexed singleton
-blocks; explicit aliases `日` and `月` have those blocks. Arbitrary single-character
+or semantic alias expansion. Single-character queries only find single-character
+index entries, such as the explicit aliases `日` and `月`. Arbitrary single-character
 substring matching is not supported. Use `Catalog.lookup()` for exact identity lookup.
 
 ## Add a sourced variant
@@ -128,6 +127,7 @@ substring matching is not supported. Use `Catalog.lookup()` for exact identity l
 2. Add stable records to `src/astrology/knowledge/catalog.json`. Reference an
    owning enum class/member instead of copying its value or inventing an algorithm.
    The loader derives `rule.<concept-id>` request variants from those same links.
+   Lunar-node definition links are derived from `LunarNode.definition`.
    Source-only variants have no config reference; entries link variant IDs and citations.
 3. Keep excerpts, translations and authored statements distinct. `text_defaults`
    supplies initial revision 1 and project translation credit; each text can
@@ -145,7 +145,7 @@ substring matching is not supported. Use `Catalog.lookup()` for exact identity l
 
 Use stable, language-independent identifiers for concepts, rule variants, sources,
 and knowledge entries. These are record roles, not a requirement for one class or
-file per role. Define the first schema against a small real corpus.
+file per role.
 
 | Record | Holds |
 |---|---|
@@ -174,10 +174,11 @@ these questions in `knowledge.py` and `context_matching.py`:
 3. Is the entry eligible for the default output?
 4. Does a particular chart satisfy the represented prerequisites?
 
-Astrology should retain this separation rather than copying bazi's exact enum
-values or default-output rule. Source verification alone does not establish
-applicability. Finding a related statement does not establish that it applies to
-a chart.
+This catalog uses `verified` / `unverified` for source inspection,
+`complete` / `unresolved` for prerequisite representation, and
+`eligible` / `reference_only` for editorial output eligibility. `eligible` does
+not mean that a chart satisfies the prerequisites. Retrieval leaves chart
+applicability `not_assessed`, regardless of the other fields.
 
 An eventual matcher must distinguish satisfied, not satisfied, and unknown.
 Matching part of a condition must remain partial evidence. For example, a
@@ -203,36 +204,7 @@ Language labels must not change calculation. Distinct definitions must not be
 collapsed merely because a translation gives them the same display name. Search
 should support both languages and aliases while returning stable identities.
 
-## First useful slice
-
-The catalog starts with concepts and definitions requested by the natal chart: its bodies,
-zodiac signs, house systems, node definitions, and major aspects. Add enough
-verified sources to explain those definitions; leave unsupported interpretations
-out of the default corpus.
-
-The catalog supports listing concepts and variants, finding names/aliases,
-filtering entries and sources, and inspecting citations without calculating a
-chart. Ship a small worked example with source text, a labeled translation, a
-rule reference, and a conditional or unresolved entry that is not automatically
-presented as applicable.
-
-The schema may later grow to hold interpretations and premise matching. A graph
-database or general rule engine requires an actual query need, not just a large
-list of possible future techniques.
-
-## Documentation checks
-
-Generate API and catalog reference pages from their owning definitions. Handwrite
-guides that answer reader tasks: calculate a chart, compare configurations, browse
-knowledge, inspect sources, and add a sourced variant.
-
-The first documentation implementation must check counterpart-page coverage,
-stable entry links, required translation coverage, unknown references, duplicate
-identifiers, and executable examples in both languages. Inspect generated HTML as
-well as build success: missing members or descriptions can still produce a green
-build. A semantic review checks that translations preserve conditions and limits;
-an identifier comparison cannot prove that.
-
-Published documentation must identify its code/corpus version and distinguish
-development pages from released pages. Deployment is a later explicit action;
-the current Markdown documents remain the readable entry points.
+The generated [catalog](catalog.md) identifies its code and corpus versions and
+is labeled as development documentation. See [contributing](contributing.md) for
+the checks and required semantic review. A graph database or general rule engine
+requires an actual query need; it is not a prerequisite for browsing this corpus.

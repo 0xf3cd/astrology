@@ -5,6 +5,7 @@ import subprocess
 import sys
 from dataclasses import FrozenInstanceError, replace
 from importlib.resources import files
+from pathlib import Path
 from typing import Any
 
 import pytest
@@ -63,6 +64,18 @@ def test_query_contracts(catalog: Catalog) -> None:
   assert len(catalog.filter_entries(concept_id="sign.aries")) == 2
   assert len(catalog.filter_entries(source_id="source.ptolemy.ashmand1822")) == 2
   assert catalog.filter_entries(output_eligibility=OutputEligibility.ELIGIBLE) == ()
+  assert catalog.filter_entries(output_eligibility=OutputEligibility.REFERENCE_ONLY) == tuple(
+    catalog.entries
+  )
+  assert {
+    entry.identifier
+    for entry in catalog.filter_entries(prerequisite_status=PrerequisiteStatus.COMPLETE)
+  } == {
+    "entry.body_requests",
+    "entry.house_requests",
+    "entry.node_directions",
+    "entry.sign_vocabulary",
+  }
   assert all(
     entry.prerequisite_status is PrerequisiteStatus.UNRESOLVED
     for entry in catalog.filter_entries(prerequisite_status=PrerequisiteStatus.UNRESOLVED)
@@ -261,6 +274,8 @@ def test_translation_status(
     {"zh_revision": 1},
     {"translation_credit": "translator"},
     {"zh": "text", "zh_revision": 2, "translation_credit": "translator"},
+    {"zh": "text", "zh_revision": 0, "translation_credit": "translator"},
+    {"zh": "text", "zh_revision": True, "translation_credit": "translator"},
     {"zh": "text", "zh_revision": 1, "translation_credit": ""},
     {"zh": "", "zh_revision": 1, "translation_credit": "translator"},
   ],
@@ -318,6 +333,10 @@ def test_invalid_and_unknown_queries(catalog: Catalog) -> None:
   ):
     with pytest.raises(KeyError):
       getter("absent.id")
+    with pytest.raises(ValueError):
+      getter("Body.Sun")
+    with pytest.raises(TypeError):
+      getter(3)  # type: ignore[arg-type]
   with pytest.raises(KeyError):
     catalog.list_variants(concept_id="absent.id")
   with pytest.raises(KeyError):
@@ -376,3 +395,64 @@ def test_resource_is_real_json() -> None:
 
 def test_record_classes_are_public() -> None:
   assert all(cls.__doc__ for cls in (Citation, Concept, RuleVariant, Source, Entry, Catalog))
+
+
+@pytest.mark.parametrize("reverse", [False, True])
+@pytest.mark.parametrize("collision", ["alias", "name", "translated_name"])
+def test_cross_language_alias_conflicts(catalog: Catalog, reverse: bool, collision: str) -> None:
+  first, second = catalog.concepts[:2]
+  if collision == "alias":
+    first = replace(first, en_aliases=("shared",))
+    second = replace(second, zh_aliases=("SHARED",))
+  elif collision == "name":
+    second = replace(second, zh_aliases=(first.name.en,))
+  else:
+    second = replace(second, en_aliases=(first.name.zh or "",))
+  values = (second, first) if reverse else (first, second)
+  with pytest.raises(ValueError, match="Conflicting alias"):
+    Catalog("test", values, (), (), ())
+
+
+@pytest.mark.parametrize("name,error", [("", ValueError), ("  ", ValueError), (3, TypeError)])
+def test_invalid_lookup_names(catalog: Catalog, name: Any, error: type[Exception]) -> None:
+  with pytest.raises(error):
+    catalog.lookup(name)
+
+
+def test_required_sequences_and_record_types(catalog: Catalog) -> None:
+  with pytest.raises(ValueError, match="identify its concepts"):
+    replace(catalog.variants[0], concept_ids=())
+  for field in ("concept_ids", "citations"):
+    changes: dict[str, Any] = {field: ()}
+    with pytest.raises(ValueError, match="identify concepts and cite"):
+      replace(catalog.entries[0], **changes)
+  with pytest.raises(TypeError, match="excerpt"):
+    Citation("test.source", "locator", 1)  # type: ignore[arg-type]
+  for record in (catalog.concepts[0], catalog.variants[0]):
+    with pytest.raises(TypeError, match="owning config enum"):
+      replace(record, configuration=5)  # type: ignore[arg-type]
+  with pytest.raises(TypeError, match="iterator"):
+    replace(catalog, concepts=iter(catalog.concepts))  # type: ignore[arg-type]
+
+
+@pytest.mark.parametrize(
+  "reference,error",
+  [
+    ({"enum": "Absent", "member": "SUN"}, ValueError),
+    ({"enum": "Body", "member": "SIRIUS"}, KeyError),
+    ({"enum": "Body"}, KeyError),
+  ],
+)
+def test_invalid_packaged_config_reference(
+  tmp_path: Path, monkeypatch: pytest.MonkeyPatch, reference: dict[str, str], error: type[Exception]
+) -> None:
+  from astrology.knowledge import catalog as module
+
+  data = json.loads(
+    files("astrology.knowledge").joinpath("catalog.json").read_text(encoding="utf-8")
+  )
+  data["concepts"][0]["configuration"] = reference
+  (tmp_path / "catalog.json").write_text(json.dumps(data), encoding="utf-8")
+  monkeypatch.setattr(module, "files", lambda package: tmp_path)
+  with pytest.raises(error):
+    load_catalog()

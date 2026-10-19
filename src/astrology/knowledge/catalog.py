@@ -8,10 +8,11 @@ from __future__ import annotations
 import json
 import unicodedata
 from collections.abc import Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from importlib.resources import files
 from typing import Any
 
+from astrology.config import LunarNode, NodeDefinition
 from astrology.knowledge.records import (
   CONFIGURATION_TYPES,
   Citation,
@@ -46,10 +47,12 @@ class Catalog:
   config links and aliases shared by different concepts (TypeError/ValueError).
   Equal display names are allowed and lookup returns every matching identity.
   Records can retain missing/stale translations without treating them as current.
+  Malformed string IDs raise ValueError; non-string IDs raise TypeError.
 
   经核验的不可变记录；构造不做 I/O 或排盘。复制全部记录序列；重复标识、悬空链接、
   不一致的配置链接及不同概念共享别名均抛出 TypeError 或 ValueError。
   允许显示名称相同，查询返回所有命中的身份；缺译及旧译可保留，但不算当前译文。
+  格式不合法的字符串标识抛出 ValueError，非字符串标识抛出 TypeError。
   """
 
   version: str
@@ -97,21 +100,20 @@ class Catalog:
           raise ValueError(
             "This corpus schema supports English originals with Chinese translations"
           )
-    for language in ("en", "zh-CN"):
-      names: dict[str, set[str]] = {}
-      aliases: dict[str, str] = {}
-      for concept in self.concepts:
+    names: dict[str, set[str]] = {}
+    aliases: dict[str, str] = {}
+    for concept in self.concepts:
+      for language in ("en", "zh-CN"):
         if (display := concept.name.text(language)) is not None:
           names.setdefault(_name_key(display), set()).add(concept.identifier)
-      for concept in self.concepts:
-        values = concept.en_aliases if language == "en" else concept.zh_aliases
-        for alias in values:
-          key = _name_key(alias)
-          if (key in aliases and aliases[key] != concept.identifier) or (
-            names.get(key, set()) - {concept.identifier}
-          ):
-            raise ValueError(f"Conflicting {language} alias: {alias}")
-          aliases[key] = concept.identifier
+    for concept in self.concepts:
+      for alias in (*concept.en_aliases, *concept.zh_aliases):
+        key = _name_key(alias)
+        if (key in aliases and aliases[key] != concept.identifier) or (
+          names.get(key, set()) - {concept.identifier}
+        ):
+          raise ValueError(f"Conflicting alias: {alias}")
+        aliases[key] = concept.identifier
 
   def concept(self, identifier: str) -> Concept:
     """Get a concept by exact ID; unknown IDs raise KeyError. 按精确标识取概念，未知标识抛出 KeyError。"""
@@ -291,6 +293,17 @@ def load_catalog() -> Catalog:
       configuration=_config_reference(row.get("configuration")),
     )
     for row in data["concepts"]
+  )
+  definition_ids = {
+    concept.configuration: concept.identifier
+    for concept in concepts
+    if isinstance(concept.configuration, NodeDefinition)
+  }
+  concepts = tuple(
+    replace(concept, related=(definition_ids[concept.configuration.definition], *concept.related))
+    if isinstance(concept.configuration, LunarNode)
+    else concept
+    for concept in concepts
   )
   variants = tuple(
     RuleVariant(

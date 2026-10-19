@@ -1,6 +1,5 @@
 """Verify the installed package in isolation. 隔离验证已安装的包。"""
 
-import json
 import sys
 from datetime import UTC, date, datetime, time, timedelta
 from importlib import import_module
@@ -21,15 +20,14 @@ def _check_native_isolation() -> None:
     raise ValueError("Import initialized the astronomy adapter")
 
 
-def _check_knowledge() -> None:
+def _check_knowledge(expected_corpus_version: str | None = None) -> None:
   before = set(sys.modules)
   resource = files("astrology.knowledge").joinpath("catalog.json")
   if not Path(str(resource)).resolve().is_relative_to(Path(sys.prefix).resolve()):
     raise ValueError("Knowledge resource is outside the consumer environment")
-  data = json.loads(resource.read_text(encoding="utf-8"))
   catalog = astrology.load_catalog()
-  if not catalog.version or catalog.version != data["version"]:
-    raise ValueError("Installed corpus version differs from its resource")
+  if expected_corpus_version is not None and catalog.version != expected_corpus_version:
+    raise ValueError("Installed corpus version differs from the source corpus")
   if (
     catalog.lookup("Sol") != catalog.lookup("日轮")
     or catalog.lookup("日轮")[0].identifier != "body.sun"
@@ -148,7 +146,9 @@ def _check_birth_and_configuration() -> None:
     raise ValueError("Installed configuration substituted the requested house system")
 
 
-def main(expected_version: str, *, knowledge_only: bool = False) -> None:
+def main(
+  expected_version: str, *, expected_corpus_version: str | None = None, knowledge_only: bool = False
+) -> None:
   """Check installed identity, public API, provenance and native isolation.
 
   检查安装包身份、公开 API、来源元数据及原生库隔离。
@@ -169,7 +169,7 @@ def main(expected_version: str, *, knowledge_only: bool = False) -> None:
   if not Path(str(astrology.__file__)).with_name("py.typed").is_file():
     raise ValueError("Installed package is missing py.typed")
   _check_native_isolation()
-  _check_knowledge()
+  _check_knowledge(expected_corpus_version)
   if knowledge_only:
     if any(name.startswith(("tzdata", "zoneinfo", "celestial", "ctypes")) for name in sys.modules):
       raise ValueError("Knowledge-only consumer loaded time or native machinery")
@@ -181,4 +181,8 @@ def main(expected_version: str, *, knowledge_only: bool = False) -> None:
 
 
 if __name__ == "__main__":
-  main(sys.argv[1], knowledge_only="--knowledge-only" in sys.argv[2:])
+  main(
+    sys.argv[1],
+    expected_corpus_version=sys.argv[2],
+    knowledge_only="--knowledge-only" in sys.argv[3:],
+  )

@@ -23,15 +23,17 @@ def test_all_localized_fields_and_configuration_coverage() -> None:
 
 
 @pytest.mark.parametrize("stale", [False, True])
-def test_translation_gap_is_visible_and_not_complete(stale: bool) -> None:
+@pytest.mark.parametrize("language", ["en", "zh-CN"])
+def test_translation_gap_is_visible_and_not_complete(stale: bool, language: Language) -> None:
   catalog = load_catalog()
   name = replace(catalog.concepts[0].name, revision=2) if stale else LocalizedText("Sun")
   concept = replace(catalog.concepts[0], name=name)
   changed = replace(catalog, concepts=(concept, *catalog.concepts[1:]))
   with pytest.raises(ValueError, match="Required translation"):
     check_catalog_data(changed)
-  rendered = render_catalog(changed, "zh-CN", "0.0.0")
-  assert ("[stale]" if stale else "[missing]") in rendered
+  rendered = render_catalog(changed, language, "0.0.0")
+  names = next(line for line in rendered.splitlines() if line.startswith("Chinese names"))
+  assert ("[stale] 太阳" if stale else "[missing]") in names
 
 
 def test_anchor_normalization_collision_is_rejected() -> None:
@@ -55,6 +57,7 @@ def test_generation_covers_every_record(language: Language) -> None:
   assert "chart=not_assessed" in rendered
   assert "Original excerpt (English)" in rendered
   assert "project Chinese translation of Ashmand's English" in rendered
+  assert "No prerequisites recorded / 未记录前提" in rendered
 
 
 def _strings(value: object, language: Language) -> list[str]:
@@ -98,7 +101,9 @@ def catalog_html(tmp_path: Path) -> Path:
             )
           )
         source_link = (
-          f'<a href="{html.escape(record.url)}">Source</a>' if isinstance(record, Source) else ""
+          f'<a href="{html.escape(record.url)}"><code>{html.escape(record.url)}</code></a>'
+          if isinstance(record, Source)
+          else ""
         )
         blocks.append(
           f'<section id="{catalog_anchor(record.identifier, language)}">'
@@ -133,6 +138,7 @@ def test_complete_catalog_html(catalog_html: Path) -> None:
     "language",
     "navigation",
     "link",
+    "source_label",
   ],
 )
 def test_catalog_artifact_defects(catalog_html: Path, language: Language, defect: str) -> None:
@@ -148,6 +154,10 @@ def test_catalog_artifact_defects(catalog_html: Path, language: Language, defect
     "language": (f'lang="{language}"', 'lang="fr"'),
     "navigation": ("/catalog.html", "/other.html"),
     "link": ("</html>", '<a href="#catalog-lost">lost</a></html>'),
+    "source_label": (
+      "<code>https://commons.wikimedia.org/w/index.php?title=File:Ptolemy%27s",
+      "<code>https://commons.wikimedia.org/w/index.php?title=File:Ptolemy's",
+    ),
   }
   old, new = replacements[defect]
   # Chinese fixtures retain English originals too; removing the selected description must target Chinese.
@@ -223,3 +233,38 @@ def test_search_artifact_defects(search_html: Path, defect: str) -> None:
     page.write_text("Search.setIndex(" + json.dumps(index) + ")", encoding="utf-8")
   with pytest.raises(ValueError):
     check_search_html(search_html)
+
+
+@pytest.mark.parametrize("index", [-1, 2, True, "0", None])
+def test_invalid_search_document_index(search_html: Path, index: object) -> None:
+  page = search_html / "searchindex.js"
+  data = read_search_index(page)
+  data["terms"] = {"太阳": [index]}
+  page.write_text("Search.setIndex(" + json.dumps(data) + ")", encoding="utf-8")
+  with pytest.raises(ValueError, match="Invalid generated search document index"):
+    check_search_html(search_html)
+
+
+@pytest.mark.parametrize("artifact", ["catalog", "search"])
+def test_missing_knowledge_artifact(catalog_html: Path, search_html: Path, artifact: str) -> None:
+  if artifact == "catalog":
+    (catalog_html / "docs/en/catalog.html").unlink()
+    with pytest.raises(FileNotFoundError):
+      check_catalog_html(catalog_html)
+  else:
+    (search_html / "searchindex.js").unlink()
+    with pytest.raises(FileNotFoundError):
+      check_search_html(search_html)
+
+
+def test_node_definition_relation_comes_from_configuration() -> None:
+  from astrology.config import LunarNode
+
+  catalog = load_catalog()
+  node = catalog.concept("node.mean_ascending")
+  assert node.configuration is LunarNode.MEAN_ASCENDING
+  assert catalog.concept(node.related[0]).configuration is node.configuration.definition
+  changed = replace(node, related=("node_definition.meeus_five_term_true",))
+  values = tuple(changed if c.identifier == node.identifier else c for c in catalog.concepts)
+  with pytest.raises(ValueError, match="owning node-definition relation"):
+    check_catalog_data(replace(catalog, concepts=values))

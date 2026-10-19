@@ -8,6 +8,7 @@ from __future__ import annotations
 from collections.abc import Iterator
 from dataclasses import fields, is_dataclass
 
+from astrology.config import LunarNode, NodeDefinition
 from astrology.knowledge import Catalog, LocalizedText, TranslationStatus
 from astrology.knowledge.records import CONFIGURATION_TYPES, ConfigurationIdentity, Language
 
@@ -37,6 +38,16 @@ def check_catalog_data(catalog: Catalog) -> None:
   ]
   if set(actual) != expected or len(actual) != len(expected):
     raise ValueError("Catalog must cover each actual configuration identity exactly once")
+  definition_ids = {
+    concept.configuration: concept.identifier
+    for concept in catalog.concepts
+    if isinstance(concept.configuration, NodeDefinition)
+  }
+  for concept in catalog.concepts:
+    if isinstance(concept.configuration, LunarNode) and (
+      definition_ids[concept.configuration.definition] not in concept.related
+    ):
+      raise ValueError(f"Missing owning node-definition relation: {concept.identifier}")
   for path, text in localized_texts(catalog):
     for language in ("en", "zh-CN"):
       if text.status(language) is not TranslationStatus.CURRENT:
@@ -68,9 +79,9 @@ def render_catalog(catalog: Catalog, language: Language, code_version: str) -> s
   if len(anchors) != len(set(anchors)):
     raise ValueError("Catalog IDs collide after HTML anchor normalization")
 
-  def text(value: LocalizedText) -> str:
-    state = value.status(language)
-    content = value.text(language)
+  def text(value: LocalizedText, selected: Language = language) -> str:
+    state = value.status(selected)
+    content = value.text(selected)
     if state is TranslationStatus.MISSING:
       return "[missing]"
     return f"[stale] {content}" if state is TranslationStatus.STALE else str(content)
@@ -96,10 +107,10 @@ def render_catalog(catalog: Catalog, language: Language, code_version: str) -> s
     lines.extend([f"`kind={concept.kind}`", "", text(concept.description), ""])
     lines.extend(
       [
-        "English names / 英文名称：" + ", ".join((concept.name.en, *concept.en_aliases)),
+        "English names / 英文名称：" + ", ".join((text(concept.name, "en"), *concept.en_aliases)),
         "",
         "Chinese names / 中文名称："
-        + "、".join(((concept.name.zh or "[missing]"), *concept.zh_aliases)),
+        + "、".join((text(concept.name, "zh-CN"), *concept.zh_aliases)),
         "",
       ]
     )
@@ -121,7 +132,7 @@ def render_catalog(catalog: Catalog, language: Language, code_version: str) -> s
         "",
         f"`source_verification={source.verification}`",
         "",
-        f"<{source.url}>",
+        f"[`{source.url}`]({source.url})",
         "",
         text(source.lineage),
         "",
@@ -148,6 +159,8 @@ def render_catalog(catalog: Catalog, language: Language, code_version: str) -> s
     )
     lines.extend(["Prerequisites / 前提：", ""])
     lines.extend(f"- {text(premise)}" for premise in entry.prerequisites)
+    if not entry.prerequisites:
+      lines.append("No prerequisites recorded / 未记录前提")
     lines.extend(
       [
         "",
@@ -167,8 +180,8 @@ def render_catalog(catalog: Catalog, language: Language, code_version: str) -> s
             "",
             f"> {excerpt.en}",
             "",
-            f"Chinese translation / 中文译文 (`{excerpt.status('zh-CN')}`, "
-            f"revision={excerpt.zh_revision}; {excerpt.translation_credit or '[missing]'}):",
+            f"Chinese translation / 中文译文: `{excerpt.status('zh-CN')}`, "
+            f"revision={excerpt.zh_revision}; {excerpt.translation_credit or '[missing]'}",
             "",
             f"> {excerpt.zh or '[missing]'}",
             "",

@@ -10,8 +10,8 @@ The development package provides immutable [birth records and modern time
 resolution](docs/en/birth.md), [requested chart configuration](docs/en/configuration.md),
 an independent [knowledge catalog](docs/en/knowledge.md), quality checks, and bilingual
 [API documentation](docs/en/reference.md). Chart calculation is not yet implemented.
-Astronomy is not imported or
-initialized by the package. See [Contributing](docs/en/contributing.md) to run the checks.
+Astronomy is not imported or initialized by the package.
+See [Contributing](docs/en/contributing.md) to run the checks.
 
 ## First release
 

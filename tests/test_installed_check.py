@@ -248,6 +248,37 @@ def test_missing_installed_corpus_rejected(consumer: Path) -> None:
     installed_check._check_knowledge()
 
 
+def test_self_consistent_changed_corpus_version_rejected(consumer: Path) -> None:
+  path = consumer / "knowledge/catalog.json"
+  data = json.loads(path.read_text(encoding="utf-8"))
+  expected = data["version"]
+  installed_check._check_knowledge(expected)
+  data["version"] = "different-but-self-consistent"
+  path.write_text(json.dumps(data), encoding="utf-8")
+  with pytest.raises(ValueError, match="differs from the source corpus"):
+    installed_check._check_knowledge(expected)
+
+
+def test_knowledge_only_does_not_run_birth_consumer(
+  consumer: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+  def forbidden() -> None:
+    pytest.fail("Knowledge-only consumer reached birth calculations")
+
+  monkeypatch.setattr(installed_check, "_check_birth_and_configuration", forbidden)
+  monkeypatch.setattr(installed_check, "_check_knowledge", lambda expected: None)
+  monkeypatch.setattr(
+    sys,
+    "modules",
+    {
+      name: module
+      for name, module in sys.modules.items()
+      if not name.startswith(("tzdata", "zoneinfo", "celestial", "ctypes"))
+    },
+  )
+  installed_check.main(version("astrology"), knowledge_only=True)
+
+
 @pytest.mark.parametrize(
   "defect",
   [

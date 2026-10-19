@@ -11,6 +11,7 @@ from zipfile import ZipFile
 
 import pytest
 
+from astrology.knowledge import load_catalog
 from tools import check as checker
 from tools.check import (
   PACKAGE_FILES,
@@ -248,6 +249,7 @@ def test_distribution_keeps_dependency_install_and_both_consumer_modes(
   assert len(consumers) == 4
   assert all(command[0] == str(python) for command in consumers)
   assert all("-I" in command and "0.0.0" in command for command in consumers)
+  assert all(load_catalog().version in command for command in consumers)
   assert ["-O" in command for command in consumers] == [False, False, True, True]
   assert ["--knowledge-only" in command for command in consumers] == [True, False, True, False]
 

@@ -87,6 +87,15 @@ def check_search_html(directory: Path) -> None:
     or not isinstance(titleterms, dict)
   ):
     raise ValueError("Invalid generated search document/term tables")
+  if any(type(name) is not str for name in docnames):
+    raise ValueError("Invalid generated search document names")
+  for table in (terms, titleterms):
+    for value in table.values():
+      indices = [value] if type(value) is int else value
+      if not isinstance(indices, list) or any(
+        type(index) is not int or not 0 <= index < len(docnames) for index in indices
+      ):
+        raise ValueError("Invalid generated search document index")
   language = BilingualSearch({})
   script = (directory / "_static/language_data.js").read_text(encoding="utf-8")
   if JS_SPLITTER not in script:

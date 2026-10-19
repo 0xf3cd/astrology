@@ -116,6 +116,9 @@ Update both language pages when behavior changes. Public docstring summaries and
 contracts are bilingual; identifiers, signatures, units, and defaults have one
 source. Execute examples and inspect the generated pages. Automated coverage can
 detect a missing translation file, but cannot establish semantic equivalence.
+The catalog checks also reject stale text revisions, missing record descriptions,
+unknown references and duplicate IDs. Both language views have executable examples;
+source and translation review checks that conditions and limits retain their meaning.
 
 ## Review evidence
 

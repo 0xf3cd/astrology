@@ -211,9 +211,15 @@ class _CatalogHtml(_ApiHtml):
     self.records: dict[str, list[str]] = {}
     self.text: list[str] = []
     self._sections: list[list[str] | None] = []
+    self.link_labels: dict[str, list[str]] = {}
+    self._link: str | None = None
+    self._label: list[str] = []
 
   def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
     super().handle_starttag(tag, attrs)
+    if tag == "a":
+      self._link = dict(attrs).get("href")
+      self._label = []
     if tag == "section":
       self._sections.append(None)
     identifier = dict(attrs).get("id")
@@ -224,11 +230,16 @@ class _CatalogHtml(_ApiHtml):
 
   def handle_endtag(self, tag: str) -> None:
     super().handle_endtag(tag)
+    if tag == "a" and self._link is not None:
+      self.link_labels.setdefault(self._link, []).append("".join(self._label))
+      self._link = None
     if tag == "section" and self._sections:
       self._sections.pop()
 
   def handle_data(self, data: str) -> None:
     super().handle_data(data)
+    if self._link is not None:
+      self._label.append(data)
     self.text.append(data)
     for section in self._sections:
       if section is not None:
@@ -292,6 +303,8 @@ def check_catalog_html(directory: Path) -> None:
           )
           if record.url not in parser.links:
             raise ValueError(f"Missing rendered source link: {record.identifier}")
+          if record.url not in parser.link_labels.get(record.url, ()):
+            raise ValueError(f"Changed rendered source URL label: {record.identifier}")
         elif isinstance(record, Entry):
           required.extend(
             (
@@ -334,6 +347,7 @@ def check_distribution(directory: Path) -> None:
   run(("uv", "venv", "--python", sys.executable, str(environment)))
   python = environment / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
   run(("uv", "pip", "install", "--python", str(python), str(wheels[0])))
+  corpus_version = load_catalog().version
   for mode in ((), ("-O",)):
     run(
       (
@@ -342,12 +356,20 @@ def check_distribution(directory: Path) -> None:
         "-I",
         str(ROOT / "tools/installed_check.py"),
         metadata["version"],
+        corpus_version,
         "--knowledge-only",
       ),
       cwd=directory,
     )
     run(
-      (str(python), *mode, "-I", str(ROOT / "tools/installed_check.py"), metadata["version"]),
+      (
+        str(python),
+        *mode,
+        "-I",
+        str(ROOT / "tools/installed_check.py"),
+        metadata["version"],
+        corpus_version,
+      ),
       cwd=directory,
     )
 

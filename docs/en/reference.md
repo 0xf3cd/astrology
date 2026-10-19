@@ -28,6 +28,9 @@ queries. No chart-calculation API is provided yet.
 
 ## Independent knowledge
 
+Field roles and text/status distinctions are explained in the
+[record guide](knowledge.md#records-and-ownership).
+
 ```{eval-rst}
 .. automodule:: astrology.knowledge
    :members:
