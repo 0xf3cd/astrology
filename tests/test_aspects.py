@@ -1,7 +1,9 @@
 """Aspect classification against hand-computed longitudes, rates and orbs."""
 
 import math
+import sys
 from dataclasses import FrozenInstanceError
+from fractions import Fraction
 from typing import Any, cast
 
 import pytest
@@ -171,6 +173,40 @@ def test_zero_orb_admits_only_the_exact_aspect() -> None:
   zero = [rule(MajorAspect.CONJUNCTION, 0.0)]
   assert len(find_aspects([obj(SUN, 5.0), obj(MARS, 5.0)], zero)) == 1
   assert not find_aspects([obj(SUN, 5.0), obj(MARS, 5.0 + 1e-9)], zero)
+
+
+def test_the_largest_finite_longitudes_are_reduced_before_they_are_subtracted() -> None:
+  biggest = sys.float_info.max
+  conjunction = [rule(MajorAspect.CONJUNCTION, 180.0)]
+  forward = only(find_aspects([obj(SUN, -biggest), obj(MARS, biggest)], conjunction))
+  backward = only(find_aspects([obj(MARS, biggest), obj(SUN, -biggest)], conjunction))
+  # The exact separation, from rational arithmetic: 2 * biggest modulo 360 in (-180, 180].
+  exact = (2 * Fraction(biggest)) % 360
+  exact = exact - 360 if exact > 180 else exact
+  assert forward.deviation_deg == float(exact)
+  assert backward.deviation_deg == -float(exact) or abs(exact) == 180
+
+
+def test_the_largest_finite_orbs_give_a_finite_mean() -> None:
+  biggest = sys.float_info.max
+  wide = [
+    AspectRule(MajorAspect.CONJUNCTION, 3.0, [ObjectOrb(SUN, biggest), ObjectOrb(MARS, biggest)])
+  ]
+  hit = only(find_aspects([obj(SUN, 0.0), obj(MARS, 1.0)], wide, OrbCombination.MEAN_OF_ORBS))
+  assert hit.orb_limit_deg == biggest
+  tiny = 5e-324
+  small = [AspectRule(MajorAspect.CONJUNCTION, 1.0, [ObjectOrb(SUN, tiny), ObjectOrb(MARS, tiny)])]
+  hit = only(find_aspects([obj(SUN, 0.0), obj(MARS, 0.0)], small, OrbCombination.MEAN_OF_ORBS))
+  assert hit.orb_limit_deg == tiny
+
+
+def test_the_mean_of_two_orbs_is_the_same_in_either_order() -> None:
+  # Added as a + (b - a) / 2 the two orders differ in the last bit for these orbs.
+  entries = [ObjectOrb(SUN, 8.062), ObjectOrb(MARS, 50.846)]
+  mean = [AspectRule(MajorAspect.CONJUNCTION, 3.0, entries)]
+  forward = only(find_aspects([obj(SUN, 0.0), obj(MARS, 1.0)], mean, OrbCombination.MEAN_OF_ORBS))
+  backward = only(find_aspects([obj(MARS, 1.0), obj(SUN, 0.0)], mean, OrbCombination.MEAN_OF_ORBS))
+  assert forward.orb_limit_deg == backward.orb_limit_deg
 
 
 def test_a_deviation_below_float_resolution_of_180_is_not_lost() -> None:

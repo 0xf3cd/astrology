@@ -36,8 +36,8 @@ the orb of 3 degrees, and a limit counts as inside.
 A conjunction and an opposition have one exact angle, 0 and 180 degrees. A sextile,
 square or trine has two, minus and plus the aspect angle, because the second object
 can be ahead of the first or behind it. Each hit records which one it was measured
-against as `branch_deg`, and `deviation_deg` is the separation minus that branch, in
-the range from -180 up to and including 180.
+against as `branch_deg`, and `deviation_deg` is the separation minus that branch,
+greater than -180 and up to and including 180.
 
 Swapping the pair keeps the aspect and flips the orientation: the deviation changes
 sign, and so does the branch where there are two. The status does not change. A
@@ -66,7 +66,7 @@ applying; with the same sign it is separating. This holds for retrograde motion 
 | `separating` | The deviation grows in size. |
 | `exact` | The deviation is exactly zero, whatever the rates. |
 | `stationary` | The relative rate is exactly zero and the deviation is not. |
-| `indeterminate` | A rate is missing, for example for an axis. |
+| `indeterminate` | The caller gave no rate for an object. |
 
 ```{doctest}
 >>> exact = AspectObject(Body.MARS, 70.0, 1.0)
@@ -91,12 +91,13 @@ An aspect rule gives one orb for every object. To give an object its own orb, ad
 
 | `OrbCombination` | A pair holds when its deviation is within |
 |---|---|
-| `EITHER_WITHIN_OWN_ORB` | the own orb of at least one object, the larger orb |
-| `BOTH_WITHIN_OWN_ORB` | the own orb of both objects, the smaller orb |
+| `EITHER_WITHIN_OWN_ORB` | at least one object's own orb, the larger orb |
+| `BOTH_WITHIN_OWN_ORB` | both objects' own orbs, the smaller orb |
 | `MEAN_OF_ORBS` | the mean of the two orbs |
 
-The combination is required when a rule has per-object orbs, and not allowed
-otherwise. Each hit reports the limit it used.
+The combination is required when a rule has per-object orbs. A chart request must
+leave it out otherwise; `find_aspects` accepts it then and it changes nothing. Each
+hit reports the limit it used.
 
 ```{doctest}
 >>> moon = AspectObject(Body.MOON, 7.0, 13.0)
@@ -178,12 +179,14 @@ the difference quotient agrees with each rate to about 1e-6 degrees per day.
 
 The reference tests also configure the library with the published Hellenistic orbs
 and compare its aspects with a list derived from the JPL Horizons longitudes of the
-two reference instants, using plain unoriented separations. Astrodienst publishes
+two reference instants, using plain unoriented separations. That style page gives
 the parameters, not the aspect list of a chart, so this does not compare against
 another program's output. The check requires that no pair lies within 0.4 degrees of
-an orb limit, and five departures from the convention change the result. The
-[contributing guide](contributing.md#correctness) records what the references can
-and cannot detect.
+an orb limit, and each of five departures from the convention changes the result at
+one instant or the other. Those instants hold conjunctions, squares and trines but no
+sextile or opposition, so the angles 60 and 180 degrees rest on the hand-computed
+cases, not on this comparison. The [contributing guide](contributing.md#correctness)
+records what the references can and cannot detect.
 
 ## Limits
 

@@ -573,7 +573,9 @@ ASPECT_ANGLES = {
 # 越过限度：15″ 只有 0.004°。
 LIMIT_MARGIN_DEGREES = 0.4
 
-AspectKey = tuple[Body | LunarNode, Body | LunarNode, MajorAspect]
+# An unordered pair and an aspect: the order of the objects in a request does not matter.
+# 无序的一对对象加一个相位：请求里对象的先后不影响结果。
+AspectKey = tuple[frozenset[Body | LunarNode], MajorAspect]
 
 
 def _hellenistic_rules(
@@ -589,27 +591,34 @@ def _hellenistic_hits(
   rules: list[AspectRule] | None = None,
   combination: OrbCombination | None = OrbCombination.EITHER_WITHIN_OWN_ORB,
   aspect_objects: tuple[Body | LunarNode, ...] | None = HELLENISTIC_PLANETS,
+  planets: tuple[Body, ...] = HELLENISTIC_PLANETS,
 ) -> set[AspectKey]:
-  """The library's aspects among the chosen objects, as pair-and-aspect keys.
+  """The library's aspects among the chosen objects, as unordered pair-and-aspect keys.
 
-  本库在所选对象之间求出的相位，记为「配对加相位」。
+  `planets` sets the order in which the objects are requested.
+
+  本库在所选对象之间求出的相位，记为不分先后的「配对加相位」；`planets` 决定请求对象的顺序。
   """
   chosen = _hellenistic_rules() if rules is None else rules
   config = ChartConfig(
     HouseSystem.WHOLE_SIGN,
-    (*HELLENISTIC_PLANETS, *HELLENISTIC_NODES),
+    (*planets, *HELLENISTIC_NODES),
     chosen,
     aspect_objects=None if aspect_objects is None else list(aspect_objects),
     orb_combination=combination if any(rule.object_orbs for rule in chosen) else None,
   )
   chart = natal_chart(_resolved_for(case), config)
-  return {(hit.first, hit.second, hit.aspect) for hit in chart.aspects}
+  return {(frozenset((hit.first, hit.second)), hit.aspect) for hit in chart.aspects}
 
 
-def _reference_hellenistic(case: _Case) -> tuple[set[AspectKey], float]:
+def _reference_hellenistic(
+  case: _Case, angles: dict[MajorAspect, float] = ASPECT_ANGLES
+) -> tuple[set[AspectKey], float]:
   """Expected hits from the Horizons longitudes, and the smallest distance to any limit.
 
-  由 Horizons 经度得出的期望命中，以及所有配对到限度的最小距离。
+  `angles` is the table of exact angles the expectation uses.
+
+  由 Horizons 经度得出的期望命中，以及所有配对到限度的最小距离；`angles` 是期望所用的精确角度表。
   """
   hits: set[AspectKey] = set()
   margin = 180.0
@@ -622,24 +631,43 @@ def _reference_hellenistic(case: _Case) -> tuple[set[AspectKey], float]:
     limit = (
       HELLENISTIC_MOON_ORB_DEGREES if Body.MOON in (first, second) else HELLENISTIC_ORB_DEGREES
     )
-    for aspect, angle in ASPECT_ANGLES.items():
+    for aspect, angle in angles.items():
       distance = abs(separation - angle)
       margin = min(margin, abs(distance - limit))
       if distance <= limit:
-        hits.add((first, second, aspect))
+        hits.add((frozenset((first, second)), aspect))
   return hits, margin
 
 
+# With the planets reversed the Moon is the second object of its pairs, so the orb a
+# pair takes from its second object is tested as well.
+# 把行星顺序反过来，月亮就是它所在各对里的第二个对象，一对对象从第二个对象取容许度的路径
+# 也就被测到了。
 @pytest.mark.parametrize("case", _cases(), ids=lambda case: case["identifier"])
-def test_aspects_agree_with_the_published_hellenistic_orbs(case: _Case) -> None:
+@pytest.mark.parametrize(
+  "planets", [HELLENISTIC_PLANETS, HELLENISTIC_PLANETS[::-1]], ids=["classical", "reversed"]
+)
+def test_aspects_agree_with_the_published_hellenistic_orbs(
+  case: _Case, planets: tuple[Body, ...]
+) -> None:
   expected, margin = _reference_hellenistic(case)
   assert margin > LIMIT_MARGIN_DEGREES
-  assert _hellenistic_hits(case) == expected
+  assert _hellenistic_hits(case, planets=planets) == expected
 
 
 def test_the_hellenistic_reference_has_hits_and_near_misses_to_tell_conventions_apart() -> None:
   counts = [len(_reference_hellenistic(case)[0]) for case in _cases()]
   assert counts == [3, 6]
+
+
+# The two instants hold no sextile and no opposition, so the angles 60 and 180 degrees are
+# not compared with the reference. The guides say so; add the instants and the words
+# together if the fixture ever gains one.
+# 两个时刻里没有六分相和对分相，所以 60 度与 180 度这两个角度没有与参考比较。指南里写明了这一点；
+# 夹具以后若增加了这样的时刻，文字要一起更新。
+def test_the_reference_instants_sample_conjunction_square_and_trine_only() -> None:
+  sampled = {aspect for case in _cases() for _, aspect in _reference_hellenistic(case)[0]}
+  assert sampled == {MajorAspect.CONJUNCTION, MajorAspect.SQUARE, MajorAspect.TRINE}
 
 
 def _hits_under(case: _Case, defect: str) -> set[AspectKey]:
@@ -669,6 +697,26 @@ def test_a_departure_from_the_published_convention_changes_the_hits(defect: str)
     case["identifier"]
     for case in _cases()
     if _hits_under(case, defect) != _reference_hellenistic(case)[0]
+  ]
+  assert differing
+
+
+# The reference tells a wrong angle apart for the aspects it samples: with the expectation's
+# angle moved, the library's hits no longer agree with it at one instant or the other.
+# 参考能分出被采样的相位上的错误角度：把期望所用的角度挪开，本库的命中在其中一个时刻就不再一致。
+@pytest.mark.parametrize(
+  "aspect,wrong",
+  [(MajorAspect.CONJUNCTION, 10.0), (MajorAspect.SQUARE, 80.0), (MajorAspect.TRINE, 100.0)],
+  ids=["conjunction", "square", "trine"],
+)
+def test_a_wrong_angle_changes_the_expected_hits_of_a_sampled_aspect(
+  aspect: MajorAspect, wrong: float
+) -> None:
+  moved = {**ASPECT_ANGLES, aspect: wrong}
+  differing = [
+    case["identifier"]
+    for case in _cases()
+    if _hellenistic_hits(case) != _reference_hellenistic(case, moved)[0]
   ]
   assert differing
 

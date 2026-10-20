@@ -148,11 +148,12 @@ need no astronomy. A one-hour difference quotient of the reported longitudes che
 that the rates behind the applying and separating status have the right sign and
 unit. The reference tests configure the orbs that Astrodienst publishes for its
 Hellenistic drawing style and compare the resulting aspect set with one derived from
-the Horizons longitudes. They detect a wrong orb, combination rule or angle where a
-pair lies near it, and a node that takes part. They cannot detect a longitude error
-smaller than the 0.4-degree margin, and they do not check the status against an
-external source: Horizons supplies no rates here, and Astrodienst publishes
-parameters, not the aspect list of a chart.
+the Horizons longitudes. Where a pair lies near an orb limit, they detect a wrong orb,
+combination rule or angle; they also detect a node that takes part. They cannot
+detect a longitude error smaller than the 0.4-degree margin, and the two instants
+hold no sextile or opposition, so those angles rest on the hand-computed cases. They
+do not check the status against an external source: Horizons supplies no rates here,
+and the style page gives parameters, not the aspect list of a chart.
 
 ## Knowledge and documentation
 

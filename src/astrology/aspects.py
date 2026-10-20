@@ -34,14 +34,15 @@ class AspectMotion(StrEnum):
   """Local motion of an aspect at the instant, from the sign of the deviation and its rate.
 
   The relative longitude rate is the second object's rate minus the first's. The
-  deviation shrinks in magnitude when they have opposite signs (applying) and grows
-  when they have the same sign (separating). Statuses compare exact floats, with no
+  deviation shrinks in magnitude when the relative rate and the deviation have
+  opposite signs (applying) and grows when they have the same sign (separating).
+  Statuses compare exact floats, with no
   hidden tolerance. `STATIONARY` means the relative rate is exactly zero, which is not
   a planet's own station. `INDETERMINATE` means a rate is missing.
 
   某一时刻相位的局部运动，由偏差的符号及其变化率得出。相对黄经速率是第二个对象的速率减去
-  第一个的速率。两者异号，偏差的绝对值在缩小（入相）；同号则在增大（离相）。各状态比较
-  的是确切的浮点数，没有隐含的容差。`STATIONARY` 指相对速率恰为零，不是某颗行星自己的留。
+  第一个的速率。相对速率与偏差异号时，偏差的绝对值在缩小（入相）；同号时在增大（离相）。
+  各状态比较的是确切的浮点数，没有隐含的容差。`STATIONARY` 指相对速率恰为零，不是某颗行星自己的留。
   `INDETERMINATE` 指缺少速率。
   """
 
@@ -56,10 +57,10 @@ class AspectMotion(StrEnum):
 class AspectObject:
   """One object's longitude in degrees and its rate in degrees per day, if it has one.
 
-  The rate may be None where no meaningful motion exists, such as an axis; it is never
-  borrowed from another object. All objects must use the same day, such as the TT day.
+  The rate may be None where no meaningful motion exists; it is never borrowed from
+  another object. All objects must use the same day, such as the TT day.
 
-  一个对象的黄经（度）及其速率（度每日，若有）。没有有意义的运动时速率可为 None，例如轴线；
+  一个对象的黄经（度）及其速率（度每日，若有）。没有有意义的运动时速率可为 None；
   绝不借用别的对象的速率。所有对象必须用同一种日，例如 TT 日。
   """
 
@@ -167,7 +168,8 @@ def _limit(
   if combination is OrbCombination.BOTH_WITHIN_OWN_ORB:
     return min(first_orb, second_orb)
   if combination is OrbCombination.MEAN_OF_ORBS:
-    return (first_orb + second_orb) / 2.0
+    low, high = sorted((first_orb, second_orb))
+    return low + (high - low) / 2.0
   return max(first_orb, second_orb)
 
 
@@ -199,7 +201,7 @@ def find_aspects(
   definitions and two directions.
 
   按固定顺序返回对象两两之间成立的所有相位。顺序是：配对按 `objects` 的顺序，再按相位角，
-  再按分支（负的在前），所以是全序。凡是成立的相位和分支都会返回：宽容许度可能让一对对象有
+  再按分支（负的在前），所以是全序。凡是成立的相位和分支都会返回：容许度较宽时，一对对象可能有
   多个命中，也不会为了取更近的而丢弃别的。偏差的绝对值不超过限度时成立，限度本身包含在内。
   限度是规则的容许度；规则带按对象的容许度时，是两个对象容许度的合成结果，此时必须给出
   `combination`。两个月交点之间不构成相位：四个标识只是同一对交点的两种定义和两个方向。
@@ -229,7 +231,7 @@ def find_aspects(
     for second in members[index + 1 :]:
       if isinstance(first.identity, LunarNode) and isinstance(second.identity, LunarNode):
         continue
-      separation = _signed(second.longitude_deg - first.longitude_deg)
+      separation = _signed(_signed(second.longitude_deg) - _signed(first.longitude_deg))
       for rule in by_angle:
         limit = _limit(rule, first.identity, second.identity, combination)
         for branch in _branches(_ANGLES[rule.aspect]):

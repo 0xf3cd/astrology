@@ -123,7 +123,7 @@ class EffectiveConfiguration:
   this calculation, not a caller request. `evaluation` names the joint
   evaluation that produced the positions: selecting a subset of the requested
   objects filters that output and does not narrow the evaluated domain.
-  `aspect_objects` is the set of objects aspects were judged among, in the order of
+  `aspect_objects` holds the objects aspects were judged among, in the order of
   the requested objects, and is empty when no aspect rules were requested.
   `orb_combination` repeats the requested rule, or None when no rule has
   per-object orbs.

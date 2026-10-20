@@ -560,6 +560,7 @@ def test_aspects_are_judged_from_the_positions_and_rates_of_the_same_calculation
   )
   assert chart.aspects == expected
   assert len(chart.aspects) > 10
+  assert chart.effective.orb_combination is None
   assert chart.effective.aspect_objects == _ALL_OBJECTS
   for hit in chart.aspects:
     relative = rates[hit.second] - rates[hit.first]
