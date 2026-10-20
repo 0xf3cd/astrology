@@ -13,6 +13,7 @@ station. Nothing here depends on astronomy or on the chart.
 
 from __future__ import annotations
 
+import sys
 from collections.abc import Sequence
 from dataclasses import dataclass
 from enum import StrEnum
@@ -20,6 +21,8 @@ from math import isfinite, remainder
 from typing import cast
 
 from astrology.config import AspectRule, Body, LunarNode, MajorAspect, OrbCombination
+
+_HALF_MAXIMUM = sys.float_info.max / 2.0
 
 _ANGLES: dict[MajorAspect, float] = {
   MajorAspect.CONJUNCTION: 0.0,
@@ -156,6 +159,23 @@ def _branches(angle: float) -> tuple[float, ...]:
   return (-angle, angle)
 
 
+def _mean(first: float, second: float) -> float:
+  """Return the correctly rounded mean of two finite nonnegative numbers, never infinite.
+
+  `(first + second) / 2` rounds once, even into the subnormal range, as long as the sum
+  does not overflow. When either number is above half the largest float the sum might
+  overflow, so both are halved first; a number that large has a rounding step so coarse
+  that halving a tiny partner cannot change the result.
+
+  返回两个有限非负数的平均值，正确舍入，且不会是无穷。只要和不溢出，`(first + second) / 2`
+  只舍入一次，次正规数范围内也是如此。任一数大于最大浮点数的一半时，和可能溢出，就先各自除以
+  2；这么大的数舍入步长很粗，另一个很小的数除以 2 不会改变结果。
+  """
+  if first > _HALF_MAXIMUM or second > _HALF_MAXIMUM:
+    return first / 2.0 + second / 2.0
+  return (first + second) / 2.0
+
+
 def _limit(
   rule: AspectRule,
   first: Body | LunarNode,
@@ -168,8 +188,7 @@ def _limit(
   if combination is OrbCombination.BOTH_WITHIN_OWN_ORB:
     return min(first_orb, second_orb)
   if combination is OrbCombination.MEAN_OF_ORBS:
-    low, high = sorted((first_orb, second_orb))
-    return low + (high - low) / 2.0
+    return _mean(first_orb, second_orb)
   return max(first_orb, second_orb)
 
 

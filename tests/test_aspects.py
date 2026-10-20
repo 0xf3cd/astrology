@@ -200,6 +200,28 @@ def test_the_largest_finite_orbs_give_a_finite_mean() -> None:
   assert hit.orb_limit_deg == tiny
 
 
+@pytest.mark.parametrize(
+  "pair",
+  [
+    (5e-324, sys.float_info.min),
+    (0.0, 5e-324),
+    (1e-320, 3e-320),
+    (sys.float_info.min, sys.float_info.max),
+    (sys.float_info.max / 2, sys.float_info.max),
+    (sys.float_info.max, sys.float_info.max),
+    (8.062, 50.846),
+  ],
+)
+def test_the_mean_of_two_orbs_is_correctly_rounded_even_at_the_ends_of_the_range(
+  pair: tuple[float, float],
+) -> None:
+  first, second = pair
+  entries = [ObjectOrb(SUN, first), ObjectOrb(MARS, second)]
+  mean = [AspectRule(MajorAspect.CONJUNCTION, 3.0, entries)]
+  hit = only(find_aspects([obj(SUN, 0.0), obj(MARS, 0.0)], mean, OrbCombination.MEAN_OF_ORBS))
+  assert hit.orb_limit_deg == float((Fraction(first) + Fraction(second)) / 2)
+
+
 def test_the_mean_of_two_orbs_is_the_same_in_either_order() -> None:
   # Added as a + (b - a) / 2 the two orders differ in the last bit for these orbs.
   entries = [ObjectOrb(SUN, 8.062), ObjectOrb(MARS, 50.846)]
