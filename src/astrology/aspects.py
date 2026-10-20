@@ -123,6 +123,22 @@ def _signed(angle: float) -> float:
   return 180.0 if value == -180.0 else value
 
 
+def _deviation(separation: float, branch: float) -> float:
+  """Separation minus branch in (-180, 180], so that swapping a pair negates it exactly.
+
+  For the branch 180, `remainder` of a sum near -360 rounds to zero while the mirrored
+  pair stays a few ulps away, which would make the two orders disagree on the status.
+  Adding or subtracting 180 by the sign of the separation keeps both exact near zero.
+
+  间距减去分支，取值在 (-180, 180]，使交换配对后正好变号。分支为 180 时，接近 -360 的和经
+  `remainder` 可能舍入成零，而镜像那一对仍差几个 ulp，两种顺序对状态的判断就会不一致。
+  按间距的正负加或减 180，两边在接近零处都是精确的。
+  """
+  if branch == 180.0:
+    return separation - 180.0 if separation > 0.0 else separation + 180.0
+  return _signed(separation - branch)
+
+
 def aspect_angle(aspect: MajorAspect) -> float:
   """Return the exact angle of an aspect in degrees: 0, 60, 90, 120 or 180.
 
@@ -217,7 +233,7 @@ def find_aspects(
       for rule in by_angle:
         limit = _limit(rule, first.identity, second.identity, combination)
         for branch in _branches(_ANGLES[rule.aspect]):
-          deviation = _signed(separation - branch)
+          deviation = _deviation(separation, branch)
           if abs(deviation) <= limit:
             hits.append(
               AspectHit(

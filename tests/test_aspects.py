@@ -245,6 +245,24 @@ def test_swapping_the_pair_keeps_the_aspect_and_flips_orientation(
   assert forward.orb_limit_deg == backward.orb_limit_deg
 
 
+@pytest.mark.parametrize("ulps", [1, 2, 3, 10, 1000])
+@pytest.mark.parametrize("side", [1.0, -1.0])
+def test_swapping_an_opposition_a_few_ulps_from_exact_keeps_the_status(
+  ulps: int, side: float
+) -> None:
+  gap = 180.0
+  for _ in range(ulps):
+    gap = math.nextafter(gap, 0.0)
+  rules = [rule(MajorAspect.OPPOSITION, 1.0)]
+  forward = only(find_aspects([obj(SUN, 0.0, 1.0), obj(MARS, side * gap, 2.0)], rules))
+  backward = only(find_aspects([obj(MARS, side * gap, 2.0), obj(SUN, 0.0, 1.0)], rules))
+  expected = AspectMotion.APPLYING if side > 0 else AspectMotion.SEPARATING
+  assert forward.deviation_deg != 0.0
+  assert backward.deviation_deg == -forward.deviation_deg
+  assert forward.motion is expected
+  assert backward.motion is expected
+
+
 def test_two_lunar_nodes_never_form_an_aspect() -> None:
   nodes = [
     obj(LunarNode.MEAN_ASCENDING, 10.0, -0.05),
