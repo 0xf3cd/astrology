@@ -162,6 +162,10 @@ Swiss itself does not supply an aspect table. Mean-node longitude/rate are compa
 as named models, not assumed identical formulas. Node distance and true nodes are
 not equivalent comparisons; zero node latitude is a definition-level check.
 
+If a reference point is within the combined longitude/cusp tolerances of a cusp,
+the comparison accepts either adjoining house. It does not claim an exact
+independent house label for that point.
+
 The [Swiss documentation](https://www.astro.com/swisseph/swisseph.htm) describes
 Moshier's precision class. The recorded thresholds include both implementations'
 model differences and finite calibration; they are not global accuracy guarantees.

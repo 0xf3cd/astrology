@@ -459,10 +459,6 @@ def _unique_object(pairs: list[tuple[str, object]]) -> dict[str, object]:
   return result
 
 
-def _reject_constant(value: str) -> object:
-  raise ValueError(f"Nonfinite JSON constant: {value}")
-
-
 def loads_chart(data: str) -> NatalChart:
   """Restore schema v1 without astronomy, timezone lookup or replacing stored values.
 
@@ -480,12 +476,7 @@ def loads_chart(data: str) -> NatalChart:
   if type(data) is not str:
     raise TypeError("data must be a plain string")
   try:
-    value: object = json.loads(
-      data,
-      object_pairs_hook=_unique_object,
-      parse_constant=_reject_constant,
-      parse_float=lambda text: finite_number(float(text), "JSON number"),
-    )
+    value: object = json.loads(data, object_pairs_hook=_unique_object)
     return _read_chart(value)
   except (TypeError, ValueError, OverflowError, RecursionError) as exc:
     raise ChartRecordError(f"Invalid chart record: {exc}") from exc

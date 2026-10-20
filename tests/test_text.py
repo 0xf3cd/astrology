@@ -2,19 +2,25 @@
 
 import math
 from dataclasses import replace
+from pathlib import Path
+from typing import get_args
 
 import pytest
 
 from astrology import (
+  AspectMotion,
   AspectObject,
   AspectRule,
   Body,
   ChartConfig,
   ChartHouses,
   EclipticPosition,
+  FixedOffset,
   HouseSystem,
   MajorAspect,
   NatalChart,
+  ObjectOrb,
+  OrbCombination,
   Placement,
   dumps_chart,
   find_aspects,
@@ -26,8 +32,38 @@ from astrology import (
   sign_of,
 )
 from astrology.knowledge import Catalog
+from astrology.knowledge.records import Language
 
 _CUSPS = tuple(float(index * 30) for index in range(12))
+
+
+def test_presentation_tables_cover_supported_languages_and_motion() -> None:
+  from astrology import text
+
+  assert set(text._HEADINGS) == set(text._MOTIONS) == set(text._AXES) == set(get_args(Language))
+  for motions in text._MOTIONS.values():
+    assert set(motions) == set(AspectMotion)
+
+
+@pytest.mark.parametrize(
+  "language,expected",
+  [("en", "Timezone data / fold: None / None / None"), ("zh-CN", "时区数据 / fold: 无 / 无 / 无")],
+)
+def test_missing_timezone_provenance_uses_language_label(
+  recorded_chart: NatalChart, language: Language, expected: str
+) -> None:
+  resolved = recorded_chart.resolved
+  fixed = replace(
+    resolved,
+    record=replace(resolved.record, timezone=FixedOffset(resolved.utc_offset)),
+    timezone_key=None,
+    fold=None,
+    tzdata_version=None,
+    iana_version=None,
+  )
+  output = format_chart(replace(recorded_chart, resolved=fixed), load_catalog(), language=language)
+  assert expected in output.splitlines()
+  assert output.splitlines()[1].endswith(" / UTC-05:00")
 
 
 def display_case(
@@ -36,14 +72,21 @@ def display_case(
   *,
   second: float = 0.0,
   orb: float = 720.0,
+  first_rate: float = -4e-6,
+  second_rate: float = 1.0,
+  object_orbs: tuple[ObjectOrb, ...] = (),
+  combination: OrbCombination | None = None,
   cusps: tuple[float, ...] = _CUSPS,
 ) -> NatalChart:
   config = ChartConfig(
-    HouseSystem.WHOLE_SIGN, (Body.SUN, Body.MARS), (AspectRule(MajorAspect.CONJUNCTION, orb),)
+    HouseSystem.WHOLE_SIGN,
+    (Body.SUN, Body.MARS),
+    (AspectRule(MajorAspect.CONJUNCTION, orb, object_orbs),),
+    orb_combination=combination,
   )
   positions = (
-    EclipticPosition(Body.SUN, longitude, 0, 1, -4e-6),
-    EclipticPosition(Body.MARS, second, 0, 1, 1),
+    EclipticPosition(Body.SUN, longitude, 0, 1, first_rate),
+    EclipticPosition(Body.MARS, second, 0, 1, second_rate),
   )
   houses = ChartHouses(HouseSystem.WHOLE_SIGN, 0, 90, 180, 270, cusps)
   placements = tuple(
@@ -58,6 +101,7 @@ def display_case(
   aspects = find_aspects(
     [AspectObject(p.identity, p.longitude_deg, p.longitude_rate_deg_per_tt_day) for p in positions],
     config.aspects,
+    combination,
   )
   return replace(
     chart,
@@ -66,7 +110,7 @@ def display_case(
       chart.effective,
       house_system=config.house_system,
       aspect_objects=config.aspect_participants(),
-      orb_combination=None,
+      orb_combination=combination,
     ),
     houses=houses,
     positions=positions,
@@ -88,6 +132,93 @@ def test_complete_table_and_no_mutation(recorded_chart: NatalChart, language: st
   assert ("House cusp" if language == "en" else "宫头") in output
   assert "°" in output
   assert repr(recorded_chart) == before
+
+
+@pytest.mark.parametrize("language", ["en", "zh-CN"])
+def test_complete_constructed_geometry_table(language: Language) -> None:
+  reference = Path(__file__).parent / "reference"
+  base = loads_chart((reference / "chart_record_v1.json").read_text(encoding="utf-8"))
+  chart = display_case(
+    base,
+    0,
+    second=7,
+    orb=6,
+    object_orbs=(ObjectOrb(Body.SUN, 10),),
+    combination=OrbCombination.MEAN_OF_ORBS,
+  )
+  expected = (reference / f"constructed_chart.{language}.txt").read_text(encoding="utf-8")
+  assert format_chart(chart, load_catalog(), language=language) == expected.removesuffix("\n")
+
+
+@pytest.mark.parametrize("language", ["en", "zh-CN"])
+@pytest.mark.parametrize(
+  "first,second,first_rate,second_rate,motion,english,chinese",
+  [
+    (1.0, 0.0, 0.0, 1.0, AspectMotion.APPLYING, "applying", "入相"),
+    (0.0, 1.0, 0.0, 1.0, AspectMotion.SEPARATING, "separating", "离相"),
+    (0.0, 0.0, 0.0, 1.0, AspectMotion.EXACT, "exact", "精确"),
+    (0.0, 1.0, 1.0, 1.0, AspectMotion.STATIONARY, "stationary", "相对速率为零"),
+    (0.0, 180.0, 0.0, 1.0, AspectMotion.INDETERMINATE, "indeterminate", "无法确定"),
+  ],
+)
+def test_all_aspect_motion_labels(
+  recorded_chart: NatalChart,
+  language: Language,
+  first: float,
+  second: float,
+  first_rate: float,
+  second_rate: float,
+  motion: AspectMotion,
+  english: str,
+  chinese: str,
+) -> None:
+  chart = display_case(
+    recorded_chart, first, second=second, orb=180, first_rate=first_rate, second_rate=second_rate
+  )
+  assert chart.aspects[0].motion is motion
+  label = english if language == "en" else chinese
+  output = format_chart(chart, load_catalog(), language=language)
+  assert any(line.endswith(" | " + label) for line in output.splitlines())
+
+
+@pytest.mark.parametrize("language", ["en", "zh-CN"])
+def test_no_aspects_and_no_overrides_are_rendered(
+  recorded_chart: NatalChart,
+  language: Language,
+) -> None:
+  chart = display_case(recorded_chart, 0, second=120, orb=6)
+  output = format_chart(chart, load_catalog(), language=language)
+  if language == "en":
+    assert "Motion\nNone\n\nConfiguration" in output
+    assert "Orb combination (identifier): None" in output
+    assert "Aspect rule / base orb / object overrides: Conjunction / 6°00'00\" / None" in output
+  else:
+    assert "运动\n无\n\n配置" in output
+    assert "容许度合成规则（标识）: 无" in output
+    assert "相位规则 / 基础容许度 / 对象单独设置: 合相 / 6°00'00\" / 无" in output
+
+
+@pytest.mark.parametrize(
+  "longitude,expected_sign,expected_house",
+  [
+    (math.nextafter(360.0, 0.0), "pisces", 1),
+    (0.0, "aries", 1),
+    (math.nextafter(350.0, 0.0), "pisces", 12),
+    (350.0, "pisces", 1),
+  ],
+)
+def test_boundary_records_keep_sign_and_cusp_wrap(
+  recorded_chart: NatalChart,
+  longitude: float,
+  expected_sign: str,
+  expected_house: int,
+) -> None:
+  cusps = (350.0, *(float(index * 30 + 20) for index in range(11)))
+  chart = display_case(recorded_chart, longitude, cusps=cusps)
+  restored = loads_chart(dumps_chart(chart))
+  assert restored == chart
+  assert restored.placements[0].sign.value == expected_sign
+  assert restored.placements[0].house == expected_house
 
 
 @pytest.mark.parametrize(

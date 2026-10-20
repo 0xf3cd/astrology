@@ -290,6 +290,28 @@ def test_installed_comparison_rejects_different_development_output(consumer: Pat
     installed_check.main(version("astrology"), expected_chart=expected)
 
 
+@pytest.mark.parametrize("defect", ["schema", "duplicates"])
+def test_installed_consumer_rejects_a_permissive_record_loader(
+  consumer: Path,
+  monkeypatch: pytest.MonkeyPatch,
+  defect: str,
+) -> None:
+  original = astrology.loads_chart
+
+  def permissive(data: str) -> astrology.NatalChart:
+    record = json.loads(data)
+    if defect == "schema" and record["schema_version"] == 2:
+      record["schema_version"] = 1
+      return original(json.dumps(record))
+    if defect == "duplicates" and data.count('"schema_version"') > 1:
+      return original(json.dumps(record))
+    return original(data)
+
+  monkeypatch.setattr(astrology, "loads_chart", permissive)
+  with pytest.raises(ValueError, match="unsupported schema or duplicate key"):
+    installed_check.main(version("astrology"))
+
+
 def test_installed_consumer_checks_native_adapter_origin(
   consumer: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

@@ -5,7 +5,10 @@
 
 from __future__ import annotations
 
+from typing import cast
+
 from astrology.aspects import AspectMotion
+from astrology.birth import Location
 from astrology.chart import NatalChart
 from astrology.config import Body, HouseSystem, LunarNode, MajorAspect
 from astrology.knowledge import Catalog, TranslationStatus
@@ -22,7 +25,6 @@ _HEADINGS = {
     "position_columns": "Object | Sign and longitude within sign | House | Motion",
     "motion_legend": "R: decreasing longitude; D: increasing; S: zero rate (unrounded).",
     "axes": "Axes and house cusps",
-    "axis_names": "Ascendant|Midheaven|Descendant|Imum Coeli",
     "cusp": "House cusp",
     "aspects": "Aspects",
     "aspect_columns": "First | Second | Aspect | Branch | Deviation | Orb limit | Motion",
@@ -51,7 +53,6 @@ _HEADINGS = {
     "position_columns": "对象 | 星座及星座内黄经 | 宫位 | 运动",
     "motion_legend": "R：黄经减小；D：黄经增大；S：速率为零（按未舍入值判断）。",
     "axes": "四轴与宫头",
-    "axis_names": "上升点|中天|下降点|天底",
     "cusp": "宫头",
     "aspects": "相位",
     "aspect_columns": "第一对象 | 第二对象 | 相位 | 分支 | 偏差 | 容许度上限 | 运动",
@@ -71,6 +72,10 @@ _HEADINGS = {
     "frame": "位置坐标约定 / UT1 推导方式",
     "display": "角度向零截断到整角秒；存储的分类结果不变。",
   },
+}
+_AXES = {
+  "en": ("Ascendant", "Midheaven", "Descendant", "Imum Coeli"),
+  "zh-CN": ("上升点", "中天", "下降点", "天底"),
 }
 _MOTIONS = {
   "en": {motion: motion.value for motion in AspectMotion},
@@ -158,9 +163,7 @@ def format_chart(chart: NatalChart, catalog: Catalog, *, language: Language = "e
     raise ValueError("language must be en or zh-CN")
   labels = _HEADINGS[language]
   record = chart.resolved.record
-  location = record.location
-  if location is None:
-    raise ValueError("A complete chart requires a location")
+  location = cast("Location", record.location)
   lines = [
     labels["title"],
     f"{labels['input']}: {record.birth_date} {record.birth_time} / {chart.resolved.timezone_identity}",
@@ -179,7 +182,7 @@ def format_chart(chart: NatalChart, catalog: Catalog, *, language: Language = "e
     )
   lines.extend([labels["motion_legend"], "", labels["axes"]])
   for label, value in zip(
-    labels["axis_names"].split("|"),
+    _AXES[language],
     (
       chart.houses.ascendant_deg,
       chart.houses.midheaven_deg,
@@ -245,8 +248,9 @@ def format_chart(chart: NatalChart, catalog: Catalog, *, language: Language = "e
     [
       "",
       labels["provenance"],
-      f"{labels['time_source']}: {_cell(str(chart.resolved.tzdata_version))} / "
-      f"{_cell(str(chart.resolved.iana_version))} / {chart.resolved.fold}",
+      f"{labels['time_source']}: {_cell(chart.resolved.tzdata_version or labels['none'])} / "
+      f"{_cell(chart.resolved.iana_version or labels['none'])} / "
+      f"{labels['none'] if chart.resolved.fold is None else chart.resolved.fold}",
       f"{labels['times']}: {chart.times.jd_ut1} / {chart.times.jde_tt}",
       f"{labels['model']}: {_cell(chart.effective.delta_t_model)} / {chart.effective.evaluation}",
       f"{labels['versions']}: {_cell(chart.provenance.astrology_version)} / "

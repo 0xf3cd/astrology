@@ -1,5 +1,6 @@
 """Verify the installed package in isolation. 隔离验证已安装的包。"""
 
+import json
 import sys
 from dataclasses import replace
 from datetime import UTC, date, datetime, time, timedelta
@@ -222,6 +223,18 @@ def _check_natal_chart(expected_chart: Path | None = None) -> None:
   restored = astrology.loads_chart(packed)
   if restored != chart or astrology.dumps_chart(restored) != packed:
     raise ValueError("Installed chart restoration lost stored values")
+  unsupported_schema = json.loads(packed)
+  unsupported_schema["schema_version"] = 2
+  duplicate_schema = packed.replace(
+    '"schema_version": 1', '"schema_version": 1, "schema_version": 1'
+  )
+  for invalid_record in (json.dumps(unsupported_schema), duplicate_schema):
+    try:
+      astrology.loads_chart(invalid_record)
+    except astrology.ChartRecordError:
+      pass
+    else:
+      raise ValueError("Installed restoration accepted an unsupported schema or duplicate key")
   if astrology.recompute_chart(restored) != chart:
     raise ValueError("Installed replay differs from the calculated chart")
   catalog = astrology.load_catalog()

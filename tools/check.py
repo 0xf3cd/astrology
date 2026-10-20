@@ -61,6 +61,8 @@ SDIST_FILES = (
   "tests/reference/natal_reference.json",
   "tests/reference/complete_chart_reference.json",
   "tests/reference/chart_record_v1.json",
+  "tests/reference/constructed_chart.en.txt",
+  "tests/reference/constructed_chart.zh-CN.txt",
 )
 
 
@@ -219,6 +221,8 @@ def check_package_files(root: Path = ROOT) -> None:
     raise ValueError(f"Package files missing from PACKAGE_FILES: {sorted(unlisted)}")
   from tools.installed_check import MODULES
 
+  # The root is checked directly; the astronomy adapter is checked after explicit calculation.
+  # 包根单独检查；天文适配层在显式计算之后检查。
   expected_modules = {
     name.removeprefix("astrology/").removesuffix(".py").removesuffix("/__init__").replace("/", ".")
     for name in PACKAGE_FILES

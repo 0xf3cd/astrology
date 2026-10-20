@@ -36,6 +36,16 @@ def difference_arcsec(first: float, second: float) -> float:
   return abs((first - second + 180.0) % 360.0 - 180.0) * 3600.0
 
 
+def reference_house_candidates(
+  longitude: float, cusps: list[float], expected_house: int, tolerance_arcsec: float
+) -> set[int]:
+  adjoining: set[int] = set()
+  for index, cusp in enumerate(cusps):
+    if difference_arcsec(longitude, cusp) <= tolerance_arcsec:
+      adjoining.update((index + 1, (index - 1) % 12 + 1))
+  return adjoining or {expected_house}
+
+
 @pytest.mark.parametrize("case", _REFERENCE["cases"], ids=lambda case: case["identifier"])
 @pytest.mark.parametrize("system", list(HouseSystem))
 def test_complete_independent_chart(case: dict[str, Any], system: HouseSystem) -> None:
@@ -100,12 +110,26 @@ def test_complete_independent_chart(case: dict[str, Any], system: HouseSystem) -
   )
   for cusp, expected_cusp in zip(chart.houses.cusps_deg, geometry["cusps_deg"], strict=True):
     assert difference_arcsec(cusp, expected_cusp) < tolerances["axes_cusps_arcsec"]
-  for placement, expected in zip(chart.placements, geometry["placements"], strict=True):
-    assert (placement.identity.value, placement.sign.value, placement.house) == (
+  for placement, expected, raw in zip(
+    chart.placements, geometry["placements"], case["positions"], strict=True
+  ):
+    assert (placement.identity.value, placement.sign.value) == (
       expected["identity"],
       expected["sign"],
-      expected["house"],
     )
+    longitude_tolerance = tolerances["positions"][placement.identity.value]["longitude_arcsec"]
+    assert (
+      min(expected["sign_degree_deg"], 30.0 - expected["sign_degree_deg"]) * 3600
+      > longitude_tolerance
+    )
+    candidates = reference_house_candidates(
+      raw["longitude_deg"],
+      geometry["cusps_deg"],
+      expected["house"],
+      longitude_tolerance + tolerances["axes_cusps_arcsec"],
+    )
+    assert expected["house"] in candidates
+    assert placement.house in candidates
     assert (
       abs(placement.sign_degree_deg - expected["sign_degree_deg"]) * 3600
       < tolerances["positions"][placement.identity.value]["longitude_arcsec"]
@@ -137,3 +161,23 @@ def test_reference_definitions_and_coverage() -> None:
   assert _REFERENCE["source"]["data_files"] == []
   assert _REFERENCE["source"]["backend"] == "Moshier, explicitly requested"
   assert len(_REFERENCE["calibration"]["inputs"]) == 14
+
+
+def test_reference_house_ambiguity_is_explicit_and_limited() -> None:
+  uncertain = []
+  for case in _REFERENCE["cases"]:
+    for geometry in case["houses"]:
+      for position, placement in zip(case["positions"], geometry["placements"], strict=True):
+        limits = _REFERENCE["tolerances"]
+        candidates = reference_house_candidates(
+          position["longitude_deg"],
+          geometry["cusps_deg"],
+          placement["house"],
+          limits["positions"][position["identity"]]["longitude_arcsec"]
+          + limits["axes_cusps_arcsec"],
+        )
+        if len(candidates) > 1:
+          uncertain.append(
+            (case["identifier"], geometry["system"], position["identity"], sorted(candidates))
+          )
+  assert uncertain == [("fold-2021-first", "equal", "mean_ascending_node", [9, 10])]

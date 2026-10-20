@@ -9,8 +9,47 @@ from typing import Any
 
 import pytest
 
-from astrology import HouseSystem, NatalChart, dumps_chart, loads_chart
-from tools import check, installed_check
+from astrology import (
+  AspectHit,
+  AspectMotion,
+  Body,
+  HouseSystem,
+  LunarNode,
+  MajorAspect,
+  NatalChart,
+  dumps_chart,
+  loads_chart,
+)
+
+
+@pytest.mark.parametrize(
+  "first,second,deviation,limit,motion",
+  [
+    (Body.SUN, Body.SUN, 1.0, 1.0, AspectMotion.APPLYING),
+    (LunarNode.MEAN_ASCENDING, LunarNode.MEAN_DESCENDING, 1.0, 1.0, AspectMotion.APPLYING),
+    (Body.SUN, Body.MOON, 0.0, 1.0, AspectMotion.SEPARATING),
+    (Body.SUN, Body.MOON, 1.0, 1.0, AspectMotion.EXACT),
+    (Body.SUN, Body.MOON, 2.0, 1.0, AspectMotion.APPLYING),
+  ],
+)
+def test_direct_aspect_hit_rejects_invalid_invariants(
+  first: Body | LunarNode,
+  second: Body | LunarNode,
+  deviation: float,
+  limit: float,
+  motion: AspectMotion,
+) -> None:
+  with pytest.raises(ValueError):
+    AspectHit(first, second, MajorAspect.CONJUNCTION, 0.0, deviation, limit, motion)
+
+
+def test_direct_aspect_hit_accepts_exact_and_inclusive_limit() -> None:
+  exact = AspectHit(Body.SUN, Body.MOON, MajorAspect.CONJUNCTION, 0.0, 0.0, 1.0, AspectMotion.EXACT)
+  edge = AspectHit(
+    Body.SUN, Body.MOON, MajorAspect.CONJUNCTION, 0.0, 1.0, 1.0, AspectMotion.APPLYING
+  )
+  assert exact.motion is AspectMotion.EXACT
+  assert edge.deviation_deg == edge.orb_limit_deg == 1.0
 
 
 @pytest.mark.parametrize(
@@ -136,19 +175,3 @@ def test_chart_hashing_preserves_equality_and_distinct_birth_metadata(
   assert other != recorded_chart
   assert len({recorded_chart, restored, other}) == 2
   assert {recorded_chart: "original", other: "other"}[other] == "other"
-
-
-@pytest.mark.parametrize(
-  "modules",
-  [
-    installed_check.MODULES[:-1],
-    (*installed_check.MODULES, "invented"),
-    (*installed_check.MODULES, installed_check.MODULES[0]),
-  ],
-)
-def test_consumer_module_guard_rejects_missing_extra_and_duplicate(
-  monkeypatch: pytest.MonkeyPatch, modules: tuple[str, ...]
-) -> None:
-  monkeypatch.setattr(installed_check, "MODULES", modules)
-  with pytest.raises(ValueError, match="module coverage"):
-    check.check_package_files()

@@ -13,6 +13,7 @@ import pytest
 
 from astrology.knowledge import load_catalog
 from tools import check as checker
+from tools import installed_check
 from tools.check import (
   PACKAGE_FILES,
   SDIST_FILES,
@@ -26,6 +27,22 @@ from tools.check import (
 )
 
 SDIST_PATHS = (*("src/" + name for name in PACKAGE_FILES), *SDIST_FILES)
+
+
+@pytest.mark.parametrize(
+  "modules",
+  [
+    installed_check.MODULES[:-1],
+    (*installed_check.MODULES, "invented"),
+    (*installed_check.MODULES, installed_check.MODULES[0]),
+  ],
+)
+def test_consumer_module_guard_rejects_missing_extra_and_duplicate(
+  monkeypatch: pytest.MonkeyPatch, modules: tuple[str, ...]
+) -> None:
+  monkeypatch.setattr(installed_check, "MODULES", modules)
+  with pytest.raises(ValueError, match="module coverage"):
+    check_package_files()
 
 
 @pytest.fixture
