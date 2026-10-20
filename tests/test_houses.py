@@ -3,6 +3,7 @@
 基于给定宫头几何的落宫成员关系，含边界与回绕用例。
 """
 
+import math
 import subprocess
 import sys
 
@@ -12,6 +13,8 @@ from astrology import house_of
 
 # A table that starts at 300 degrees, so houses 3 and 12 cross the 0/360 seam.
 _CUSPS = (300.0, 330.0, 0.0, 30.0, 60.0, 90.0, 120.0, 150.0, 180.0, 210.0, 240.0, 270.0)
+# The same cyclic table expressed from another starting cusp.
+_ROTATED = (120.0, 150.0, 180.0, 210.0, 240.0, 270.0, 300.0, 330.0, 0.0, 30.0, 60.0, 90.0)
 
 
 def test_a_longitude_on_a_cusp_belongs_to_the_house_starting_there() -> None:
@@ -23,6 +26,24 @@ def test_a_longitude_just_below_a_cusp_belongs_to_the_previous_house() -> None:
   for index, cusp in enumerate(_CUSPS):
     previous = 12 if index == 0 else index
     assert house_of((cusp - 1e-6) % 360.0, _CUSPS) == previous
+
+
+def test_adjacent_representable_values_keep_their_cusp_ownership() -> None:
+  # The value one representable step below a cusp stays in the house that ends
+  # there; a rotation by a common origin used to round it onto the cusp.
+  for index, cusp in enumerate(_CUSPS):
+    previous = 12 if index == 0 else index
+    below = math.nextafter(cusp, 0.0) if cusp > 0.0 else math.nextafter(360.0, 0.0)
+    assert house_of(below, _CUSPS) == previous
+    assert house_of(cusp, _CUSPS) == index + 1
+
+
+def test_adjacent_representable_values_keep_their_side_in_a_rotated_table() -> None:
+  below = math.nextafter(30.0, 0.0)
+  assert house_of(below, _ROTATED) == 9
+  assert house_of(30.0, _ROTATED) == 10
+  assert house_of(math.nextafter(360.0, 0.0), _ROTATED) == 8
+  assert house_of(0.0, _ROTATED) == 9
 
 
 def test_membership_wraps_across_zero_degrees() -> None:
@@ -53,6 +74,9 @@ def test_membership_uses_only_the_cusp_table() -> None:
     tuple(float(value) for value in range(0, 330, 30)),
     (0.0, 30.0, 60.0, 90.0, 120.0, 150.0, 180.0, 210.0, 240.0, 270.0, 300.0, 300.0),
     (0.0, 30.0, 60.0, 90.0, 120.0, 150.0, 180.0, 210.0, 240.0, 270.0, 300.0, 30.0),
+    (0.0, 30.0, 60.0, 90.0, 120.0, 150.0, 180.0, 210.0, 240.0, 270.0, 300.0, 360.0),
+    (0.0, 30.0, 60.0, float("nan"), 120.0, 150.0, 180.0, 210.0, 240.0, 270.0, 300.0, 330.0),
+    (-30.0, 0.0, 30.0, 60.0, 90.0, 120.0, 150.0, 180.0, 210.0, 240.0, 270.0, 300.0),
   ],
 )
 def test_invalid_cusp_tables_are_rejected(cusps: tuple[float, ...]) -> None:

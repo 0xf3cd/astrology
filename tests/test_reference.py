@@ -3,6 +3,7 @@
 与 JPL Horizons 独立参考及定义级交点参考的一致性。
 """
 
+import hashlib
 import json
 import math
 from datetime import datetime, timedelta
@@ -53,6 +54,7 @@ class _Case(TypedDict):
   delta_at_source: str
   jde_tt: float
   ephemeris_sources: dict[str, str]
+  center_source: str
   queries: dict[str, str]
   bodies: dict[str, _Body]
   local_apparent_sidereal_time_deg: float
@@ -71,16 +73,63 @@ class _Fixture(TypedDict):
 FIXTURE = Path(__file__).resolve().parent / "reference" / "natal_reference.json"
 
 # Tolerances, in arcseconds unless stated otherwise. 容差，除注明外均以角秒计。
+# Body tolerances follow the upstream's own model error against Horizons, so a
+# correct upstream passes at any instant and not only at the two fixture
+# instants. The Sun and planets agree within 0.80" in longitude over 24 instants
+# in 2000-2002, and within 1.34" at the 2020 fixture instant; the truncated lunar
+# model within 9.96" in longitude and 2.39" in latitude over 60 instants in
+# 2000-2030. Those samples were taken ad hoc and are not kept in the repository.
+# 天体容差取自上游模型对 Horizons 的自身误差，使正确的上游在任何时刻都能通过，
+# 而不止在两个夹具时刻。采样为临时测量，未留在仓库里。
 LONGITUDE_TOLERANCE_ARCSEC = 3.0
-MOON_LONGITUDE_TOLERANCE_ARCSEC = 10.0
+MOON_LONGITUDE_TOLERANCE_ARCSEC = 15.0
 LATITUDE_TOLERANCE_ARCSEC = 1.0
+MOON_LATITUDE_TOLERANCE_ARCSEC = 3.0
 NODE_TOLERANCE_ARCSEC = 1.0
-# The Ascendant and Midheaven depend on UT1, which the library models rather
-# than observes; the bound covers the modelled-versus-observed difference.
-# 上升点与中天依赖 UT1，本库用模型推得而非观测值，容差覆盖模型与观测之差。
-AXIS_TOLERANCE_DEGREES = 0.005
+# The Ascendant, Midheaven and Placidus cusps follow UT1, which the library
+# models from civil UTC while Horizons derives sidereal time from observed UT1.
+# The two fixture instants agree within 0.92 arcseconds; 0.001 degrees is 3.6
+# arcseconds, about four times that, and rejects a mean sidereal time used for the
+# apparent one. 上升点、中天与 Placidus 宫头随 UT1 变化：本库由民用 UTC 经模型推得，
+# Horizons 的恒星时取自观测 UT1。两个夹具时刻一致到 0.92″，0.001 度即 3.6″，约四倍余量。
+AXIS_TOLERANCE_DEGREES = 0.001
+CUSP_TOLERANCE_DEGREES = 0.001
 # JDE(TT) - JD(UTC) is an exact leap-second relation, not an approximation.
 TIME_TOLERANCE_DAYS = 1e-9
+
+# The tolerances are the reference gate's sensitivity. Pinning them here makes
+# widening one a visible change in two places instead of one silent edit.
+# 容差就是参考门禁的灵敏度；在此再钉一份，改宽它就得改两处，不会是一次悄悄的修改。
+EXPECTED_TOLERANCES = {
+  "longitude": 3.0,
+  "moon_longitude": 15.0,
+  "latitude": 1.0,
+  "moon_latitude": 3.0,
+  "node": 1.0,
+  "axis": 0.001,
+  "cusp": 0.001,
+  "time": 1e-9,
+}
+
+# The target kernel Horizons names for each body, and the geocenter kernel.
+# 各天体的星历核（Horizons 的目标行）及地心核。
+EXPECTED_EPHEMERIS_SOURCES = {
+  "sun": "DE441",
+  "moon": "DE441",
+  "mercury": "DE441",
+  "venus": "DE441",
+  "mars": "mar099",
+  "jupiter": "jup365_merged",
+  "saturn": "sat441l",
+  "uranus": "ura184_merged",
+  "neptune": "nep098_merged",
+  "pluto": "plu060_merged",
+}
+
+# The fixture without its retrieval time is pinned, so an edited reference value
+# cannot pass unnoticed; refetching the same data leaves the digest unchanged.
+# 夹具（不含取数时间）钉摘要，就地改参考数值不能悄悄通过；重新取同样的数据不改变摘要。
+EXPECTED_FIXTURE_DIGEST = "7c3e1990c5785c8a077498437bd835acba793fb55311c7a6ba0574ac2a7bfb2f"
 
 
 def _fixture() -> _Fixture:
@@ -187,6 +236,58 @@ def _angle_difference(first: float, second: float) -> float:
   return (first - second + 180.0) % 360.0 - 180.0
 
 
+def _substantive_digest(fixture: _Fixture) -> str:
+  """Hash the fixture without its retrieval time. 对夹具去掉取数时间后取摘要。"""
+  payload = {key: value for key, value in fixture.items() if key != "retrieved_utc"}
+  canonical = json.dumps(payload, sort_keys=True, ensure_ascii=False).encode("utf-8")
+  return hashlib.sha256(canonical).hexdigest()
+
+
+def _placidus_residual(
+  house: int, cusp_deg: float, ramc_deg: float, latitude_deg: float, obliquity_rad: float
+) -> float:
+  """Degrees by which a cusp misses its Placidus time division.
+
+  Placidus puts cusps 11 and 12 at one and two thirds of the cusp point's own
+  diurnal semi-arc east of the meridian, and cusps 2 and 3 at one and two thirds
+  of its nocturnal semi-arc beyond the horizon. The hour angle comes from the
+  reference sidereal time, so the definition is checked without an iteration.
+
+  宫头偏离 Placidus 时间分割的度数。Placidus 把第 11、12 宫头放在宫头点自身昼弧
+  子午圈以东的三分之一与三分之二处，第 2、3 宫头放在其夜弧地平线以下的三分之一与
+  三分之二处。时角取自参考恒星时，因此不必迭代即可核对定义。
+  """
+  longitude = math.radians(cusp_deg)
+  right_ascension = math.degrees(
+    math.atan2(math.sin(longitude) * math.cos(obliquity_rad), math.cos(longitude))
+  )
+  declination = math.asin(math.sin(obliquity_rad) * math.sin(longitude))
+  diurnal = math.degrees(math.acos(-math.tan(math.radians(latitude_deg)) * math.tan(declination)))
+  nocturnal = 180.0 - diurnal
+  expected = {
+    11: -diurnal / 3,
+    12: -2 * diurnal / 3,
+    2: -(diurnal + nocturnal / 3),
+    3: -(diurnal + 2 * nocturnal / 3),
+  }[house]
+  return _angle_difference(ramc_deg - right_ascension, expected)
+
+
+def _porphyry_cusps(ascendant_deg: float, midheaven_deg: float) -> dict[int, float]:
+  """Cusps 11, 12, 2 and 3 of a Porphyry table, each quadrant trisected along the ecliptic.
+
+  Porphyry 宫制的第 11、12、2、3 宫头：每个象限沿黄道三等分。
+  """
+  above = (ascendant_deg - midheaven_deg) % 360.0
+  below = (midheaven_deg + 180.0 - ascendant_deg) % 360.0
+  return {
+    11: (midheaven_deg + above / 3) % 360.0,
+    12: (midheaven_deg + 2 * above / 3) % 360.0,
+    2: (ascendant_deg + below / 3) % 360.0,
+    3: (ascendant_deg + 2 * below / 3) % 360.0,
+  }
+
+
 def _instant(case: _Case) -> datetime:
   """Read the reference instant as an aware UTC datetime. 读取参考时刻（UTC 带时区）。"""
   return datetime.fromisoformat(case["utc"].replace("Z", "+00:00"))
@@ -228,34 +329,41 @@ def _chart_for(case: _Case) -> tuple[NatalChart, ResolvedBirth]:
   return natal_chart(resolved, config), resolved
 
 
+def test_the_tolerances_are_the_documented_ones() -> None:
+  assert {
+    "longitude": LONGITUDE_TOLERANCE_ARCSEC,
+    "moon_longitude": MOON_LONGITUDE_TOLERANCE_ARCSEC,
+    "latitude": LATITUDE_TOLERANCE_ARCSEC,
+    "moon_latitude": MOON_LATITUDE_TOLERANCE_ARCSEC,
+    "node": NODE_TOLERANCE_ARCSEC,
+    "axis": AXIS_TOLERANCE_DEGREES,
+    "cusp": CUSP_TOLERANCE_DEGREES,
+    "time": TIME_TOLERANCE_DAYS,
+  } == EXPECTED_TOLERANCES
+
+
 def test_the_fixture_records_its_own_provenance() -> None:
   fixture = _fixture()
   assert fixture["api"] == "https://ssd.jpl.nasa.gov/api/horizons.api"
   assert fixture["retrieved_utc"].endswith("+00:00")
   conventions = fixture["conventions"]
   assert "QUANTITIES=31" in conventions["positions"]
+  assert "IAU76/80" in conventions["positions"]
+  assert "nutation in obliquity" in conventions["axis"]
   assert "32.184" in conventions["tt_utc"]
   for case in _cases():
     assert case["house_system"] == "placidus"
     assert case["delta_at_source"]
-    sources = case["ephemeris_sources"]
-    assert set(sources) == {
-      "sun",
-      "moon",
-      "mercury",
-      "venus",
-      "mars",
-      "jupiter",
-      "saturn",
-      "uranus",
-      "neptune",
-      "pluto",
-    }
-    assert "DE4" in sources["sun"]
+    assert case["ephemeris_sources"] == EXPECTED_EPHEMERIS_SOURCES
+    assert case["center_source"] == "DE441"
     queries = case["queries"]
     assert "local_apparent_sidereal_time" in queries
     for url in queries.values():
       assert url.startswith("https://ssd.jpl.nasa.gov/api/horizons.api?")
+
+
+def test_the_fixture_values_are_the_pinned_ones() -> None:
+  assert _substantive_digest(_fixture()) == EXPECTED_FIXTURE_DIGEST
 
 
 @pytest.mark.parametrize("case", _cases(), ids=lambda case: str(case["identifier"]))
@@ -264,17 +372,18 @@ def test_body_positions_agree_with_horizons(case: _Case) -> None:
   bodies = case["bodies"]
   for position in chart.positions[:10]:
     reference = bodies[position.identity.value]
-    longitude_tolerance = (
-      MOON_LONGITUDE_TOLERANCE_ARCSEC
-      if position.identity is Body.MOON
-      else LONGITUDE_TOLERANCE_ARCSEC
-    )
+    if position.identity is Body.MOON:
+      longitude_tolerance = MOON_LONGITUDE_TOLERANCE_ARCSEC
+      latitude_tolerance = MOON_LATITUDE_TOLERANCE_ARCSEC
+    else:
+      longitude_tolerance = LONGITUDE_TOLERANCE_ARCSEC
+      latitude_tolerance = LATITUDE_TOLERANCE_ARCSEC
     longitude_difference = abs(
       _angle_difference(position.longitude_deg, reference["longitude_deg"])
     )
     assert longitude_difference * 3600 <= longitude_tolerance
     latitude_difference = abs(position.latitude_deg - reference["latitude_deg"])
-    assert latitude_difference * 3600 <= LATITUDE_TOLERANCE_ARCSEC
+    assert latitude_difference * 3600 <= latitude_tolerance
 
 
 @pytest.mark.parametrize("case", _cases(), ids=lambda case: str(case["identifier"]))
@@ -308,6 +417,39 @@ def test_the_axes_agree_with_the_reference_sidereal_time(case: _Case) -> None:
   )
   assert abs(_angle_difference(chart.houses.ascendant_deg, ascendant)) <= AXIS_TOLERANCE_DEGREES
   assert abs(_angle_difference(chart.houses.midheaven_deg, midheaven)) <= AXIS_TOLERANCE_DEGREES
+
+
+@pytest.mark.parametrize("case", _cases(), ids=lambda case: str(case["identifier"]))
+def test_the_placidus_cusps_follow_the_time_division_of_their_semi_arcs(case: _Case) -> None:
+  chart, _ = _chart_for(case)
+  obliquity = _obliquity(chart.times.jde_tt)
+  ramc = float(case["local_apparent_sidereal_time_deg"])
+  latitude = case["location"]["latitude"]
+  cusps = chart.houses.cusps_deg
+  for house in (11, 12, 2, 3):
+    residual = _placidus_residual(house, cusps[house - 1], ramc, latitude, obliquity)
+    assert abs(residual) <= CUSP_TOLERANCE_DEGREES
+  for house in range(1, 7):
+    assert abs(_angle_difference(cusps[house + 5], cusps[house - 1] + 180.0)) < 1e-9
+
+
+@pytest.mark.parametrize("case", _cases(), ids=lambda case: str(case["identifier"]))
+def test_the_placidus_check_rejects_a_different_house_system_and_a_shifted_cusp(
+  case: _Case,
+) -> None:
+  chart, _ = _chart_for(case)
+  obliquity = _obliquity(chart.times.jde_tt)
+  ramc = float(case["local_apparent_sidereal_time_deg"])
+  latitude = case["location"]["latitude"]
+  houses = chart.houses
+  porphyry = _porphyry_cusps(houses.ascendant_deg, houses.midheaven_deg)
+  for house, cusp in porphyry.items():
+    residual = _placidus_residual(house, cusp, ramc, latitude, obliquity)
+    assert abs(residual) > 50 * CUSP_TOLERANCE_DEGREES
+  for house in (11, 12, 2, 3):
+    shifted = (houses.cusps_deg[house - 1] + 0.01) % 360.0
+    residual = _placidus_residual(house, shifted, ramc, latitude, obliquity)
+    assert abs(residual) > CUSP_TOLERANCE_DEGREES
 
 
 @pytest.mark.parametrize("case", _cases(), ids=lambda case: str(case["identifier"]))

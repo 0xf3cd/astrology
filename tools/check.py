@@ -39,8 +39,10 @@ ROOT = Path(__file__).resolve().parents[1]
 PACKAGE_FILES = (
   "astrology/__init__.py",
   "astrology/py.typed",
+  "astrology/birth.py",
   "astrology/celestial.py",
   "astrology/chart.py",
+  "astrology/config.py",
   "astrology/houses.py",
   "astrology/zodiac.py",
   "astrology/knowledge/__init__.py",
@@ -176,6 +178,25 @@ def check_api_html(directory: Path) -> None:
       raise ValueError(f"Incorrect API HTML language for {language}")
     if f"../{counterpart}/reference.html" not in parser.links:
       raise ValueError(f"Missing API HTML counterpart navigation for {language}")
+
+
+def check_package_files(root: Path = ROOT) -> None:
+  """Require every file under the package source to be listed in PACKAGE_FILES.
+
+  The wheel and sdist checks only look for the listed files, so an unlisted new
+  module would be missing from the artifacts without any check noticing.
+
+  要求包源码下的每个文件都列入 PACKAGE_FILES。wheel 与 sdist 检查只找已列出的文件，
+  未列入的新模块缺席制品时没有任何检查会发现。
+  """
+  package = root / "src" / "astrology"
+  present = {
+    path.relative_to(package.parent).as_posix()
+    for path in package.rglob("*")
+    if path.is_file() and "__pycache__" not in path.parts
+  }
+  if unlisted := present - set(PACKAGE_FILES):
+    raise ValueError(f"Package files missing from PACKAGE_FILES: {sorted(unlisted)}")
 
 
 def check_wheel(wheel: Path, expected_version: str) -> None:
@@ -398,6 +419,7 @@ def main() -> None:
   for arguments in commands:
     run((sys.executable, *arguments))
   check_documents()
+  check_package_files()
   with tempfile.TemporaryDirectory(
     prefix="astrology-check-", dir=os.environ.get("SCRATCH")
   ) as temporary:

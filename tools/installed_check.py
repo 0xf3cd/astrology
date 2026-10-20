@@ -152,8 +152,6 @@ def _check_natal_chart() -> None:
   The chart is calculated after the isolation checks, so it also shows that the
   adapter is loaded by the calculation and not by the import. 在已安装环境中计算一张
   合成本命盘；此检查排在隔离检查之后，因此也表明适配层由计算加载，而非由导入加载。
-
-  在已安装环境中计算一张合成本命盘。
   """
   if any(
     name in ("celestial_calendar", "astrology.celestial") or name.startswith("celestial_calendar.")

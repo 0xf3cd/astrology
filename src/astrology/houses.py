@@ -43,9 +43,14 @@ def house_of(longitude_deg: float, cusps_deg: Sequence[float]) -> int:
   coincides with the first cusp is a property of the house system, not of this
   function.
 
+  The intervals are compared in the given angles. Rotating them by a common
+  origin would round a longitude that sits just below a cusp onto the cusp
+  itself and hand it to the next house.
+
   返回包含该热带黄经的宫（1-12）。区间为半开 [宫头, 下一宫头)：恰好落在宫头上的黄经
   归属于从该宫头开始的宫。成员关系跨 0/360 环绕。本函数只使用给定宫头表；上升点等轴
   是否与第一宫头重合是宫制的性质，不是本函数的性质。
+  区间按给定角度直接比较：按共同原点旋转会把紧贴宫头下方的黄经舍入到宫头上，交给下一宫。
   """
   cusps = _cusps(cusps_deg)
   if type(longitude_deg) not in (int, float):
@@ -53,9 +58,10 @@ def house_of(longitude_deg: float, cusps_deg: Sequence[float]) -> int:
   longitude = float(longitude_deg)
   if not isfinite(longitude) or not 0.0 <= longitude < _FULL_TURN:
     raise ValueError("longitude_deg must be finite and in [0, 360)")
-  offset = (longitude - cusps[0]) % _FULL_TURN
-  rotated = tuple((value - cusps[0]) % _FULL_TURN for value in cusps)
-  for index in range(_HOUSES - 1, 0, -1):
-    if offset >= rotated[index]:
+  for index in range(_HOUSES):
+    start = cusps[index]
+    end = cusps[(index + 1) % _HOUSES]
+    inside = start <= longitude < end if start < end else longitude >= start or longitude < end
+    if inside:
       return index + 1
-  return 1
+  raise ValueError("cusps_deg does not cover the circle")

@@ -1,10 +1,11 @@
 {
-  "retrieved_utc": "2026-10-20T01:47:25+00:00",
+  "retrieved_utc": "2026-10-20T04:14:46+00:00",
   "api": "https://ssd.jpl.nasa.gov/api/horizons.api",
   "conventions": {
-    "positions": "Apparent geocentric ecliptic longitude/latitude of date, geocenter 500@399, TIME_TYPE=TT at the instant's JDE(TT), QUANTITIES=31",
-    "axis": "Local apparent sidereal time at the site (QUANTITIES=7, TIME_TYPE=UT) converted to RAMC degrees; Asc/MC derived test-side from RAMC and Meeus mean obliquity plus low-accuracy nutation in longitude",
-    "tt_utc": "JDE(TT) - JD(UTC) = (32.184 + delta AT) / 86400 exactly"
+    "positions": "Apparent geocentric ecliptic longitude/latitude of date, geocenter 500@399, TIME_TYPE=TT at the instant's JDE(TT), QUANTITIES=31; Horizons reports the IAU76/80 ecliptic of date with light-time, gravitational deflection of light and stellar aberration",
+    "axis": "Local apparent sidereal time at the site (QUANTITIES=7, TIME_TYPE=UT) converted to RAMC degrees; Asc/MC derived test-side from RAMC and the Meeus mean obliquity plus the low-accuracy nutation in obliquity",
+    "tt_utc": "JDE(TT) - JD(UTC) = (32.184 + delta AT) / 86400 exactly",
+    "center_source": "The geocenter kernel is taken from the center line of the first body query; Horizons echoes the requested kernel on that line for some targets"
   },
   "cases": [
     {
@@ -23,13 +24,14 @@
         "moon": "DE441",
         "mercury": "DE441",
         "venus": "DE441",
-        "mars": "DE441",
-        "jupiter": "DE441",
-        "saturn": "DE441",
-        "uranus": "DE441",
+        "mars": "mar099",
+        "jupiter": "jup365_merged",
+        "saturn": "sat441l",
+        "uranus": "ura184_merged",
         "neptune": "nep098_merged",
-        "pluto": "DE441"
+        "pluto": "plu060_merged"
       },
+      "center_source": "DE441",
       "queries": {
         "sun": "https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%2710%27&OBJ_DATA=%27NO%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27OBSERVER%27&CENTER=%27500%40399%27&TLIST=%272452837.7349211113%27&TLIST_TYPE=%27JD%27&TIME_TYPE=%27TT%27&QUANTITIES=%2731%27&ANG_FORMAT=%27DEG%27&EXTRA_PREC=%27YES%27&CSV_FORMAT=%27YES%27",
         "moon": "https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%27301%27&OBJ_DATA=%27NO%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27OBSERVER%27&CENTER=%27500%40399%27&TLIST=%272452837.7349211113%27&TLIST_TYPE=%27JD%27&TIME_TYPE=%27TT%27&QUANTITIES=%2731%27&ANG_FORMAT=%27DEG%27&EXTRA_PREC=%27YES%27&CSV_FORMAT=%27YES%27",
@@ -103,13 +105,14 @@
         "moon": "DE441",
         "mercury": "DE441",
         "venus": "DE441",
-        "mars": "DE441",
-        "jupiter": "DE441",
-        "saturn": "DE441",
-        "uranus": "DE441",
+        "mars": "mar099",
+        "jupiter": "jup365_merged",
+        "saturn": "sat441l",
+        "uranus": "ura184_merged",
         "neptune": "nep098_merged",
-        "pluto": "DE441"
+        "pluto": "plu060_merged"
       },
+      "center_source": "DE441",
       "queries": {
         "sun": "https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%2710%27&OBJ_DATA=%27NO%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27OBSERVER%27&CENTER=%27500%40399%27&TLIST=%272459002.0008007409%27&TLIST_TYPE=%27JD%27&TIME_TYPE=%27TT%27&QUANTITIES=%2731%27&ANG_FORMAT=%27DEG%27&EXTRA_PREC=%27YES%27&CSV_FORMAT=%27YES%27",
         "moon": "https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%27301%27&OBJ_DATA=%27NO%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27OBSERVER%27&CENTER=%27500%40399%27&TLIST=%272459002.0008007409%27&TLIST_TYPE=%27JD%27&TIME_TYPE=%27TT%27&QUANTITIES=%2731%27&ANG_FORMAT=%27DEG%27&EXTRA_PREC=%27YES%27&CSV_FORMAT=%27YES%27",

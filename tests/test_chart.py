@@ -3,6 +3,7 @@
 本命盘组合、入口条件、失败分类与来源记录。
 """
 
+import math
 import subprocess
 import sys
 from dataclasses import FrozenInstanceError
@@ -33,6 +34,33 @@ from astrology import (
 
 # A northern, non-integer-minute instant used by several cases.
 _NORTH = (date(2003, 7, 17), time(5, 37, 13), 64.15, -21.94)
+
+# The fourteen objects the upstream evaluates together, in its roster order.
+_ALL_OBJECTS: tuple[Body | LunarNode, ...] = (
+  Body.SUN,
+  Body.MOON,
+  Body.MERCURY,
+  Body.VENUS,
+  Body.MARS,
+  Body.JUPITER,
+  Body.SATURN,
+  Body.URANUS,
+  Body.NEPTUNE,
+  Body.PLUTO,
+  LunarNode.MEAN_ASCENDING,
+  LunarNode.MEAN_DESCENDING,
+  LunarNode.MEEUS_FIVE_TERM_TRUE_ASCENDING,
+  LunarNode.MEEUS_FIVE_TERM_TRUE_DESCENDING,
+)
+
+# At this instant the Midheaven is exactly 270 degrees, so the Ascendant has no
+# direction at the critical latitude of the ecliptic's tilt. The witnesses are the
+# upstream consumer test's; 66.0 is a nearby latitude where the chart exists.
+# 此刻中天恰为 270°，在黄赤交角决定的临界纬度上升点没有方向。证人取自上游消费者测试；
+# 66.0 是附近有定义的纬度。
+_UNRESOLVED_ASCENDANT = (date(2026, 1, 1), time(12, 0, 5))
+_UNRESOLVED_NORTH = (66.561856230963841, -11.176256364511062)
+_UNRESOLVED_SOUTH = (-66.561856230963841, 168.82374363548894)
 
 
 def record_at(
@@ -129,6 +157,37 @@ def test_a_high_latitude_placidus_failure_is_reported_without_substitution() -> 
     assert chart.requested.house_system is system
 
 
+@pytest.mark.parametrize("system", list(HouseSystem), ids=lambda system: system.value)
+@pytest.mark.parametrize("site", [_UNRESOLVED_NORTH, _UNRESOLVED_SOUTH], ids=["north", "south"])
+def test_an_undefined_ascendant_direction_fails_under_every_house_system(
+  system: HouseSystem, site: tuple[float, float]
+) -> None:
+  resolved = resolved_at(*_UNRESOLVED_ASCENDANT, *site)
+  with pytest.raises(ChartDomainError) as caught:
+    natal_chart(resolved, config_for(system))
+  assert caught.value.house_system is system
+  assert caught.value.operation == "chart_snapshot"
+  assert caught.value.recorded is True
+  assert caught.value.upstream_message
+
+
+def test_the_undefined_ascendant_is_a_point_and_not_a_latitude_band() -> None:
+  nearby = resolved_at(*_UNRESOLVED_ASCENDANT, 66.0, _UNRESOLVED_NORTH[1])
+  chart = natal_chart(nearby, config_for(HouseSystem.WHOLE_SIGN))
+  assert chart.houses.midheaven_deg == 270.0
+
+
+def test_a_latitude_just_inside_the_pole_is_left_to_the_upstream_domain() -> None:
+  resolved = resolved_at(date(2003, 7, 17), time(12, 0), math.nextafter(90.0, 0.0))
+  for system in (HouseSystem.WHOLE_SIGN, HouseSystem.EQUAL):
+    assert natal_chart(resolved, config_for(system)).houses.system is system
+  with pytest.raises(ChartDomainError) as caught:
+    natal_chart(resolved, config_for(HouseSystem.PLACIDUS))
+  # An upstream failure, not the pre-call rejection reserved for the poles.
+  assert caught.value.operation == "chart_snapshot"
+  assert caught.value.recorded is True
+
+
 def test_failures_are_classified_by_structure_and_not_by_message_text() -> None:
   # A pre-call rejection carries no upstream detail; an upstream failure
   # carries the operation and recording status. Neither is decided by reading
@@ -179,6 +238,26 @@ def test_selecting_one_object_does_not_widen_the_evaluation_domain() -> None:
   assert chart.effective.evaluation == "fixed_fourteen_object_joint_snapshot"
 
 
+def test_positions_follow_the_requested_order() -> None:
+  chart = natal_chart(
+    resolved_at(*_NORTH[:2], *_NORTH[2:]),
+    config_for(HouseSystem.WHOLE_SIGN, (Body.MOON, Body.SUN)),
+  )
+  assert [position.identity for position in chart.positions] == [Body.MOON, Body.SUN]
+  assert [placement.identity for placement in chart.placements] == [Body.MOON, Body.SUN]
+
+
+def test_a_selected_subset_carries_the_values_of_the_full_evaluation() -> None:
+  resolved = resolved_at(*_NORTH[:2], *_NORTH[2:])
+  full = natal_chart(resolved, config_for(HouseSystem.WHOLE_SIGN, _ALL_OBJECTS))
+  subset = natal_chart(resolved, config_for(HouseSystem.WHOLE_SIGN, (Body.MOON, Body.SUN)))
+  everything = {position.identity: position for position in full.positions}
+  for position in subset.positions:
+    assert position == everything[position.identity]
+  assert subset.houses == full.houses
+  assert subset.times == full.times
+
+
 def test_whole_sign_keeps_the_ascendant_in_the_first_house() -> None:
   chart = natal_chart(resolved_at(*_NORTH[:2], *_NORTH[2:]), config_for(HouseSystem.WHOLE_SIGN))
   cusps = chart.houses.cusps_deg
@@ -193,6 +272,29 @@ def test_placidus_keeps_the_ascendant_and_midheaven_on_their_cusps() -> None:
   chart = natal_chart(resolved_at(*_NORTH[:2], *_NORTH[2:]), config_for(HouseSystem.PLACIDUS))
   assert chart.houses.cusps_deg[0] == chart.houses.ascendant_deg
   assert chart.houses.cusps_deg[9] == chart.houses.midheaven_deg
+
+
+def test_equal_houses_start_at_the_ascendant_in_thirty_degree_steps() -> None:
+  resolved = resolved_at(*_NORTH[:2], *_NORTH[2:])
+  equal = natal_chart(resolved, config_for(HouseSystem.EQUAL)).houses
+  cusps = equal.cusps_deg
+  assert cusps[0] == equal.ascendant_deg
+  for index in range(12):
+    assert (cusps[(index + 1) % 12] - cusps[index]) % 360.0 == pytest.approx(30.0, abs=1e-9)
+  assert cusps[9] != equal.midheaven_deg
+  # The same instant under the other systems separates Equal from them.
+  whole = natal_chart(resolved, config_for(HouseSystem.WHOLE_SIGN)).houses
+  placidus = natal_chart(resolved, config_for(HouseSystem.PLACIDUS)).houses
+  assert whole.cusps_deg[0] != whole.ascendant_deg
+  assert (placidus.cusps_deg[1] - placidus.cusps_deg[0]) % 360.0 != pytest.approx(30.0)
+
+
+def test_the_descendant_and_the_imum_coeli_oppose_the_ascendant_and_the_midheaven() -> None:
+  houses = natal_chart(
+    resolved_at(*_NORTH[:2], *_NORTH[2:]), config_for(HouseSystem.PLACIDUS)
+  ).houses
+  assert (houses.descendant_deg - houses.ascendant_deg) % 360.0 == pytest.approx(180.0)
+  assert (houses.imum_coeli_deg - houses.midheaven_deg) % 360.0 == pytest.approx(180.0)
 
 
 def test_each_identity_binds_to_its_upstream_target() -> None:
@@ -236,6 +338,7 @@ def test_each_identity_binds_to_its_upstream_target() -> None:
     assert position.longitude_deg == upstream[target].longitude_deg
     assert position.latitude_deg == upstream[target].latitude_deg
     assert position.distance_au == upstream[target].distance_au
+    assert position.longitude_rate_deg_per_tt_day == upstream[target].longitude_rate_deg_per_tt_day
 
 
 def test_lunar_nodes_carry_no_distance_and_no_latitude() -> None:

@@ -36,7 +36,7 @@ BODIES = {
 
 
 class _Body(TypedDict):
-  """One body's apparent ecliptic longitude and latitude. 单个天体的视黄经与黄纬。"""
+  """One body's apparent ecliptic coordinates. 单个天体的视黄道坐标。"""
 
   longitude_deg: float
   latitude_deg: float
@@ -64,6 +64,7 @@ class _CaseResult(TypedDict):
   delta_at_source: str
   jde_tt: float
   ephemeris_sources: dict[str, str]
+  center_source: str
   queries: dict[str, str]
   bodies: dict[str, _Body]
   local_apparent_sidereal_time_deg: float
@@ -136,12 +137,17 @@ def rows(result: str) -> list[list[str]]:
   ]
 
 
-def source_marker(result: str) -> str:
-  """Extract the DE/SPICE source marker from the center-body header line."""
+def source_marker(result: str, body_line: str) -> str:
+  """Extract the ephemeris kernel from the named header line.
+
+  Horizons names the kernel that provided a body's data on its own line; the
+  target line names the body's kernel, the center line the geocenter's.
+  Horizons 把所用星历核写在各自那一行：目标行是该天体的核，地心行是地心的核。
+  """
   for line in result.splitlines():
-    if "{source: " in line and "Center body" in line:
+    if line.strip().startswith(body_line) and "{source: " in line:
       return line.partition("{source: ")[2].rstrip("}")
-  raise RuntimeError("No source marker in Horizons header")
+  raise RuntimeError(f"No source marker for {body_line} in Horizons header")
 
 
 def fetch_case(case: _Case) -> _CaseResult:
@@ -154,6 +160,7 @@ def fetch_case(case: _Case) -> _CaseResult:
   bodies: dict[str, _Body] = {}
   query_urls: dict[str, str] = {}
   sources: dict[str, str] = {}
+  center_source = ""
   for name, command in BODIES.items():
     result, url = query(
       {
@@ -175,7 +182,10 @@ def fetch_case(case: _Case) -> _CaseResult:
     row = rows(result)[0]
     bodies[name] = {"longitude_deg": float(row[3]), "latitude_deg": float(row[4])}
     query_urls[name] = url
-    sources[name] = source_marker(result)
+    sources[name] = source_marker(result, "Target body name:")
+    center = source_marker(result, "Center body name:")
+    if not center_source:
+      center_source = center
 
   result, url = query(
     {
@@ -208,6 +218,7 @@ def fetch_case(case: _Case) -> _CaseResult:
     "delta_at_source": case["delta_at_source"],
     "jde_tt": tt_jd,
     "ephemeris_sources": sources,
+    "center_source": center_source,
     "queries": query_urls,
     "bodies": bodies,
     "local_apparent_sidereal_time_deg": last_hours * 15.0,
@@ -224,14 +235,20 @@ def main() -> None:
     "conventions": {
       "positions": (
         "Apparent geocentric ecliptic longitude/latitude of date, geocenter 500@399, "
-        "TIME_TYPE=TT at the instant's JDE(TT), QUANTITIES=31"
+        "TIME_TYPE=TT at the instant's JDE(TT), QUANTITIES=31; Horizons reports the "
+        "IAU76/80 ecliptic of date with light-time, gravitational deflection of light "
+        "and stellar aberration"
       ),
       "axis": (
         "Local apparent sidereal time at the site (QUANTITIES=7, TIME_TYPE=UT) converted "
-        "to RAMC degrees; Asc/MC derived test-side from RAMC and Meeus mean obliquity "
-        "plus low-accuracy nutation in longitude"
+        "to RAMC degrees; Asc/MC derived test-side from RAMC and the Meeus mean "
+        "obliquity plus the low-accuracy nutation in obliquity"
       ),
       "tt_utc": "JDE(TT) - JD(UTC) = (32.184 + delta AT) / 86400 exactly",
+      "center_source": (
+        "The geocenter kernel is taken from the center line of the first body query; "
+        "Horizons echoes the requested kernel on that line for some targets"
+      ),
     },
     "cases": cases,
   }

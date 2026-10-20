@@ -16,7 +16,7 @@ initializes it.
 See [Contributing](docs/en/contributing.md) to run the checks.
 
 Installation follows the astronomy dependency: celestial-calendar 0.8.0 publishes
-wheels for Linux x86_64 and aarch64, macOS arm64 and Windows amd64, and no source
+wheels for Linux x86_64 and aarch64, macOS 14+ arm64 and Windows amd64, and no source
 distribution. On any other platform this package cannot be installed, and
 knowledge browsing is not available either.
 

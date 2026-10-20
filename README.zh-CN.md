@@ -13,7 +13,7 @@
 运行检查见[参与开发](docs/zh-CN/contributing.md)。
 
 安装随天文依赖而定：celestial-calendar 0.8.0 只发布 Linux x86_64 与 aarch64、
-macOS arm64、Windows amd64 的轮子，没有源码分发包。其他平台无法安装本包，
+macOS 14+ arm64、Windows amd64 的轮子，没有源码分发包。其他平台无法安装本包，
 连知识浏览也不可用。
 
 ## 首版目标

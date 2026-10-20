@@ -228,18 +228,24 @@ narrow the evaluated domain, and the result says so.
 ## Check the result against an independent reference
 
 The reference cases in `tests/reference/natal_reference.json` compare two
-instants, one per hemisphere, with JPL Horizons (DE441). Under matched
-conventions the agreement is within 3 arcseconds for the Sun and the planets,
-10 arcseconds for the Moon and 1 arcsecond in latitude; the axes agree within
-0.005 degrees, and the leap-second relation `JDE(TT) - JD(UTC)` is exact. The
+instants, one per hemisphere, with JPL Horizons. Under matched conventions the
+checks require agreement within 3 arcseconds for the Sun and the planets, 15 for
+the Moon, 1 arcsecond in latitude (3 for the Moon) and 0.001 degrees for the
+axes. The Placidus cusps 2, 3, 11 and 12 are held to the same 0.001 degrees
+against the Placidus definition, evaluated at the Horizons sidereal time. The
+node check reimplements the Meeus chapter 47 formulas that the library also
+uses, and the leap-second relation `JDE(TT) - JD(UTC)` is exact. The
 [contributing guide](contributing.md#correctness) records what each reference
-can detect.
+can and cannot detect.
 
 ## Limits
 
 - Aspect angles, orbs and applying or separating motion are not calculated
   here; see the [configuration guide](configuration.md).
 - Results are not serialized and have no text output yet.
+- No external source publishes Placidus cusps. Cusps 2, 3, 11 and 12 are checked
+  against the definition, which the check and the library read alike; cusps 5, 6,
+  8 and 9 are checked only as the exact opposites.
 - The astronomy library supports civil years 1885 to 2099 and, for UTC input,
   instants from 1972-01-01; the ephemeris range is narrower than the civil
   range, and an instant outside it fails explicitly.

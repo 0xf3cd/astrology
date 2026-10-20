@@ -17,6 +17,7 @@ from tools.check import (
   PACKAGE_FILES,
   check_documents,
   check_examples,
+  check_package_files,
   check_sdist,
   check_wheel,
   document_errors,
@@ -133,6 +134,33 @@ def test_document_word_in_doctest_group() -> None:
       "1 item passed all tests:\n   2 tests in Document: group\n2 tests in 1 item.\n",
     )
   )
+
+
+def _package_tree(root: Path, names: Sequence[str]) -> None:
+  for name in names:
+    path = root / "src" / name
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("", encoding="utf-8")
+
+
+def test_every_package_file_is_listed() -> None:
+  check_package_files()
+
+
+def test_a_listed_package_tree_passes(tmp_path: Path) -> None:
+  _package_tree(tmp_path, PACKAGE_FILES)
+  pycache = tmp_path / "src" / "astrology" / "__pycache__"
+  pycache.mkdir()
+  (pycache / "module.cpython-314.pyc").write_bytes(b"")
+  check_package_files(tmp_path)
+
+
+@pytest.mark.parametrize("extra", ["astrology/new_module.py", "astrology/knowledge/data.json"])
+def test_an_unlisted_package_file_is_rejected(tmp_path: Path, extra: str) -> None:
+  _package_tree(tmp_path, (*PACKAGE_FILES, extra))
+  with pytest.raises(ValueError, match="PACKAGE_FILES") as caught:
+    check_package_files(tmp_path)
+  assert extra in str(caught.value)
 
 
 @pytest.mark.parametrize("missing", [*PACKAGE_FILES, "a.dist-info/licenses/LICENSE"])

@@ -102,14 +102,14 @@ class Placement:
 
 @dataclass(frozen=True, slots=True)
 class EffectiveConfiguration:
-  """The resolved choices actually used; substitution between them is impossible.
+  """The resolved choices actually used; a requested system never appears here as another one.
 
   `delta_t_model` is the upstream ΔT model member value the adapter fixed for
   this calculation, not a caller request. `evaluation` names the joint
   evaluation that produced the positions: selecting a subset of the requested
   objects filters that output and does not narrow the evaluated domain.
 
-  实际使用的已解析选择；它们之间不可能发生替代。`delta_t_model` 是适配层为本次计算
+  实际使用的已解析选择；请求的宫制不会以另一种宫制出现在这里。`delta_t_model` 是适配层为本次计算
   固定的上游 ΔT 模型成员值，不是调用方请求；`evaluation` 标明产出位置的联合求值方式：
   选取请求对象的子集只是过滤输出，不缩小求值域。
   """

@@ -1,6 +1,13 @@
 """The concrete adapter between resolved birth input and celestial-calendar.
 
-已解析出生输入与 celestial-calendar 之间的具体适配。
+It produces the chart module's own result values and raises its `ChartDomainError`,
+so it depends on `chart`; `chart` imports it only inside `natal_chart`. That is
+deliberate while `natal_chart` is the only consumer: a second one would be the
+reason to give the adapter its own result type.
+
+已解析出生输入与 celestial-calendar 之间的具体适配。它直接产出 chart 模块的结果值并抛出
+其 `ChartDomainError`，因此依赖 `chart`；`chart` 仅在 `natal_chart` 内导入它。在
+`natal_chart` 是唯一消费者时这是有意为之；出现第二个消费者才有理由给适配层单独的结果类型。
 """
 
 from __future__ import annotations
