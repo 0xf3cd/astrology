@@ -9,7 +9,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from enum import StrEnum
 from math import isfinite
-from typing import Literal
+from typing import Literal, cast
 
 
 class HouseSystem(StrEnum):
@@ -68,9 +68,9 @@ class LunarNode(StrEnum):
 
 
 class MajorAspect(StrEnum):
-  """The five admitted aspect identities; calculation belongs to the aspect feature.
+  """The five supported aspects; `astrology.aspects` defines their angles and evaluation.
 
-  接纳的五种相位标识；计算归后续相位功能。
+  支持的五种相位；角度定义和判断函数在 `astrology.aspects` 里。
   """
 
   CONJUNCTION = "conjunction"
@@ -80,28 +80,82 @@ class MajorAspect(StrEnum):
   OPPOSITION = "opposition"
 
 
+class OrbCombination(StrEnum):
+  """Combine two objects' orbs into one limit, without prescribing a tradition's rule.
+
+  Each object has an orb for the aspect (its own override or the rule's orb). A pair
+  is within the limit when its deviation from the exact angle satisfies the rule:
+  either object's orb contains it (the larger orb), both objects' orbs contain it
+  (the smaller orb), or the mean of the two orbs contains it. A limit is inclusive.
+
+  将两个对象的容许度合成一个上限，不指定哪个规则属于哪个传统。每个对象使用单独设置的容许度，
+  未单独设置时使用相位规则的容许度。三种合成方式分别取较大值、较小值或平均值；
+  偏差的绝对值不超过该上限就算符合规则，等于上限也算。
+  """
+
+  EITHER_WITHIN_OWN_ORB = "either_within_own_orb"
+  BOTH_WITHIN_OWN_ORB = "both_within_own_orb"
+  MEAN_OF_ORBS = "mean_of_orbs"
+
+
+def _orb(value: object) -> float:
+  """Return a finite nonnegative orb as a float. 返回有限且非负的容许度，类型为 float。"""
+  if type(value) not in (int, float):
+    raise TypeError("orb_degrees must be a number, not bool")
+  try:
+    orb = float(cast("int | float", value))
+  except OverflowError as exc:
+    raise ValueError("orb_degrees must be finite and nonnegative") from exc
+  if not isfinite(orb) or orb < 0:
+    raise ValueError("orb_degrees must be finite and nonnegative")
+  return orb
+
+
+@dataclass(frozen=True, slots=True)
+class ObjectOrb:
+  """One object's own orb for one aspect rule, in degrees; finite and nonnegative.
+
+  为某个对象在一条相位规则中单独设置的容许度，单位为度，必须有限且非负。
+  """
+
+  identity: Body | LunarNode
+  orb_degrees: float
+
+  def __post_init__(self) -> None:
+    if not isinstance(self.identity, (Body, LunarNode)):
+      raise TypeError("identity must be a Body or LunarNode")
+    object.__setattr__(self, "orb_degrees", _orb(self.orb_degrees))
+
+
 @dataclass(frozen=True, slots=True)
 class AspectRule:
-  """An explicit caller-supplied, finite nonnegative orb in degrees; no default or evaluation.
+  """An explicit caller-supplied orb for one aspect, with optional per-object orbs.
 
-  调用方显式给出以度为单位、有限且非负的容许度；不提供默认值，也不执行判断。
+  `orb_degrees` is finite, nonnegative and in degrees; it applies to every object
+  without an entry in `object_orbs`. The entries are copied into a tuple and name
+  each object once. There is no default orb, and this type does not evaluate.
+
+  由调用方给出一种相位的容许度，也可以为对象单独设置。`orb_degrees` 必须有限、非负，
+  单位为度。未在 `object_orbs` 中单独设置的对象使用这个值。条目复制为元组，
+  每个对象只能出现一次。没有默认容许度；这个类型只保存规则，不计算相位。
   """
 
   aspect: MajorAspect
   orb_degrees: float
+  object_orbs: Sequence[ObjectOrb] = ()
 
   def __post_init__(self) -> None:
     if not isinstance(self.aspect, MajorAspect):
       raise TypeError("aspect must be a MajorAspect")
-    if type(self.orb_degrees) not in (int, float):
-      raise TypeError("orb_degrees must be a number, not bool")
-    try:
-      orb = float(self.orb_degrees)
-    except OverflowError as exc:
-      raise ValueError("orb_degrees must be finite and nonnegative") from exc
-    if not isfinite(orb) or orb < 0:
-      raise ValueError("orb_degrees must be finite and nonnegative")
-    object.__setattr__(self, "orb_degrees", orb)
+    object.__setattr__(self, "orb_degrees", _orb(self.orb_degrees))
+    if not isinstance(self.object_orbs, Sequence) or isinstance(self.object_orbs, (str, bytes)):
+      raise TypeError("object_orbs must be a sequence of ObjectOrb values")
+    object_orbs = tuple(self.object_orbs)
+    if any(type(value) is not ObjectOrb for value in object_orbs):
+      raise TypeError("object_orbs must contain only ObjectOrb values")
+    if len({value.identity for value in object_orbs}) != len(object_orbs):
+      raise ValueError("object_orbs must not repeat an object")
+    object.__setattr__(self, "object_orbs", object_orbs)
 
 
 @dataclass(frozen=True, slots=True)
@@ -109,12 +163,19 @@ class ChartConfig:
   """Requested choices only, preserving order in isolated immutable tuples.
 
   Select a house system, nonempty unique objects, and explicit unique aspect rules.
-  An empty aspect sequence is allowed.
-  Only tropical/geocentric is admitted. No orb or house defaults, effective-model
-  claims, computation, or fallback are supplied.
+  An empty aspect sequence is allowed. Aspects are judged among `aspect_objects`,
+  which must be a subset of `objects`; omitted, it means all requested objects.
+  `orb_combination` is required exactly when some rule has per-object orbs, and a
+  per-object orb may name only a participating object. Only tropical/geocentric is
+  admitted. No orb or house defaults, effective-model claims, computation, or
+  fallback are supplied.
 
-  仅保存请求选择，按原顺序存入隔离的不可变元组。宫制、非空且不重复的对象及不重复的显式相位规则
-  均须给出，相位序列可以为空；仅支持热带黄道和地心。不提供容许度或宫制默认值、实际模型声明、计算或替代策略。
+  只保存排盘请求。对象和相位规则按原顺序复制为不可变元组，不受调用方后续修改列表的影响。
+  必须指定宫制和至少一个对象，对象不能重复；相位规则也不能重复，但可以为空。
+  `aspect_objects` 指定参与相位的对象，必须是 `objects` 的子集；省略时所有请求的对象都参与。
+  只要有规则为对象单独设置容许度，就必须给出 `orb_combination`，否则不能给。
+  单独设置容许度的对象必须参与相位。仅支持热带黄道和地心，不提供默认容许度或默认宫制，
+  不记录实际计算模型，也不执行计算或提供替代策略。
   """
 
   house_system: HouseSystem
@@ -122,6 +183,8 @@ class ChartConfig:
   aspects: Sequence[AspectRule]
   zodiac: Literal["tropical"] = "tropical"
   center: Literal["geocentric"] = "geocentric"
+  aspect_objects: Sequence[Body | LunarNode] | None = None
+  orb_combination: OrbCombination | None = None
 
   def __post_init__(self) -> None:
     if not isinstance(self.house_system, HouseSystem):
@@ -146,5 +209,34 @@ class ChartConfig:
       raise TypeError("aspects must contain only AspectRule values")
     if len({value.aspect for value in aspects}) != len(aspects):
       raise ValueError("aspects must not repeat an aspect identity")
+    if self.aspect_objects is not None:
+      if not aspects:
+        raise ValueError("aspect_objects requires aspect rules")
+      if not isinstance(self.aspect_objects, Sequence) or isinstance(
+        self.aspect_objects, (str, bytes)
+      ):
+        raise TypeError("aspect_objects must be a sequence of Body or LunarNode values")
+      participants = tuple(self.aspect_objects)
+      if not participants:
+        raise ValueError("aspect_objects must not be empty")
+      if any(not isinstance(value, (Body, LunarNode)) for value in participants):
+        raise TypeError("aspect_objects must contain only Body or LunarNode values")
+      if len(set(participants)) != len(participants):
+        raise ValueError("aspect_objects must not contain duplicate identities")
+      if not set(participants) <= set(objects):
+        raise ValueError("aspect_objects must be a subset of objects")
+      object.__setattr__(self, "aspect_objects", participants)
+    else:
+      participants = objects
+    has_object_orbs = any(rule.object_orbs for rule in aspects)
+    if self.orb_combination is not None and not isinstance(self.orb_combination, OrbCombination):
+      raise TypeError("orb_combination must be an OrbCombination")
+    if has_object_orbs and self.orb_combination is None:
+      raise ValueError("orb_combination is required when aspect rules have object orbs")
+    if not has_object_orbs and self.orb_combination is not None:
+      raise ValueError("orb_combination requires aspect rules with object orbs")
+    for rule in aspects:
+      if any(entry.identity not in participants for entry in rule.object_orbs):
+        raise ValueError("object orbs may name only objects that take part in aspects")
     object.__setattr__(self, "objects", objects)
     object.__setattr__(self, "aspects", aspects)

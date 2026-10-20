@@ -143,6 +143,18 @@ the tolerance can still be caught. The cases below were judged with that offset 
 | Horizons sidereal time, Placidus cusps 2, 3, 11 and 12 | Cusps away from the Placidus time division by more than about 0.0015 degrees, such as another house system. | A misreading of the Placidus definition shared with the check. Cusps 5, 6, 8 and 9 are checked only as the exact opposites; the repository keeps no external reference values for the cusps. |
 | Meeus chapter 47 nodes | A wrong node definition, direction or missing nutation term. | A mistake in the shared formula, and a TT/UT mix, which moves a node by under 0.4 arcseconds. |
 
+Aspect tests have three parts. Hand-computed cases in `tests/test_aspects.py`
+need no astronomy. Dividing a one-hour longitude change by the elapsed time checks
+the sign and unit of the rates used to determine applying or separating motion.
+The reference tests configure the orbs that Astrodienst publishes for its
+Hellenistic drawing style and compare the resulting aspect set with one derived from
+the Horizons longitudes. Where a pair lies near an orb limit, they detect a wrong orb,
+combination rule or angle; they also detect a node that takes part. They cannot
+detect a longitude error smaller than the 0.4-degree margin, and the two instants
+hold no sextile or opposition, so those angles rest on the hand-computed cases. They
+do not check the status against an external source: Horizons supplies no rates here,
+and the style page gives parameters, not the aspect list of a chart.
+
 ## Knowledge and documentation
 
 Follow the [knowledge design](knowledge.md). Link explanations to stable concepts,

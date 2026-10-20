@@ -2,8 +2,8 @@
 
 [English](../en/architecture.md) · [项目入口](../../README.zh-CN.md) · [知识组织](knowledge.md)
 
-出生记录、现代时刻解析、请求配置、热带本命盘及独立知识已实现，合同见[出生](birth.md)、
-[配置](configuration.md)、[排盘](chart.md)
+出生记录、现代时刻解析、请求配置、热带本命盘、主要相位及独立知识已实现，用法和约束见[出生](birth.md)、
+[配置](configuration.md)、[排盘](chart.md)、[相位](aspects.md)
 及[知识](knowledge.md)指南；
 下方其余结构仍属规划。当前命盘是可复现的现代热带黄道、地心本命盘，
 并能独立查阅排盘所依据的知识。
@@ -83,7 +83,7 @@ Equal 和 Whole Sign 同样保留上游对四轴无定义情形的限制，不�
 
 ## 交付顺序
 
-出生／配置值、独立知识目录及热带本命盘已实现。下一步增加相位，随后完成序列化及文本输出，
+出生／配置值、独立知识目录、热带本命盘及主要相位已实现。下一步完成序列化及文本输出，
 并随这些功能扩充双语文档与安装包验收。
 
 任务状态归 [v0.1.0 milestone](https://github.com/0xf3cd/astrology/milestone/1)。

@@ -3,8 +3,8 @@
 [English](../en/reference.md) · [文档](index.md)
 
 这些开发期 API 从定义模块渲染。公开概述与合同保留双语；两种语言视图使用同一份定义。
-已执行的例子、校验行为和支持范围见[出生输入](birth.md)、[请求配置](configuration.md)
-与[排盘指南](chart.md)。独立查询见[知识指南](knowledge.md)。
+已执行的例子、校验行为和支持范围见[出生输入](birth.md)、[请求配置](configuration.md)、
+[排盘指南](chart.md)与[相位指南](aspects.md)。独立查询见[知识指南](knowledge.md)。
 
 ## 出生记录与时刻解析
 
@@ -20,7 +20,7 @@
 
 ```{eval-rst}
 .. automodule:: astrology.config
-   :members: HouseSystem, Body, NodeDefinition, LunarNode, MajorAspect, AspectRule, ChartConfig
+   :members: HouseSystem, Body, NodeDefinition, LunarNode, MajorAspect, OrbCombination, ObjectOrb, AspectRule, ChartConfig
    :undoc-members:
    :member-order: bysource
    :no-index:
@@ -51,6 +51,16 @@
 ```{eval-rst}
 .. automodule:: astrology.houses
    :members: house_of
+   :undoc-members:
+   :member-order: bysource
+   :no-index:
+```
+
+## 相位
+
+```{eval-rst}
+.. automodule:: astrology.aspects
+   :members: AspectMotion, AspectObject, AspectHit, aspect_angle, find_aspects
    :undoc-members:
    :member-order: bysource
    :no-index:

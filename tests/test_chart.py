@@ -7,12 +7,15 @@ import math
 import subprocess
 import sys
 from dataclasses import FrozenInstanceError, replace
-from datetime import date, time, timedelta
+from datetime import date, datetime, time, timedelta
 from importlib.metadata import version
 
 import pytest
 
 from astrology import (
+  AspectMotion,
+  AspectObject,
+  AspectRule,
   BirthRecord,
   Body,
   ChartConfig,
@@ -21,9 +24,14 @@ from astrology import (
   HouseSystem,
   Location,
   LunarNode,
+  MajorAspect,
   MissingBirthDataError,
+  NatalChart,
+  ObjectOrb,
+  OrbCombination,
   ResolvedBirth,
   TimePrecision,
+  find_aspects,
   house_of,
   natal_chart,
   prepare_natal_input,
@@ -427,7 +435,7 @@ def test_a_result_needs_twelve_cusps_in_a_sequence(cusps: object) -> None:
     replace(chart.houses, cusps_deg=cusps)  # type: ignore[arg-type]
 
 
-@pytest.mark.parametrize("name", ["positions", "placements"])
+@pytest.mark.parametrize("name", ["positions", "placements", "aspects"])
 def test_a_result_needs_its_members_in_a_sequence(name: str) -> None:
   chart = natal_chart(resolved_at(*_NORTH[:2], *_NORTH[2:]), config_for())
   with pytest.raises(TypeError, match=name):
@@ -505,3 +513,167 @@ else:
   for mode in ((), ("-O",)):
     result = subprocess.run([sys.executable, *mode, "-c", code], text=True, capture_output=True)
     assert result.returncode == 0, result.stdout + result.stderr
+
+
+def wide_rules(orb: float = 10.0) -> list[AspectRule]:
+  return [AspectRule(aspect, orb) for aspect in MajorAspect]
+
+
+def aspect_chart(
+  rules: list[AspectRule],
+  objects: tuple[Body | LunarNode, ...] = _ALL_OBJECTS,
+  *,
+  site: tuple[date, time, float, float] = _NORTH,
+  aspect_objects: list[Body | LunarNode] | None = None,
+  orb_combination: OrbCombination | None = None,
+) -> NatalChart:
+  request = ChartConfig(
+    HouseSystem.EQUAL,
+    objects,
+    rules,
+    aspect_objects=aspect_objects,
+    orb_combination=orb_combination,
+  )
+  return natal_chart(resolved_at(*site), request)
+
+
+def test_without_aspect_rules_there_are_no_aspects_and_no_participants() -> None:
+  chart = natal_chart(
+    resolved_at(*_NORTH[:2], *_NORTH[2:]), config_for(HouseSystem.EQUAL, _ALL_OBJECTS)
+  )
+  assert chart.aspects == ()
+  assert chart.effective.aspect_objects == ()
+  assert chart.effective.orb_combination is None
+
+
+def test_aspects_are_judged_from_the_positions_and_rates_of_the_same_calculation() -> None:
+  chart = aspect_chart(wide_rules())
+  rates = {
+    position.identity: position.longitude_rate_deg_per_tt_day for position in chart.positions
+  }
+  expected = find_aspects(
+    [
+      AspectObject(p.identity, p.longitude_deg, p.longitude_rate_deg_per_tt_day)
+      for p in chart.positions
+    ],
+    chart.requested.aspects,
+  )
+  assert chart.aspects == expected
+  assert len(chart.aspects) > 10
+  assert chart.effective.orb_combination is None
+  assert chart.effective.aspect_objects == _ALL_OBJECTS
+  for hit in chart.aspects:
+    relative = rates[hit.second] - rates[hit.first]
+    if hit.motion is AspectMotion.APPLYING:
+      assert hit.deviation_deg * relative < 0
+    elif hit.motion is AspectMotion.SEPARATING:
+      assert hit.deviation_deg * relative > 0
+    else:
+      assert hit.motion is AspectMotion.EXACT
+
+
+def test_pairs_follow_the_requested_object_order() -> None:
+  forward = (Body.SUN, Body.MOON, Body.MARS, Body.SATURN)
+  backward = forward[::-1]
+  rules = wide_rules(15.0)
+  first = {(h.first, h.second, h.aspect) for h in aspect_chart(rules, forward).aspects}
+  second = aspect_chart(rules, backward).aspects
+  assert first
+  assert len(second) == len(first)
+  order: dict[Body | LunarNode, int] = {identity: index for index, identity in enumerate(backward)}
+  assert all(order[h.first] < order[h.second] for h in second)
+
+
+def test_a_subset_of_aspect_objects_limits_the_pairs_and_is_recorded_in_chart_order() -> None:
+  chart = aspect_chart(wide_rules(15.0), aspect_objects=[Body.VENUS, Body.SUN, Body.MOON])
+  assert chart.effective.aspect_objects == (Body.SUN, Body.MOON, Body.VENUS)
+  assert chart.aspects
+  assert {h.first for h in chart.aspects} | {h.second for h in chart.aspects} <= {
+    Body.SUN,
+    Body.MOON,
+    Body.VENUS,
+  }
+  assert len(chart.positions) == len(_ALL_OBJECTS)
+
+
+def test_two_lunar_nodes_do_not_aspect_even_when_exactly_opposed() -> None:
+  rules = [AspectRule(MajorAspect.OPPOSITION, 10.0), AspectRule(MajorAspect.CONJUNCTION, 10.0)]
+  chart = aspect_chart(rules, (LunarNode.MEAN_ASCENDING, LunarNode.MEAN_DESCENDING, Body.SUN))
+  assert not any(
+    isinstance(h.first, LunarNode) and isinstance(h.second, LunarNode) for h in chart.aspects
+  )
+  assert LunarNode.MEAN_ASCENDING in {p.identity for p in chart.positions}
+
+
+def test_a_node_kept_out_of_aspect_objects_still_has_its_position() -> None:
+  chart = aspect_chart(
+    wide_rules(30.0),
+    (Body.SUN, Body.MOON, LunarNode.MEAN_ASCENDING),
+    aspect_objects=[Body.SUN, Body.MOON],
+  )
+  assert LunarNode.MEAN_ASCENDING in {p.identity for p in chart.positions}
+  assert chart.effective.aspect_objects == (Body.SUN, Body.MOON)
+  assert not any(LunarNode.MEAN_ASCENDING in (h.first, h.second) for h in chart.aspects)
+  with_node = aspect_chart(wide_rules(30.0), (Body.SUN, Body.MOON, LunarNode.MEAN_ASCENDING))
+  assert any(LunarNode.MEAN_ASCENDING in (h.first, h.second) for h in with_node.aspects)
+
+
+def test_the_requested_orb_combination_is_recorded_and_used() -> None:
+  rules = [AspectRule(aspect, 3.0, [ObjectOrb(Body.MOON, 13.0)]) for aspect in MajorAspect]
+  chart = aspect_chart(
+    rules,
+    (Body.SUN, Body.MOON, Body.MERCURY, Body.VENUS, Body.MARS, Body.JUPITER, Body.SATURN),
+    site=(*_SOUTH[:2], *_SOUTH[2:]),
+    orb_combination=OrbCombination.EITHER_WITHIN_OWN_ORB,
+  )
+  assert chart.effective.orb_combination is OrbCombination.EITHER_WITHIN_OWN_ORB
+  limits = {Body.MOON in (h.first, h.second): h.orb_limit_deg for h in chart.aspects}
+  assert limits == {True: 13.0, False: 3.0}
+
+
+def test_the_result_does_not_alias_aspect_sequences_given_by_the_caller() -> None:
+  chart = aspect_chart(wide_rules())
+  aspects = list(chart.aspects)
+  rebuilt = replace(chart, aspects=aspects)  # type: ignore[arg-type]
+  aspects.clear()
+  assert isinstance(rebuilt.aspects, tuple)
+  assert rebuilt.aspects == chart.aspects
+  participants = list(chart.effective.aspect_objects)
+  effective = replace(chart.effective, aspect_objects=participants)  # type: ignore[arg-type]
+  participants.clear()
+  assert isinstance(effective.aspect_objects, tuple)
+  assert effective.aspect_objects == chart.effective.aspect_objects
+  with pytest.raises(TypeError, match="aspect_objects"):
+    replace(chart.effective, aspect_objects="sun")  # type: ignore[arg-type]
+
+
+# Aspect motion uses these rates. Check them against a one-hour central difference
+# of the longitudes: agreement is about 1e-6 degrees per day for the Moon and true
+# node. A wrong sign, hours instead of days, or a wrong day length gives an error
+# of at least 0.01 degrees per day even for the slowest object.
+# 相位的运动状态依赖这些速率，因此用相隔一小时的黄经作中心差分来核对。
+# 月亮和真交点的误差约为 1e-6 度/日。如果符号错了、把每天当成每小时，或日长用错，
+# 即使最慢的对象也会相差至少 0.01 度/日。
+RATE_TOLERANCE_DEGREES_PER_DAY = 1e-5
+
+
+def test_longitude_rates_are_the_derivative_of_the_longitudes_per_tt_day() -> None:
+  middle = datetime.combine(_NORTH[0], _NORTH[1])
+  half_hour = timedelta(minutes=30)
+  charts = [
+    natal_chart(
+      resolved_at(instant.date(), instant.time(), *_NORTH[2:]),
+      config_for(HouseSystem.WHOLE_SIGN, _ALL_OBJECTS),
+    )
+    for instant in (middle - half_hour, middle, middle + half_hour)
+  ]
+  one_hour = 1 / 24
+  assert math.isclose(
+    charts[2].times.jde_tt - charts[0].times.jde_tt, one_hour, rel_tol=0, abs_tol=1e-8
+  )
+  before, now, after = (chart.positions for chart in charts)
+  for early, current, late in zip(before, now, after, strict=True):
+    difference = (late.longitude_deg - early.longitude_deg + 180.0) % 360.0 - 180.0
+    derivative = difference / one_hour
+    assert abs(derivative - current.longitude_rate_deg_per_tt_day) < RATE_TOLERANCE_DEGREES_PER_DAY
+    assert abs(current.longitude_rate_deg_per_tt_day) > 0.01

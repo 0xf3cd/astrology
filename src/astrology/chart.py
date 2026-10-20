@@ -9,8 +9,9 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Literal
 
+from astrology.aspects import AspectHit, AspectObject, find_aspects
 from astrology.birth import MissingBirthDataError, ResolvedBirth
-from astrology.config import Body, ChartConfig, HouseSystem, LunarNode
+from astrology.config import Body, ChartConfig, HouseSystem, LunarNode, OrbCombination
 from astrology.houses import house_of
 from astrology.zodiac import Sign, sign_degree, sign_of
 
@@ -122,15 +123,30 @@ class EffectiveConfiguration:
   this calculation, not a caller request. `evaluation` names the joint
   evaluation that produced the positions: selecting a subset of the requested
   objects filters that output and does not narrow the evaluated domain.
+  `aspect_objects` holds the objects aspects were judged among, in the order of
+  the requested objects, and is empty when no aspect rules were requested.
+  `orb_combination` repeats the requested rule, or None when no rule has
+  per-object orbs.
 
   实际采用的已确定选择。请求的宫制不会在这里变成另一种宫制。`delta_t_model` 是适配层为
   这次计算固定下来的上游 ΔT 模型取值，不是调用方的请求；`evaluation` 说明位置来自哪种
-  联合求值：只选一部分对象时，只是筛选输出，不缩小求值域。
+  联合求值：只选一部分对象时，只是筛选输出，不缩小求值域。`aspect_objects` 是判断相位时
+  所用的对象，按请求对象的顺序排列；没有请求相位规则时为空。`orb_combination` 保存请求中的
+  合成规则；没有规则带按对象的容许度时为 None。
   """
 
   house_system: HouseSystem
   delta_t_model: str
   evaluation: Literal["fixed_fourteen_object_joint_snapshot"]
+  aspect_objects: tuple[Body | LunarNode, ...]
+  orb_combination: OrbCombination | None
+
+  def __post_init__(self) -> None:
+    if not isinstance(self.aspect_objects, Sequence) or isinstance(
+      self.aspect_objects, (str, bytes)
+    ):
+      raise TypeError("aspect_objects must be a sequence")
+    object.__setattr__(self, "aspect_objects", tuple(self.aspect_objects))
 
 
 @dataclass(frozen=True, slots=True)
@@ -149,11 +165,14 @@ class ChartProvenance:
 class NatalChart:
   """A complete immutable natal result; objects follow the requested order.
 
-  The positions and placements are copied into tuples, so lists given by the
+  Aspects are those requested in `requested.aspects`, among the objects named in
+  `effective.aspect_objects`, in the order documented by `find_aspects`. The
+  positions, placements and aspects are copied into tuples, so lists given by the
   caller are not aliased.
 
-  完整且不可变的本命盘结果；对象按请求的顺序排列。位置和落宫会复制成元组，不会引用
-  调用方传入的列表。
+  完整且不可变的本命盘结果；对象按请求的顺序排列。按 `requested.aspects` 中的规则，
+  在 `effective.aspect_objects` 所列对象之间计算相位，结果顺序见 `find_aspects`。
+  位置、落宫和相位会复制成元组，不会引用调用方传入的列表。
   """
 
   requested: ChartConfig
@@ -163,9 +182,10 @@ class NatalChart:
   positions: tuple[EclipticPosition, ...]
   houses: ChartHouses
   placements: tuple[Placement, ...]
+  aspects: tuple[AspectHit, ...]
 
   def __post_init__(self) -> None:
-    for name in ("positions", "placements"):
+    for name in ("positions", "placements", "aspects"):
       members = getattr(self, name)
       if not isinstance(members, Sequence) or isinstance(members, (str, bytes)):
         raise TypeError(f"{name} must be a sequence")
@@ -179,12 +199,16 @@ def natal_chart(resolved: ResolvedBirth, config: ChartConfig) -> NatalChart:
   preparation. The astronomy adapter is imported here, not at package import, so
   importing astrology or querying knowledge never initializes native astronomy.
   A requested geometry outside the joint upstream domain raises
-  `ChartDomainError` and never falls back to another house system.
+  `ChartDomainError` and never falls back to another house system. Requested
+  aspect rules are judged among the objects of `config.aspect_objects`, or among
+  all requested objects when it is unset, from the positions and longitude rates
+  of this calculation.
 
   为已解析的出生时刻计算热带地心本命盘。出生记录必须带地点；时间未知的记录在准备阶段
   就已被拒绝。天文适配层在这个函数里才导入，不在导入包时导入，所以导入 astrology 或查询
   知识都不会初始化原生天文库。请求的几何超出上游的联合求值域时，抛出
-  `ChartDomainError`，绝不退回到别的宫制。
+  `ChartDomainError`，不会改用别的宫制。根据这次计算的位置和黄经速率，
+  在 `config.aspect_objects` 指定的对象之间计算相位；未设置时，所有请求的对象都参与。
   """
   if type(resolved) is not ResolvedBirth:
     raise TypeError("resolved must be a ResolvedBirth")
@@ -209,12 +233,34 @@ def natal_chart(resolved: ResolvedBirth, config: ChartConfig) -> NatalChart:
     )
     for position in positions
   )
+  participants = (
+    tuple(
+      identity
+      for identity in config.objects
+      if config.aspect_objects is None or identity in config.aspect_objects
+    )
+    if config.aspects
+    else ()
+  )
+  aspects = find_aspects(
+    [
+      AspectObject(
+        position.identity, position.longitude_deg, position.longitude_rate_deg_per_tt_day
+      )
+      for position in positions
+      if position.identity in participants
+    ],
+    config.aspects,
+    config.orb_combination,
+  )
   return NatalChart(
     requested=config,
     effective=EffectiveConfiguration(
       house_system=config.house_system,
       delta_t_model=delta_t_model_id(),
       evaluation="fixed_fourteen_object_joint_snapshot",
+      aspect_objects=participants,
+      orb_combination=config.orb_combination,
     ),
     provenance=ChartProvenance(
       celestial_version=celestial_version(),
@@ -225,4 +271,5 @@ def natal_chart(resolved: ResolvedBirth, config: ChartConfig) -> NatalChart:
     positions=positions,
     houses=houses,
     placements=placements,
+    aspects=aspects,
   )

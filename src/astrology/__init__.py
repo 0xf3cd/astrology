@@ -5,6 +5,13 @@ Importing the package initializes no native astronomy.
 出生输入、请求配置、命盘组合，以及独立的知识查询；导入这个包本身不会初始化原生天文库。
 """
 
+from astrology.aspects import (
+  AspectHit,
+  AspectMotion,
+  AspectObject,
+  aspect_angle,
+  find_aspects,
+)
 from astrology.birth import (
   AmbiguousBirthTimeError,
   BirthRecord,
@@ -38,6 +45,8 @@ from astrology.config import (
   LunarNode,
   MajorAspect,
   NodeDefinition,
+  ObjectOrb,
+  OrbCombination,
 )
 from astrology.houses import house_of
 from astrology.knowledge import Catalog, load_catalog
@@ -45,6 +54,9 @@ from astrology.zodiac import Sign, sign_degree, sign_of, truncate_display
 
 __all__ = [
   "AmbiguousBirthTimeError",
+  "AspectHit",
+  "AspectMotion",
+  "AspectObject",
   "AspectRule",
   "BirthRecord",
   "Body",
@@ -67,10 +79,14 @@ __all__ = [
   "NatalChart",
   "NodeDefinition",
   "NonexistentBirthTimeError",
+  "ObjectOrb",
+  "OrbCombination",
   "Placement",
   "ResolvedBirth",
   "Sign",
   "TimePrecision",
+  "aspect_angle",
+  "find_aspects",
   "house_of",
   "load_catalog",
   "natal_chart",

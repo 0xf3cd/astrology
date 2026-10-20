@@ -44,13 +44,13 @@ can change without changing the request. Duplicate objects or duplicate aspect
 identities are rejected rather than silently merged. Enum value strings such as
 `"sun"` are not enum instances and are not implicitly converted.
 
-## Supply aspect rules without evaluating them
+## Request aspects
 
 `MajorAspect` names conjunction, sextile, square, trine, and opposition.
-The [aspect feature](https://github.com/0xf3cd/astrology/issues/4) owns their angles and evaluation rules.
-`AspectRule` carries a caller-supplied finite nonnegative `orb_degrees` value.
-This foundation stores requests; it does not calculate aspects, choose a
-tradition's orb policy, or classify applying/separating motion.
+`AspectRule` carries a caller-supplied finite nonnegative `orb_degrees` value in
+degrees. This layer stores the request. It does not calculate aspects or choose a
+tradition's orb policy; the [aspect guide](aspects.md) explains how the request is
+judged.
 
 ```{doctest}
 >>> from astrology import AspectRule, MajorAspect
@@ -64,8 +64,38 @@ tradition's orb policy, or classify applying/separating motion.
 ```
 
 The zero orb above is an explicit synthetic request value, not a library default
-or recommendation. NaN, infinity, negative orbs, booleans, unsupported modes,
-and inconsistent selections fail under normal Python and `python -O`.
+or recommendation.
+
+## Give an object its own orb, and choose who takes part
+
+Use `ObjectOrb` to set an object's orb separately; other objects use the rule's
+`orb_degrees`. If any rule uses `ObjectOrb`, you must choose `orb_combination` to
+combine the pair's orbs into one limit. Otherwise, leave `orb_combination` out.
+`aspect_objects` selects the objects to include in aspects and must be a subset
+of `objects`. If omitted, all requested objects take part. You can set a separate
+orb only for an object that takes part.
+
+```{doctest}
+>>> from astrology import LunarNode, ObjectOrb, OrbCombination
+>>> rules = [AspectRule(MajorAspect.TRINE, 3, [ObjectOrb(Body.MOON, 13)])]
+>>> objects = (Body.SUN, Body.MOON, LunarNode.MEAN_ASCENDING)
+>>> request = ChartConfig(
+...   HouseSystem.PLACIDUS, objects, rules,
+...   aspect_objects=[Body.SUN, Body.MOON],
+...   orb_combination=OrbCombination.EITHER_WITHIN_OWN_ORB,
+... )
+>>> [value.value for value in request.aspect_objects]
+['sun', 'moon']
+>>> request.orb_combination.value
+'either_within_own_orb'
+>>> ChartConfig(HouseSystem.PLACIDUS, objects, rules)
+Traceback (most recent call last):
+...
+ValueError: orb_combination is required when aspect rules have object orbs
+```
+
+NaN, infinity, negative orbs, booleans, unsupported modes, and inconsistent
+selections fail under normal Python and `python -O`.
 
 The defining enums and API contracts are generated in the [reference](reference.md).
 Actual astronomy models, versions, time scales, and effective calculation

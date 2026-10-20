@@ -5,8 +5,9 @@
 The package supplies birth records, modern timezone resolution, immutable
 requested configuration, tropical natal chart calculation, independent knowledge
 queries and development checks. Chart calculation is available through
-[the chart guide](chart.md); aspects and result serialization are still tracked
-in the [v0.1 roadmap](https://github.com/0xf3cd/astrology/issues/12).
+[the chart guide](chart.md) and aspects through [the aspect guide](aspects.md);
+result serialization is still tracked in the
+[v0.1 roadmap](https://github.com/0xf3cd/astrology/issues/12).
 
 ```{toctree}
 :maxdepth: 1
@@ -15,6 +16,7 @@ in the [v0.1 roadmap](https://github.com/0xf3cd/astrology/issues/12).
 birth
 configuration
 chart
+aspects
 reference
 architecture
 knowledge

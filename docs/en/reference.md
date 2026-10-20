@@ -5,7 +5,7 @@
 These development APIs are rendered from their defining modules. Public summaries
 and contracts are bilingual; both language views use the same definitions.
 See [birth inputs](birth.md), [requested configuration](configuration.md) and
-[the chart guide](chart.md) for executed input examples. The
+[the chart guide](chart.md) and [the aspect guide](aspects.md) for executed examples. The
 [knowledge guide](knowledge.md) covers chart-independent queries.
 
 ## Birth records and resolution
@@ -21,7 +21,7 @@ See [birth inputs](birth.md), [requested configuration](configuration.md) and
 
 ```{eval-rst}
 .. automodule:: astrology.config
-   :members: HouseSystem, Body, NodeDefinition, LunarNode, MajorAspect, AspectRule, ChartConfig
+   :members: HouseSystem, Body, NodeDefinition, LunarNode, MajorAspect, OrbCombination, ObjectOrb, AspectRule, ChartConfig
    :undoc-members:
    :member-order: bysource
 ```
@@ -49,6 +49,15 @@ See [birth inputs](birth.md), [requested configuration](configuration.md) and
 ```{eval-rst}
 .. automodule:: astrology.houses
    :members: house_of
+   :undoc-members:
+   :member-order: bysource
+```
+
+## Aspects
+
+```{eval-rst}
+.. automodule:: astrology.aspects
+   :members: AspectMotion, AspectObject, AspectHit, aspect_angle, find_aspects
    :undoc-members:
    :member-order: bysource
 ```

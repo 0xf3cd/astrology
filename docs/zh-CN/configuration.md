@@ -36,12 +36,11 @@ Meeus 五项真交点定义的数学升降交点。定义是各交点标识的�
 对象和规则序列按原顺序复制为元组，调用方随后修改列表不会改变请求。
 重复对象或重复相位标识会被拒绝，不静默合并。`"sun"` 这样的枚举值字符串不是枚举实例，不作隐式转换。
 
-## 提供相位规则，但不执行判断
+## 请求相位
 
 `MajorAspect` 标识合相（conjunction）、六分相（sextile）、四分相（square）、三分相（trine）和对分相（opposition）。
-角度及求值规则归[相位功能](https://github.com/0xf3cd/astrology/issues/4)。`AspectRule` 保存调用方提供的
-有限、非负 `orb_degrees`，单位为度。本层只保存请求，不计算相位，不选择流派的容许度政策，
-也不判断入相／出相运动。
+`AspectRule` 保存调用方提供的有限、非负 `orb_degrees`，单位为度。本层只保存请求，不计算相位，
+也不替调用方选择流派的容许度规则；如何计算相位，见[相位指南](aspects.md)。
 
 ```{doctest}
 >>> from astrology import AspectRule, MajorAspect
@@ -54,7 +53,34 @@ Meeus 五项真交点定义的数学升降交点。定义是各交点标识的�
 ('tropical', 'geocentric')
 ```
 
-上例的零容许度是显式的合成请求值，不是库默认值或建议。
+上例中的零容许度是为演示手动设置的，不是库的默认值或建议值。
+
+## 给对象单独的容许度，并选择参与的对象
+
+用 `ObjectOrb` 为某个对象单独设置容许度；其他对象使用规则的 `orb_degrees`。
+只要有规则使用了 `ObjectOrb`，就必须指定 `orb_combination`，说明两个对象的容许度如何合成一个上限；
+没有规则使用时，就不能指定。`aspect_objects` 指定参与相位的对象，必须是 `objects` 的子集；
+不写时，所有请求的对象都参与。只能为参与相位的对象单独设置容许度。
+
+```{doctest}
+>>> from astrology import LunarNode, ObjectOrb, OrbCombination
+>>> rules = [AspectRule(MajorAspect.TRINE, 3, [ObjectOrb(Body.MOON, 13)])]
+>>> objects = (Body.SUN, Body.MOON, LunarNode.MEAN_ASCENDING)
+>>> request = ChartConfig(
+...   HouseSystem.PLACIDUS, objects, rules,
+...   aspect_objects=[Body.SUN, Body.MOON],
+...   orb_combination=OrbCombination.EITHER_WITHIN_OWN_ORB,
+... )
+>>> [value.value for value in request.aspect_objects]
+['sun', 'moon']
+>>> request.orb_combination.value
+'either_within_own_orb'
+>>> ChartConfig(HouseSystem.PLACIDUS, objects, rules)
+Traceback (most recent call last):
+...
+ValueError: orb_combination is required when aspect rules have object orbs
+```
+
 NaN、无穷、负容许度、布尔值、不支持的模式及不一致的选择，在普通 Python 和 `python -O` 下都会报错。
 
 定义枚举和 API 合同见从实际定义生成的[参考页](reference.md)。实际天文模型、版本、时标和生效计算设置

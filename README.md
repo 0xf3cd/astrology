@@ -35,8 +35,8 @@ time and location:
 - Return immutable structured results, a text table, and a versioned serialization
   that retains inputs, configuration, astronomical values, and model identities.
 
-Positions, axes, cusps, signs and house placement are implemented. Aspects,
-text output and serialization follow in the same milestone.
+Positions, axes, cusps, signs, house placement and aspects are implemented. Text
+output and serialization follow in the same milestone.
 
 See the [v0.1.0 milestone](https://github.com/0xf3cd/astrology/milestone/1) for
 delivery tasks and acceptance criteria.

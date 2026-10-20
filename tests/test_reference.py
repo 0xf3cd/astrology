@@ -4,6 +4,7 @@
 """
 
 import hashlib
+import itertools
 import json
 import math
 from datetime import datetime, timedelta
@@ -14,6 +15,7 @@ from typing import TypedDict, cast
 import pytest
 
 from astrology import (
+  AspectRule,
   BirthRecord,
   Body,
   ChartConfig,
@@ -22,7 +24,10 @@ from astrology import (
   HouseSystem,
   Location,
   LunarNode,
+  MajorAspect,
   NatalChart,
+  ObjectOrb,
+  OrbCombination,
   ResolvedBirth,
   TimePrecision,
   natal_chart,
@@ -281,8 +286,8 @@ def _instant(case: _Case) -> datetime:
   return datetime.fromisoformat(case["utc"].replace("Z", "+00:00"))
 
 
-def _chart_for(case: _Case) -> tuple[NatalChart, ResolvedBirth]:
-  """Build the chart the reference case describes. 按参考案例计算命盘。"""
+def _resolved_for(case: _Case) -> ResolvedBirth:
+  """Resolve the birth the reference case describes. 解析参考案例所描述的出生输入。"""
   instant = _instant(case)
   location = case["location"]
   record = BirthRecord(
@@ -293,7 +298,12 @@ def _chart_for(case: _Case) -> tuple[NatalChart, ResolvedBirth]:
     TimePrecision.SECOND,
     {"reference": case["identifier"]},
   )
-  resolved = prepare_natal_input(record)
+  return prepare_natal_input(record)
+
+
+def _chart_for(case: _Case) -> tuple[NatalChart, ResolvedBirth]:
+  """Build the chart the reference case describes. 按参考案例计算命盘。"""
+  resolved = _resolved_for(case)
   config = ChartConfig(
     HouseSystem.PLACIDUS,
     (
@@ -522,3 +532,209 @@ def test_the_reference_fixture_is_packaged_next_to_the_tests() -> None:
   assert FIXTURE.is_file()
   assert FIXTURE.name == "natal_reference.json"
   assert files("astrology.knowledge").joinpath("catalog.json").is_file()
+
+
+# Astrodienst's published "Hellenistic" drawing style, read 2026-10-20 from
+# https://www.astro.com/faq/fq_fh_owstyle_e.htm: only the conjunction, opposition,
+# square, trine and sextile; an orb of 13 degrees for the Moon and 3 degrees for the
+# Sun and the planets; the lunar node has no orb and no aspects are drawn for it. A
+# line is drawn even when only the Moon's orb is met, so a pair involving the Moon
+# uses the Moon's orb. The page publishes parameters, not the aspect
+# list of any chart, so the expected hits below are derived from the Horizons
+# longitudes with plain unoriented separations, apart from the library's oriented
+# branches. The whole-sign (dotted) aspects of that style are not modeled here.
+# Astrodienst 公布的 "Hellenistic" 绘图风格，2026-10-20 读自上面的网址：只用合相、对分、
+# 四分、三分和六分；月亮的容许度 13°，太阳和行星 3°；月交点没有容许度，也不为它画相位。
+# 即使只有月亮的容许度满足条件，也会画出相位线，所以涉及月亮的配对使用月亮的容许度。该页给出的是
+# 参数，不是某张盘的相位表，所以下面的期望命中由 Horizons 的经度用无向间距的算术推出，
+# 与本库的有向分支无关。该风格的整宫（虚线）相位不在这里建模。
+HELLENISTIC_PLANETS = (
+  Body.SUN,
+  Body.MOON,
+  Body.MERCURY,
+  Body.VENUS,
+  Body.MARS,
+  Body.JUPITER,
+  Body.SATURN,
+)
+HELLENISTIC_NODES = (LunarNode.MEAN_ASCENDING, LunarNode.MEEUS_FIVE_TERM_TRUE_ASCENDING)
+HELLENISTIC_ORB_DEGREES = 3.0
+HELLENISTIC_MOON_ORB_DEGREES = 13.0
+ASPECT_ANGLES = {
+  MajorAspect.CONJUNCTION: 0.0,
+  MajorAspect.SEXTILE: 60.0,
+  MajorAspect.SQUARE: 90.0,
+  MajorAspect.TRINE: 120.0,
+  MajorAspect.OPPOSITION: 180.0,
+}
+# Require every pair to stay farther than this margin from an orb limit. Then the
+# few arcseconds of difference from Horizons cannot change which aspects match:
+# 15 arcseconds is 0.004 degrees.
+# 要求所有配对到容许度上限的距离都大于这个余量，避免本库与 Horizons 之间的几角秒误差
+# 改变相位结果：15″ 只有 0.004°。
+LIMIT_MARGIN_DEGREES = 0.4
+
+# An unordered pair and an aspect: the order of the objects in a request does not matter.
+# 无序的一对对象加一个相位：请求里对象的先后不影响结果。
+AspectKey = tuple[frozenset[Body | LunarNode], MajorAspect]
+
+
+def _hellenistic_rules(
+  moon_orb: float | None = HELLENISTIC_MOON_ORB_DEGREES,
+) -> list[AspectRule]:
+  entries = [] if moon_orb is None else [ObjectOrb(Body.MOON, moon_orb)]
+  return [AspectRule(aspect, HELLENISTIC_ORB_DEGREES, entries) for aspect in ASPECT_ANGLES]
+
+
+def _hellenistic_hits(
+  case: _Case,
+  *,
+  rules: list[AspectRule] | None = None,
+  combination: OrbCombination | None = OrbCombination.EITHER_WITHIN_OWN_ORB,
+  aspect_objects: tuple[Body | LunarNode, ...] | None = HELLENISTIC_PLANETS,
+  planets: tuple[Body, ...] = HELLENISTIC_PLANETS,
+) -> set[AspectKey]:
+  """The library's aspects among the chosen objects, as unordered pair-and-aspect keys.
+
+  `planets` sets the order in which the objects are requested.
+
+  本库在所选对象之间求出的相位，记为不分先后的「配对加相位」；`planets` 决定请求对象的顺序。
+  """
+  chosen = _hellenistic_rules() if rules is None else rules
+  config = ChartConfig(
+    HouseSystem.WHOLE_SIGN,
+    (*planets, *HELLENISTIC_NODES),
+    chosen,
+    aspect_objects=None if aspect_objects is None else list(aspect_objects),
+    orb_combination=combination if any(rule.object_orbs for rule in chosen) else None,
+  )
+  chart = natal_chart(_resolved_for(case), config)
+  return {(frozenset((hit.first, hit.second)), hit.aspect) for hit in chart.aspects}
+
+
+def _reference_hellenistic(
+  case: _Case, angles: dict[MajorAspect, float] = ASPECT_ANGLES
+) -> tuple[set[AspectKey], float]:
+  """Expected hits from the Horizons longitudes, and the smallest distance to any limit.
+
+  `angles` is the table of exact angles the expectation uses.
+
+  由 Horizons 经度得出的期望命中，以及所有配对到限度的最小距离；`angles` 是期望所用的精确角度表。
+  """
+  hits: set[AspectKey] = set()
+  margin = 180.0
+  for first, second in itertools.combinations(HELLENISTIC_PLANETS, 2):
+    separation = abs(
+      _angle_difference(
+        case["bodies"][first.value]["longitude_deg"], case["bodies"][second.value]["longitude_deg"]
+      )
+    )
+    limit = (
+      HELLENISTIC_MOON_ORB_DEGREES if Body.MOON in (first, second) else HELLENISTIC_ORB_DEGREES
+    )
+    for aspect, angle in angles.items():
+      distance = abs(separation - angle)
+      margin = min(margin, abs(distance - limit))
+      if distance <= limit:
+        hits.add((frozenset((first, second)), aspect))
+  return hits, margin
+
+
+# With the planets reversed the Moon is the second object of its pairs, so the orb a
+# pair takes from its second object is tested as well.
+# 反转行星顺序后，月亮在各配对中排第二，这样也能检查是否正确使用了第二个对象的容许度。
+@pytest.mark.parametrize("case", _cases(), ids=lambda case: case["identifier"])
+@pytest.mark.parametrize(
+  "planets", [HELLENISTIC_PLANETS, HELLENISTIC_PLANETS[::-1]], ids=["classical", "reversed"]
+)
+def test_aspects_agree_with_the_published_hellenistic_orbs(
+  case: _Case, planets: tuple[Body, ...]
+) -> None:
+  expected, margin = _reference_hellenistic(case)
+  assert margin > LIMIT_MARGIN_DEGREES
+  assert _hellenistic_hits(case, planets=planets) == expected
+
+
+def test_the_hellenistic_reference_has_hits_and_near_misses_to_tell_conventions_apart() -> None:
+  counts = [len(_reference_hellenistic(case)[0]) for case in _cases()]
+  assert counts == [3, 6]
+
+
+# The two instants hold no sextile and no opposition, so the angles 60 and 180 degrees are
+# not compared with the reference. The guides say so; add the instants and the words
+# together if the fixture ever gains one.
+# 两个时刻里没有六分相和对分相，所以 60 度与 180 度这两个角度没有与参考比较。指南里写明了这一点；
+# 夹具以后若增加了这样的时刻，文字要一起更新。
+def test_the_reference_instants_sample_conjunction_square_and_trine_only() -> None:
+  sampled = {aspect for case in _cases() for _, aspect in _reference_hellenistic(case)[0]}
+  assert sampled == {MajorAspect.CONJUNCTION, MajorAspect.SQUARE, MajorAspect.TRINE}
+
+
+def _hits_under(case: _Case, defect: str) -> set[AspectKey]:
+  if defect == "no_moon_orb":
+    return _hellenistic_hits(case, rules=_hellenistic_rules(None), combination=None)
+  if defect == "both_within_own_orb":
+    return _hellenistic_hits(case, combination=OrbCombination.BOTH_WITHIN_OWN_ORB)
+  if defect == "mean_of_orbs":
+    return _hellenistic_hits(case, combination=OrbCombination.MEAN_OF_ORBS)
+  if defect == "moon_orb_for_all":
+    wide = [AspectRule(aspect, HELLENISTIC_MOON_ORB_DEGREES) for aspect in ASPECT_ANGLES]
+    return _hellenistic_hits(case, rules=wide, combination=None)
+  return _hellenistic_hits(case, aspect_objects=None)
+
+
+# One case alone cannot tell every departure apart: at the northern instant no pair
+# with the Moon lies between 8 and 13 degrees, so the mean of the orbs agrees with the
+# published rule there. The two instants together tell all of them apart.
+# 单个案例不能区分所有规则差异：北例中，涉及月亮的配对没有落在 8° 到 13° 之间，
+# 因此取平均值也会得到同样的相位结果。两个案例一起才能检出每一种改动。
+@pytest.mark.parametrize(
+  "defect",
+  ["no_moon_orb", "both_within_own_orb", "mean_of_orbs", "moon_orb_for_all", "node_takes_part"],
+)
+def test_a_departure_from_the_published_convention_changes_the_hits(defect: str) -> None:
+  differing = [
+    case["identifier"]
+    for case in _cases()
+    if _hits_under(case, defect) != _reference_hellenistic(case)[0]
+  ]
+  assert differing
+
+
+# For each sampled aspect, changing its angle in the reference calculation must
+# make the expected results disagree with the library for at least one instant.
+# 对参考案例里出现的每种相位，改动参考计算中的角度后，至少一个时刻的期望结果应与本库不同。
+@pytest.mark.parametrize(
+  "aspect,wrong",
+  [(MajorAspect.CONJUNCTION, 10.0), (MajorAspect.SQUARE, 80.0), (MajorAspect.TRINE, 100.0)],
+  ids=["conjunction", "square", "trine"],
+)
+def test_a_wrong_angle_changes_the_expected_hits_of_a_sampled_aspect(
+  aspect: MajorAspect, wrong: float
+) -> None:
+  moved = {**ASPECT_ANGLES, aspect: wrong}
+  differing = [
+    case["identifier"]
+    for case in _cases()
+    if _hellenistic_hits(case) != _reference_hellenistic(case, moved)[0]
+  ]
+  assert differing
+
+
+@pytest.mark.parametrize("case", _cases(), ids=lambda case: case["identifier"])
+def test_the_lunar_node_is_shown_but_takes_part_in_no_aspect(case: _Case) -> None:
+  chart = natal_chart(
+    _resolved_for(case),
+    ChartConfig(
+      HouseSystem.WHOLE_SIGN,
+      (*HELLENISTIC_PLANETS, *HELLENISTIC_NODES),
+      _hellenistic_rules(),
+      aspect_objects=list(HELLENISTIC_PLANETS),
+      orb_combination=OrbCombination.EITHER_WITHIN_OWN_ORB,
+    ),
+  )
+  assert {position.identity for position in chart.positions} >= set(HELLENISTIC_NODES)
+  assert chart.effective.aspect_objects == HELLENISTIC_PLANETS
+  assert not any(
+    node in (hit.first, hit.second) for hit in chart.aspects for node in HELLENISTIC_NODES
+  )

@@ -51,6 +51,7 @@ def consumer(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
   (knowledge / "catalog.json").write_bytes(corpus)
   monkeypatch.setattr(astrology, "__file__", str(package / "__init__.py"))
   for name in (
+    "aspects",
     "birth",
     "chart",
     "config",
@@ -83,6 +84,7 @@ def test_wrong_installed_version_rejected(consumer: Path) -> None:
 @pytest.mark.parametrize(
   "module",
   [
+    "astrology.aspects",
     "astrology.birth",
     "astrology.chart",
     "astrology.config",

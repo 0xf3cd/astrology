@@ -39,6 +39,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PACKAGE_FILES = (
   "astrology/__init__.py",
   "astrology/py.typed",
+  "astrology/aspects.py",
   "astrology/birth.py",
   "astrology/celestial.py",
   "astrology/chart.py",
@@ -111,7 +112,7 @@ def check_examples(report: str) -> None:
   要求双语开发指南与 API 指南均有已执行的例子。
   """
   for language in ("en", "zh-CN"):
-    for page in ("contributing", "birth", "configuration", "chart", "knowledge"):
+    for page in ("contributing", "birth", "configuration", "chart", "aspects", "knowledge"):
       marker = f"Document: docs/{language}/{page}\n"
       section = re.split(r"(?m)^Document: ", report.partition(marker)[2], maxsplit=1)[0]
       if not re.search(r"(?m)^[1-9]\d* tests? in \d+ items?\.$", section):
