@@ -6,7 +6,7 @@
 import math
 import subprocess
 import sys
-from dataclasses import FrozenInstanceError
+from dataclasses import FrozenInstanceError, replace
 from datetime import date, time, timedelta
 from importlib.metadata import version
 
@@ -397,6 +397,40 @@ def test_the_result_is_immutable() -> None:
     chart.provenance = chart.provenance  # type: ignore[misc]
   with pytest.raises(FrozenInstanceError):
     chart.positions[0].longitude_deg = 0.0  # type: ignore[misc]
+
+
+def test_the_result_does_not_alias_sequences_given_by_the_caller() -> None:
+  chart = natal_chart(
+    resolved_at(*_NORTH[:2], *_NORTH[2:]),
+    config_for(HouseSystem.PLACIDUS, (Body.SUN, Body.MOON)),
+  )
+  cusps = list(chart.houses.cusps_deg)
+  houses = replace(chart.houses, cusps_deg=cusps)  # type: ignore[arg-type]
+  cusps[0] = 999.0
+  assert isinstance(houses.cusps_deg, tuple)
+  assert houses.cusps_deg == chart.houses.cusps_deg
+  positions, placements = list(chart.positions), list(chart.placements)
+  rebuilt = replace(chart, positions=positions, placements=placements)  # type: ignore[arg-type]
+  positions.clear()
+  placements.clear()
+  assert isinstance(rebuilt.positions, tuple)
+  assert isinstance(rebuilt.placements, tuple)
+  assert rebuilt.positions == chart.positions
+  assert rebuilt.placements == chart.placements
+
+
+@pytest.mark.parametrize("cusps", ["not cusps", 30.0, (0.0,) * 11, (0.0,) * 13])
+def test_a_result_needs_twelve_cusps_in_a_sequence(cusps: object) -> None:
+  chart = natal_chart(resolved_at(*_NORTH[:2], *_NORTH[2:]), config_for())
+  with pytest.raises((TypeError, ValueError), match="cusps"):
+    replace(chart.houses, cusps_deg=cusps)  # type: ignore[arg-type]
+
+
+@pytest.mark.parametrize("name", ["positions", "placements"])
+def test_a_result_needs_its_members_in_a_sequence(name: str) -> None:
+  chart = natal_chart(resolved_at(*_NORTH[:2], *_NORTH[2:]), config_for())
+  with pytest.raises(TypeError, match=name):
+    replace(chart, **{name: "sun"})  # type: ignore[arg-type]
 
 
 @pytest.mark.parametrize(

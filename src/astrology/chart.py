@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Literal
 
@@ -76,7 +77,9 @@ class EclipticPosition:
 class ChartHouses:
   """Four axes and twelve cyclically ordered cusps, all in [0, 360) degrees.
 
-  四轴与十二个按循环顺序排列的宫头，均为 [0, 360) 度。
+  The cusps are copied into a tuple, so a list given by the caller is not aliased.
+
+  四轴与十二个按循环顺序排列的宫头，均为 [0, 360) 度。宫头被复制进元组，调用方给出的列表不被引用。
   """
 
   system: HouseSystem
@@ -85,6 +88,14 @@ class ChartHouses:
   descendant_deg: float
   imum_coeli_deg: float
   cusps_deg: tuple[float, ...]
+
+  def __post_init__(self) -> None:
+    if not isinstance(self.cusps_deg, Sequence) or isinstance(self.cusps_deg, (str, bytes)):
+      raise TypeError("cusps_deg must be a sequence of twelve numbers")
+    cusps = tuple(self.cusps_deg)
+    if len(cusps) != 12:
+      raise ValueError("cusps_deg must contain exactly twelve cusps")
+    object.__setattr__(self, "cusps_deg", cusps)
 
 
 @dataclass(frozen=True, slots=True)
@@ -135,7 +146,10 @@ class ChartProvenance:
 class NatalChart:
   """A complete immutable natal result; objects follow the requested order.
 
-  完整的不可变命盘结果；对象遵循请求顺序。
+  The positions and placements are copied into tuples, so lists given by the
+  caller are not aliased.
+
+  完整的不可变命盘结果；对象遵循请求顺序。位置与落宫被复制进元组，调用方给出的列表不被引用。
   """
 
   requested: ChartConfig
@@ -145,6 +159,13 @@ class NatalChart:
   positions: tuple[EclipticPosition, ...]
   houses: ChartHouses
   placements: tuple[Placement, ...]
+
+  def __post_init__(self) -> None:
+    for name in ("positions", "placements"):
+      members = getattr(self, name)
+      if not isinstance(members, Sequence) or isinstance(members, (str, bytes)):
+        raise TypeError(f"{name} must be a sequence")
+      object.__setattr__(self, name, tuple(members))
 
 
 def natal_chart(resolved: ResolvedBirth, config: ChartConfig) -> NatalChart:
