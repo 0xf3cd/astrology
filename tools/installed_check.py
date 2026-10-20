@@ -146,6 +146,39 @@ def _check_birth_and_configuration() -> None:
     raise ValueError("Installed configuration substituted the requested house system")
 
 
+def _check_natal_chart() -> None:
+  """Calculate one synthetic natal chart in the installed environment.
+
+  The chart is calculated after the isolation checks, so it also shows that the
+  adapter is loaded by the calculation and not by the import. 在已安装环境中计算一张
+  合成本命盘；此检查排在隔离检查之后，因此也表明适配层由计算加载，而非由导入加载。
+
+  在已安装环境中计算一张合成本命盘。
+  """
+  if any(
+    name in ("celestial_calendar", "astrology.celestial") or name.startswith("celestial_calendar.")
+    for name in sys.modules
+  ):
+    raise ValueError("Chart calculation started with the astronomy adapter already loaded")
+  record = astrology.BirthRecord(
+    date(2026, 4, 5),
+    time(1, 45),
+    astrology.IanaTimezone("Australia/Lord_Howe"),
+    astrology.Location(0, 0),
+    astrology.TimePrecision.MINUTE,
+    {"record": "synthetic"},
+  )
+  resolved = astrology.prepare_natal_input(record, fold=0)
+  config = astrology.ChartConfig(astrology.HouseSystem.WHOLE_SIGN, (astrology.Body.SUN,), ())
+  chart = astrology.natal_chart(resolved, config)
+  if len(chart.positions) != 1 or chart.houses.system is not astrology.HouseSystem.WHOLE_SIGN:
+    raise ValueError("Installed chart calculation did not return the requested result")
+  if chart.provenance.celestial_version != version("celestial-calendar"):
+    raise ValueError("Installed chart misreported the astronomy library version")
+  if chart.effective.delta_t_model != "algo5":
+    raise ValueError("Installed chart misreported the delta T model")
+
+
 def main(
   expected_version: str, *, expected_corpus_version: str | None = None, knowledge_only: bool = False
 ) -> None:
@@ -161,7 +194,16 @@ def main(
     astrology,
     *(
       import_module("astrology." + name)
-      for name in ("birth", "config", "knowledge", "knowledge.catalog", "knowledge.records")
+      for name in (
+        "birth",
+        "chart",
+        "config",
+        "houses",
+        "knowledge",
+        "knowledge.catalog",
+        "knowledge.records",
+        "zodiac",
+      )
     ),
   ):
     origin = Path(str(module.__file__)).resolve()
@@ -180,6 +222,7 @@ def main(
     return
   _check_birth_and_configuration()
   _check_native_isolation()
+  _check_natal_chart()
   print(f"Installed astrology {metadata.version}; optimized={sys.flags.optimize}")
 
 

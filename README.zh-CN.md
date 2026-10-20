@@ -7,10 +7,14 @@
 出处和流派变体，并组织可复现的星盘结果。
 
 开发包提供不可变的[出生记录与现代时刻解析](docs/zh-CN/birth.md)、
-[排盘请求配置](docs/zh-CN/configuration.md)、独立[知识目录](docs/zh-CN/knowledge.md)、
-质量检查和双语 [API 文档](docs/zh-CN/reference.md)。
-尚未实现排盘计算；导入包不会导入或初始化天文库。
+[排盘请求配置](docs/zh-CN/configuration.md)、[热带本命盘计算](docs/zh-CN/chart.md)、
+独立[知识目录](docs/zh-CN/knowledge.md)、质量检查和双语 [API 文档](docs/zh-CN/reference.md)。
+天文库只在排盘时导入，导入本包或查询知识都不会初始化它。
 运行检查见[参与开发](docs/zh-CN/contributing.md)。
+
+安装随天文依赖而定：celestial-calendar 0.8.0 只发布 Linux x86_64 与 aarch64、
+macOS arm64、Windows amd64 的轮子，没有源码分发包。其他平台无法安装本包，
+连知识浏览也不可用。
 
 ## 首版目标
 
@@ -21,6 +25,8 @@
 - 支持 Whole Sign（整宫制）、Equal（等宫制）、Placidus；请求的几何无定义时显式失败。
 - 计算星座、二维黄经落宫、五大相位，以及可配置容许度和局部入相／出相状态。
 - 输出不可变结构、文本表格与带版本的序列化，保留输入、配置、天文原值和模型身份。
+
+位置、四轴、宫头、星座与落宫已实现；相位、文本输出与序列化在同一里程碑内继续交付。
 
 交付任务与验收见 [v0.1.0 milestone](https://github.com/0xf3cd/astrology/milestone/1)。
 

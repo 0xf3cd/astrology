@@ -5,7 +5,9 @@
 The development package provides a chart-independent knowledge catalog. List
 concepts and variants, find bilingual names/aliases, filter entries and sources,
 and inspect citations without birth data or native astronomy. Chart calculation
-is not implemented. See the generated [catalog](catalog.md) and [API](reference.md).
+is available through the [chart guide](chart.md) and is never needed to browse
+the catalog.
+See the generated [catalog](catalog.md) and [API](reference.md).
 
 ## Browse without a chart
 
@@ -42,11 +44,13 @@ Entry filters combine all selected criteria; they never evaluate prerequisites.
 
 ## Follow a source to a definition
 
-The corpus contains project configuration contracts and one single-source
-historical grouping. It names every admitted configuration identity and twelve
-sign concepts. It provides no sign boundaries, house geometry, node formula,
-aspect angles, default orbs, dignity or interpretation rules. Request variants
-reference actual config enum members, not implemented astronomical algorithms.
+The corpus contains project configuration contracts, the project conventions for
+sign sectors and house placement, and one single-source historical grouping. It
+names every admitted configuration identity and twelve sign concepts, and points
+at the executable rules in the chart implementation instead of restating them.
+It provides no aspect angles, default orbs, dignity or interpretation rules.
+Request variants reference actual config enum members and the implementation
+that owns them.
 
 ```{doctest}
 >>> entry = catalog.entry("entry.equinoctial_example")

@@ -1,6 +1,6 @@
-"""Birth inputs, requested configuration and independent knowledge, without native astronomy.
+"""Birth inputs, requested configuration, chart composition and independent knowledge.
 
-出生输入、请求配置与独立知识查询，不初始化原生天文库。
+出生输入、请求配置、命盘组合与独立知识查询；包导入本身不起初始化原生天文库。
 """
 
 from astrology.birth import (
@@ -17,6 +17,17 @@ from astrology.birth import (
   prepare_natal_input,
   resolve_birth_time,
 )
+from astrology.chart import (
+  ChartDomainError,
+  ChartHouses,
+  ChartProvenance,
+  ChartTimes,
+  EclipticPosition,
+  EffectiveConfiguration,
+  NatalChart,
+  Placement,
+  natal_chart,
+)
 from astrology.config import (
   AspectRule,
   Body,
@@ -26,7 +37,9 @@ from astrology.config import (
   MajorAspect,
   NodeDefinition,
 )
+from astrology.houses import house_of
 from astrology.knowledge import Catalog, load_catalog
+from astrology.zodiac import Sign, sign_degree, sign_of, truncate_display
 
 __all__ = [
   "AmbiguousBirthTimeError",
@@ -35,6 +48,12 @@ __all__ = [
   "Body",
   "Catalog",
   "ChartConfig",
+  "ChartDomainError",
+  "ChartHouses",
+  "ChartProvenance",
+  "ChartTimes",
+  "EclipticPosition",
+  "EffectiveConfiguration",
   "FixedOffset",
   "HistoricalTimeError",
   "HouseSystem",
@@ -43,11 +62,19 @@ __all__ = [
   "LunarNode",
   "MajorAspect",
   "MissingBirthDataError",
+  "NatalChart",
   "NodeDefinition",
   "NonexistentBirthTimeError",
+  "Placement",
   "ResolvedBirth",
+  "Sign",
   "TimePrecision",
+  "house_of",
   "load_catalog",
+  "natal_chart",
   "prepare_natal_input",
   "resolve_birth_time",
+  "sign_degree",
+  "sign_of",
+  "truncate_display",
 ]

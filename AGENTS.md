@@ -42,7 +42,9 @@ Python 3.11–3.14 is supported. Use `uv sync --locked`, then
 `uv run --locked python tools/check.py` for the same checks as CI. Configuration
 and pinned tool versions live in `pyproject.toml` and `uv.lock`. Change both when
 updating dependencies and verify the minimum and maximum Python versions.
-The development package has no chart or knowledge-query API yet.
+The development package provides a tropical natal chart API and
+chart-independent knowledge queries. Importing it initializes no native
+astronomy.
 
 ## Knowledge and documentation
 

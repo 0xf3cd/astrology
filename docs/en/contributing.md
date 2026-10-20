@@ -19,10 +19,15 @@ uv sync --locked --python 3.14
 uv run --locked python tools/check.py
 ```
 
-Python 3.11–3.14 is supported. The lower bound matches celestial-calendar 0.8.0;
-the astronomy dependency will be added with the concrete adapter. CI runs the
+Python 3.11–3.14 is supported. The lower bound matches celestial-calendar 0.8.0,
+which is a hard dependency of the package. CI runs the
 same command on Linux 3.11/3.14 and macOS/Windows 3.14. Use
 `uv sync --locked --python 3.11` to check the lower endpoint locally.
+
+The astronomy dependency publishes wheels for Linux x86_64 and aarch64, macOS
+arm64 and Windows amd64, and no source distribution. This package therefore
+cannot be installed on any other platform, and browsing the knowledge catalog
+needs the same install.
 
 The command checks Ruff lint/two-space formatting, strict mypy, pytest in normal
 and optimized modes, document pairs/local links, fresh strict HTML/doctest builds,
@@ -37,9 +42,10 @@ system temporary directory, and are removed on exit. Build metadata and tool
 caches may remain in ignored checkout directories.
 
 Tool versions are locked in `uv.lock`. Sphinx 8.2.3 serves Python 3.11; Sphinx
-9.1.0 serves newer Python versions. Coverage is reported to locate gaps; this
-package has no astronomical algorithms to certify. Tests exercise birth/time and
-configuration contracts as well as development checks. Add domain tests with each feature.
+9.1.0 serves newer Python versions. Coverage is reported to locate gaps; it
+cannot certify the astronomy values, which the reference cases do. Tests exercise
+birth/time and configuration contracts as well as development checks. Add domain
+tests with each feature.
 
 For local formatting, run `uv run ruff format .`. A failed command stops the
 check run; fix its cause and rerun. Dependency changes must update the lock and
@@ -105,6 +111,20 @@ same mistake. Explain why a reference can detect the defect being tested.
 
 Use synthetic examples or sources that can be redistributed. Keep astronomical
 validation separate from the claimed interpretation of a chart.
+
+The natal chart cases in `tests/reference/natal_reference.json` compare two
+instants, one per hemisphere, against JPL Horizons (DE441) and against a
+definition-level reimplementation of the Meeus chapter 47 lunar nodes. The
+fixture records the query URLs, the ephemeris source markers, the retrieval time
+and the conventions used. Each reference detects a different defect: the
+Horizons longitudes detect a wrong ephemeris or a mixed time scale, the local
+apparent sidereal time detects a wrong axis, the exact leap-second relation
+detects a UTC/UT1 confusion, and the node reimplementation detects a wrong node
+definition or direction. The node reference shares its formulas with the
+astronomy library, so it detects mapping and time-parameter defects rather than
+a differing implementation. The tolerances are 3 arcseconds for the Sun and the
+planets, 10 for the Moon, 1 for latitude, 1 for the nodes and 0.005 degrees for
+the axes; the axis tolerance covers the modelled-versus-observed UT1 difference.
 
 ## Knowledge and documentation
 

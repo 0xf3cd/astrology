@@ -1,0 +1,171 @@
+{
+  "retrieved_utc": "2026-10-20T01:47:25+00:00",
+  "api": "https://ssd.jpl.nasa.gov/api/horizons.api",
+  "conventions": {
+    "positions": "Apparent geocentric ecliptic longitude/latitude of date, geocenter 500@399, TIME_TYPE=TT at the instant's JDE(TT), QUANTITIES=31",
+    "axis": "Local apparent sidereal time at the site (QUANTITIES=7, TIME_TYPE=UT) converted to RAMC degrees; Asc/MC derived test-side from RAMC and Meeus mean obliquity plus low-accuracy nutation in longitude",
+    "tt_utc": "JDE(TT) - JD(UTC) = (32.184 + delta AT) / 86400 exactly"
+  },
+  "cases": [
+    {
+      "identifier": "north-2003-64n",
+      "utc": "2003-07-17T05:37:13Z",
+      "location": {
+        "latitude": 64.15,
+        "longitude": -21.94
+      },
+      "house_system": "placidus",
+      "delta_at_seconds": 32.0,
+      "delta_at_source": "IERS leap-second history: delta AT = 32 s from 1999-01-01 until 2006-01-01",
+      "jde_tt": 2452837.7349211113,
+      "ephemeris_sources": {
+        "sun": "DE441",
+        "moon": "DE441",
+        "mercury": "DE441",
+        "venus": "DE441",
+        "mars": "DE441",
+        "jupiter": "DE441",
+        "saturn": "DE441",
+        "uranus": "DE441",
+        "neptune": "nep098_merged",
+        "pluto": "DE441"
+      },
+      "queries": {
+        "sun": "https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%2710%27&OBJ_DATA=%27NO%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27OBSERVER%27&CENTER=%27500%40399%27&TLIST=%272452837.7349211113%27&TLIST_TYPE=%27JD%27&TIME_TYPE=%27TT%27&QUANTITIES=%2731%27&ANG_FORMAT=%27DEG%27&EXTRA_PREC=%27YES%27&CSV_FORMAT=%27YES%27",
+        "moon": "https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%27301%27&OBJ_DATA=%27NO%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27OBSERVER%27&CENTER=%27500%40399%27&TLIST=%272452837.7349211113%27&TLIST_TYPE=%27JD%27&TIME_TYPE=%27TT%27&QUANTITIES=%2731%27&ANG_FORMAT=%27DEG%27&EXTRA_PREC=%27YES%27&CSV_FORMAT=%27YES%27",
+        "mercury": "https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%27199%27&OBJ_DATA=%27NO%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27OBSERVER%27&CENTER=%27500%40399%27&TLIST=%272452837.7349211113%27&TLIST_TYPE=%27JD%27&TIME_TYPE=%27TT%27&QUANTITIES=%2731%27&ANG_FORMAT=%27DEG%27&EXTRA_PREC=%27YES%27&CSV_FORMAT=%27YES%27",
+        "venus": "https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%27299%27&OBJ_DATA=%27NO%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27OBSERVER%27&CENTER=%27500%40399%27&TLIST=%272452837.7349211113%27&TLIST_TYPE=%27JD%27&TIME_TYPE=%27TT%27&QUANTITIES=%2731%27&ANG_FORMAT=%27DEG%27&EXTRA_PREC=%27YES%27&CSV_FORMAT=%27YES%27",
+        "mars": "https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%27499%27&OBJ_DATA=%27NO%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27OBSERVER%27&CENTER=%27500%40399%27&TLIST=%272452837.7349211113%27&TLIST_TYPE=%27JD%27&TIME_TYPE=%27TT%27&QUANTITIES=%2731%27&ANG_FORMAT=%27DEG%27&EXTRA_PREC=%27YES%27&CSV_FORMAT=%27YES%27",
+        "jupiter": "https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%27599%27&OBJ_DATA=%27NO%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27OBSERVER%27&CENTER=%27500%40399%27&TLIST=%272452837.7349211113%27&TLIST_TYPE=%27JD%27&TIME_TYPE=%27TT%27&QUANTITIES=%2731%27&ANG_FORMAT=%27DEG%27&EXTRA_PREC=%27YES%27&CSV_FORMAT=%27YES%27",
+        "saturn": "https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%27699%27&OBJ_DATA=%27NO%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27OBSERVER%27&CENTER=%27500%40399%27&TLIST=%272452837.7349211113%27&TLIST_TYPE=%27JD%27&TIME_TYPE=%27TT%27&QUANTITIES=%2731%27&ANG_FORMAT=%27DEG%27&EXTRA_PREC=%27YES%27&CSV_FORMAT=%27YES%27",
+        "uranus": "https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%27799%27&OBJ_DATA=%27NO%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27OBSERVER%27&CENTER=%27500%40399%27&TLIST=%272452837.7349211113%27&TLIST_TYPE=%27JD%27&TIME_TYPE=%27TT%27&QUANTITIES=%2731%27&ANG_FORMAT=%27DEG%27&EXTRA_PREC=%27YES%27&CSV_FORMAT=%27YES%27",
+        "neptune": "https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%27899%27&OBJ_DATA=%27NO%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27OBSERVER%27&CENTER=%27500%40399%27&TLIST=%272452837.7349211113%27&TLIST_TYPE=%27JD%27&TIME_TYPE=%27TT%27&QUANTITIES=%2731%27&ANG_FORMAT=%27DEG%27&EXTRA_PREC=%27YES%27&CSV_FORMAT=%27YES%27",
+        "pluto": "https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%27999%27&OBJ_DATA=%27NO%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27OBSERVER%27&CENTER=%27500%40399%27&TLIST=%272452837.7349211113%27&TLIST_TYPE=%27JD%27&TIME_TYPE=%27TT%27&QUANTITIES=%2731%27&ANG_FORMAT=%27DEG%27&EXTRA_PREC=%27YES%27&CSV_FORMAT=%27YES%27",
+        "local_apparent_sidereal_time": "https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%2710%27&OBJ_DATA=%27NO%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27OBSERVER%27&CENTER=%27coord%40399%27&COORD_TYPE=%27GEODETIC%27&SITE_COORD=%27-21.94%2C64.15%2C0%27&TLIST=%272003-07-17+05%3A37%3A13%27&TIME_TYPE=%27UT%27&QUANTITIES=%277%27&ANG_FORMAT=%27DEG%27&EXTRA_PREC=%27YES%27&CSV_FORMAT=%27YES%27"
+      },
+      "bodies": {
+        "sun": {
+          "longitude_deg": 114.2564975,
+          "latitude_deg": -0.0002092
+        },
+        "moon": {
+          "longitude_deg": 337.8932199,
+          "latitude_deg": -5.0187569
+        },
+        "mercury": {
+          "longitude_deg": 127.2938871,
+          "latitude_deg": 1.7896957
+        },
+        "venus": {
+          "longitude_deg": 105.3120474,
+          "latitude_deg": 0.3930726
+        },
+        "mars": {
+          "longitude_deg": 339.1737765,
+          "latitude_deg": -5.3014227
+        },
+        "jupiter": {
+          "longitude_deg": 141.1711598,
+          "latitude_deg": 0.7988396
+        },
+        "saturn": {
+          "longitude_deg": 95.5583463,
+          "latitude_deg": -0.7752295
+        },
+        "uranus": {
+          "longitude_deg": 332.2162364,
+          "latitude_deg": -0.782395
+        },
+        "neptune": {
+          "longitude_deg": 312.2761505,
+          "latitude_deg": 0.0047628
+        },
+        "pluto": {
+          "longitude_deg": 257.6927105,
+          "latitude_deg": 9.4081949
+        }
+      },
+      "local_apparent_sidereal_time_deg": 357.0002474535
+    },
+    {
+      "identifier": "south-2020-34s",
+      "utc": "2020-06-01T12:00:00Z",
+      "location": {
+        "latitude": -33.87,
+        "longitude": 151.21
+      },
+      "house_system": "placidus",
+      "delta_at_seconds": 37.0,
+      "delta_at_source": "IERS leap-second history: delta AT = 37 s from 2017-01-01 onward",
+      "jde_tt": 2459002.000800741,
+      "ephemeris_sources": {
+        "sun": "DE441",
+        "moon": "DE441",
+        "mercury": "DE441",
+        "venus": "DE441",
+        "mars": "DE441",
+        "jupiter": "DE441",
+        "saturn": "DE441",
+        "uranus": "DE441",
+        "neptune": "nep098_merged",
+        "pluto": "DE441"
+      },
+      "queries": {
+        "sun": "https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%2710%27&OBJ_DATA=%27NO%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27OBSERVER%27&CENTER=%27500%40399%27&TLIST=%272459002.0008007409%27&TLIST_TYPE=%27JD%27&TIME_TYPE=%27TT%27&QUANTITIES=%2731%27&ANG_FORMAT=%27DEG%27&EXTRA_PREC=%27YES%27&CSV_FORMAT=%27YES%27",
+        "moon": "https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%27301%27&OBJ_DATA=%27NO%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27OBSERVER%27&CENTER=%27500%40399%27&TLIST=%272459002.0008007409%27&TLIST_TYPE=%27JD%27&TIME_TYPE=%27TT%27&QUANTITIES=%2731%27&ANG_FORMAT=%27DEG%27&EXTRA_PREC=%27YES%27&CSV_FORMAT=%27YES%27",
+        "mercury": "https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%27199%27&OBJ_DATA=%27NO%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27OBSERVER%27&CENTER=%27500%40399%27&TLIST=%272459002.0008007409%27&TLIST_TYPE=%27JD%27&TIME_TYPE=%27TT%27&QUANTITIES=%2731%27&ANG_FORMAT=%27DEG%27&EXTRA_PREC=%27YES%27&CSV_FORMAT=%27YES%27",
+        "venus": "https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%27299%27&OBJ_DATA=%27NO%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27OBSERVER%27&CENTER=%27500%40399%27&TLIST=%272459002.0008007409%27&TLIST_TYPE=%27JD%27&TIME_TYPE=%27TT%27&QUANTITIES=%2731%27&ANG_FORMAT=%27DEG%27&EXTRA_PREC=%27YES%27&CSV_FORMAT=%27YES%27",
+        "mars": "https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%27499%27&OBJ_DATA=%27NO%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27OBSERVER%27&CENTER=%27500%40399%27&TLIST=%272459002.0008007409%27&TLIST_TYPE=%27JD%27&TIME_TYPE=%27TT%27&QUANTITIES=%2731%27&ANG_FORMAT=%27DEG%27&EXTRA_PREC=%27YES%27&CSV_FORMAT=%27YES%27",
+        "jupiter": "https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%27599%27&OBJ_DATA=%27NO%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27OBSERVER%27&CENTER=%27500%40399%27&TLIST=%272459002.0008007409%27&TLIST_TYPE=%27JD%27&TIME_TYPE=%27TT%27&QUANTITIES=%2731%27&ANG_FORMAT=%27DEG%27&EXTRA_PREC=%27YES%27&CSV_FORMAT=%27YES%27",
+        "saturn": "https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%27699%27&OBJ_DATA=%27NO%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27OBSERVER%27&CENTER=%27500%40399%27&TLIST=%272459002.0008007409%27&TLIST_TYPE=%27JD%27&TIME_TYPE=%27TT%27&QUANTITIES=%2731%27&ANG_FORMAT=%27DEG%27&EXTRA_PREC=%27YES%27&CSV_FORMAT=%27YES%27",
+        "uranus": "https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%27799%27&OBJ_DATA=%27NO%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27OBSERVER%27&CENTER=%27500%40399%27&TLIST=%272459002.0008007409%27&TLIST_TYPE=%27JD%27&TIME_TYPE=%27TT%27&QUANTITIES=%2731%27&ANG_FORMAT=%27DEG%27&EXTRA_PREC=%27YES%27&CSV_FORMAT=%27YES%27",
+        "neptune": "https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%27899%27&OBJ_DATA=%27NO%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27OBSERVER%27&CENTER=%27500%40399%27&TLIST=%272459002.0008007409%27&TLIST_TYPE=%27JD%27&TIME_TYPE=%27TT%27&QUANTITIES=%2731%27&ANG_FORMAT=%27DEG%27&EXTRA_PREC=%27YES%27&CSV_FORMAT=%27YES%27",
+        "pluto": "https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%27999%27&OBJ_DATA=%27NO%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27OBSERVER%27&CENTER=%27500%40399%27&TLIST=%272459002.0008007409%27&TLIST_TYPE=%27JD%27&TIME_TYPE=%27TT%27&QUANTITIES=%2731%27&ANG_FORMAT=%27DEG%27&EXTRA_PREC=%27YES%27&CSV_FORMAT=%27YES%27",
+        "local_apparent_sidereal_time": "https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%2710%27&OBJ_DATA=%27NO%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27OBSERVER%27&CENTER=%27coord%40399%27&COORD_TYPE=%27GEODETIC%27&SITE_COORD=%27151.21%2C-33.87%2C0%27&TLIST=%272020-06-01+12%3A00%3A00%27&TIME_TYPE=%27UT%27&QUANTITIES=%277%27&ANG_FORMAT=%27DEG%27&EXTRA_PREC=%27YES%27&CSV_FORMAT=%27YES%27"
+      },
+      "bodies": {
+        "sun": {
+          "longitude_deg": 71.4507131,
+          "latitude_deg": 0.000184
+        },
+        "moon": {
+          "longitude_deg": 192.8865257,
+          "latitude_deg": 5.1040853
+        },
+        "mercury": {
+          "longitude_deg": 94.7008193,
+          "latitude_deg": 1.9196441
+        },
+        "venus": {
+          "longitude_deg": 74.9962067,
+          "latitude_deg": 1.0123263
+        },
+        "mars": {
+          "longitude_deg": 343.0298389,
+          "latitude_deg": -2.3887079
+        },
+        "jupiter": {
+          "longitude_deg": 296.737432,
+          "latitude_deg": -0.2138068
+        },
+        "saturn": {
+          "longitude_deg": 301.5933926,
+          "latitude_deg": -0.1540716
+        },
+        "uranus": {
+          "longitude_deg": 38.5849535,
+          "latitude_deg": -0.4468176
+        },
+        "neptune": {
+          "longitude_deg": 350.8326149,
+          "latitude_deg": -1.0570735
+        },
+        "pluto": {
+          "longitude_deg": 294.6845291,
+          "latitude_deg": -0.9247705
+        }
+      },
+      "local_apparent_sidereal_time_deg": 221.637428922
+    }
+  ]
+}

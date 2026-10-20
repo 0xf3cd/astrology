@@ -2,10 +2,11 @@
 
 [简体中文](../zh-CN/architecture.md) · [Project](../../README.md) · [Knowledge](knowledge.md)
 
-Birth records, modern time resolution, requested configuration and independent
-knowledge are implemented; their contracts are in the [birth](birth.md),
-[configuration](configuration.md) and [knowledge](knowledge.md) guides. The remaining
-layout below is planned. The first complete-chart target is
+Birth records, modern time resolution, requested configuration, the tropical
+natal chart and independent knowledge are implemented; their contracts are in
+the [birth](birth.md), [configuration](configuration.md), [chart](chart.md) and
+[knowledge](knowledge.md) guides. The remaining layout below is planned. The
+current chart is
 a reproducible modern tropical, geocentric natal chart, with independent access
 to its underlying knowledge.
 
@@ -47,8 +48,8 @@ resolve it separately. An explicit offset and an IANA timezone are distinct inpu
 forms; timezone attachment alone does not detect a DST gap or choose a fold.
 
 The current `prepare_natal_input` validates known time, timezone and location;
-it does not calculate a chart. The future complete-chart entry point will require
-that input. Unknown time remains representable and is rejected by preparation
+it does not calculate a chart. The `natal_chart` entry point requires that input.
+Unknown time remains representable and is rejected by preparation
 rather than replaced with noon. Historical inputs need their own calendar and time-scale
 contract, including the difference between pre-1972 UT1 and modern UTC.
 
@@ -78,14 +79,15 @@ separately. A complete natal calculation may require all requested components;
 future partial-chart entry points must state their own success contract.
 
 celestial v0.8.0 provides a strict fourteen-object snapshot with rates and houses.
-The first adapter can use it within its joint domain. Selecting seven output
+The adapter uses it within its joint domain. Selecting seven output
 objects does not widen that domain. Genuine independent positions and house
 queries are candidate celestial v0.10.0 work.
 
-If requested Placidus geometry is unavailable, report that result explicitly.
-Any future fallback requires an explicit policy and must record both requested
-and effective systems. Equal and Whole Sign also retain the upstream restrictions
-on undefined axes; they are not universal fallbacks.
+If requested Placidus geometry is unavailable, the adapter reports that result
+explicitly and never falls back. Any future fallback requires an explicit policy
+and must record both requested and effective systems. Equal and Whole Sign also
+retain the upstream restrictions on undefined axes; they are not universal
+fallbacks.
 
 ## Reproducibility
 
@@ -105,8 +107,8 @@ aspects, and undefined house geometry.
 
 ## Delivery order
 
-Birth/configuration values and the independent knowledge catalog are implemented.
-Next compose positions and houses, add aspects, and complete serialization and
+Birth/configuration values, the independent knowledge catalog and the tropical
+natal chart are implemented. Next add aspects, then complete serialization and
 text output, extending bilingual documentation and installed-package verification
 with those features.
 
