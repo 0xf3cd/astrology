@@ -16,10 +16,12 @@ from astrology import (
   MajorAspect,
   NatalChart,
   Placement,
+  dumps_chart,
   find_aspects,
   format_chart,
   house_of,
   load_catalog,
+  loads_chart,
   sign_degree,
   sign_of,
 )
@@ -185,3 +187,51 @@ def test_invalid_types(recorded_chart: NatalChart) -> None:
     format_chart(None, load_catalog())  # type: ignore[arg-type]
   with pytest.raises(TypeError):
     format_chart(recorded_chart, None)  # type: ignore[arg-type]
+
+
+@pytest.mark.parametrize(
+  "field",
+  ["delta_t_model", "astrology_version", "celestial_version", "tzdata_version", "iana_version"],
+)
+def test_provenance_cannot_forge_table_rows(recorded_chart: NatalChart, field: str) -> None:
+  payload = "foreign\\value|column\nFAKE ROW\r\u0085\u2028\u2029\x1b[2J"
+  if field == "delta_t_model":
+    changed = replace(
+      recorded_chart, effective=replace(recorded_chart.effective, delta_t_model=payload)
+    )
+  elif field in ("astrology_version", "celestial_version"):
+    changed = replace(
+      recorded_chart,
+      provenance=replace(recorded_chart.provenance, **{field: payload}),  # type: ignore[arg-type]
+    )
+  else:
+    changed = replace(recorded_chart, resolved=replace(recorded_chart.resolved, **{field: payload}))  # type: ignore[arg-type]
+  restored = loads_chart(dumps_chart(changed))
+  assert restored == changed
+  catalog = load_catalog()
+  baseline = format_chart(recorded_chart, catalog)
+  output = format_chart(restored, catalog)
+  assert len(output.splitlines()) == len(baseline.splitlines())
+  assert "FAKE ROW" not in output.splitlines()
+  assert r"foreign\\value\|column\nFAKE ROW\r\x85\u2028\u2029\x1b[2J" in output
+  assert all(character.isprintable() or character == "\n" for character in output)
+  assert dumps_chart(restored) == dumps_chart(changed)
+
+
+@pytest.mark.parametrize("language", ["en", "zh-CN"])
+def test_catalog_names_cannot_forge_rows(recorded_chart: NatalChart, language: str) -> None:
+  catalog = load_catalog()
+  sun = catalog.concept("body.sun")
+  payload = "Name|column\nFAKE ROW\u2028\x1b"
+  name = replace(sun.name, en=payload) if language == "en" else replace(sun.name, zh=payload)
+  supplied = replace(
+    catalog,
+    concepts=tuple(
+      replace(concept, name=name) if concept is sun else concept for concept in catalog.concepts
+    ),
+  )
+  baseline = format_chart(recorded_chart, catalog, language=language)  # type: ignore[arg-type]
+  output = format_chart(recorded_chart, supplied, language=language)  # type: ignore[arg-type]
+  assert len(output.splitlines()) == len(baseline.splitlines())
+  assert r"Name\|column\nFAKE ROW\u2028\x1b" in output
+  assert "FAKE ROW" not in output.splitlines()

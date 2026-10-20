@@ -3,12 +3,13 @@
 直接构造和恢复遵守同一套结果约束。
 """
 
+from collections.abc import Iterator, Sequence
 from dataclasses import replace
 from typing import Any
 
 import pytest
 
-from astrology import HouseSystem, NatalChart
+from astrology import HouseSystem, NatalChart, dumps_chart, loads_chart
 from tools import check, installed_check
 
 
@@ -86,6 +87,55 @@ def test_result_sequences_are_isolated(recorded_chart: NatalChart) -> None:
   placements.clear()
   aspects.clear()
   assert restored == recorded_chart
+
+
+class MutableStandIn:
+  def __init__(self) -> None:
+    self.payload: list[str] = []
+
+  def __eq__(self, other: object) -> bool:
+    return True
+
+
+class ChangingList(list[object]):
+  def __init__(self, original: Sequence[object], changed: Sequence[object]) -> None:
+    super().__init__(original)
+    self.changed = changed
+    self.iterations = 0
+
+  def __iter__(self) -> Iterator[object]:
+    self.iterations += 1
+    return super().__iter__() if self.iterations == 1 else iter(self.changed)
+
+
+@pytest.mark.parametrize("field", ["positions", "placements", "aspects"])
+def test_result_sequences_validate_the_single_stored_snapshot(
+  recorded_chart: NatalChart, field: str
+) -> None:
+  original = getattr(recorded_chart, field)
+  stand_ins = [MutableStandIn() for _ in original]
+  sequence = ChangingList(original, stand_ins)
+  result = replace(recorded_chart, **{field: sequence})  # type: ignore[arg-type]
+  assert sequence.iterations == 1
+  assert all(type(member) is type(original[0]) for member in getattr(result, field))
+  stand_ins[0].payload.append("outside mutation")
+  assert result == recorded_chart
+  with pytest.raises(TypeError):
+    replace(recorded_chart, **{field: ChangingList(stand_ins, original)})  # type: ignore[arg-type]
+
+
+def test_chart_hashing_preserves_equality_and_distinct_birth_metadata(
+  recorded_chart: NatalChart,
+) -> None:
+  restored = loads_chart(dumps_chart(recorded_chart))
+  assert hash(restored) == hash(recorded_chart)
+  other_record = replace(
+    recorded_chart.resolved.record, source={"record": "another synthetic source"}
+  )
+  other = replace(recorded_chart, resolved=replace(recorded_chart.resolved, record=other_record))
+  assert other != recorded_chart
+  assert len({recorded_chart, restored, other}) == 2
+  assert {recorded_chart: "original", other: "other"}[other] == "other"
 
 
 @pytest.mark.parametrize(

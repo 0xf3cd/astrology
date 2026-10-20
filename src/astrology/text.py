@@ -96,6 +96,18 @@ def _angle(value: float, *, signed: bool = False) -> str:
   return prefix + _dms(count)
 
 
+def _cell(value: str) -> str:
+  escaped = []
+  for character in value:
+    if character in "\\|":
+      escaped.append("\\" + character)
+    elif not character.isprintable():
+      escaped.append(ascii(character)[1:-1])
+    else:
+      escaped.append(character)
+  return "".join(escaped)
+
+
 def _name(
   identity: Body | LunarNode | MajorAspect | HouseSystem | Sign,
   catalog: Catalog,
@@ -113,7 +125,7 @@ def _name(
   name = concept.name.text(language)
   if name is None:
     raise ValueError(f"Missing {language} name for {concept.identifier}")
-  return name
+  return _cell(name)
 
 
 def _longitude_text(value: float, catalog: Catalog, language: Language) -> str:
@@ -130,12 +142,15 @@ def format_chart(chart: NatalChart, catalog: Catalog, *, language: Language = "e
   whole-arcsecond rule, without changing stored classifications, house or motion.
   Even a deviation displayed as zero retains its stored motion label. Invalid
   chart/catalog types raise TypeError. This table is not a lossless chart record.
+  Nonprinting characters, backslashes and table delimiters in supplied names and
+  provenance are escaped for display; stored values are unchanged.
 
   返回存储位置、宫位、相位、配置及来源的文本表格。调用方须提供已加载的 Catalog；
   显示不读取资源或调用原生天文库。en 或 zh-CN 的名称及译文必须齐备且为当前版本，
   否则抛出 ValueError（缺少星座标识时为 KeyError）。角度沿用 truncate_display 的整角秒截断规则，
   不改存储的分类、宫位或运动状态；偏差显示为零时也保留原运动标签。
   chart/catalog 类型错误时抛出 TypeError。本表不是无损命盘记录。
+  传入名称及来源中的非打印字符、反斜线和表格分隔符会转义显示，不改存储值。
   """
   if type(chart) is not NatalChart or type(catalog) is not Catalog:
     raise TypeError("chart and catalog must be NatalChart and Catalog values")
@@ -230,11 +245,12 @@ def format_chart(chart: NatalChart, catalog: Catalog, *, language: Language = "e
     [
       "",
       labels["provenance"],
-      f"{labels['time_source']}: {chart.resolved.tzdata_version} / "
-      f"{chart.resolved.iana_version} / {chart.resolved.fold}",
+      f"{labels['time_source']}: {_cell(str(chart.resolved.tzdata_version))} / "
+      f"{_cell(str(chart.resolved.iana_version))} / {chart.resolved.fold}",
       f"{labels['times']}: {chart.times.jd_ut1} / {chart.times.jde_tt}",
-      f"{labels['model']}: {chart.effective.delta_t_model} / {chart.effective.evaluation}",
-      f"{labels['versions']}: {chart.provenance.astrology_version} / {chart.provenance.celestial_version}",
+      f"{labels['model']}: {_cell(chart.effective.delta_t_model)} / {chart.effective.evaluation}",
+      f"{labels['versions']}: {_cell(chart.provenance.astrology_version)} / "
+      f"{_cell(chart.provenance.celestial_version)}",
       f"{labels['frame']}: {chart.provenance.position_frame} / {chart.provenance.ut1_derivation}",
       labels["display"],
     ]

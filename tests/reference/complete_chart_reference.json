@@ -5,6 +5,7 @@
     "package": "pyswisseph",
     "package_version": "2.10.3.2",
     "native_version": "2.10.03",
+    "wheel_filename": "pyswisseph-2.10.3.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
     "wheel_sha256": "e00d7e08aeafe00938603bc118874b6ca7871c5aaa55aafca8fa2c6d76aff812",
     "backend": "Moshier, explicitly requested",
     "calc_flags": 260,

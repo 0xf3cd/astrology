@@ -6,7 +6,7 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from importlib.metadata import version
 from typing import Literal
 
@@ -242,14 +242,17 @@ class NatalChart:
 
   Construction checks field types, ranges and pure derived-value consistency. It
   does not verify that the stored astronomy was calculated from the claimed input.
+  Equality includes the resolved input; hashing excludes it because its source
+  mapping is unhashable.
 
   完整且不可变的本命盘结果；对象按请求的顺序排列。按 `requested.aspects` 中的规则，
   在 `effective.aspect_objects` 所列对象之间计算相位，结果顺序见 `find_aspects`。
   位置、落宫和相位会复制成元组，不会引用调用方传入的列表。
   构造时检查字段类型、范围及纯规则推导结果的一致性，不核实所存天文值是否确实由所称输入算得。
+  相等判断包括已解析输入；哈希不包括它，因为其中的来源映射不可哈希。
   """
 
-  resolved: ResolvedBirth
+  resolved: ResolvedBirth = field(hash=False)
   requested: ChartConfig
   effective: EffectiveConfiguration
   provenance: ChartProvenance
@@ -280,9 +283,10 @@ class NatalChart:
       members = getattr(self, name)
       if not isinstance(members, Sequence) or isinstance(members, (str, bytes)):
         raise TypeError(f"{name} must be a sequence")
-      if any(type(member) is not member_type for member in members):
+      snapshot = tuple(members)
+      if any(type(member) is not member_type for member in snapshot):
         raise TypeError(f"{name} must contain only {member_type.__name__} values")
-      object.__setattr__(self, name, tuple(members))
+      object.__setattr__(self, name, snapshot)
     if not self.requested.house_system is self.effective.house_system is self.houses.system:
       raise ValueError("Requested, effective and stored house systems must agree")
     if tuple(position.identity for position in self.positions) != self.requested.objects:
