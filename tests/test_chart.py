@@ -647,13 +647,13 @@ def test_the_result_does_not_alias_aspect_sequences_given_by_the_caller() -> Non
     replace(chart.effective, aspect_objects="sun")  # type: ignore[arg-type]
 
 
-# The status of an aspect rests on these rates, so they are checked against the reported
-# longitudes: a central difference over one hour agrees to about 1e-6 degrees per day
-# (the Moon and the true node), while a sign, a unit of hours or a day of the wrong
-# length would be off by 0.01 degrees per day or more even for the slowest object.
-# 相位的状态建立在这些速率上，所以把它们和报告出的黄经对照：一小时的中心差分与速率相差约
-# 1e-6 度/日（月亮和真交点），而符号、以小时为单位或日长错了，即使对最慢的对象也会差 0.01
-# 度/日以上。
+# Aspect motion uses these rates. Check them against a one-hour central difference
+# of the longitudes: agreement is about 1e-6 degrees per day for the Moon and true
+# node. A wrong sign, hours instead of days, or a wrong day length gives an error
+# of at least 0.01 degrees per day even for the slowest object.
+# 相位的运动状态依赖这些速率，因此用相隔一小时的黄经作中心差分来核对。
+# 月亮和真交点的误差约为 1e-6 度/日。如果符号错了、把每天当成每小时，或日长用错，
+# 即使最慢的对象也会相差至少 0.01 度/日。
 RATE_TOLERANCE_DEGREES_PER_DAY = 1e-5
 
 

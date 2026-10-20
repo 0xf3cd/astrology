@@ -47,8 +47,8 @@ Entry filters combine all selected criteria; they never evaluate prerequisites.
 The corpus contains project configuration contracts, the project conventions for
 sign sectors and house placement, and one single-source historical grouping. It
 names every admitted configuration identity and twelve sign concepts, and links the
-executable rules in the chart implementation. The project's own aspect evaluation is
-stated in prose, as named variants tied to that implementation. The corpus provides
+executable rules in the chart implementation. Each project-defined aspect rule has
+a name, a written definition and a link to its implementation. The corpus provides
 no default orbs, dignity or interpretation rules.
 Request variants reference actual config enum members and the implementation
 that owns them.

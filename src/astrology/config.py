@@ -68,9 +68,9 @@ class LunarNode(StrEnum):
 
 
 class MajorAspect(StrEnum):
-  """The five admitted aspect identities; angles and evaluation live in `astrology.aspects`.
+  """The five supported aspects; `astrology.aspects` defines their angles and evaluation.
 
-  接纳的五种相位标识；角度与判断在 `astrology.aspects` 里。
+  支持的五种相位；角度定义和判断函数在 `astrology.aspects` 里。
   """
 
   CONJUNCTION = "conjunction"
@@ -81,17 +81,16 @@ class MajorAspect(StrEnum):
 
 
 class OrbCombination(StrEnum):
-  """How two objects' orbs give the limit of one pair; named rules, not tradition claims.
+  """Combine two objects' orbs into one limit, without prescribing a tradition's rule.
 
   Each object has an orb for the aspect (its own override or the rule's orb). A pair
   is within the limit when its deviation from the exact angle satisfies the rule:
   either object's orb contains it (the larger orb), both objects' orbs contain it
   (the smaller orb), or the mean of the two orbs contains it. A limit is inclusive.
 
-  两个对象的容许度如何合成一对对象的限度；具名规则，不是对传统的断言。每个对象在该相位
-  下有自己的容许度（自己的覆盖值，或规则的容许度）。一对对象与精确角度的偏差满足所选规则时
-  算在限度内：任一对象的容许度包含它（取较大者）、两个对象的容许度都包含它（取较小者），
-  或两个容许度的平均值包含它。限度包含端点。
+  将两个对象的容许度合成一个上限，不指定哪个规则属于哪个传统。每个对象使用单独设置的容许度，
+  未单独设置时使用相位规则的容许度。三种合成方式分别取较大值、较小值或平均值；
+  偏差的绝对值不超过该上限就算符合规则，等于上限也算。
   """
 
   EITHER_WITHIN_OWN_ORB = "either_within_own_orb"
@@ -116,7 +115,7 @@ def _orb(value: object) -> float:
 class ObjectOrb:
   """One object's own orb for one aspect rule, in degrees; finite and nonnegative.
 
-  某个对象在某条相位规则下自己的容许度，以度为单位，有限且非负。
+  为某个对象在一条相位规则中单独设置的容许度，单位为度，必须有限且非负。
   """
 
   identity: Body | LunarNode
@@ -136,9 +135,9 @@ class AspectRule:
   without an entry in `object_orbs`. The entries are copied into a tuple and name
   each object once. There is no default orb, and this type does not evaluate.
 
-  调用方显式给出的单个相位的容许度，可另给按对象的容许度。`orb_degrees` 有限、非负、
-  以度为单位，适用于 `object_orbs` 里没有条目的所有对象。条目复制为元组，每个对象
-  只能出现一次。没有默认容许度，这个类型也不做判断。
+  由调用方给出一种相位的容许度，也可以为对象单独设置。`orb_degrees` 必须有限、非负，
+  单位为度。未在 `object_orbs` 中单独设置的对象使用这个值。条目复制为元组，
+  每个对象只能出现一次。没有默认容许度；这个类型只保存规则，不计算相位。
   """
 
   aspect: MajorAspect
@@ -171,11 +170,12 @@ class ChartConfig:
   admitted. No orb or house defaults, effective-model claims, computation, or
   fallback are supplied.
 
-  仅保存请求选择，按原顺序存入隔离的不可变元组。宫制、非空且不重复的对象及不重复的显式相位规则
-  均须给出，相位序列可以为空。相位只在 `aspect_objects` 之间判断，它必须是 `objects` 的子集；
-  省略时表示所有已请求的对象。有规则带按对象的容许度时，必须给出 `orb_combination`，反之不能给；
-  按对象的容许度只能指名参与相位的对象。仅支持热带黄道和地心。不提供容许度或宫制默认值、
-  实际模型声明、计算或替代策略。
+  只保存排盘请求。对象和相位规则按原顺序复制为不可变元组，不受调用方后续修改列表的影响。
+  必须指定宫制和至少一个对象，对象不能重复；相位规则也不能重复，但可以为空。
+  `aspect_objects` 指定参与相位的对象，必须是 `objects` 的子集；省略时所有请求的对象都参与。
+  只要有规则为对象单独设置容许度，就必须给出 `orb_combination`，否则不能给。
+  单独设置容许度的对象必须参与相位。仅支持热带黄道和地心，不提供默认容许度或默认宫制，
+  不记录实际计算模型，也不执行计算或提供替代策略。
   """
 
   house_system: HouseSystem

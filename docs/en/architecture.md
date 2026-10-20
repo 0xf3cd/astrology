@@ -4,9 +4,9 @@
 
 Birth records, modern time resolution, requested configuration, the tropical
 natal chart, major aspects and independent knowledge are implemented; their
-contracts are in the [birth](birth.md), [configuration](configuration.md),
-[chart](chart.md), [aspect](aspects.md) and [knowledge](knowledge.md) guides. The remaining layout below is planned. The
-current chart is
+usage and constraints are in the [birth](birth.md), [configuration](configuration.md),
+[chart](chart.md), [aspect](aspects.md) and [knowledge](knowledge.md) guides.
+The remaining layout below is planned. The current chart is
 a reproducible modern tropical, geocentric natal chart, with independent access
 to its underlying knowledge.
 

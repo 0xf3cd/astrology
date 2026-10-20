@@ -1,14 +1,14 @@
-"""Major aspects between ecliptic longitudes at one instant, with local motion status.
+"""Find major aspects from longitudes and rates at a given instant.
 
-An aspect is a signed deviation of the oriented longitude separation from an exact
-angle. Orientation is kept: the separation runs from the first object to the second,
-and each hit records which exact angle (branch) it was measured against. The status
-comes from the rate of that deviation at the instant and says nothing about a later
-station. Nothing here depends on astronomy or on the chart.
+Each result records the angle measured from the first object to the second, the
+exact aspect angle used for comparison (the branch), and the signed difference.
+The motion status tells whether the magnitude of that difference is shrinking or growing.
+It does not predict later changes in motion or whether the aspect will become
+exact. This module needs no chart and does not call the astronomy library.
 
-某一时刻黄经之间的主要相位，以及局部运动状态。相位是有向黄经间距相对精确角度的带符号偏差。
-方向保留：间距从第一个对象指向第二个，每次命中都记录它相对哪个精确角度（分支）度量。状态
-来自该时刻偏差的变化率，不预言之后的留。这里不依赖天文计算，也不依赖命盘。
+根据同一时刻的黄经和速率判断主要相位。每条结果记录从第一个对象到第二个对象的角度、
+用来对照的精确相位角（分支），以及两者的带符号偏差。运动状态说明偏差的绝对值此刻在缩小还是增大，
+不预测之后的运动变化，也不预测相位之后会不会变得精确。本模块不需要命盘，也不调用天文库。
 """
 
 from __future__ import annotations
@@ -34,19 +34,21 @@ _ANGLES: dict[MajorAspect, float] = {
 
 
 class AspectMotion(StrEnum):
-  """Local motion of an aspect at the instant, from the sign of the deviation and its rate.
+  """Whether an aspect is approaching or moving away from its exact angle at this instant.
 
   The relative longitude rate is the second object's rate minus the first's. Away
   from a deviation of 180 degrees, the deviation shrinks in magnitude when the
   relative rate and the deviation have opposite signs (applying) and grows when
   they have the same sign (separating). Statuses compare exact floats, with no
-  hidden tolerance. `STATIONARY` means the relative rate is exactly zero, which is not
-  a planet's own station. `INDETERMINATE` means a rate is missing, or the deviation
-  is 180 degrees with nonzero relative motion: its magnitude has no two-sided derivative there.
+  tolerance. `STATIONARY` means the relative rate is exactly zero, not that either
+  planet has stopped changing longitude (a station). `INDETERMINATE` means a rate
+  is missing, or the deviation is 180 degrees with nonzero relative motion:
+  its magnitude has no two-sided derivative there.
 
-  某一时刻相位的局部运动，由偏差的符号及其变化率得出。相对黄经速率是第二个对象的速率减去
-  第一个的速率。偏差不为 180 度时，相对速率与偏差异号，偏差的绝对值在缩小（入相）；同号时在增大（离相）。
-  各状态比较的是确切的浮点数，没有隐含的容差。`STATIONARY` 指相对速率恰为零，不是某颗行星自己的留。
+  相位此刻在接近还是远离精确角度。相对黄经速率是第二个对象的速率减去第一个的速率。
+  偏差不为 180 度时，相对速率与偏差异号，偏差的绝对值在缩小（入相）；同号时在增大（离相）。
+  直接比较浮点数，不使用容差。`STATIONARY` 指相对速率恰为零，
+  不表示某颗行星的黄经速率为零（占星术语中的“留”）。
   `INDETERMINATE` 指缺少速率，或偏差恰为 180 度且存在相对运动，此时偏差的绝对值没有双侧导数。
   """
 
@@ -64,8 +66,8 @@ class AspectObject:
   The rate may be None where no meaningful motion exists; it is never borrowed from
   another object. All objects must use the same day, such as the TT day.
 
-  一个对象的黄经（度）及其速率（度每日，若有）。没有有意义的运动时速率可为 None；
-  绝不借用别的对象的速率。所有对象必须用同一种日，例如 TT 日。
+  一个对象的黄经（度）及其速率（度/日，可为 None）。若无法给出有意义的速率，就用 None，
+  不借用其他对象的速率。所有对象的速率必须使用相同的日长定义，例如 TT 日。
   """
 
   identity: Body | LunarNode
@@ -95,10 +97,10 @@ class AspectHit:
   pair flips the deviation, except that 180 is its own mirror, and flips the branch
   where there are two; the status does not change.
 
-  两个对象之间的一次相位；保留配对的顺序和分支。`branch_deg` 是间距所对照的、从第一个对象
-  指向第二个的有向精确角度：六分、四分、三分相取相位角的负值或正值，合相和对分相只有
+  两个对象之间符合规则的一条相位结果，保留对象顺序和分支。`branch_deg` 是用来对照间距的
+  精确角度，方向从第一个对象指向第二个：六分、四分、三分相取相位角的负值或正值，合相和对分相只有
   0 或 180 这一个角度。`deviation_deg` 是间距减去分支，取值在 (-180, 180]。交换配对时，
-  偏差反号（180 是自己的镜像，不变），有两个分支的相位分支也反号；状态不变。
+  偏差反号，但 180 仍记为 180；有两个分支时，分支也反号。运动状态不变。
   """
 
   first: Body | LunarNode
@@ -123,7 +125,10 @@ def _finite(value: object, name: str) -> float:
 
 
 def _signed(angle: float) -> float:
-  """Reduce an angle to (-180, 180] without losing small values. 把角度化到 (-180, 180]，不丢小量。"""
+  """Wrap an angle to (-180, 180], preserving small values near zero.
+
+  将角度折回 (-180, 180]，保留接近零的小角度。
+  """
   value = remainder(angle, 360.0)
   return 180.0 if value == -180.0 else value
 
@@ -135,9 +140,10 @@ def _deviation(separation: float, branch: float) -> float:
   pair stays a few ulps away, which would make the two orders disagree on the status.
   Adding or subtracting 180 by the sign of the separation keeps both exact near zero.
 
-  间距减去分支，取值在 (-180, 180]，180 是自己的镜像。分支为 180 时，接近 -360 的和经
-  `remainder` 可能舍入成零，而镜像那一对仍差几个 ulp，两种顺序对状态的判断就会不一致。
-  按间距的正负加或减 180，两边在接近零处都是精确的。
+  间距减去分支，结果折回 (-180, 180]；交换对象后，180 仍记为正值。
+  分支为 180 时，直接相减再用 `remainder` 可能把接近 -360 的结果舍入成零，
+  交换对象后却仍差几个 ulp，导致两种顺序的运动状态不同。
+  按间距的正负选择加或减 180，可以保留两种顺序下接近零的偏差。
   """
   if branch == 180.0:
     return _signed(separation - 180.0 if separation > 0.0 else separation + 180.0)
@@ -168,9 +174,9 @@ def _mean(first: float, second: float) -> float:
   overflow, so both are halved first; a number that large has a rounding step so coarse
   that halving a tiny partner cannot change the result.
 
-  返回两个有限非负数的平均值，正确舍入，且不会是无穷。只要和不溢出，`(first + second) / 2`
+  返回两个有限非负数正确舍入后的平均值，结果不会是无穷。只要和不溢出，`(first + second) / 2`
   只舍入一次，次正规数范围内也是如此。任一数大于最大浮点数的一半时，和可能溢出，就先各自除以
-  2；这么大的数舍入步长很粗，另一个很小的数除以 2 不会改变结果。
+  2；这么大的数，相邻浮点值之间的间隔也很大，另一个很小的数除以 2 不会改变结果。
   """
   if first > _HALF_MAXIMUM or second > _HALF_MAXIMUM:
     return first / 2.0 + second / 2.0
@@ -222,11 +228,11 @@ def find_aspects(
   nodes never form an aspect: the four identities are one pair of nodes under two
   definitions and two directions.
 
-  按固定顺序返回对象两两之间成立的所有相位。顺序是：配对按 `objects` 的顺序，再按相位角，
-  再按分支（负的在前），所以是全序。凡是成立的相位和分支都会返回：容许度较宽时，一对对象可能有
-  多个命中，也不会为了取更近的而丢弃别的。偏差的绝对值不超过限度时成立，限度本身包含在内。
-  限度是规则的容许度；规则带按对象的容许度时，是两个对象容许度的合成结果，此时必须给出
-  `combination`。两个月交点之间不构成相位：四个标识只是同一对交点的两种定义和两个方向。
+  按固定顺序返回对象两两之间符合规则的所有相位。配对按 `objects` 的顺序排列，再按相位角排序，
+  同一相位的负分支排在正分支之前。容许度较宽时，同一对对象可能符合多个相位或分支，都会返回，
+  不会只保留偏差最小的一个。偏差的绝对值不超过容许度上限就算符合，等于上限也算。
+  上限通常是规则的容许度；规则给对象单独设置容许度时，上限由两个对象的容许度合成，
+  此时必须给出 `combination`。两个月交点之间不构成相位：四个标识表示同一对交点的两种定义和两个方向。
   """
   if not isinstance(objects, Sequence) or isinstance(objects, (str, bytes)):
     raise TypeError("objects must be a sequence of AspectObject values")

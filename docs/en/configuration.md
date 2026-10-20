@@ -68,12 +68,12 @@ or recommendation.
 
 ## Give an object its own orb, and choose who takes part
 
-An `AspectRule` may carry `ObjectOrb` entries. An object with an entry uses it in
-that rule; any other object uses the rule's `orb_degrees`. When some rule has
-object orbs, `orb_combination` must say how the two orbs of a pair combine, and when
-none has, it must be left out. `aspect_objects` names the objects that take part in
-aspects, as a subset of `objects`; left out, all requested objects take part. An
-object orb may name only a participating object.
+Use `ObjectOrb` to set an object's orb separately; other objects use the rule's
+`orb_degrees`. If any rule uses `ObjectOrb`, you must choose `orb_combination` to
+combine the pair's orbs into one limit. Otherwise, leave `orb_combination` out.
+`aspect_objects` selects the objects to include in aspects and must be a subset
+of `objects`. If omitted, all requested objects take part. You can set a separate
+orb only for an object that takes part.
 
 ```{doctest}
 >>> from astrology import LunarNode, ObjectOrb, OrbCombination

@@ -2,7 +2,7 @@
 
 [English](../en/architecture.md) · [项目入口](../../README.zh-CN.md) · [知识组织](knowledge.md)
 
-出生记录、现代时刻解析、请求配置、热带本命盘、主要相位及独立知识已实现，合同见[出生](birth.md)、
+出生记录、现代时刻解析、请求配置、热带本命盘、主要相位及独立知识已实现，用法和约束见[出生](birth.md)、
 [配置](configuration.md)、[排盘](chart.md)、[相位](aspects.md)
 及[知识](knowledge.md)指南；
 下方其余结构仍属规划。当前命盘是可复现的现代热带黄道、地心本命盘，

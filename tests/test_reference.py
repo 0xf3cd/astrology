@@ -538,14 +538,14 @@ def test_the_reference_fixture_is_packaged_next_to_the_tests() -> None:
 # https://www.astro.com/faq/fq_fh_owstyle_e.htm: only the conjunction, opposition,
 # square, trine and sextile; an orb of 13 degrees for the Moon and 3 degrees for the
 # Sun and the planets; the lunar node has no orb and no aspects are drawn for it. A
-# line whose only satisfied end is the Moon is still drawn, so a pair that involves
-# the Moon holds within the Moon's orb. The page publishes parameters, not the aspect
+# line is drawn even when only the Moon's orb is met, so a pair involving the Moon
+# uses the Moon's orb. The page publishes parameters, not the aspect
 # list of any chart, so the expected hits below are derived from the Horizons
 # longitudes with plain unoriented separations, apart from the library's oriented
 # branches. The whole-sign (dotted) aspects of that style are not modeled here.
 # Astrodienst 公布的 "Hellenistic" 绘图风格，2026-10-20 读自上面的网址：只用合相、对分、
 # 四分、三分和六分；月亮的容许度 13°，太阳和行星 3°；月交点没有容许度，也不为它画相位。
-# 只有月亮一端满足的线仍然会画出，所以涉及月亮的一对对象在月亮的容许度内成立。该页给出的是
+# 即使只有月亮的容许度满足条件，也会画出相位线，所以涉及月亮的配对使用月亮的容许度。该页给出的是
 # 参数，不是某张盘的相位表，所以下面的期望命中由 Horizons 的经度用无向间距的算术推出，
 # 与本库的有向分支无关。该风格的整宫（虚线）相位不在这里建模。
 HELLENISTIC_PLANETS = (
@@ -567,10 +567,11 @@ ASPECT_ANGLES = {
   MajorAspect.TRINE: 120.0,
   MajorAspect.OPPOSITION: 180.0,
 }
-# No pair may sit this close to an orb limit, so the library's few arcseconds of
-# difference from Horizons cannot move a hit across it: 15 arcseconds is 0.004 degrees.
-# 没有任何一对对象可以离容许度限度这么近，这样本库与 Horizons 相差的几角秒就不会让命中
-# 越过限度：15″ 只有 0.004°。
+# Require every pair to stay farther than this margin from an orb limit. Then the
+# few arcseconds of difference from Horizons cannot change which aspects match:
+# 15 arcseconds is 0.004 degrees.
+# 要求所有配对到容许度上限的距离都大于这个余量，避免本库与 Horizons 之间的几角秒误差
+# 改变相位结果：15″ 只有 0.004°。
 LIMIT_MARGIN_DEGREES = 0.4
 
 # An unordered pair and an aspect: the order of the objects in a request does not matter.
@@ -641,8 +642,7 @@ def _reference_hellenistic(
 
 # With the planets reversed the Moon is the second object of its pairs, so the orb a
 # pair takes from its second object is tested as well.
-# 把行星顺序反过来，月亮就是它所在各对里的第二个对象，一对对象从第二个对象取容许度的路径
-# 也就被测到了。
+# 反转行星顺序后，月亮在各配对中排第二，这样也能检查是否正确使用了第二个对象的容许度。
 @pytest.mark.parametrize("case", _cases(), ids=lambda case: case["identifier"])
 @pytest.mark.parametrize(
   "planets", [HELLENISTIC_PLANETS, HELLENISTIC_PLANETS[::-1]], ids=["classical", "reversed"]
@@ -686,8 +686,8 @@ def _hits_under(case: _Case, defect: str) -> set[AspectKey]:
 # One case alone cannot tell every departure apart: at the northern instant no pair
 # with the Moon lies between 8 and 13 degrees, so the mean of the orbs agrees with the
 # published rule there. The two instants together tell all of them apart.
-# 单个案例分不出所有的偏离：北站点没有月亮的配对落在 8° 到 13° 之间，所以在那里取容许度
-# 的平均与公布的规则一致。两个案例合起来才能分出每一种偏离。
+# 单个案例不能区分所有规则差异：北例中，涉及月亮的配对没有落在 8° 到 13° 之间，
+# 因此取平均值也会得到同样的相位结果。两个案例一起才能检出每一种改动。
 @pytest.mark.parametrize(
   "defect",
   ["no_moon_orb", "both_within_own_orb", "mean_of_orbs", "moon_orb_for_all", "node_takes_part"],
@@ -701,9 +701,9 @@ def test_a_departure_from_the_published_convention_changes_the_hits(defect: str)
   assert differing
 
 
-# The reference tells a wrong angle apart for the aspects it samples: with the expectation's
-# angle moved, the library's hits no longer agree with it at one instant or the other.
-# 参考能分出被采样的相位上的错误角度：把期望所用的角度挪开，本库的命中在其中一个时刻就不再一致。
+# For each sampled aspect, changing its angle in the reference calculation must
+# make the expected results disagree with the library for at least one instant.
+# 对参考案例里出现的每种相位，改动参考计算中的角度后，至少一个时刻的期望结果应与本库不同。
 @pytest.mark.parametrize(
   "aspect,wrong",
   [(MajorAspect.CONJUNCTION, 10.0), (MajorAspect.SQUARE, 80.0), (MajorAspect.TRINE, 100.0)],

@@ -131,7 +131,7 @@ class EffectiveConfiguration:
   实际采用的已确定选择。请求的宫制不会在这里变成另一种宫制。`delta_t_model` 是适配层为
   这次计算固定下来的上游 ΔT 模型取值，不是调用方的请求；`evaluation` 说明位置来自哪种
   联合求值：只选一部分对象时，只是筛选输出，不缩小求值域。`aspect_objects` 是判断相位时
-  所用的对象，按请求对象的顺序排列；没有请求相位规则时为空。`orb_combination` 照录请求的
+  所用的对象，按请求对象的顺序排列；没有请求相位规则时为空。`orb_combination` 保存请求中的
   合成规则；没有规则带按对象的容许度时为 None。
   """
 
@@ -170,8 +170,8 @@ class NatalChart:
   positions, placements and aspects are copied into tuples, so lists given by the
   caller are not aliased.
 
-  完整且不可变的本命盘结果；对象按请求的顺序排列。相位是 `requested.aspects` 所请求的、
-  在 `effective.aspect_objects` 所列对象之间成立的那些，顺序按 `find_aspects` 的文档。
+  完整且不可变的本命盘结果；对象按请求的顺序排列。按 `requested.aspects` 中的规则，
+  在 `effective.aspect_objects` 所列对象之间计算相位，结果顺序见 `find_aspects`。
   位置、落宫和相位会复制成元组，不会引用调用方传入的列表。
   """
 
@@ -207,8 +207,8 @@ def natal_chart(resolved: ResolvedBirth, config: ChartConfig) -> NatalChart:
   为已解析的出生时刻计算热带地心本命盘。出生记录必须带地点；时间未知的记录在准备阶段
   就已被拒绝。天文适配层在这个函数里才导入，不在导入包时导入，所以导入 astrology 或查询
   知识都不会初始化原生天文库。请求的几何超出上游的联合求值域时，抛出
-  `ChartDomainError`，绝不退回到别的宫制。请求的相位规则，在 `config.aspect_objects` 的
-  对象之间判断，未设置时在所有已请求对象之间判断，所用的是这次计算的位置和黄经速率。
+  `ChartDomainError`，不会改用别的宫制。根据这次计算的位置和黄经速率，
+  在 `config.aspect_objects` 指定的对象之间计算相位；未设置时，所有请求的对象都参与。
   """
   if type(resolved) is not ResolvedBirth:
     raise TypeError("resolved must be a ResolvedBirth")

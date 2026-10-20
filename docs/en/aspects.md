@@ -2,16 +2,15 @@
 
 [简体中文](../zh-CN/aspects.md) · [Documentation](index.md) · [API reference](reference.md)
 
-An aspect relates two objects by the angle between their ecliptic longitudes.
-`find_aspects` judges the five major aspects at one instant from longitudes and
-longitude rates. Each result keeps the exact angle it was measured against, the
-signed deviation from it, the limit used and a local motion status. The caller
+`find_aspects` checks for the five major aspects using two objects' ecliptic
+longitudes and rates at the same instant. Each result gives the exact angle used
+for comparison, the signed deviation from it, the orb limit and the current motion status. The caller
 supplies every orb; there is no default. [`natal_chart`](chart.md) calls the same
-function for the aspects a request asks for.
+function to calculate the requested aspects.
 
 ## Judge aspects from plain values
 
-`find_aspects` needs no chart and no astronomy. Give it objects with a longitude in
+`find_aspects` needs no chart and does not call the astronomy library. Give it objects with a longitude in
 degrees and a rate in degrees per day, and the rules to apply.
 
 ```{doctest}
@@ -29,7 +28,7 @@ degrees and a rate in degrees per day, and the rules to apply.
 
 The separation runs from the first object to the second: 68 minus 10 is 58 degrees.
 A sextile is 60 degrees, so the deviation is 58 minus 60, which is -2. It is inside
-the orb of 3 degrees, and a limit counts as inside.
+the orb of 3 degrees. A deviation exactly at the limit also counts as a match.
 
 ## Read the branch and the deviation
 
@@ -41,7 +40,7 @@ greater than -180 and up to and including 180.
 
 Swapping the pair keeps the aspect and flips the orientation: the deviation changes
 sign, and so does the branch where there are two. The status does not change. A
-deviation of exactly 180 is its own mirror.
+deviation of exactly 180 stays positive in either order.
 
 ```{doctest}
 >>> hit = find_aspects([mars, sun], [sextile])[0]
@@ -81,9 +80,10 @@ retrograde motion too.
 'indeterminate'
 ```
 
-The statuses compare exact numbers and use no tolerance. `stationary` means no
-relative motion; it is not a planet's own station. The status describes the instant
-only. It does not say that an aspect will become exact before a later station.
+The checks compare floats directly, without a tolerance. `stationary` means no
+relative motion, not that either planet has stopped changing longitude (a station).
+The status describes this instant only. It does not predict whether an aspect
+will become exact; a planet may change direction before that happens.
 
 At a deviation of 180 degrees, the absolute wrapped deviation has a cusp and no
 two-sided derivative when the relative rate is nonzero, so the status is
@@ -101,9 +101,9 @@ An aspect rule gives one orb for every object. To give an object its own orb, ad
 | `BOTH_WITHIN_OWN_ORB` | both objects' own orbs, the smaller orb |
 | `MEAN_OF_ORBS` | the mean of the two orbs |
 
-The combination is required when a rule has per-object orbs. A chart request must
-leave it out otherwise; `find_aspects` accepts it then and it changes nothing. Each
-hit reports the limit it used.
+When a rule has per-object orbs, you must choose a combination rule. Without
+per-object orbs, a chart request rejects a combination rule, while `find_aspects`
+accepts it without changing the result. Each hit records the limit it used.
 
 ```{doctest}
 >>> moon = AspectObject(Body.MOON, 7.0, 13.0)
@@ -139,7 +139,7 @@ no aspect. Axes are not objects of a request and have no aspects.
 
 ## Aspects in a natal chart
 
-`natal_chart` judges the requested rules among the participating objects, using the
+`natal_chart` calculates the requested aspects among the participating objects, using the
 positions and rates of the same calculation, and returns them in `chart.aspects`.
 `chart.effective` records which objects took part and which combination was used.
 The example takes the orbs from the "Hellenistic" drawing style that Astrodienst
@@ -181,7 +181,8 @@ moon saturn trine -2.34 separating
 Hand-computed cases cover the wrap at 0 and 360 degrees, both branches, the orb
 endpoints, exact aspects, equal rates and retrograde motion. The longitude rates
 that decide the status are checked against the reported longitudes: over one hour,
-the difference quotient agrees with each rate to about 1e-6 degrees per day.
+dividing the longitude change by the elapsed time agrees with each rate to about
+1e-6 degrees per day.
 
 The reference tests also configure the library with the published Hellenistic orbs
 and compare its aspects with a list derived from the JPL Horizons longitudes of the
@@ -198,8 +199,8 @@ records what the references can and cannot detect.
 
 - Only ecliptic longitude is used. Latitude, declination, minor aspects, whole-sign
   aspects and aspects to axes are not evaluated.
-- The status is local. It does not predict whether an aspect becomes exact before a
-  later station, and it is not an interpretation or a strength.
+- The motion status describes this instant only. It does not predict whether an
+  aspect will become exact, or describe its meaning or strength.
 - The library supplies no default orb. The corpus describes the evaluation as a
   project definition; it makes no claim about any tradition's orbs.
 - Results are not serialized and have no text output yet.

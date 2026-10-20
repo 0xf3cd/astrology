@@ -40,7 +40,7 @@ Meeus 五项真交点定义的数学升降交点。定义是各交点标识的�
 
 `MajorAspect` 标识合相（conjunction）、六分相（sextile）、四分相（square）、三分相（trine）和对分相（opposition）。
 `AspectRule` 保存调用方提供的有限、非负 `orb_degrees`，单位为度。本层只保存请求，不计算相位，
-也不选择流派的容许度政策；请求如何判断，见[相位指南](aspects.md)。
+也不替调用方选择流派的容许度规则；如何计算相位，见[相位指南](aspects.md)。
 
 ```{doctest}
 >>> from astrology import AspectRule, MajorAspect
@@ -53,14 +53,14 @@ Meeus 五项真交点定义的数学升降交点。定义是各交点标识的�
 ('tropical', 'geocentric')
 ```
 
-上例的零容许度是显式的合成请求值，不是库默认值或建议。
+上例中的零容许度是为演示手动设置的，不是库的默认值或建议值。
 
 ## 给对象单独的容许度，并选择参与的对象
 
-`AspectRule` 可以带 `ObjectOrb` 条目。有条目的对象在这条规则里用它，其他对象用规则的 `orb_degrees`。
-只要有规则带按对象的容许度，就必须用 `orb_combination` 说明一对对象的两个容许度怎样合成；
-没有规则带时，不能给。`aspect_objects` 指定参与相位的对象，必须是 `objects` 的子集；不写时，
-所有请求的对象都参与。按对象的容许度只能指名参与相位的对象。
+用 `ObjectOrb` 为某个对象单独设置容许度；其他对象使用规则的 `orb_degrees`。
+只要有规则使用了 `ObjectOrb`，就必须指定 `orb_combination`，说明两个对象的容许度如何合成一个上限；
+没有规则使用时，就不能指定。`aspect_objects` 指定参与相位的对象，必须是 `objects` 的子集；
+不写时，所有请求的对象都参与。只能为参与相位的对象单独设置容许度。
 
 ```{doctest}
 >>> from astrology import LunarNode, ObjectOrb, OrbCombination
