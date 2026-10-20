@@ -5,7 +5,8 @@
 `natal_chart` is the single entry point for a modern tropical, geocentric natal
 chart. It takes a resolved birth instant and a requested configuration and
 returns an immutable result that keeps the requested choices, the effective
-choices, the astronomical values and their provenance apart.
+choices, the astronomical values and their provenance apart. The aspects a
+request asks for are in `chart.aspects`; the [aspect guide](aspects.md) explains them.
 
 ## Calculate one chart
 
