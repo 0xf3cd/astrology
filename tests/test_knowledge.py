@@ -57,7 +57,8 @@ def test_query_contracts(catalog: Catalog) -> None:
   assert catalog.list_concepts() == tuple(catalog.concepts)
   assert len(catalog.list_concepts(kind=ConceptKind.BODY)) == len(Body)
   assert len(catalog.list_concepts(kind=ConceptKind.SIGN)) == 12
-  assert catalog.list_variants(concept_id="sign.taurus") == ()
+  sign_rules = catalog.list_variants(concept_id="sign.taurus")
+  assert [rule.identifier for rule in sign_rules] == ["rule.project.tropical_sign_sectors"]
   assert catalog.list_variants(concept_id="body.sun")[0].configuration is Body.SUN
   assert len(catalog.list_variants()) == len(catalog.variants)
   assert catalog.filter_entries() == tuple(catalog.entries)
@@ -171,7 +172,8 @@ def test_container_ownership(catalog: Catalog) -> None:
   citations.clear()
   prerequisites.clear()
   assert entry.concept_ids == rule.concept_ids == ("body.sun",)
-  assert len(entry.citations) == len(entry.prerequisites) == 1
+  assert len(entry.citations) == len(catalog.entries[0].citations)
+  assert len(entry.prerequisites) == 1
 
 
 @pytest.mark.parametrize("group", ["concepts", "variants", "sources", "entries"])

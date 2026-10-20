@@ -19,10 +19,15 @@ uv sync --locked --python 3.14
 uv run --locked python tools/check.py
 ```
 
-Python 3.11–3.14 is supported. The lower bound matches celestial-calendar 0.8.0;
-the astronomy dependency will be added with the concrete adapter. CI runs the
+Python 3.11–3.14 is supported. The lower bound matches celestial-calendar 0.8.0,
+which is a hard dependency of the package. CI runs the
 same command on Linux 3.11/3.14 and macOS/Windows 3.14. Use
 `uv sync --locked --python 3.11` to check the lower endpoint locally.
+
+The astronomy dependency publishes wheels for Linux x86_64 and aarch64, macOS 14+
+arm64 and Windows amd64, and no source distribution. This package therefore
+cannot be installed on any other platform, and browsing the knowledge catalog
+needs the same install.
 
 The command checks Ruff lint/two-space formatting, strict mypy, pytest in normal
 and optimized modes, document pairs/local links, fresh strict HTML/doctest builds,
@@ -37,9 +42,10 @@ system temporary directory, and are removed on exit. Build metadata and tool
 caches may remain in ignored checkout directories.
 
 Tool versions are locked in `uv.lock`. Sphinx 8.2.3 serves Python 3.11; Sphinx
-9.1.0 serves newer Python versions. Coverage is reported to locate gaps; this
-package has no astronomical algorithms to certify. Tests exercise birth/time and
-configuration contracts as well as development checks. Add domain tests with each feature.
+9.1.0 serves newer Python versions. Coverage is reported to locate gaps; it
+cannot certify the astronomy values, which the reference cases do. Tests exercise
+birth/time and configuration contracts as well as development checks. Add domain
+tests with each feature.
 
 For local formatting, run `uv run ruff format .`. A failed command stops the
 check run; fix its cause and rerun. Dependency changes must update the lock and
@@ -105,6 +111,37 @@ same mistake. Explain why a reference can detect the defect being tested.
 
 Use synthetic examples or sources that can be redistributed. Keep astronomical
 validation separate from the claimed interpretation of a chart.
+
+The natal chart cases in `tests/reference/natal_reference.json` compare two
+instants, one per hemisphere, against JPL Horizons and against definition-level
+checks. The fixture records the query URLs, the ephemeris kernel Horizons names
+for each body and for the geocenter (the Sun, the Moon, Mercury and Venus use
+DE441, the other bodies their own kernels), the retrieval time and the
+conventions used.
+
+The body tolerances follow the upstream's own model error against Horizons, not
+the two instants. The Sun and the planets agree to about 0.8 arcseconds in
+longitude over 24 instants in 2000-2002 and to 1.3 at the 2020 instant; the
+truncated lunar model agrees within 10 arcseconds in longitude and 2.4 in
+latitude over 60 instants in 2000-2030. Those samples were taken ad hoc and are
+not kept in the repository. The tolerances are 3 arcseconds for the Sun and the
+planets, 15 for the Moon, 1 for latitude, 3 for the Moon's latitude and 1 for
+the nodes. The axes and the Placidus cusps use 0.001 degrees (3.6 arcseconds):
+the two instants differ by at most 0.91 arcseconds there, which is the difference
+between the UT1 the library models and the UT1 Horizons observes.
+
+Each reference detects a different defect. Whether a defect is caught depends on the
+tolerance and on the offset the library already has from the reference (up to 0.91
+arcseconds for the axes and 3.4 for the Moon's longitude), so a shift somewhat below
+the tolerance can still be caught. The cases below were judged with that offset counted:
+
+| Reference | Detects | Does not detect |
+|---|---|---|
+| Horizons longitudes | A wrong ephemeris or body mapping. UTC used for TT (64-69 seconds) moves the Moon 35-42 arcseconds and Mercury 3-5. | A shift that stays inside the tolerance with that offset counted, including a path that corrupts only the Sun (2.6-2.8 arcseconds). |
+| Exact leap-second relation | UTC or UT1 passed where TT belongs: the reported JDE(TT) is 0.2-0.3 seconds off. | A rotation path that treats UTC as UT1; the reported JDE(TT) stays exact. |
+| Horizons sidereal time, axes | The mean sidereal time used for the apparent one (0.002-0.005 degrees). UT1 taken as UTC: 5.0 arcseconds at the northern instant and 3.7 at the southern one, only just past the 3.6 threshold. A mean obliquity for the true one at the northern instant (5.7). | A mean obliquity for the true one at the southern instant (under 1 arcsecond). |
+| Horizons sidereal time, Placidus cusps 2, 3, 11 and 12 | Cusps away from the Placidus time division by more than about 0.0015 degrees, such as another house system. | A misreading of the Placidus definition shared with the check. Cusps 5, 6, 8 and 9 are checked only as the exact opposites; the repository keeps no external reference values for the cusps. |
+| Meeus chapter 47 nodes | A wrong node definition, direction or missing nutation term. | A mistake in the shared formula, and a TT/UT mix, which moves a node by under 0.4 arcseconds. |
 
 ## Knowledge and documentation
 

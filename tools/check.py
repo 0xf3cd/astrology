@@ -39,11 +39,21 @@ ROOT = Path(__file__).resolve().parents[1]
 PACKAGE_FILES = (
   "astrology/__init__.py",
   "astrology/py.typed",
+  "astrology/birth.py",
+  "astrology/celestial.py",
+  "astrology/chart.py",
+  "astrology/config.py",
+  "astrology/houses.py",
+  "astrology/zodiac.py",
   "astrology/knowledge/__init__.py",
   "astrology/knowledge/records.py",
   "astrology/knowledge/catalog.py",
   "astrology/knowledge/catalog.json",
 )
+
+# Files outside the package that the tests in the source distribution read.
+# 源码分发包里的测试要读取、但不在包内的文件。
+SDIST_FILES = ("tests/reference/natal_reference.json",)
 
 
 def run(command: Sequence[str], *, cwd: Path = ROOT) -> None:
@@ -101,7 +111,7 @@ def check_examples(report: str) -> None:
   要求双语开发指南与 API 指南均有已执行的例子。
   """
   for language in ("en", "zh-CN"):
-    for page in ("contributing", "birth", "configuration", "knowledge"):
+    for page in ("contributing", "birth", "configuration", "chart", "knowledge"):
       marker = f"Document: docs/{language}/{page}\n"
       section = re.split(r"(?m)^Document: ", report.partition(marker)[2], maxsplit=1)[0]
       if not re.search(r"(?m)^[1-9]\d* tests? in \d+ items?\.$", section):
@@ -174,6 +184,25 @@ def check_api_html(directory: Path) -> None:
       raise ValueError(f"Missing API HTML counterpart navigation for {language}")
 
 
+def check_package_files(root: Path = ROOT) -> None:
+  """Require every file under the package source to be listed in PACKAGE_FILES.
+
+  The wheel and sdist checks only look for the listed files, so an unlisted new
+  module would be missing from the artifacts without any check noticing.
+
+  要求包源码下的每个文件都列在 PACKAGE_FILES 里。wheel 和 sdist 的检查只找列出的文件，
+  新增的模块如果没列进去，即使制品里缺了它，也不会有任何检查发现。
+  """
+  package = root / "src" / "astrology"
+  present = {
+    path.relative_to(package.parent).as_posix()
+    for path in package.rglob("*")
+    if path.is_file() and "__pycache__" not in path.parts
+  }
+  if unlisted := present - set(PACKAGE_FILES):
+    raise ValueError(f"Package files missing from PACKAGE_FILES: {sorted(unlisted)}")
+
+
 def check_wheel(wheel: Path, expected_version: str) -> None:
   """Validate wheel content and metadata. 校验 wheel 内容与元数据。"""
   from email.parser import Parser
@@ -193,13 +222,14 @@ def check_wheel(wheel: Path, expected_version: str) -> None:
 
 
 def check_sdist(sdist: Path) -> None:
-  """Require the complete package and corpus in the source distribution.
+  """Require the complete package, corpus and reference fixture in the source distribution.
 
-  要求源码分发包包含完整包及语料。
+  要求源码分发包里有完整的包、语料和参考夹具。
   """
   with tarfile.open(sdist) as archive:
     names = {name.partition("/")[2] for name in archive.getnames()}
-  if missing := {"src/" + name for name in PACKAGE_FILES} - names:
+  expected = {"src/" + name for name in PACKAGE_FILES} | set(SDIST_FILES)
+  if missing := expected - names:
     raise ValueError(f"Sdist is missing package resources: {sorted(missing)}")
 
 
@@ -394,6 +424,7 @@ def main() -> None:
   for arguments in commands:
     run((sys.executable, *arguments))
   check_documents()
+  check_package_files()
   with tempfile.TemporaryDirectory(
     prefix="astrology-check-", dir=os.environ.get("SCRATCH")
   ) as temporary:

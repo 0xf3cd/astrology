@@ -12,7 +12,7 @@ empty. There is no default house system or orb.
 
 `HouseSystem` admits Whole Sign, Equal, and Placidus. This layer preserves the
 selection; it neither calculates geometry nor substitutes a different system.
-The future chart adapter must report unavailable requested geometry explicitly.
+The [chart guide](chart.md) reports unavailable requested geometry explicitly.
 
 `Body` identifies the ten physical bodies from Sun and Moon through Pluto.
 `LunarNode` identifies mathematical ascending/descending nodes with either the
@@ -20,8 +20,9 @@ mean or Meeus five-term true definition. The definition is part of each node's
 identity, not an accuracy flag or an interchangeable model. Both definitions
 may be selected explicitly in one request.
 
-These are requested identities; the [adapter feature](https://github.com/0xf3cd/astrology/issues/3)
-will bind them to the astronomical definitions and models. No node formula is implemented here.
+These are requested identities; the [chart adapter](chart.md) binds them to the
+astronomical definitions and models. No node formula is implemented in this
+layer.
 
 ```{doctest}
 >>> from astrology import Body, ChartConfig, HouseSystem, LunarNode
@@ -68,6 +69,7 @@ and inconsistent selections fail under normal Python and `python -O`.
 
 The defining enums and API contracts are generated in the [reference](reference.md).
 Actual astronomy models, versions, time scales, and effective calculation
-settings belong to the future adapter result; they are not invented here to
-complete a metadata record. Knowledge lookup and chart computation are not yet
-available.
+settings belong to the chart result; they are not invented here to complete a
+metadata record. The [chart guide](chart.md) shows how a request becomes that
+result, and the [knowledge guide](knowledge.md) covers queries that need no
+chart at all.

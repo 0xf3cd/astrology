@@ -15,13 +15,17 @@ from astrology.knowledge import load_catalog
 from tools import check as checker
 from tools.check import (
   PACKAGE_FILES,
+  SDIST_FILES,
   check_documents,
   check_examples,
+  check_package_files,
   check_sdist,
   check_wheel,
   document_errors,
   run,
 )
+
+SDIST_PATHS = (*("src/" + name for name in PACKAGE_FILES), *SDIST_FILES)
 
 
 @pytest.fixture
@@ -106,12 +110,12 @@ def valid_example_report() -> str:
   return "".join(
     f"Document: docs/{language}/{page}\n2 tests in 1 items.\n"
     for language in ("en", "zh-CN")
-    for page in ("contributing", "birth", "configuration", "knowledge")
+    for page in ("contributing", "birth", "configuration", "chart", "knowledge")
   )
 
 
 @pytest.mark.parametrize("language", ["en", "zh-CN"])
-@pytest.mark.parametrize("page", ["contributing", "birth", "configuration", "knowledge"])
+@pytest.mark.parametrize("page", ["contributing", "birth", "configuration", "chart", "knowledge"])
 @pytest.mark.parametrize("count", [None, 0])
 def test_examples_cannot_be_empty(language: str, page: str, count: int | None) -> None:
   section = f"Document: docs/{language}/{page}\n2 tests in 1 items.\n"
@@ -133,6 +137,33 @@ def test_document_word_in_doctest_group() -> None:
       "1 item passed all tests:\n   2 tests in Document: group\n2 tests in 1 item.\n",
     )
   )
+
+
+def _package_tree(root: Path, names: Sequence[str]) -> None:
+  for name in names:
+    path = root / "src" / name
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("", encoding="utf-8")
+
+
+def test_every_package_file_is_listed() -> None:
+  check_package_files()
+
+
+def test_a_listed_package_tree_passes(tmp_path: Path) -> None:
+  _package_tree(tmp_path, PACKAGE_FILES)
+  pycache = tmp_path / "src" / "astrology" / "__pycache__"
+  pycache.mkdir()
+  (pycache / "module.cpython-314.pyc").write_bytes(b"")
+  check_package_files(tmp_path)
+
+
+@pytest.mark.parametrize("extra", ["astrology/new_module.py", "astrology/knowledge/data.json"])
+def test_an_unlisted_package_file_is_rejected(tmp_path: Path, extra: str) -> None:
+  _package_tree(tmp_path, (*PACKAGE_FILES, extra))
+  with pytest.raises(ValueError, match="PACKAGE_FILES") as caught:
+    check_package_files(tmp_path)
+  assert extra in str(caught.value)
 
 
 @pytest.mark.parametrize("missing", [*PACKAGE_FILES, "a.dist-info/licenses/LICENSE"])
@@ -221,8 +252,8 @@ def test_distribution_keeps_dependency_install_and_both_consumer_modes(
       artifacts = Path(command[-1])
       artifacts.mkdir(parents=True)
       with tarfile.open(artifacts / "astrology.tar.gz", "w:gz") as archive:
-        for name in PACKAGE_FILES:
-          archive.addfile(tarfile.TarInfo("astrology/src/" + name), BytesIO())
+        for name in SDIST_PATHS:
+          archive.addfile(tarfile.TarInfo("astrology/" + name), BytesIO())
       with ZipFile(artifacts / "astrology.whl", "w") as archive:
         for name in (*PACKAGE_FILES, "a.dist-info/licenses/LICENSE"):
           archive.writestr(name, "")
@@ -254,13 +285,13 @@ def test_distribution_keeps_dependency_install_and_both_consumer_modes(
   assert ["--knowledge-only" in command for command in consumers] == [True, False, True, False]
 
 
-@pytest.mark.parametrize("missing", [None, *PACKAGE_FILES])
+@pytest.mark.parametrize("missing", [None, *SDIST_PATHS])
 def test_sdist_resource_contents(tmp_path: Path, missing: str | None) -> None:
   sdist = tmp_path / "package.tar.gz"
   with tarfile.open(sdist, "w:gz") as archive:
-    for name in PACKAGE_FILES:
+    for name in SDIST_PATHS:
       if name != missing:
-        archive.addfile(tarfile.TarInfo("astrology/src/" + name), BytesIO())
+        archive.addfile(tarfile.TarInfo("astrology/" + name), BytesIO())
   if missing is None:
     check_sdist(sdist)
   else:

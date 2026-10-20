@@ -2,7 +2,8 @@
 
 import json
 import sys
-from collections.abc import Sequence
+from collections.abc import Iterator, Sequence
+from dataclasses import replace
 from datetime import UTC, date, datetime, timedelta
 from importlib import import_module
 from importlib.metadata import version
@@ -17,6 +18,27 @@ import astrology
 from tools import installed_check
 
 
+def _is_astronomy(name: str) -> bool:
+  """Report whether a module name belongs to the astronomy adapter. 判断模块名是否属于天文适配层。"""
+  return name in ("celestial_calendar", "astrology.celestial") or name.startswith(
+    "celestial_calendar."
+  )
+
+
+@pytest.fixture(autouse=True)
+def consumer_process_without_astronomy() -> Iterator[None]:
+  """Model a consumer process that has not loaded the astronomy adapter.
+
+  模拟尚未加载天文适配层的消费者进程。
+  """
+  removed = {name: sys.modules.pop(name) for name in list(sys.modules) if _is_astronomy(name)}
+  yield
+  for name in list(sys.modules):
+    if _is_astronomy(name):
+      del sys.modules[name]
+  sys.modules.update(removed)
+
+
 @pytest.fixture
 def consumer(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
   package = tmp_path / "astrology"
@@ -28,7 +50,16 @@ def consumer(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
   knowledge.mkdir()
   (knowledge / "catalog.json").write_bytes(corpus)
   monkeypatch.setattr(astrology, "__file__", str(package / "__init__.py"))
-  for name in ("birth", "config", "knowledge", "knowledge.catalog", "knowledge.records"):
+  for name in (
+    "birth",
+    "chart",
+    "config",
+    "houses",
+    "knowledge",
+    "knowledge.catalog",
+    "knowledge.records",
+    "zodiac",
+  ):
     monkeypatch.setattr(import_module(f"astrology.{name}"), "__file__", str(package / f"{name}.py"))
   monkeypatch.setattr(sys, "prefix", str(tmp_path))
   monkeypatch.setattr(installed_check, "files", lambda package: knowledge)
@@ -53,10 +84,13 @@ def test_wrong_installed_version_rejected(consumer: Path) -> None:
   "module",
   [
     "astrology.birth",
+    "astrology.chart",
     "astrology.config",
+    "astrology.houses",
     "astrology.knowledge",
     "astrology.knowledge.catalog",
     "astrology.knowledge.records",
+    "astrology.zodiac",
   ],
 )
 def test_submodule_outside_consumer_rejected(
@@ -231,6 +265,40 @@ def test_installed_consumer_rejects_configuration_defects(
 
   monkeypatch.setattr(astrology, "ChartConfig", incorrect)
   with pytest.raises(ValueError, match=r"mutable input alias|substituted"):
+    installed_check.main(version("astrology"))
+
+
+def test_installed_consumer_calculates_a_chart(
+  consumer: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+  calls: list[astrology.ChartConfig] = []
+  original = astrology.natal_chart
+
+  def record(
+    resolved: astrology.ResolvedBirth, config: astrology.ChartConfig
+  ) -> astrology.NatalChart:
+    calls.append(config)
+    return original(resolved, config)
+
+  monkeypatch.setattr(astrology, "natal_chart", record)
+  installed_check.main(version("astrology"))
+  assert len(calls) == 1
+  assert calls[0].house_system is astrology.HouseSystem.WHOLE_SIGN
+
+
+def test_installed_consumer_rejects_a_misreported_astronomy_version(
+  consumer: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+  original = astrology.natal_chart
+
+  def incorrect(
+    resolved: astrology.ResolvedBirth, config: astrology.ChartConfig
+  ) -> astrology.NatalChart:
+    chart = original(resolved, config)
+    return replace(chart, provenance=replace(chart.provenance, celestial_version="0.0.0"))
+
+  monkeypatch.setattr(astrology, "natal_chart", incorrect)
+  with pytest.raises(ValueError, match="astronomy library version"):
     installed_check.main(version("astrology"))
 
 

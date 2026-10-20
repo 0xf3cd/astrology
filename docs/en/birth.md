@@ -135,7 +135,7 @@ Older Gregorian records remain storable. Resolving earlier instants needs a
 future explicit historical-time/UT1 contract; this API does not extrapolate UTC,
 convert time scales, or accept leap-second labels. A failed UTC conversion beyond
 datetime's upper range is an explicit `ValueError`. Astronomy model domains belong
-to the future adapter, not this record type.
+to the chart adapter, not this record type.
 
 | Error | Meaning |
 |---|---|
