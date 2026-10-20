@@ -243,7 +243,7 @@ can and cannot detect.
 - Aspect angles, orbs and applying or separating motion are not calculated
   here; see the [configuration guide](configuration.md).
 - Results are not serialized and have no text output yet.
-- No external source publishes Placidus cusps. Cusps 2, 3, 11 and 12 are checked
+- The repository keeps no external reference values for Placidus cusps. Cusps 2, 3, 11 and 12 are checked
   against the definition, which the check and the library read alike; cusps 5, 6,
   8 and 9 are checked only as the exact opposites.
 - The astronomy library supports civil years 1885 to 2099 and, for UTC input,

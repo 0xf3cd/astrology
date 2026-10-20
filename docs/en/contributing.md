@@ -136,9 +136,12 @@ Each reference detects a different defect, and only above its tolerance:
 |---|---|---|
 | Horizons longitudes | A wrong ephemeris or body mapping. UTC used for TT (64-69 seconds) moves the Moon 35-42 arcseconds and Mercury 3-5. | A shift below the tolerance, including a path that corrupts only the Sun (2.6-2.8 arcseconds). |
 | Exact leap-second relation | UTC or UT1 passed where TT belongs: the reported JDE(TT) is 0.2-0.3 seconds off. | A rotation path that treats UTC as UT1; the reported JDE(TT) stays exact. |
-| Horizons sidereal time, axes | The mean sidereal time used for the apparent one (0.002-0.005 degrees). At the northern instant also UT1 taken as UTC (4.9 arcseconds) and a mean obliquity for the true one (5.7). | At the southern instant, a mean obliquity for the true one (0.06 arcseconds) and UT1 taken as UTC (2.8, under the 3.6 arcsecond threshold). |
-| Horizons sidereal time, Placidus cusps 2, 3, 11 and 12 | Cusps away from the Placidus time division by more than about 0.0015 degrees, such as another house system. | A misreading of the Placidus definition shared with the check. Cusps 5, 6, 8 and 9 are checked only as the exact opposites; no external source publishes the cusps. |
+| Horizons sidereal time, axes | The mean sidereal time used for the apparent one (0.002-0.005 degrees). UT1 taken as UTC: 5.0 arcseconds at the northern instant and 3.7 at the southern one, only just past the 3.6 threshold. A mean obliquity for the true one at the northern instant (5.7). | A mean obliquity for the true one at the southern instant (under 1 arcsecond). |
+| Horizons sidereal time, Placidus cusps 2, 3, 11 and 12 | Cusps away from the Placidus time division by more than about 0.0015 degrees, such as another house system. | A misreading of the Placidus definition shared with the check. Cusps 5, 6, 8 and 9 are checked only as the exact opposites; the repository keeps no external reference values for the cusps. |
 | Meeus chapter 47 nodes | A wrong node definition, direction or missing nutation term. | A mistake in the shared formula, and a TT/UT mix, which moves a node by under 0.4 arcseconds. |
+
+The axis figures are differences from the axes derived from Horizons, so they include
+the offset of up to 0.91 arcseconds that the library already has there.
 
 ## Knowledge and documentation
 
