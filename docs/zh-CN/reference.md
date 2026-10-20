@@ -20,7 +20,7 @@
 
 ```{eval-rst}
 .. automodule:: astrology.config
-   :members: HouseSystem, Body, NodeDefinition, LunarNode, MajorAspect, AspectRule, ChartConfig
+   :members: HouseSystem, Body, NodeDefinition, LunarNode, MajorAspect, OrbCombination, ObjectOrb, AspectRule, ChartConfig
    :undoc-members:
    :member-order: bysource
    :no-index:

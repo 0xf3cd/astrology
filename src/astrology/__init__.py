@@ -38,6 +38,8 @@ from astrology.config import (
   LunarNode,
   MajorAspect,
   NodeDefinition,
+  ObjectOrb,
+  OrbCombination,
 )
 from astrology.houses import house_of
 from astrology.knowledge import Catalog, load_catalog
@@ -67,6 +69,8 @@ __all__ = [
   "NatalChart",
   "NodeDefinition",
   "NonexistentBirthTimeError",
+  "ObjectOrb",
+  "OrbCombination",
   "Placement",
   "ResolvedBirth",
   "Sign",
