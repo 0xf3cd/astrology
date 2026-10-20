@@ -51,6 +51,10 @@ PACKAGE_FILES = (
   "astrology/knowledge/catalog.json",
 )
 
+# Files outside the package that the tests in the source distribution read.
+# 源码分发包中的测试所读取的、包外的文件。
+SDIST_FILES = ("tests/reference/natal_reference.json",)
+
 
 def run(command: Sequence[str], *, cwd: Path = ROOT) -> None:
   """Run a command and propagate failure. 执行命令并传播失败。"""
@@ -218,13 +222,14 @@ def check_wheel(wheel: Path, expected_version: str) -> None:
 
 
 def check_sdist(sdist: Path) -> None:
-  """Require the complete package and corpus in the source distribution.
+  """Require the complete package, corpus and reference fixture in the source distribution.
 
-  要求源码分发包包含完整包及语料。
+  要求源码分发包包含完整包、语料及参考夹具。
   """
   with tarfile.open(sdist) as archive:
     names = {name.partition("/")[2] for name in archive.getnames()}
-  if missing := {"src/" + name for name in PACKAGE_FILES} - names:
+  expected = {"src/" + name for name in PACKAGE_FILES} | set(SDIST_FILES)
+  if missing := expected - names:
     raise ValueError(f"Sdist is missing package resources: {sorted(missing)}")
 
 

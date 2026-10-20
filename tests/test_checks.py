@@ -15,6 +15,7 @@ from astrology.knowledge import load_catalog
 from tools import check as checker
 from tools.check import (
   PACKAGE_FILES,
+  SDIST_FILES,
   check_documents,
   check_examples,
   check_package_files,
@@ -23,6 +24,8 @@ from tools.check import (
   document_errors,
   run,
 )
+
+SDIST_PATHS = (*("src/" + name for name in PACKAGE_FILES), *SDIST_FILES)
 
 
 @pytest.fixture
@@ -249,8 +252,8 @@ def test_distribution_keeps_dependency_install_and_both_consumer_modes(
       artifacts = Path(command[-1])
       artifacts.mkdir(parents=True)
       with tarfile.open(artifacts / "astrology.tar.gz", "w:gz") as archive:
-        for name in PACKAGE_FILES:
-          archive.addfile(tarfile.TarInfo("astrology/src/" + name), BytesIO())
+        for name in SDIST_PATHS:
+          archive.addfile(tarfile.TarInfo("astrology/" + name), BytesIO())
       with ZipFile(artifacts / "astrology.whl", "w") as archive:
         for name in (*PACKAGE_FILES, "a.dist-info/licenses/LICENSE"):
           archive.writestr(name, "")
@@ -282,13 +285,13 @@ def test_distribution_keeps_dependency_install_and_both_consumer_modes(
   assert ["--knowledge-only" in command for command in consumers] == [True, False, True, False]
 
 
-@pytest.mark.parametrize("missing", [None, *PACKAGE_FILES])
+@pytest.mark.parametrize("missing", [None, *SDIST_PATHS])
 def test_sdist_resource_contents(tmp_path: Path, missing: str | None) -> None:
   sdist = tmp_path / "package.tar.gz"
   with tarfile.open(sdist, "w:gz") as archive:
-    for name in PACKAGE_FILES:
+    for name in SDIST_PATHS:
       if name != missing:
-        archive.addfile(tarfile.TarInfo("astrology/src/" + name), BytesIO())
+        archive.addfile(tarfile.TarInfo("astrology/" + name), BytesIO())
   if missing is None:
     check_sdist(sdist)
   else:
