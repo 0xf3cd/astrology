@@ -99,8 +99,6 @@ def _check_knowledge(expected_corpus_version: str | None = None) -> None:
       "Installed retrieval collapsed editorial states or claimed chart applicability"
     )
   aliases = ["isolated alias"]
-  from dataclasses import replace
-
   concept = replace(catalog.concepts[0], en_aliases=aliases)
   aliases.clear()
   if tuple(concept.en_aliases) != ("isolated alias",):

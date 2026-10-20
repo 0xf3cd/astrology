@@ -27,6 +27,15 @@ from tools.check import (
 )
 
 SDIST_PATHS = (*("src/" + name for name in PACKAGE_FILES), *SDIST_FILES)
+_EXAMPLE_PAGES = (
+  "contributing",
+  "birth",
+  "configuration",
+  "chart",
+  "aspects",
+  "records",
+  "knowledge",
+)
 
 
 @pytest.mark.parametrize(
@@ -127,22 +136,12 @@ def valid_example_report() -> str:
   return "".join(
     f"Document: docs/{language}/{page}\n2 tests in 1 items.\n"
     for language in ("en", "zh-CN")
-    for page in (
-      "contributing",
-      "birth",
-      "configuration",
-      "chart",
-      "aspects",
-      "records",
-      "knowledge",
-    )
+    for page in _EXAMPLE_PAGES
   )
 
 
 @pytest.mark.parametrize("language", ["en", "zh-CN"])
-@pytest.mark.parametrize(
-  "page", ["contributing", "birth", "configuration", "chart", "aspects", "records", "knowledge"]
-)
+@pytest.mark.parametrize("page", _EXAMPLE_PAGES)
 @pytest.mark.parametrize("count", [None, 0])
 def test_examples_cannot_be_empty(language: str, page: str, count: int | None) -> None:
   section = f"Document: docs/{language}/{page}\n2 tests in 1 items.\n"

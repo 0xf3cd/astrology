@@ -33,7 +33,9 @@ The command checks Ruff lint/two-space formatting, strict mypy, pytest in normal
 and optimized modes, document pairs/local links, fresh strict HTML/doctest builds,
 and an isolated wheel install with its declared runtime dependencies. `python -m
 build` builds the wheel through the sdist. The installed consumer exercises birth,
-timezone provenance and configuration outside the checkout. A separate knowledge-only
+timezone provenance and configuration outside the checkout; its complete-chart,
+restoration, replay and text checks are described in the
+[record guide](records.md#verification-and-limits). A separate knowledge-only
 consumer lists, looks up, filters and resolves citations without time/native
 initialization. Both use isolated imports in normal and optimized modes; wheel
 and sdist checks require the actual corpus resources. Temporary HTML, doctest reports,
@@ -44,7 +46,7 @@ caches may remain in ignored checkout directories.
 Tool versions are locked in `uv.lock`. Sphinx 8.2.3 serves Python 3.11; Sphinx
 9.1.0 serves newer Python versions. Coverage is reported to locate gaps; it
 cannot certify the astronomy values, which the reference cases do. Tests exercise
-birth/time and configuration contracts as well as development checks. Add domain
+birth/time, chart/configuration, record and text contracts as well as development checks. Add domain
 tests with each feature.
 
 For local formatting, run `uv run ruff format .`. A failed command stops the

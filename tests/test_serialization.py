@@ -4,6 +4,7 @@ import json
 import math
 import subprocess
 import sys
+from collections.abc import Iterator
 from dataclasses import FrozenInstanceError, replace
 from datetime import date, time, timedelta
 from pathlib import Path
@@ -236,12 +237,35 @@ def test_fields_are_explicit(recorded_chart: NatalChart, nested: bool, missing: 
     loads_chart(json.dumps(record))
 
 
+def numeric_paths(
+  value: object, path: tuple[str | int, ...] = ()
+) -> Iterator[tuple[str | int, ...]]:
+  if type(value) in (int, float):
+    yield path
+  elif isinstance(value, dict):
+    for key, child in value.items():
+      yield from numeric_paths(child, (*path, key))
+  elif isinstance(value, list):
+    for index, child in enumerate(value):
+      yield from numeric_paths(child, (*path, index))
+
+
+_RECORD_TEXT = (Path(__file__).parent / "reference/chart_record_v1.json").read_text(
+  encoding="utf-8"
+)
+
+
+@pytest.mark.parametrize("path", tuple(numeric_paths(json.loads(_RECORD_TEXT))))
 @pytest.mark.parametrize("token", ["NaN", "Infinity", "-Infinity", "1e400", "-1e400"])
-def test_nonfinite_json_numbers_rejected(recorded_chart: NatalChart, token: str) -> None:
-  packed = dumps_chart(recorded_chart)
-  value = str(recorded_chart.times.jd_ut1)
+def test_nonfinite_json_numbers_rejected(path: tuple[str | int, ...], token: str) -> None:
+  record: Any = json.loads(_RECORD_TEXT)
+  parent = record
+  for key in path[:-1]:
+    parent = parent[key]
+  parent[path[-1]] = "__nonfinite_token__"
+  packed = json.dumps(record).replace('"__nonfinite_token__"', token)
   with pytest.raises(ChartRecordError):
-    loads_chart(packed.replace(value, token))
+    loads_chart(packed)
 
 
 @pytest.mark.parametrize("text", ["null", "[]", "{}", "[", "[[]]", "[" * 1500 + "]" * 1500])

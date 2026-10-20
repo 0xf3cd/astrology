@@ -1,4 +1,7 @@
-"""Unrounded classifications survive bilingual display. 双语显示保留未舍入分类。"""
+"""Unrounded classifications survive bilingual display and chart-record round trips.
+
+双语显示与命盘记录往返都保留未舍入分类。
+"""
 
 import math
 from dataclasses import replace
@@ -47,7 +50,10 @@ def test_presentation_tables_cover_supported_languages_and_motion() -> None:
 
 @pytest.mark.parametrize(
   "language,expected",
-  [("en", "Timezone data / fold: None / None / None"), ("zh-CN", "时区数据 / fold: 无 / 无 / 无")],
+  [
+    ("en", "tzdata package / IANA release / fold: None / None / None"),
+    ("zh-CN", "tzdata 包版本 / IANA 版本 / fold: 无 / 无 / 无"),
+  ],
 )
 def test_missing_timezone_provenance_uses_language_label(
   recorded_chart: NatalChart, language: Language, expected: str
@@ -76,12 +82,13 @@ def display_case(
   second_rate: float = 1.0,
   object_orbs: tuple[ObjectOrb, ...] = (),
   combination: OrbCombination | None = None,
+  aspect: MajorAspect = MajorAspect.CONJUNCTION,
   cusps: tuple[float, ...] = _CUSPS,
 ) -> NatalChart:
   config = ChartConfig(
     HouseSystem.WHOLE_SIGN,
     (Body.SUN, Body.MARS),
-    (AspectRule(MajorAspect.CONJUNCTION, orb, object_orbs),),
+    (AspectRule(aspect, orb, object_orbs),),
     orb_combination=combination,
   )
   positions = (
@@ -127,7 +134,7 @@ def test_complete_table_and_no_mutation(recorded_chart: NatalChart, language: st
   assert ("Mean ascending lunar node" if language == "en" else "平均升交点") in output
   assert "mean_of_orbs" in output
   assert "algo5" in output
-  assert "0.8.0" in output
+  assert recorded_chart.provenance.celestial_version in output
   assert "2021-11-07T06:30:00+00:00" in output
   assert ("House cusp" if language == "en" else "宫头") in output
   assert "°" in output
@@ -148,6 +155,46 @@ def test_complete_constructed_geometry_table(language: Language) -> None:
   )
   expected = (reference / f"constructed_chart.{language}.txt").read_text(encoding="utf-8")
   assert format_chart(chart, load_catalog(), language=language) == expected.removesuffix("\n")
+
+
+@pytest.mark.parametrize("language", ["en", "zh-CN"])
+def test_distinct_position_houses_and_zero_rate(
+  recorded_chart: NatalChart, language: Language
+) -> None:
+  chart = display_case(recorded_chart, 0, second=35, second_rate=0, orb=6)
+  rows = format_chart(chart, load_catalog(), language=language).splitlines()
+  if language == "en":
+    assert "Sun [sun] | Aries 0°00'00\" | 1 | R" in rows
+    assert "Mars [mars] | Taurus 5°00'00\" | 2 | S" in rows
+  else:
+    assert "太阳 [sun] | 白羊座 0°00'00\" | 1 | R" in rows
+    assert "火星 [mars] | 金牛座 5°00'00\" | 2 | S" in rows
+
+
+@pytest.mark.parametrize("language", ["en", "zh-CN"])
+@pytest.mark.parametrize(
+  "first,second,aspect,branch,english,chinese",
+  [
+    (1.0, 0.0, MajorAspect.CONJUNCTION, "0°00'00\"", "Conjunction", "合相"),
+    (0.0, 179.0, MajorAspect.OPPOSITION, "+180°00'00\"", "Opposition", "对分相"),
+  ],
+)
+def test_signed_aspect_branch_and_negative_deviation(
+  recorded_chart: NatalChart,
+  language: Language,
+  first: float,
+  second: float,
+  aspect: MajorAspect,
+  branch: str,
+  english: str,
+  chinese: str,
+) -> None:
+  chart = display_case(recorded_chart, first, second=second, orb=6, aspect=aspect)
+  rows = format_chart(chart, load_catalog(), language=language).splitlines()
+  if language == "en":
+    assert f"Sun | Mars | {english} | {branch} | -1°00'00\" | 6°00'00\" | applying" in rows
+  else:
+    assert f"太阳 | 火星 | {chinese} | {branch} | -1°00'00\" | 6°00'00\" | 入相" in rows
 
 
 @pytest.mark.parametrize("language", ["en", "zh-CN"])

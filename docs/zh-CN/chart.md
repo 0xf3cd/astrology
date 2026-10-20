@@ -63,10 +63,11 @@
 'delta_t_model_from_civil_utc'
 ```
 
-`position_frame` 说明这些值是瞬时真黄道、真春分点上的地心视位置。
-`ut1_derivation` 说明 UT1 由民用 UTC 经 ΔT 模型推得，不是观测的 DUT1。
 结果还在 `chart.resolved` 中保留实际输入，在 `chart.provenance.astrology_version` 中记录
 astrology 包版本。保存、恢复、重算及双语文本输出见[记录指南](records.md)。
+
+`position_frame` 说明这些值是瞬时真黄道、真春分点上的地心视位置。
+`ut1_derivation` 说明 UT1 由民用 UTC 经 ΔT 模型推得，不是观测的 DUT1。
 月交点以同一真春分点为基准，因此已含黄经章动。`ChartTimes` 记录该时刻的
 UT1 儒略日与 TT 儒略历书日。
 

@@ -39,7 +39,7 @@ R：黄经减小；D：黄经增大；S：速率为零（按未舍入值判断�
 相位规则 / 基础容许度 / 对象单独设置: 合相 / 6°00'00" / 太阳=10°00'00"
 
 来源
-时区数据 / fold: 2026.5 / 2026e / 0
+tzdata 包版本 / IANA 版本 / fold: 2026.5 / 2026e / 0
 JD(UT1) / JDE(TT): 2461135.1145838792 / 2461135.115384074
 ΔT 模型 / 求值方式: algo5 / fixed_fourteen_object_joint_snapshot
 astrology / celestial-calendar 版本: 0.0.0 / 0.8.0

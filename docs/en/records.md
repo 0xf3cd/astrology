@@ -43,6 +43,13 @@ Moon [moon] | Scorpio 13°32'41" | 4 | D
 Mercury [mercury] | Pisces 17°05'04" | 8 | D
 ```
 
+The Sun's orb is 10° and the other bodies use 6°; their mean is 8° for pairs with
+the Sun and 6° otherwise. The explicit participant list excludes the node and
+records the bodies in reverse order; effective participants still follow the
+requested object order. The exact replay equality above holds in this same code
+tree. For comparisons across trees, compare numerical fields with stated
+tolerances, as in [Verification and limits](#verification-and-limits).
+
 The full table also includes all requested objects, four axes, twelve cusps,
 aspects with their oriented branches, deviations, limits and motion labels,
 requested/effective configuration and provenance. Pass `language="zh-CN"` for
@@ -130,8 +137,9 @@ does not identify a unique code revision or guarantee bitwise equality between t
 
 Angles use the named `truncate_display` rule: truncate toward zero to whole
 arcseconds. Aries 29.9999999° displays as Aries 29°59'59", not Taurus 0°00'00".
-House and aspect-motion labels always come from the stored result. Two displayed
-angles may tie without having the same house; a nonzero deviation displayed as zero
+House and aspect-motion labels always come from the stored result. An object's
+displayed longitude can match a cusp's while its unrounded position is still in
+the preceding house; a nonzero deviation displayed as zero
 can still be applying or separating. `R` uses the sign of the unrounded rate, `D`
 means increasing longitude, and `S` means exactly zero rate. The text is not a
 lossless alternative to JSON.
@@ -152,11 +160,14 @@ tested separately, without these tolerances.
 
 `tests/reference/complete_chart_reference.json` contains independently executed
 Swiss Ephemeris 2.10.03 / pyswisseph 2.10.3.2 numeric states for four synthetic
-instants, each with three house systems. It records the wheel hash, flags,
+instants, each with three house systems. It records the pyswisseph Python wheel's
+SHA-256 hash, flags,
 coordinate/time conventions, source URLs, separate calibration and per-field
 tolerances. Moshier is requested explicitly; returned `calc` flags are checked.
-Swiss houses use Swiss UT1 and Delta-T, not Algo5. Their tolerance includes that
-time-model difference. Signs, two-dimensional house membership, aspects and motion
+Swiss houses use Swiss UT1 and Delta-T, not Algo5, the fixed Delta-T model used
+by this adapter. Their tolerance includes that
+time-model difference. Signs, two-dimensional house membership (using longitude,
+not object latitude), aspects and motion
 were derived by separate project-authored arithmetic from the Swiss states;
 Swiss itself does not supply an aspect table. Mean-node longitude/rate are compared
 as named models, not assumed identical formulas. Node distance and true nodes are

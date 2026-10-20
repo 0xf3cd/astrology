@@ -30,7 +30,7 @@ time and location:
 - Compute the Sun, Moon, eight planets, and explicitly selected lunar nodes.
 - Support Whole Sign, Equal, and Placidus houses, with explicit failures where a
   requested geometry is undefined.
-- Derive signs, two-dimensional longitude house placement, and the five major
+- Derive signs, two-dimensional house placement (longitude only, without object latitude), and the five major
   aspects with configurable orbs and local applying/separating status.
 - Return immutable structured results, a text table, and a versioned serialization
   that retains inputs, configuration, astronomical values, and model identities.
