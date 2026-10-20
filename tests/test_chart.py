@@ -35,6 +35,9 @@ from astrology import (
 # A northern, non-integer-minute instant used by several cases.
 _NORTH = (date(2003, 7, 17), time(5, 37, 13), 64.15, -21.94)
 
+# A southern instant, the same as the southern reference case.
+_SOUTH = (date(2020, 6, 1), time(12, 0), -33.87, 151.21)
+
 # The fourteen objects the upstream evaluates together, in its roster order.
 _ALL_OBJECTS: tuple[Body | LunarNode, ...] = (
   Body.SUN,
@@ -53,11 +56,12 @@ _ALL_OBJECTS: tuple[Body | LunarNode, ...] = (
   LunarNode.MEEUS_FIVE_TERM_TRUE_DESCENDING,
 )
 
-# At this instant the Midheaven is exactly 270 degrees, so the Ascendant has no
-# direction at the critical latitude of the ecliptic's tilt. The witnesses are the
+# At the critical latitude, where the ecliptic lies on the horizon, the Ascendant has
+# no direction. The sidereal time is 270 degrees at the northern witness and 90 at
+# the southern one, which is 180 degrees away in longitude. The witnesses are the
 # upstream consumer test's; 66.0 is a nearby latitude where the chart exists.
-# 此刻中天恰为 270°，在黄赤交角决定的临界纬度上升点没有方向。证人取自上游消费者测试；
-# 66.0 是附近有定义的纬度。
+# 在黄道与地平圈重合的临界纬度，上升点没有方向。恒星时在北站点是 270°，在南站点
+# （经度相差 180°）是 90°。证人取自上游消费者测试；66.0 是附近有定义的纬度。
 _UNRESOLVED_ASCENDANT = (date(2026, 1, 1), time(12, 0, 5))
 _UNRESOLVED_NORTH = (66.561856230963841, -11.176256364511062)
 _UNRESOLVED_SOUTH = (-66.561856230963841, 168.82374363548894)
@@ -238,13 +242,23 @@ def test_selecting_one_object_does_not_widen_the_evaluation_domain() -> None:
   assert chart.effective.evaluation == "fixed_fourteen_object_joint_snapshot"
 
 
-def test_positions_follow_the_requested_order() -> None:
+# Each request differs from the roster order, from the alphabetical order of the
+# identifiers, or from both. 每个请求与名册顺序、标识的字母顺序或两者都不同。
+@pytest.mark.parametrize(
+  "order",
+  [
+    (Body.MOON, Body.SUN),
+    (Body.VENUS, Body.MARS),
+    (Body.MERCURY, Body.SUN, Body.MARS),
+  ],
+)
+def test_positions_follow_the_requested_order(order: tuple[Body, ...]) -> None:
   chart = natal_chart(
     resolved_at(*_NORTH[:2], *_NORTH[2:]),
-    config_for(HouseSystem.WHOLE_SIGN, (Body.MOON, Body.SUN)),
+    config_for(HouseSystem.WHOLE_SIGN, order),
   )
-  assert [position.identity for position in chart.positions] == [Body.MOON, Body.SUN]
-  assert [placement.identity for placement in chart.placements] == [Body.MOON, Body.SUN]
+  assert tuple(position.identity for position in chart.positions) == order
+  assert tuple(placement.identity for placement in chart.placements) == order
 
 
 def test_a_selected_subset_carries_the_values_of_the_full_evaluation() -> None:
@@ -274,8 +288,11 @@ def test_placidus_keeps_the_ascendant_and_midheaven_on_their_cusps() -> None:
   assert chart.houses.cusps_deg[9] == chart.houses.midheaven_deg
 
 
-def test_equal_houses_start_at_the_ascendant_in_thirty_degree_steps() -> None:
-  resolved = resolved_at(*_NORTH[:2], *_NORTH[2:])
+@pytest.mark.parametrize("site", [_NORTH, _SOUTH], ids=["north", "south"])
+def test_equal_houses_start_at_the_ascendant_in_thirty_degree_steps(
+  site: tuple[date, time, float, float],
+) -> None:
+  resolved = resolved_at(*site)
   equal = natal_chart(resolved, config_for(HouseSystem.EQUAL)).houses
   cusps = equal.cusps_deg
   assert cusps[0] == equal.ascendant_deg

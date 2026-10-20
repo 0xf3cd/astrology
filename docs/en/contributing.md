@@ -115,27 +115,28 @@ validation separate from the claimed interpretation of a chart.
 The natal chart cases in `tests/reference/natal_reference.json` compare two
 instants, one per hemisphere, against JPL Horizons and against definition-level
 checks. The fixture records the query URLs, the ephemeris kernel Horizons names
-for each body and for the geocenter (the Sun and the Moon use DE441, the other
-bodies their own kernels), the retrieval time and the conventions used.
+for each body and for the geocenter (the Sun, the Moon, Mercury and Venus use
+DE441, the other bodies their own kernels), the retrieval time and the
+conventions used.
 
 The body tolerances follow the upstream's own model error against Horizons, not
-the two instants. The Sun and the planets agree within 0.8 arcseconds in
-longitude over 24 instants in 2000-2002 and within 1.3 at the 2020 instant; the
+the two instants. The Sun and the planets agree to about 0.8 arcseconds in
+longitude over 24 instants in 2000-2002 and to 1.3 at the 2020 instant; the
 truncated lunar model agrees within 10 arcseconds in longitude and 2.4 in
 latitude over 60 instants in 2000-2030. Those samples were taken ad hoc and are
 not kept in the repository. The tolerances are 3 arcseconds for the Sun and the
 planets, 15 for the Moon, 1 for latitude, 3 for the Moon's latitude and 1 for
 the nodes. The axes and the Placidus cusps use 0.001 degrees (3.6 arcseconds):
-the two instants agree within 0.92 arcseconds there, which is the difference
+the two instants differ by at most 0.91 arcseconds there, which is the difference
 between the UT1 the library models and the UT1 Horizons observes.
 
 Each reference detects a different defect, and only above its tolerance:
 
 | Reference | Detects | Does not detect |
 |---|---|---|
-| Horizons longitudes | A wrong ephemeris or body mapping. UTC used for TT (64-69 seconds) moves the Moon 35-42 arcseconds and Mercury 3-5. | A shift below the tolerance, including a path that corrupts only the Sun (2.6 arcseconds). |
+| Horizons longitudes | A wrong ephemeris or body mapping. UTC used for TT (64-69 seconds) moves the Moon 35-42 arcseconds and Mercury 3-5. | A shift below the tolerance, including a path that corrupts only the Sun (2.6-2.8 arcseconds). |
 | Exact leap-second relation | UTC or UT1 passed where TT belongs: the reported JDE(TT) is 0.2-0.3 seconds off. | A rotation path that treats UTC as UT1; the reported JDE(TT) stays exact. |
-| Horizons sidereal time, axes | The mean sidereal time used for the apparent one (0.004-0.005 degrees). | UT1 taken as UTC, or a mean obliquity for the true one: they move the axes by 0.0016 degrees at most, near the threshold. |
+| Horizons sidereal time, axes | The mean sidereal time used for the apparent one (0.002-0.005 degrees). At the northern instant also UT1 taken as UTC (4.9 arcseconds) and a mean obliquity for the true one (5.7). | At the southern instant, a mean obliquity for the true one (0.06 arcseconds) and UT1 taken as UTC (2.8, under the 3.6 arcsecond threshold). |
 | Horizons sidereal time, Placidus cusps 2, 3, 11 and 12 | Cusps away from the Placidus time division by more than about 0.0015 degrees, such as another house system. | A misreading of the Placidus definition shared with the check. Cusps 5, 6, 8 and 9 are checked only as the exact opposites; no external source publishes the cusps. |
 | Meeus chapter 47 nodes | A wrong node definition, direction or missing nutation term. | A mistake in the shared formula, and a TT/UT mix, which moves a node by under 0.4 arcseconds. |
 

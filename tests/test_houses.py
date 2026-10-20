@@ -46,6 +46,18 @@ def test_adjacent_representable_values_keep_their_side_in_a_rotated_table() -> N
   assert house_of(0.0, _ROTATED) == 9
 
 
+def test_distinct_adjacent_cusps_are_accepted_from_every_starting_cusp() -> None:
+  # Offsets from the first cusp round 30.0 and the next float onto each other for
+  # most starting cusps; the table is still strictly cyclic. 多数起点下，相对首宫头
+  # 的偏移会把 30.0 与下一个浮点数舍入成同一个值，而该表仍是严格循环递增的。
+  above = math.nextafter(30.0, math.inf)
+  cusps = (300.0, 330.0, 0.0, 30.0, above, 60.0, 90.0, 120.0, 150.0, 180.0, 210.0, 240.0)
+  for shift in range(12):
+    table = cusps[shift:] + cusps[:shift]
+    assert house_of(30.0, table) == (3 - shift) % 12 + 1
+    assert house_of(above, table) == (4 - shift) % 12 + 1
+
+
 def test_membership_wraps_across_zero_degrees() -> None:
   assert house_of(359.999999, _CUSPS) == 2
   assert house_of(0.0, _CUSPS) == 3
@@ -75,6 +87,8 @@ def test_membership_uses_only_the_cusp_table() -> None:
     (0.0, 30.0, 60.0, 90.0, 120.0, 150.0, 180.0, 210.0, 240.0, 270.0, 300.0, 300.0),
     (0.0, 30.0, 60.0, 90.0, 120.0, 150.0, 180.0, 210.0, 240.0, 270.0, 300.0, 30.0),
     (0.0, 30.0, 60.0, 90.0, 120.0, 150.0, 180.0, 210.0, 240.0, 270.0, 300.0, 360.0),
+    # In cyclic order from its first cusp, so only the range check rejects it.
+    (360.0, 30.0, 60.0, 90.0, 120.0, 150.0, 180.0, 210.0, 240.0, 270.0, 300.0, 330.0),
     (0.0, 30.0, 60.0, float("nan"), 120.0, 150.0, 180.0, 210.0, 240.0, 270.0, 300.0, 330.0),
     (-30.0, 0.0, 30.0, 60.0, 90.0, 120.0, 150.0, 180.0, 210.0, 240.0, 270.0, 300.0),
   ],

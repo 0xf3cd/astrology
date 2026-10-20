@@ -17,6 +17,7 @@ from astrology import (
   BirthRecord,
   Body,
   ChartConfig,
+  EclipticPosition,
   FixedOffset,
   HouseSystem,
   Location,
@@ -75,7 +76,7 @@ FIXTURE = Path(__file__).resolve().parent / "reference" / "natal_reference.json"
 # Tolerances, in arcseconds unless stated otherwise. 容差，除注明外均以角秒计。
 # Body tolerances follow the upstream's own model error against Horizons, so a
 # correct upstream passes at any instant and not only at the two fixture
-# instants. The Sun and planets agree within 0.80" in longitude over 24 instants
+# instants. The Sun and planets agree to about 0.8" in longitude over 24 instants
 # in 2000-2002, and within 1.34" at the 2020 fixture instant; the truncated lunar
 # model within 9.96" in longitude and 2.39" in latitude over 60 instants in
 # 2000-2030. Those samples were taken ad hoc and are not kept in the repository.
@@ -88,28 +89,14 @@ MOON_LATITUDE_TOLERANCE_ARCSEC = 3.0
 NODE_TOLERANCE_ARCSEC = 1.0
 # The Ascendant, Midheaven and Placidus cusps follow UT1, which the library
 # models from civil UTC while Horizons derives sidereal time from observed UT1.
-# The two fixture instants agree within 0.92 arcseconds; 0.001 degrees is 3.6
+# The two fixture instants differ by at most 0.91 arcseconds; 0.001 degrees is 3.6
 # arcseconds, about four times that, and rejects a mean sidereal time used for the
 # apparent one. 上升点、中天与 Placidus 宫头随 UT1 变化：本库由民用 UTC 经模型推得，
-# Horizons 的恒星时取自观测 UT1。两个夹具时刻一致到 0.92″，0.001 度即 3.6″，约四倍余量。
+# Horizons 的恒星时取自观测 UT1。两个夹具时刻最多相差 0.91″，0.001 度即 3.6″，约四倍余量。
 AXIS_TOLERANCE_DEGREES = 0.001
 CUSP_TOLERANCE_DEGREES = 0.001
 # JDE(TT) - JD(UTC) is an exact leap-second relation, not an approximation.
 TIME_TOLERANCE_DAYS = 1e-9
-
-# The tolerances are the reference gate's sensitivity. Pinning them here makes
-# widening one a visible change in two places instead of one silent edit.
-# 容差就是参考门禁的灵敏度；在此再钉一份，改宽它就得改两处，不会是一次悄悄的修改。
-EXPECTED_TOLERANCES = {
-  "longitude": 3.0,
-  "moon_longitude": 15.0,
-  "latitude": 1.0,
-  "moon_latitude": 3.0,
-  "node": 1.0,
-  "axis": 0.001,
-  "cusp": 0.001,
-  "time": 1e-9,
-}
 
 # The target kernel Horizons names for each body, and the geocenter kernel.
 # 各天体的星历核（Horizons 的目标行）及地心核。
@@ -329,17 +316,87 @@ def _chart_for(case: _Case) -> tuple[NatalChart, ResolvedBirth]:
   return natal_chart(resolved, config), resolved
 
 
-def test_the_tolerances_are_the_documented_ones() -> None:
-  assert {
-    "longitude": LONGITUDE_TOLERANCE_ARCSEC,
-    "moon_longitude": MOON_LONGITUDE_TOLERANCE_ARCSEC,
-    "latitude": LATITUDE_TOLERANCE_ARCSEC,
-    "moon_latitude": MOON_LATITUDE_TOLERANCE_ARCSEC,
-    "node": NODE_TOLERANCE_ARCSEC,
-    "axis": AXIS_TOLERANCE_DEGREES,
-    "cusp": CUSP_TOLERANCE_DEGREES,
-    "time": TIME_TOLERANCE_DAYS,
-  } == EXPECTED_TOLERANCES
+def _body_agrees(
+  position: EclipticPosition,
+  reference: _Body,
+  longitude_shift_arcsec: float = 0.0,
+  latitude_shift_arcsec: float = 0.0,
+) -> bool:
+  """Whether a position is within its tolerances of the reference, which may be displaced.
+
+  The displacement lets a test show that a shifted reference is rejected.
+  位置是否在参考容差之内；参考可被偏移，供测试证明偏移后的参考被拒。
+  """
+  if position.identity is Body.MOON:
+    longitude_tolerance = MOON_LONGITUDE_TOLERANCE_ARCSEC
+    latitude_tolerance = MOON_LATITUDE_TOLERANCE_ARCSEC
+  else:
+    longitude_tolerance = LONGITUDE_TOLERANCE_ARCSEC
+    latitude_tolerance = LATITUDE_TOLERANCE_ARCSEC
+  longitude_difference = abs(
+    _angle_difference(
+      position.longitude_deg, reference["longitude_deg"] + longitude_shift_arcsec / 3600
+    )
+  )
+  latitude_difference = abs(
+    position.latitude_deg - (reference["latitude_deg"] + latitude_shift_arcsec / 3600)
+  )
+  return (
+    longitude_difference * 3600 <= longitude_tolerance
+    and latitude_difference * 3600 <= latitude_tolerance
+  )
+
+
+def _axes_agree(chart: NatalChart, case: _Case, ramc_shift_deg: float = 0.0) -> bool:
+  """Whether the Ascendant and Midheaven match the reference sidereal time, which may be displaced.
+
+  上升点与中天是否与参考恒星时一致；恒星时可被偏移。
+  """
+  ascendant, midheaven = _axes(
+    float(case["local_apparent_sidereal_time_deg"]) + ramc_shift_deg,
+    case["location"]["latitude"],
+    _obliquity(chart.times.jde_tt),
+  )
+  return (
+    abs(_angle_difference(chart.houses.ascendant_deg, ascendant)) <= AXIS_TOLERANCE_DEGREES
+    and abs(_angle_difference(chart.houses.midheaven_deg, midheaven)) <= AXIS_TOLERANCE_DEGREES
+  )
+
+
+def _cusps_agree(chart: NatalChart, case: _Case, ramc_shift_deg: float = 0.0) -> bool:
+  """Whether Placidus cusps 2, 3, 11 and 12 follow the definition, with a displaceable sidereal time.
+
+  Placidus 第 2、3、11、12 宫头是否符合定义；恒星时可被偏移。
+  """
+  obliquity = _obliquity(chart.times.jde_tt)
+  ramc = float(case["local_apparent_sidereal_time_deg"]) + ramc_shift_deg
+  latitude = case["location"]["latitude"]
+  cusps = chart.houses.cusps_deg
+  return all(
+    abs(_placidus_residual(house, cusps[house - 1], ramc, latitude, obliquity))
+    <= CUSP_TOLERANCE_DEGREES
+    for house in (11, 12, 2, 3)
+  )
+
+
+def _nodes_agree(chart: NatalChart, node_shift_arcsec: float = 0.0) -> bool:
+  """Whether the mean and true ascending nodes match the Meeus definition, which may be displaced.
+
+  平升交点与真升交点是否符合 Meeus 定义；参考可被偏移。
+  """
+  # The upstream refers the nodes to the true equinox of date, so the nutation in
+  # longitude belongs to the reference as well. 上游交点以瞬时真春分点为基准，
+  # 参考值同样要加黄经章动。
+  mean, true, nutation = _meeus_nodes(chart.times.jde_tt)
+  shift = node_shift_arcsec / 3600
+  ascending = chart.positions[10]
+  true_ascending = chart.positions[12]
+  return (
+    abs(_angle_difference(ascending.longitude_deg, mean + nutation + shift)) * 3600
+    <= NODE_TOLERANCE_ARCSEC
+    and abs(_angle_difference(true_ascending.longitude_deg, true + nutation + shift)) * 3600
+    <= NODE_TOLERANCE_ARCSEC
+  )
 
 
 def test_the_fixture_records_its_own_provenance() -> None:
@@ -369,21 +426,8 @@ def test_the_fixture_values_are_the_pinned_ones() -> None:
 @pytest.mark.parametrize("case", _cases(), ids=lambda case: str(case["identifier"]))
 def test_body_positions_agree_with_horizons(case: _Case) -> None:
   chart, _ = _chart_for(case)
-  bodies = case["bodies"]
   for position in chart.positions[:10]:
-    reference = bodies[position.identity.value]
-    if position.identity is Body.MOON:
-      longitude_tolerance = MOON_LONGITUDE_TOLERANCE_ARCSEC
-      latitude_tolerance = MOON_LATITUDE_TOLERANCE_ARCSEC
-    else:
-      longitude_tolerance = LONGITUDE_TOLERANCE_ARCSEC
-      latitude_tolerance = LATITUDE_TOLERANCE_ARCSEC
-    longitude_difference = abs(
-      _angle_difference(position.longitude_deg, reference["longitude_deg"])
-    )
-    assert longitude_difference * 3600 <= longitude_tolerance
-    latitude_difference = abs(position.latitude_deg - reference["latitude_deg"])
-    assert latitude_difference * 3600 <= latitude_tolerance
+    assert _body_agrees(position, case["bodies"][position.identity.value])
 
 
 @pytest.mark.parametrize("case", _cases(), ids=lambda case: str(case["identifier"]))
@@ -410,25 +454,14 @@ def test_the_time_scale_follows_the_leap_second_table(case: _Case) -> None:
 @pytest.mark.parametrize("case", _cases(), ids=lambda case: str(case["identifier"]))
 def test_the_axes_agree_with_the_reference_sidereal_time(case: _Case) -> None:
   chart, _ = _chart_for(case)
-  location = case["location"]
-  obliquity = _obliquity(chart.times.jde_tt)
-  ascendant, midheaven = _axes(
-    float(case["local_apparent_sidereal_time_deg"]), location["latitude"], obliquity
-  )
-  assert abs(_angle_difference(chart.houses.ascendant_deg, ascendant)) <= AXIS_TOLERANCE_DEGREES
-  assert abs(_angle_difference(chart.houses.midheaven_deg, midheaven)) <= AXIS_TOLERANCE_DEGREES
+  assert _axes_agree(chart, case)
 
 
 @pytest.mark.parametrize("case", _cases(), ids=lambda case: str(case["identifier"]))
 def test_the_placidus_cusps_follow_the_time_division_of_their_semi_arcs(case: _Case) -> None:
   chart, _ = _chart_for(case)
-  obliquity = _obliquity(chart.times.jde_tt)
-  ramc = float(case["local_apparent_sidereal_time_deg"])
-  latitude = case["location"]["latitude"]
+  assert _cusps_agree(chart, case)
   cusps = chart.houses.cusps_deg
-  for house in (11, 12, 2, 3):
-    residual = _placidus_residual(house, cusps[house - 1], ramc, latitude, obliquity)
-    assert abs(residual) <= CUSP_TOLERANCE_DEGREES
   for house in range(1, 7):
     assert abs(_angle_difference(cusps[house + 5], cusps[house - 1] + 180.0)) < 1e-9
 
@@ -455,26 +488,33 @@ def test_the_placidus_check_rejects_a_different_house_system_and_a_shifted_cusp(
 @pytest.mark.parametrize("case", _cases(), ids=lambda case: str(case["identifier"]))
 def test_the_lunar_nodes_agree_with_the_meeus_definition(case: _Case) -> None:
   chart, _ = _chart_for(case)
-  mean, true, nutation = _meeus_nodes(chart.times.jde_tt)
-  ascending = chart.positions[10]
-  descending = chart.positions[11]
-  true_ascending = chart.positions[12]
-  true_descending = chart.positions[13]
-  # The upstream refers the nodes to the true equinox of date, so the nutation
-  # in longitude belongs to the reference as well. 上游交点以瞬时真春分点为基准，
-  # 参考值同样要加黄经章动。
-  assert (
-    abs(_angle_difference(ascending.longitude_deg, mean + nutation)) * 3600 <= NODE_TOLERANCE_ARCSEC
-  )
-  assert (
-    abs(_angle_difference(true_ascending.longitude_deg, true + nutation)) * 3600
-    <= NODE_TOLERANCE_ARCSEC
-  )
+  assert _nodes_agree(chart)
+  ascending, descending, true_ascending, true_descending = chart.positions[10:14]
   assert abs(_angle_difference(descending.longitude_deg, ascending.longitude_deg + 180.0)) < 1e-9
   assert (
     abs(_angle_difference(true_descending.longitude_deg, true_ascending.longitude_deg + 180.0))
     < 1e-9
   )
+
+
+@pytest.mark.parametrize("case", _cases(), ids=lambda case: str(case["identifier"]))
+def test_the_comparisons_reject_a_displaced_reference(case: _Case) -> None:
+  # The displacements are written here and not read from the tolerances, so a
+  # loosened tolerance or comparison fails this test. 偏移量直接写在这里，不从容差读取，
+  # 因此放宽容差或放宽比较都会使本测试失败。
+  chart, _ = _chart_for(case)
+  by_identity = {position.identity: position for position in chart.positions}
+  sun, moon = by_identity[Body.SUN], by_identity[Body.MOON]
+  sun_reference, moon_reference = case["bodies"]["sun"], case["bodies"]["moon"]
+  assert _body_agrees(sun, sun_reference)
+  assert not _body_agrees(sun, sun_reference, longitude_shift_arcsec=4.0)
+  assert not _body_agrees(sun, sun_reference, latitude_shift_arcsec=2.0)
+  assert _body_agrees(moon, moon_reference, longitude_shift_arcsec=4.0)
+  assert not _body_agrees(moon, moon_reference, longitude_shift_arcsec=20.0)
+  assert not _body_agrees(moon, moon_reference, latitude_shift_arcsec=4.0)
+  assert not _axes_agree(chart, case, ramc_shift_deg=0.003)
+  assert not _cusps_agree(chart, case, ramc_shift_deg=0.003)
+  assert not _nodes_agree(chart, node_shift_arcsec=2.0)
 
 
 def test_the_reference_fixture_is_packaged_next_to_the_tests() -> None:
