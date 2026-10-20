@@ -56,6 +56,16 @@
    :no-index:
 ```
 
+## 相位
+
+```{eval-rst}
+.. automodule:: astrology.aspects
+   :members: AspectMotion, AspectObject, AspectHit, aspect_angle, find_aspects
+   :undoc-members:
+   :member-order: bysource
+   :no-index:
+```
+
 ## 独立知识查询
 
 字段职责见[记录指南](knowledge.md#记录与归属)。

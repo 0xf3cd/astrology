@@ -39,6 +39,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PACKAGE_FILES = (
   "astrology/__init__.py",
   "astrology/py.typed",
+  "astrology/aspects.py",
   "astrology/birth.py",
   "astrology/celestial.py",
   "astrology/chart.py",

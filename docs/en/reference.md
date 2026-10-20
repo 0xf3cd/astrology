@@ -53,6 +53,15 @@ See [birth inputs](birth.md), [requested configuration](configuration.md) and
    :member-order: bysource
 ```
 
+## Aspects
+
+```{eval-rst}
+.. automodule:: astrology.aspects
+   :members: AspectMotion, AspectObject, AspectHit, aspect_angle, find_aspects
+   :undoc-members:
+   :member-order: bysource
+```
+
 ## Independent knowledge
 
 Field roles are explained in the

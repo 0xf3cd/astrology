@@ -195,6 +195,7 @@ def main(
     *(
       import_module("astrology." + name)
       for name in (
+        "aspects",
         "birth",
         "chart",
         "config",
