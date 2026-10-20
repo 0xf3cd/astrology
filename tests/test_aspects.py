@@ -330,6 +330,44 @@ def test_both_branches_are_returned_in_a_fixed_order() -> None:
   assert [(hit.branch_deg, hit.deviation_deg) for hit in hits] == [(-60.0, 60.0), (60.0, -60.0)]
 
 
+@pytest.mark.parametrize(
+  "separation",
+  [
+    -math.ulp(180.0) / 2,
+    -1e-14,
+    -1e-16,
+    -math.ulp(0.0),
+    math.ulp(0.0),
+    1e-16,
+    1e-14,
+    math.ulp(180.0) / 2,
+  ],
+)
+@pytest.mark.parametrize(
+  "first_rate,second_rate,expected",
+  [
+    (0.0, 1.0, AspectMotion.INDETERMINATE),
+    (1.0, 0.0, AspectMotion.INDETERMINATE),
+    (1.0, 1.0, AspectMotion.STATIONARY),
+    (None, 1.0, AspectMotion.INDETERMINATE),
+    (1.0, None, AspectMotion.INDETERMINATE),
+    (None, None, AspectMotion.INDETERMINATE),
+  ],
+)
+def test_a_rounded_opposition_antipode_keeps_the_canonical_deviation_and_status(
+  separation: float,
+  first_rate: float | None,
+  second_rate: float | None,
+  expected: AspectMotion,
+) -> None:
+  pair = [obj(SUN, 0.0, first_rate), obj(MARS, separation, second_rate)]
+  rules = [rule(MajorAspect.OPPOSITION, 180.0)]
+  for objects in (pair, pair[::-1]):
+    hit = only(find_aspects(objects, rules))
+    assert hit.deviation_deg == 180.0
+    assert hit.motion is expected
+
+
 def test_overlapping_orbs_report_every_aspect_by_angle_whatever_the_rule_order() -> None:
   rules = [rule(MajorAspect.SEXTILE, 30.0), rule(MajorAspect.CONJUNCTION, 35.0)]
   hits = find_aspects([obj(SUN, 0.0), obj(MARS, 30.0)], rules)
