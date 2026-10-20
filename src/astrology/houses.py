@@ -6,7 +6,9 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
-from math import isfinite
+
+from astrology._validation import finite_number
+from astrology.zodiac import _longitude
 
 _HOUSES = 12
 _FULL_TURN = 360.0
@@ -29,10 +31,8 @@ def _cusps(cusps_deg: Sequence[float]) -> tuple[float, ...]:
   values = tuple(cusps_deg)
   if len(values) != _HOUSES:
     raise ValueError("cusps_deg must contain exactly twelve cusps")
-  if any(type(value) not in (int, float) for value in values):
-    raise TypeError("cusps_deg must contain only numbers")
-  cusps = tuple(float(value) for value in values)
-  if any(not isfinite(value) or not 0.0 <= value < _FULL_TURN for value in cusps):
+  cusps = tuple(finite_number(value, "cusps_deg") for value in values)
+  if any(not 0.0 <= value < _FULL_TURN for value in cusps):
     raise ValueError("cusps_deg must be finite and in [0, 360)")
   following = (*cusps[1:], cusps[0])
   ascents = sum(left < right for left, right in zip(cusps, following, strict=True))
@@ -63,11 +63,7 @@ def house_of(longitude_deg: float, cusps_deg: Sequence[float]) -> int:
   错判成下一宫。
   """
   cusps = _cusps(cusps_deg)
-  if type(longitude_deg) not in (int, float):
-    raise TypeError("longitude_deg must be a number")
-  longitude = float(longitude_deg)
-  if not isfinite(longitude) or not 0.0 <= longitude < _FULL_TURN:
-    raise ValueError("longitude_deg must be finite and in [0, 360)")
+  longitude = _longitude(longitude_deg)
   for index in range(_HOUSES):
     start = cusps[index]
     end = cusps[(index + 1) % _HOUSES]

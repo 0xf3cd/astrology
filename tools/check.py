@@ -38,6 +38,7 @@ from tools.docs_search import check_search_html
 ROOT = Path(__file__).resolve().parents[1]
 PACKAGE_FILES = (
   "astrology/__init__.py",
+  "astrology/_validation.py",
   "astrology/py.typed",
   "astrology/aspects.py",
   "astrology/birth.py",
@@ -45,6 +46,8 @@ PACKAGE_FILES = (
   "astrology/chart.py",
   "astrology/config.py",
   "astrology/houses.py",
+  "astrology/serialization.py",
+  "astrology/text.py",
   "astrology/zodiac.py",
   "astrology/knowledge/__init__.py",
   "astrology/knowledge/records.py",
@@ -54,7 +57,11 @@ PACKAGE_FILES = (
 
 # Files outside the package that the tests in the source distribution read.
 # 源码分发包里的测试要读取、但不在包内的文件。
-SDIST_FILES = ("tests/reference/natal_reference.json",)
+SDIST_FILES = (
+  "tests/reference/natal_reference.json",
+  "tests/reference/complete_chart_reference.json",
+  "tests/reference/chart_record_v1.json",
+)
 
 
 def run(command: Sequence[str], *, cwd: Path = ROOT) -> None:
@@ -112,7 +119,15 @@ def check_examples(report: str) -> None:
   要求双语开发指南与 API 指南均有已执行的例子。
   """
   for language in ("en", "zh-CN"):
-    for page in ("contributing", "birth", "configuration", "chart", "aspects", "knowledge"):
+    for page in (
+      "contributing",
+      "birth",
+      "configuration",
+      "chart",
+      "aspects",
+      "records",
+      "knowledge",
+    ):
       marker = f"Document: docs/{language}/{page}\n"
       section = re.split(r"(?m)^Document: ", report.partition(marker)[2], maxsplit=1)[0]
       if not re.search(r"(?m)^[1-9]\d* tests? in \d+ items?\.$", section):
@@ -202,6 +217,15 @@ def check_package_files(root: Path = ROOT) -> None:
   }
   if unlisted := present - set(PACKAGE_FILES):
     raise ValueError(f"Package files missing from PACKAGE_FILES: {sorted(unlisted)}")
+  from tools.installed_check import MODULES
+
+  expected_modules = {
+    name.removeprefix("astrology/").removesuffix(".py").removesuffix("/__init__").replace("/", ".")
+    for name in PACKAGE_FILES
+    if name.endswith(".py")
+  } - {"__init__", "celestial"}
+  if set(MODULES) != expected_modules or len(MODULES) != len(set(MODULES)):
+    raise ValueError("Installed-consumer module coverage differs from PACKAGE_FILES")
 
 
 def check_wheel(wheel: Path, expected_version: str) -> None:
@@ -379,6 +403,10 @@ def check_distribution(directory: Path) -> None:
   python = environment / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
   run(("uv", "pip", "install", "--python", str(python), str(wheels[0])))
   corpus_version = load_catalog().version
+  from tools.installed_check import acceptance_chart
+
+  expected_chart = directory / "development-chart.json"
+  expected_chart.write_text(astrology.dumps_chart(acceptance_chart()), encoding="utf-8")
   for mode in ((), ("-O",)):
     run(
       (
@@ -400,6 +428,8 @@ def check_distribution(directory: Path) -> None:
         str(ROOT / "tools/installed_check.py"),
         metadata["version"],
         corpus_version,
+        "--expected-chart",
+        str(expected_chart),
       ),
       cwd=directory,
     )

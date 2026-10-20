@@ -7,13 +7,15 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from dataclasses import dataclass
+from importlib.metadata import version
 from typing import Literal
 
+from astrology._validation import finite_number
 from astrology.aspects import AspectHit, AspectObject, find_aspects
 from astrology.birth import MissingBirthDataError, ResolvedBirth
 from astrology.config import Body, ChartConfig, HouseSystem, LunarNode, OrbCombination
-from astrology.houses import house_of
-from astrology.zodiac import Sign, sign_degree, sign_of
+from astrology.houses import _cusps, house_of
+from astrology.zodiac import Sign, _longitude, sign_degree, sign_of
 
 
 class ChartDomainError(ValueError):
@@ -55,6 +57,10 @@ class ChartTimes:
   jd_ut1: float
   jde_tt: float
 
+  def __post_init__(self) -> None:
+    for name in ("jd_ut1", "jde_tt"):
+      object.__setattr__(self, name, finite_number(getattr(self, name), name))
+
 
 @dataclass(frozen=True, slots=True)
 class EclipticPosition:
@@ -75,6 +81,28 @@ class EclipticPosition:
   distance_au: float | None
   longitude_rate_deg_per_tt_day: float
 
+  def __post_init__(self) -> None:
+    if not isinstance(self.identity, (Body, LunarNode)):
+      raise TypeError("identity must be a Body or LunarNode")
+    object.__setattr__(self, "longitude_deg", _longitude(self.longitude_deg))
+    latitude = finite_number(self.latitude_deg, "latitude_deg")
+    if not -90.0 <= latitude <= 90.0:
+      raise ValueError("latitude_deg must be in [-90, 90]")
+    object.__setattr__(self, "latitude_deg", latitude)
+    object.__setattr__(
+      self,
+      "longitude_rate_deg_per_tt_day",
+      finite_number(self.longitude_rate_deg_per_tt_day, "longitude_rate_deg_per_tt_day"),
+    )
+    if isinstance(self.identity, LunarNode):
+      if self.distance_au is not None or latitude != 0.0:
+        raise ValueError("Lunar nodes require zero latitude and absent distance")
+    else:
+      distance = finite_number(self.distance_au, "distance_au")
+      if distance <= 0.0:
+        raise ValueError("Physical objects require positive distance_au")
+      object.__setattr__(self, "distance_au", distance)
+
 
 @dataclass(frozen=True, slots=True)
 class ChartHouses:
@@ -94,12 +122,11 @@ class ChartHouses:
   cusps_deg: tuple[float, ...]
 
   def __post_init__(self) -> None:
-    if not isinstance(self.cusps_deg, Sequence) or isinstance(self.cusps_deg, (str, bytes)):
-      raise TypeError("cusps_deg must be a sequence of twelve numbers")
-    cusps = tuple(self.cusps_deg)
-    if len(cusps) != 12:
-      raise ValueError("cusps_deg must contain exactly twelve cusps")
-    object.__setattr__(self, "cusps_deg", cusps)
+    if type(self.system) is not HouseSystem:
+      raise TypeError("system must be a HouseSystem")
+    for name in ("ascendant_deg", "midheaven_deg", "descendant_deg", "imum_coeli_deg"):
+      object.__setattr__(self, name, _longitude(getattr(self, name)))
+    object.__setattr__(self, "cusps_deg", _cusps(self.cusps_deg))
 
 
 @dataclass(frozen=True, slots=True)
@@ -113,6 +140,18 @@ class Placement:
   sign: Sign
   sign_degree_deg: float
   house: int
+
+  def __post_init__(self) -> None:
+    if not isinstance(self.identity, (Body, LunarNode)) or type(self.sign) is not Sign:
+      raise TypeError("identity and sign must use their owning enum types")
+    degree = finite_number(self.sign_degree_deg, "sign_degree_deg")
+    if not 0.0 <= degree < 30.0:
+      raise ValueError("sign_degree_deg must be in [0, 30)")
+    object.__setattr__(self, "sign_degree_deg", degree)
+    if type(self.house) is not int:
+      raise TypeError("house must be an integer, not bool")
+    if not 1 <= self.house <= 12:
+      raise ValueError("house must be in [1, 12]")
 
 
 @dataclass(frozen=True, slots=True)
@@ -142,23 +181,54 @@ class EffectiveConfiguration:
   orb_combination: OrbCombination | None
 
   def __post_init__(self) -> None:
+    if type(self.house_system) is not HouseSystem:
+      raise TypeError("house_system must be a HouseSystem")
+    if type(self.delta_t_model) is not str or not self.delta_t_model.strip():
+      raise ValueError("delta_t_model must be a nonempty plain string")
+    if (
+      type(self.evaluation) is not str or self.evaluation != "fixed_fourteen_object_joint_snapshot"
+    ):
+      raise ValueError("Unknown chart evaluation")
     if not isinstance(self.aspect_objects, Sequence) or isinstance(
       self.aspect_objects, (str, bytes)
     ):
       raise TypeError("aspect_objects must be a sequence")
-    object.__setattr__(self, "aspect_objects", tuple(self.aspect_objects))
+    participants = tuple(self.aspect_objects)
+    if any(not isinstance(identity, (Body, LunarNode)) for identity in participants):
+      raise TypeError("aspect_objects must contain Body or LunarNode values")
+    if len(set(participants)) != len(participants):
+      raise ValueError("aspect_objects must not contain duplicate identities")
+    object.__setattr__(self, "aspect_objects", participants)
+    if self.orb_combination is not None and type(self.orb_combination) is not OrbCombination:
+      raise TypeError("orb_combination must be an OrbCombination or None")
 
 
 @dataclass(frozen=True, slots=True)
 class ChartProvenance:
-  """Astronomy version and coordinate conventions retained with the result.
+  """Package versions and coordinate conventions retained with the result.
 
-  随结果一起保存的天文库版本和坐标约定。
+  随结果一起保存的包版本和坐标约定。
   """
 
   celestial_version: str
   position_frame: Literal["apparent_geocentric_true_ecliptic_of_date"]
   ut1_derivation: Literal["delta_t_model_from_civil_utc"]
+  astrology_version: str
+
+  def __post_init__(self) -> None:
+    for name in ("celestial_version", "astrology_version"):
+      value = getattr(self, name)
+      if type(value) is not str or not value.strip():
+        raise ValueError(f"{name} must be a nonempty plain string")
+    if (
+      type(self.position_frame) is not str
+      or self.position_frame != "apparent_geocentric_true_ecliptic_of_date"
+    ):
+      raise ValueError("Unknown position frame")
+    if (
+      type(self.ut1_derivation) is not str or self.ut1_derivation != "delta_t_model_from_civil_utc"
+    ):
+      raise ValueError("Unknown UT1 derivation")
 
 
 @dataclass(frozen=True, slots=True)
@@ -170,11 +240,16 @@ class NatalChart:
   positions, placements and aspects are copied into tuples, so lists given by the
   caller are not aliased.
 
+  Construction checks field types, ranges and pure derived-value consistency. It
+  does not verify that the stored astronomy was calculated from the claimed input.
+
   完整且不可变的本命盘结果；对象按请求的顺序排列。按 `requested.aspects` 中的规则，
   在 `effective.aspect_objects` 所列对象之间计算相位，结果顺序见 `find_aspects`。
   位置、落宫和相位会复制成元组，不会引用调用方传入的列表。
+  构造时检查字段类型、范围及纯规则推导结果的一致性，不核实所存天文值是否确实由所称输入算得。
   """
 
+  resolved: ResolvedBirth
   requested: ChartConfig
   effective: EffectiveConfiguration
   provenance: ChartProvenance
@@ -185,11 +260,70 @@ class NatalChart:
   aspects: tuple[AspectHit, ...]
 
   def __post_init__(self) -> None:
-    for name in ("positions", "placements", "aspects"):
+    for name, expected in (
+      ("resolved", ResolvedBirth),
+      ("requested", ChartConfig),
+      ("effective", EffectiveConfiguration),
+      ("provenance", ChartProvenance),
+      ("times", ChartTimes),
+      ("houses", ChartHouses),
+    ):
+      if type(getattr(self, name)) is not expected:
+        raise TypeError(f"{name} must be a {expected.__name__}")
+    if self.resolved.record.location is None:
+      raise MissingBirthDataError("A complete chart requires a birth location")
+    for name, member_type in (
+      ("positions", EclipticPosition),
+      ("placements", Placement),
+      ("aspects", AspectHit),
+    ):
       members = getattr(self, name)
       if not isinstance(members, Sequence) or isinstance(members, (str, bytes)):
         raise TypeError(f"{name} must be a sequence")
+      if any(type(member) is not member_type for member in members):
+        raise TypeError(f"{name} must contain only {member_type.__name__} values")
       object.__setattr__(self, name, tuple(members))
+    if not self.requested.house_system is self.effective.house_system is self.houses.system:
+      raise ValueError("Requested, effective and stored house systems must agree")
+    if tuple(position.identity for position in self.positions) != self.requested.objects:
+      raise ValueError("Position identities and order must match requested objects")
+    if self.effective.aspect_objects != self.requested.aspect_participants():
+      raise ValueError("Effective aspect participants differ from the request")
+    if self.effective.orb_combination is not self.requested.orb_combination:
+      raise ValueError("Effective orb combination differs from the request")
+    if self.placements != _placements(self.positions, self.houses):
+      raise ValueError("Stored placements differ from pure derivation")
+    if self.aspects != _aspects(self.positions, self.requested):
+      raise ValueError("Stored aspects differ from pure derivation")
+
+
+def _placements(
+  positions: Sequence[EclipticPosition], houses: ChartHouses
+) -> tuple[Placement, ...]:
+  return tuple(
+    Placement(
+      position.identity,
+      sign_of(position.longitude_deg),
+      sign_degree(position.longitude_deg),
+      house_of(position.longitude_deg, houses.cusps_deg),
+    )
+    for position in positions
+  )
+
+
+def _aspects(positions: Sequence[EclipticPosition], config: ChartConfig) -> tuple[AspectHit, ...]:
+  participants = config.aspect_participants()
+  return find_aspects(
+    [
+      AspectObject(
+        position.identity, position.longitude_deg, position.longitude_rate_deg_per_tt_day
+      )
+      for position in positions
+      if position.identity in participants
+    ],
+    config.aspects,
+    config.orb_combination,
+  )
 
 
 def natal_chart(resolved: ResolvedBirth, config: ChartConfig) -> NatalChart:
@@ -224,48 +358,23 @@ def natal_chart(resolved: ResolvedBirth, config: ChartConfig) -> NatalChart:
   )
 
   times, positions, houses = snapshot(resolved, config)
-  placements = tuple(
-    Placement(
-      position.identity,
-      sign_of(position.longitude_deg),
-      sign_degree(position.longitude_deg),
-      house_of(position.longitude_deg, houses.cusps_deg),
-    )
-    for position in positions
-  )
-  participants = (
-    tuple(
-      identity
-      for identity in config.objects
-      if config.aspect_objects is None or identity in config.aspect_objects
-    )
-    if config.aspects
-    else ()
-  )
-  aspects = find_aspects(
-    [
-      AspectObject(
-        position.identity, position.longitude_deg, position.longitude_rate_deg_per_tt_day
-      )
-      for position in positions
-      if position.identity in participants
-    ],
-    config.aspects,
-    config.orb_combination,
-  )
+  placements = _placements(positions, houses)
+  aspects = _aspects(positions, config)
   return NatalChart(
+    resolved=resolved,
     requested=config,
     effective=EffectiveConfiguration(
       house_system=config.house_system,
       delta_t_model=delta_t_model_id(),
       evaluation="fixed_fourteen_object_joint_snapshot",
-      aspect_objects=participants,
+      aspect_objects=config.aspect_participants(),
       orb_combination=config.orb_combination,
     ),
     provenance=ChartProvenance(
       celestial_version=celestial_version(),
       position_frame="apparent_geocentric_true_ecliptic_of_date",
       ut1_derivation="delta_t_model_from_civil_utc",
+      astrology_version=version("astrology"),
     ),
     times=times,
     positions=positions,

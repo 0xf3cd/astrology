@@ -35,6 +35,20 @@ See [birth inputs](birth.md), [requested configuration](configuration.md) and
    :member-order: bysource
 ```
 
+## Chart records and text
+
+See the [complete example and record contract](records.md).
+
+```{eval-rst}
+.. automodule:: astrology.serialization
+   :members: ChartRecordError, ChartReplayError, dumps_chart, loads_chart, recompute_chart
+   :undoc-members:
+   :member-order: bysource
+
+.. automodule:: astrology.text
+   :members: format_chart
+```
+
 ## Zodiac classification
 
 ```{eval-rst}

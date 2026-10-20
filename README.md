@@ -2,16 +2,16 @@
 
 [English](README.md) | [简体中文](README.zh-CN.md)
 
-A Python library in development for reproducible Western astrology charts. It will use
+A Python library in development for reproducible Western astrology charts. It uses
 [celestial-calendar](https://github.com/0xf3cd/celestial-calendar) for astronomy and
 keeps astrological rules, their sources, and their variants in this repository.
 
 The development package provides immutable [birth records and modern time
 resolution](docs/en/birth.md), [requested chart configuration](docs/en/configuration.md),
-[tropical natal chart calculation](docs/en/chart.md), an independent
+[tropical natal chart calculation](docs/en/chart.md), [chart records and text output](docs/en/records.md), an independent
 [knowledge catalog](docs/en/knowledge.md), quality checks, and bilingual
 [API documentation](docs/en/reference.md). The astronomy library is imported only
-when a chart is calculated, so importing the package or querying knowledge never
+when calculation or replay is requested, so importing the package or querying knowledge never
 initializes it.
 See [Contributing](docs/en/contributing.md) to run the checks.
 
@@ -35,8 +35,9 @@ time and location:
 - Return immutable structured results, a text table, and a versioned serialization
   that retains inputs, configuration, astronomical values, and model identities.
 
-Positions, axes, cusps, signs, house placement and aspects are implemented. Text
-output and serialization follow in the same milestone.
+Positions, axes, cusps, signs, house placement, aspects, text output and versioned
+records are implemented. Restoration preserves stored results without native
+astronomy; replay explicitly checks available versions and models.
 
 See the [v0.1.0 milestone](https://github.com/0xf3cd/astrology/milestone/1) for
 delivery tasks and acceptance criteria.

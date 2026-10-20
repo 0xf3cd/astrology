@@ -55,6 +55,10 @@ The requested configuration and the effective configuration are separate
 values. The adapter fixes the ΔT model; it is not a caller request, and the
 result names it anyway.
 
+The result also keeps the actual input in `chart.resolved` and the astrology
+package version in `chart.provenance.astrology_version`. See the [record guide](records.md)
+for storage, restoration, replay and bilingual text output.
+
 ```{doctest}
 >>> chart.effective.delta_t_model
 'algo5'
@@ -239,14 +243,17 @@ uses, and the leap-second relation `JDE(TT) - JD(UTC)` is exact. The
 [contributing guide](contributing.md#correctness) records what each reference
 can and cannot detect.
 
+Separate complete-chart cases compare against Swiss states, rates and all twelve
+cusps, with independent derived placements/aspects. Their conventions, tolerances
+and limits are in the [record guide](records.md#verification-and-limits).
+
 ## Limits
 
 - Requested aspects are judged among the participating objects; the
   [aspect guide](aspects.md) explains the rules and their limits.
-- Results are not serialized and have no text output yet.
-- The repository keeps no external reference values for Placidus cusps. Cusps 2, 3, 11 and 12 are checked
-  against the definition, which the check and the library read alike; cusps 5, 6,
-  8 and 9 are checked only as the exact opposites.
+- The Horizons fixture itself has no external cusp values; its checks against the
+  Placidus definition can share a misreading with the library. The separate Swiss
+  fixture checks the complete geometry but has its own time-model differences.
 - The astronomy library supports civil years 1885 to 2099 and, for UTC input,
   instants from 1972-01-01; the ephemeris range is narrower than the civil
   range, and an instant outside it fails explicitly.

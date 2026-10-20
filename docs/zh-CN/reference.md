@@ -36,6 +36,22 @@
    :no-index:
 ```
 
+## 命盘记录与文本
+
+见[完整例子与记录合同](records.md)。
+
+```{eval-rst}
+.. automodule:: astrology.serialization
+   :members: ChartRecordError, ChartReplayError, dumps_chart, loads_chart, recompute_chart
+   :undoc-members:
+   :member-order: bysource
+   :no-index:
+
+.. automodule:: astrology.text
+   :members: format_chart
+   :no-index:
+```
+
 ## 星座归属
 
 ```{eval-rst}

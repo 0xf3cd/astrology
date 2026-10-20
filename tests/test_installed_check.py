@@ -50,19 +50,21 @@ def consumer(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
   knowledge.mkdir()
   (knowledge / "catalog.json").write_bytes(corpus)
   monkeypatch.setattr(astrology, "__file__", str(package / "__init__.py"))
-  for name in (
-    "aspects",
-    "birth",
-    "chart",
-    "config",
-    "houses",
-    "knowledge",
-    "knowledge.catalog",
-    "knowledge.records",
-    "zodiac",
-  ):
+  for name in installed_check.MODULES:
     monkeypatch.setattr(import_module(f"astrology.{name}"), "__file__", str(package / f"{name}.py"))
   monkeypatch.setattr(sys, "prefix", str(tmp_path))
+  original_chart = astrology.natal_chart
+
+  def chart_with_consumer_origin(
+    resolved: astrology.ResolvedBirth, config: astrology.ChartConfig
+  ) -> astrology.NatalChart:
+    result = original_chart(resolved, config)
+    monkeypatch.setattr(
+      import_module("astrology.celestial"), "__file__", str(package / "celestial.py")
+    )
+    return result
+
+  monkeypatch.setattr(astrology, "natal_chart", chart_with_consumer_origin)
   monkeypatch.setattr(installed_check, "files", lambda package: knowledge)
   monkeypatch.setattr(
     import_module("astrology.knowledge.catalog"), "files", lambda package: knowledge
@@ -83,17 +85,7 @@ def test_wrong_installed_version_rejected(consumer: Path) -> None:
 
 @pytest.mark.parametrize(
   "module",
-  [
-    "astrology.aspects",
-    "astrology.birth",
-    "astrology.chart",
-    "astrology.config",
-    "astrology.houses",
-    "astrology.knowledge",
-    "astrology.knowledge.catalog",
-    "astrology.knowledge.records",
-    "astrology.zodiac",
-  ],
+  ["astrology." + name for name in installed_check.MODULES],
 )
 def test_submodule_outside_consumer_rejected(
   consumer: Path, monkeypatch: pytest.MonkeyPatch, module: str
@@ -284,8 +276,37 @@ def test_installed_consumer_calculates_a_chart(
 
   monkeypatch.setattr(astrology, "natal_chart", record)
   installed_check.main(version("astrology"))
-  assert len(calls) == 1
+  assert len(calls) == 2
   assert calls[0].house_system is astrology.HouseSystem.WHOLE_SIGN
+  assert calls[1].house_system is astrology.HouseSystem.PLACIDUS
+  assert calls[0].aspects
+  assert calls[0].orb_combination is astrology.OrbCombination.MEAN_OF_ORBS
+
+
+def test_installed_comparison_rejects_different_development_output(consumer: Path) -> None:
+  expected = consumer.parent / "wrong-chart.json"
+  expected.write_text("{}", encoding="utf-8")
+  with pytest.raises(ValueError, match="differs from the development"):
+    installed_check.main(version("astrology"), expected_chart=expected)
+
+
+def test_installed_consumer_checks_native_adapter_origin(
+  consumer: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+  original = astrology.natal_chart
+
+  def outside(
+    resolved: astrology.ResolvedBirth, config: astrology.ChartConfig
+  ) -> astrology.NatalChart:
+    chart = original(resolved, config)
+    monkeypatch.setattr(
+      import_module("astrology.celestial"), "__file__", str(consumer.parent.parent / "outside.py")
+    )
+    return chart
+
+  monkeypatch.setattr(astrology, "natal_chart", outside)
+  with pytest.raises(ValueError, match=r"astrology\.celestial from outside"):
+    installed_check.main(version("astrology"))
 
 
 def test_installed_consumer_rejects_a_misreported_astronomy_version(

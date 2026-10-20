@@ -14,6 +14,8 @@ from errno import EINVAL, EISDIR, ENAMETOOLONG, ENOENT, ENOTDIR
 from types import MappingProxyType
 from typing import Literal
 
+from astrology._validation import finite_number
+
 _DAY = timedelta(days=1)
 _MODERN_UTC_START = datetime(1972, 1, 1, tzinfo=UTC)
 _EARLIEST_MODERN_WALL = _MODERN_UTC_START.replace(tzinfo=None) - _DAY
@@ -63,11 +65,10 @@ class Location:
       ("latitude", self.latitude, 90),
       ("longitude", self.longitude, 180),
     ):
-      if type(value) not in (int, float):
-        raise TypeError(f"{name} must be a number, not bool or a converted string")
-      if not -limit <= value <= limit:
+      number = finite_number(value, name)
+      if not -limit <= number <= limit:
         raise ValueError(f"{name} must be finite and within [-{limit}, {limit}] degrees")
-      object.__setattr__(self, name, float(value))
+      object.__setattr__(self, name, number)
 
 
 @dataclass(frozen=True, slots=True)

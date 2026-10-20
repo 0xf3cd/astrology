@@ -6,7 +6,8 @@
 from __future__ import annotations
 
 from enum import StrEnum
-from math import isfinite
+
+from astrology._validation import finite_number
 
 
 class Sign(StrEnum):
@@ -36,10 +37,11 @@ _ARC_SECONDS_PER_DEGREE = 3600
 
 def _longitude(value: float) -> float:
   """Validate a tropical longitude in degrees. 校验以度为单位的热带黄经。"""
-  if type(value) not in (int, float):
-    raise TypeError("longitude_deg must be a number")
-  degrees = float(value)
-  if not isfinite(degrees) or not 0.0 <= degrees < 360.0:
+  try:
+    degrees = finite_number(value, "longitude_deg")
+  except ValueError as exc:
+    raise ValueError("longitude_deg must be finite and in [0, 360)") from exc
+  if not 0.0 <= degrees < 360.0:
     raise ValueError("longitude_deg must be finite and in [0, 360)")
   return degrees
 
@@ -78,6 +80,13 @@ def truncate_display(longitude_deg: float) -> float:
   下方的值，不会因为乘法而被进位到边界的另一侧。
   """
   degrees = _longitude(longitude_deg)
-  numerator, denominator = degrees.as_integer_ratio()
-  whole_arc_seconds = numerator * _ARC_SECONDS_PER_DEGREE // denominator
-  return whole_arc_seconds / _ARC_SECONDS_PER_DEGREE
+  return _whole_arcseconds(degrees) / _ARC_SECONDS_PER_DEGREE
+
+
+def _whole_arcseconds(nonnegative_degrees: float) -> int:
+  """Truncate a validated finite nonnegative angle without a float multiplication.
+
+  对已校验为有限且非负的角度做截断，不用浮点乘法。
+  """
+  numerator, denominator = nonnegative_degrees.as_integer_ratio()
+  return numerator * _ARC_SECONDS_PER_DEGREE // denominator
