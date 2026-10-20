@@ -1,6 +1,6 @@
 """Tropical zodiac classification over supplied longitudes, without astronomy.
 
-对给定黄经做热带黄道分类，不做天文计算。
+对给定的黄经做热带黄道分类，不涉及天文计算。
 """
 
 from __future__ import annotations
@@ -12,7 +12,7 @@ from math import isfinite
 class Sign(StrEnum):
   """One of the twelve tropical signs, identified by its 30-degree longitude sector.
 
-  热带黄道十二星座之一，由 30 度黄经区间标识。
+  热带黄道十二星座之一，由各自 30° 的黄经区间界定。
   """
 
   ARIES = "aries"
@@ -49,7 +49,7 @@ def sign_of(longitude_deg: float) -> Sign:
 
   Boundaries belong to the higher sign: exactly 30° is Taurus, exactly 0° is Aries.
 
-  按半开区间 [0, 30) 度对热带黄经分类。边界归入后一个星座：恰好 30° 为金牛，恰好 0° 为白羊。
+  按半开的 [0, 30) 度区间给热带黄经分星座。区间边界归后一个星座：恰好 30° 是金牛，恰好 0° 是白羊。
   """
   return _SIGNS[int(_longitude(longitude_deg) // _SECTOR_DEGREES)]
 
@@ -57,7 +57,7 @@ def sign_of(longitude_deg: float) -> Sign:
 def sign_degree(longitude_deg: float) -> float:
   """Return the unrounded degree within its sign, in [0, 30).
 
-  返回座内未舍入的度数，范围 [0, 30)。
+  返回黄经在所属星座内的未舍入度数，范围 [0, 30)。
   """
   return _longitude(longitude_deg) % _SECTOR_DEGREES
 
@@ -72,10 +72,10 @@ def truncate_display(longitude_deg: float) -> float:
   fraction, so a value that sits just below a sector boundary cannot be
   rounded up across it by the multiplication.
 
-  向零截断到角秒分辨率；显示值不跨边界。展示舍入不得改变分类，截断是具名规则：
-  29.9999999° 显示为 29°59'59"，不会显示成下一星座的 30°00'00"。
-  角秒数在二进制分数上以精确整数运算取下整，因此紧贴区间边界之下的值
-  不会因乘法而被进位到边界另一侧。
+  向零截断到角秒；显示出来的值不会越过星座边界。显示用的舍入不能改变分类，所以
+  采用截断，并把它定为具名规则：29.9999999° 显示为 29°59'59"，不会显示成下一个
+  星座的 30°00'00"。角秒数按二进制分数用精确的整数运算向下取整，因此紧贴区间边界
+  下方的值，不会因为乘法而被进位到边界的另一侧。
   """
   degrees = _longitude(longitude_deg)
   numerator, denominator = degrees.as_integer_ratio()

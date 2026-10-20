@@ -1,6 +1,6 @@
 """House placement over supplied cusp geometry, without calculating positions.
 
-对给定宫头几何求落宫，不计算天体位置。
+按给定的宫头判断落在哪一宫，不计算天体位置。
 """
 
 from __future__ import annotations
@@ -15,12 +15,14 @@ _FULL_TURN = 360.0
 def _cusps(cusps_deg: Sequence[float]) -> tuple[float, ...]:
   """Validate twelve finite cyclically ordered cusps in [0, 360).
 
-  校验十二个有限、按循环顺序递增、范围 [0, 360) 的宫头。
+  校验十二个宫头：都是有限数，落在 [0, 360) 内，并按循环顺序严格递增。
 
   Cyclic order is judged on the given angles: one wrap across 0/360 and eleven
   strict rises. Offsets from the first cusp can round two distinct cusps onto each
-  other, so they are not used. 循环顺序按给定角度判断：恰有一次跨 0/360 的回落与
-  十一次严格上升；相对首宫头的偏移可能把两个不同的宫头舍入成同一个值，因此不用它。
+  other, so they are not used.
+
+  循环顺序直接按给定的角度判断：整圈恰有一次越过 0/360 的回落，其余十一次都是严格
+  上升。不用相对首宫头的偏移，因为它可能把两个不同的宫头舍入成同一个值。
   """
   if not isinstance(cusps_deg, Sequence) or isinstance(cusps_deg, (str, bytes)):
     raise TypeError("cusps_deg must be a sequence of twelve numbers")
@@ -53,10 +55,12 @@ def house_of(longitude_deg: float, cusps_deg: Sequence[float]) -> int:
   origin would round a longitude that sits just below a cusp onto the cusp
   itself and hand it to the next house.
 
-  返回包含该热带黄经的宫（1-12）。区间为半开 [宫头, 下一宫头)：恰好落在宫头上的黄经
-  归属于从该宫头开始的宫。成员关系跨 0/360 环绕。本函数只使用给定宫头表；上升点等轴
-  是否与第一宫头重合是宫制的性质，不是本函数的性质。
-  区间按给定角度直接比较：按共同原点旋转会把紧贴宫头下方的黄经舍入到宫头上，交给下一宫。
+  返回该热带黄经所在的宫（1 至 12）。每个区间都是半开的 [宫头, 下一宫头)：恰好落在
+  宫头上的黄经，归从这个宫头开始的那一宫；区间可以跨过 0/360。本函数只看给定的宫头表，
+  上升点等轴是否与第一宫头重合，由宫制决定，与本函数无关。
+
+  区间直接按给定的角度比较。如果先减去同一个起点，紧贴宫头下方的黄经会被舍入到宫头上，
+  错判成下一宫。
   """
   cusps = _cusps(cusps_deg)
   if type(longitude_deg) not in (int, float):

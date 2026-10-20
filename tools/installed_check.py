@@ -150,8 +150,10 @@ def _check_natal_chart() -> None:
   """Calculate one synthetic natal chart in the installed environment.
 
   The chart is calculated after the isolation checks, so it also shows that the
-  adapter is loaded by the calculation and not by the import. 在已安装环境中计算一张
-  合成本命盘；此检查排在隔离检查之后，因此也表明适配层由计算加载，而非由导入加载。
+  adapter is loaded by the calculation and not by the import.
+
+  在已安装的环境里计算一张合成本命盘。这一步排在隔离检查之后，因此也能说明适配层是由
+  计算加载的，而不是由导入加载的。
   """
   if any(
     name in ("celestial_calendar", "astrology.celestial") or name.startswith("celestial_calendar.")

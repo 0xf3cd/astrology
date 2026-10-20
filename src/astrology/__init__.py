@@ -1,6 +1,6 @@
 """Birth inputs, requested configuration, chart composition and independent knowledge.
 
-出生输入、请求配置、命盘组合与独立知识查询；包导入本身不起初始化原生天文库。
+出生输入、请求配置、命盘组合，以及独立的知识查询；导入这个包本身不会初始化原生天文库。
 """
 
 from astrology.birth import (

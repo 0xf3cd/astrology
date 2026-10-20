@@ -1,6 +1,6 @@
 """Tropical sign classification, sign degrees and display rounding.
 
-热带星座归属、座内度数与展示舍入。
+热带星座归属、座内度数与显示舍入。
 """
 
 import math

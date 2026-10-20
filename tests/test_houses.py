@@ -1,6 +1,6 @@
 """House membership over supplied cusp geometry, including boundary and wrap cases.
 
-基于给定宫头几何的落宫成员关系，含边界与回绕用例。
+按给定宫头判断落宫，含边界与跨 0/360 回绕的用例。
 """
 
 import math
@@ -48,8 +48,9 @@ def test_adjacent_representable_values_keep_their_side_in_a_rotated_table() -> N
 
 def test_distinct_adjacent_cusps_are_accepted_from_every_starting_cusp() -> None:
   # Offsets from the first cusp round 30.0 and the next float onto each other for
-  # most starting cusps; the table is still strictly cyclic. 多数起点下，相对首宫头
-  # 的偏移会把 30.0 与下一个浮点数舍入成同一个值，而该表仍是严格循环递增的。
+  # most starting cusps; the table is still strictly cyclic.
+  # 多数起点下，相对首宫头的偏移会把 30.0 和它的下一个浮点数舍入成同一个值，
+  # 但这张表仍然是严格循环递增的。
   above = math.nextafter(30.0, math.inf)
   cusps = (300.0, 330.0, 0.0, 30.0, above, 60.0, 90.0, 120.0, 150.0, 180.0, 210.0, 240.0)
   for shift in range(12):
@@ -73,7 +74,7 @@ def test_every_house_is_reachable() -> None:
 
 def test_membership_uses_only_the_cusp_table() -> None:
   # The Ascendant is not an argument: a table whose first cusp differs from an
-  # Ascendant still decides membership. 宫头表之外没有上升点参数。
+  # Ascendant still decides membership. 上升点不是参数，落宫只由宫头表决定。
   assert house_of(305.0, _CUSPS) == 1
   assert house_of(295.0, _CUSPS) == 12
 

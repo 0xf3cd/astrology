@@ -1,6 +1,6 @@
 """Agreement with independent JPL Horizons references and definition-level node references.
 
-与 JPL Horizons 独立参考及定义级交点参考的一致性。
+与 JPL Horizons 的独立参考、以及按定义重算的交点参考是否一致。
 """
 
 import hashlib
@@ -80,8 +80,8 @@ FIXTURE = Path(__file__).resolve().parent / "reference" / "natal_reference.json"
 # in 2000-2002, and within 1.34" at the 2020 fixture instant; the truncated lunar
 # model within 9.96" in longitude and 2.39" in latitude over 60 instants in
 # 2000-2030. Those samples were taken ad hoc and are not kept in the repository.
-# 天体容差取自上游模型对 Horizons 的自身误差，使正确的上游在任何时刻都能通过，
-# 而不止在两个夹具时刻。采样为临时测量，未留在仓库里。
+# 天体容差按上游模型自身对 Horizons 的误差来定，这样正确的上游在任何时刻都能通过，
+# 而不只是在两个夹具时刻。采样是临时做的，没有留在仓库里。
 LONGITUDE_TOLERANCE_ARCSEC = 3.0
 MOON_LONGITUDE_TOLERANCE_ARCSEC = 15.0
 LATITUDE_TOLERANCE_ARCSEC = 1.0
@@ -91,15 +91,16 @@ NODE_TOLERANCE_ARCSEC = 1.0
 # models from civil UTC while Horizons derives sidereal time from observed UT1.
 # The two fixture instants differ by at most 0.91 arcseconds; 0.001 degrees is 3.6
 # arcseconds, about four times that, and rejects a mean sidereal time used for the
-# apparent one. 上升点、中天与 Placidus 宫头随 UT1 变化：本库由民用 UTC 经模型推得，
-# Horizons 的恒星时取自观测 UT1。两个夹具时刻最多相差 0.91″，0.001 度即 3.6″，约四倍余量。
+# apparent one.
+# 上升点、中天和 Placidus 宫头都随 UT1 变化：本库按模型由民用 UTC 推出 UT1，Horizons 的
+# 恒星时用的是观测到的 UT1。两个夹具时刻最多差 0.91″，而 0.001° 是 3.6″，约有四倍余量。
 AXIS_TOLERANCE_DEGREES = 0.001
 CUSP_TOLERANCE_DEGREES = 0.001
 # JDE(TT) - JD(UTC) is an exact leap-second relation, not an approximation.
 TIME_TOLERANCE_DAYS = 1e-9
 
 # The target kernel Horizons names for each body, and the geocenter kernel.
-# 各天体的星历核（Horizons 的目标行）及地心核。
+# 各天体在 Horizons 目标行上的星历核，以及地心的星历核。
 EXPECTED_EPHEMERIS_SOURCES = {
   "sun": "DE441",
   "moon": "DE441",
@@ -115,7 +116,7 @@ EXPECTED_EPHEMERIS_SOURCES = {
 
 # The fixture without its retrieval time is pinned, so an edited reference value
 # cannot pass unnoticed; refetching the same data leaves the digest unchanged.
-# 夹具（不含取数时间）钉摘要，就地改参考数值不能悄悄通过；重新取同样的数据不改变摘要。
+# 对夹具（去掉取数时间后）的内容钉住摘要：直接改参考数值会被发现；重新取回同样的数据，摘要不变。
 EXPECTED_FIXTURE_DIGEST = "7c3e1990c5785c8a077498437bd835acba793fb55311c7a6ba0574ac2a7bfb2f"
 
 
@@ -128,7 +129,7 @@ def _cases() -> tuple[_Case, ...]:
 
 
 def _julian_day_utc(instant: tuple[int, int, int, int, int, int]) -> float:
-  """Julian Day of a UTC calendar instant. UTC 历日时刻的儒略日。"""
+  """Julian Day of a UTC calendar instant. UTC 日历时刻对应的儒略日。"""
   year, month, day, hour, minute, second = instant
   if month <= 2:
     year, month = year - 1, month + 12
@@ -143,7 +144,7 @@ def _julian_day_utc(instant: tuple[int, int, int, int, int, int]) -> float:
 def _obliquity(jde_tt: float) -> float:
   """True obliquity in radians: Meeus ch. 22 mean obliquity plus low-accuracy nutation.
 
-  真黄赤交角（弧度）：Meeus 第 22 章平黄赤交角加低精度章动项。
+  真黄赤交角（弧度）：Meeus 第 22 章的平黄赤交角，加上低精度的章动项。
   """
   t = (jde_tt - 2451545.0) / 36525
   mean = 23.4392911111 - (46.8150 * t + 0.00059 * t**2 - 0.001813 * t**3) / 3600
@@ -162,7 +163,7 @@ def _obliquity(jde_tt: float) -> float:
 def _axes(ramc_deg: float, latitude_deg: float, obliquity_rad: float) -> tuple[float, float]:
   """Ascendant and Midheaven ecliptic longitudes from the meridian's right ascension.
 
-  由子午圈赤经求上升点与中天的黄经。子午圈赤经取当地真恒星时。
+  由子午圈赤经求上升点和中天的黄经；子午圈赤经取当地真恒星时。
   """
   ramc = math.radians(ramc_deg)
   latitude = math.radians(latitude_deg)
@@ -185,7 +186,7 @@ def _meeus_nodes(jde_tt: float) -> tuple[float, float, float]:
   """Mean node, five-term true node and nutation in longitude, in degrees.
 
   Meeus ch. 47 mean-node and five-term true-node series with the ch. 22
-  low-accuracy nutation in longitude. 平交点、五项真交点及黄经章动（度）。
+  low-accuracy nutation in longitude. 平交点、五项真交点和黄经章动，单位为度。
   """
   t = (jde_tt - 2451545.0) / 36525
   elongation = (
@@ -219,12 +220,12 @@ def _meeus_nodes(jde_tt: float) -> tuple[float, float, float]:
 
 
 def _angle_difference(first: float, second: float) -> float:
-  """Signed difference in degrees, wrapped to [-180, 180). 归一化到 [-180, 180) 的角度差。"""
+  """Signed difference in degrees, wrapped to [-180, 180). 带符号的角度差，归到 [-180, 180) 内。"""
   return (first - second + 180.0) % 360.0 - 180.0
 
 
 def _substantive_digest(fixture: _Fixture) -> str:
-  """Hash the fixture without its retrieval time. 对夹具去掉取数时间后取摘要。"""
+  """Hash the fixture without its retrieval time. 夹具去掉取数时间后的摘要。"""
   payload = {key: value for key, value in fixture.items() if key != "retrieved_utc"}
   canonical = json.dumps(payload, sort_keys=True, ensure_ascii=False).encode("utf-8")
   return hashlib.sha256(canonical).hexdigest()
@@ -240,9 +241,9 @@ def _placidus_residual(
   of its nocturnal semi-arc beyond the horizon. The hour angle comes from the
   reference sidereal time, so the definition is checked without an iteration.
 
-  宫头偏离 Placidus 时间分割的度数。Placidus 把第 11、12 宫头放在宫头点自身昼弧
-  子午圈以东的三分之一与三分之二处，第 2、3 宫头放在其夜弧地平线以下的三分之一与
-  三分之二处。时角取自参考恒星时，因此不必迭代即可核对定义。
+  宫头偏离 Placidus 时间分割的度数。Placidus 把第 11、12 宫头放在宫头点自身昼弧上、
+  子午圈以东的 1/3 和 2/3 处，把第 2、3 宫头放在其夜弧上、地平线以下的 1/3 和 2/3 处。
+  时角直接取参考恒星时，所以不用迭代就能核对这个定义。
   """
   longitude = math.radians(cusp_deg)
   right_ascension = math.degrees(
@@ -276,7 +277,7 @@ def _porphyry_cusps(ascendant_deg: float, midheaven_deg: float) -> dict[int, flo
 
 
 def _instant(case: _Case) -> datetime:
-  """Read the reference instant as an aware UTC datetime. 读取参考时刻（UTC 带时区）。"""
+  """Read the reference instant as an aware UTC datetime. 把参考时刻读成带时区的 UTC 时间。"""
   return datetime.fromisoformat(case["utc"].replace("Z", "+00:00"))
 
 
@@ -325,7 +326,7 @@ def _body_agrees(
   """Whether a position is within its tolerances of the reference, which may be displaced.
 
   The displacement lets a test show that a shifted reference is rejected.
-  位置是否在参考容差之内；参考可被偏移，供测试证明偏移后的参考被拒。
+  位置是否在容差之内；参考值可以人为偏移，用来证明偏移后的参考会被拒绝。
   """
   if position.identity is Body.MOON:
     longitude_tolerance = MOON_LONGITUDE_TOLERANCE_ARCSEC
@@ -350,7 +351,7 @@ def _body_agrees(
 def _axes_agree(chart: NatalChart, case: _Case, ramc_shift_deg: float = 0.0) -> bool:
   """Whether the Ascendant and Midheaven match the reference sidereal time, which may be displaced.
 
-  上升点与中天是否与参考恒星时一致；恒星时可被偏移。
+  上升点和中天是否与参考恒星时一致；恒星时可以人为偏移。
   """
   ascendant, midheaven = _axes(
     float(case["local_apparent_sidereal_time_deg"]) + ramc_shift_deg,
@@ -366,7 +367,7 @@ def _axes_agree(chart: NatalChart, case: _Case, ramc_shift_deg: float = 0.0) -> 
 def _cusps_agree(chart: NatalChart, case: _Case, ramc_shift_deg: float = 0.0) -> bool:
   """Whether Placidus cusps 2, 3, 11 and 12 follow the definition, with a displaceable sidereal time.
 
-  Placidus 第 2、3、11、12 宫头是否符合定义；恒星时可被偏移。
+  Placidus 第 2、3、11、12 宫头是否符合定义；恒星时可以人为偏移。
   """
   obliquity = _obliquity(chart.times.jde_tt)
   ramc = float(case["local_apparent_sidereal_time_deg"]) + ramc_shift_deg
@@ -382,11 +383,11 @@ def _cusps_agree(chart: NatalChart, case: _Case, ramc_shift_deg: float = 0.0) ->
 def _nodes_agree(chart: NatalChart, node_shift_arcsec: float = 0.0) -> bool:
   """Whether the mean and true ascending nodes match the Meeus definition, which may be displaced.
 
-  平升交点与真升交点是否符合 Meeus 定义；参考可被偏移。
+  平升交点和真升交点是否符合 Meeus 的定义；参考值可以人为偏移。
   """
   # The upstream refers the nodes to the true equinox of date, so the nutation in
-  # longitude belongs to the reference as well. 上游交点以瞬时真春分点为基准，
-  # 参考值同样要加黄经章动。
+  # longitude belongs to the reference as well.
+  # 上游把交点算在当时的真春分点上，所以参考值也要加上黄经章动。
   mean, true, nutation = _meeus_nodes(chart.times.jde_tt)
   shift = node_shift_arcsec / 3600
   ascending = chart.positions[10]
@@ -500,8 +501,8 @@ def test_the_lunar_nodes_agree_with_the_meeus_definition(case: _Case) -> None:
 @pytest.mark.parametrize("case", _cases(), ids=lambda case: str(case["identifier"]))
 def test_the_comparisons_reject_a_displaced_reference(case: _Case) -> None:
   # The displacements are written here and not read from the tolerances, so a
-  # loosened tolerance or comparison fails this test. 偏移量直接写在这里，不从容差读取，
-  # 因此放宽容差或放宽比较都会使本测试失败。
+  # loosened tolerance or comparison fails this test.
+  # 偏移量就写在这里，不从容差常量读取，所以无论放宽容差还是放宽比较，这个测试都会失败。
   chart, _ = _chart_for(case)
   by_identity = {position.identity: position for position in chart.positions}
   sun, moon = by_identity[Body.SUN], by_identity[Body.MOON]

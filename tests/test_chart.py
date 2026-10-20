@@ -1,6 +1,6 @@
 """Natal chart composition, entry conditions, failure classification and provenance.
 
-本命盘组合、入口条件、失败分类与来源记录。
+命盘的组合、入口条件、失败分类和来源记录。
 """
 
 import math
@@ -60,8 +60,8 @@ _ALL_OBJECTS: tuple[Body | LunarNode, ...] = (
 # no direction. The sidereal time is 270 degrees at the northern witness and 90 at
 # the southern one, which is 180 degrees away in longitude. The witnesses are the
 # upstream consumer test's; 66.0 is a nearby latitude where the chart exists.
-# 在黄道与地平圈重合的临界纬度，上升点没有方向。恒星时在北站点是 270°，在南站点
-# （经度相差 180°）是 90°。证人取自上游消费者测试；66.0 是附近有定义的纬度。
+# 在黄道与地平圈重合的临界纬度，上升点没有确定的方向。恒星时在北站点是 270°，在南站点
+# （经度相差 180°）是 90°。这两个站点取自上游消费者的测试；66.0 是附近有定义的纬度。
 _UNRESOLVED_ASCENDANT = (date(2026, 1, 1), time(12, 0, 5))
 _UNRESOLVED_NORTH = (66.561856230963841, -11.176256364511062)
 _UNRESOLVED_SOUTH = (-66.561856230963841, 168.82374363548894)
@@ -133,7 +133,7 @@ def test_a_civil_year_beyond_the_supported_range_is_rejected() -> None:
 
 def test_the_upper_jde_bound_is_reported_as_a_domain_error() -> None:
   # The upstream JDE(TT) domain ends inside 2099-12-31; 14:00 UTC is still
-  # inside it and 16:00 UTC is not. 上游 JDE(TT) 有效域在 2099-12-31 内结束。
+  # inside it and 16:00 UTC is not. 上游 JDE(TT) 的有效范围在 2099-12-31 当天结束。
   inside = natal_chart(resolved_at(date(2099, 12, 31), time(14, 0), 0.0), config_for())
   assert inside.positions[0].longitude_deg >= 0.0
   with pytest.raises(ChartDomainError) as caught:
@@ -195,7 +195,7 @@ def test_a_latitude_just_inside_the_pole_is_left_to_the_upstream_domain() -> Non
 def test_failures_are_classified_by_structure_and_not_by_message_text() -> None:
   # A pre-call rejection carries no upstream detail; an upstream failure
   # carries the operation and recording status. Neither is decided by reading
-  # the message. 调用前拒绝不带上游细节；上游失败携带操作与记录状态，分类不靠解析消息文本。
+  # the message. 调用前的拒绝不带上游细节；上游的失败带有操作和记录状态；分类不靠解析消息文本。
   with pytest.raises(ChartDomainError) as rejected:
     natal_chart(resolved_at(date(2100, 1, 1), time(12, 0), 0.0), config_for())
   assert rejected.value.operation is None
@@ -243,7 +243,7 @@ def test_selecting_one_object_does_not_widen_the_evaluation_domain() -> None:
 
 
 # Each request differs from the roster order, from the alphabetical order of the
-# identifiers, or from both. 每个请求与名册顺序、标识的字母顺序或两者都不同。
+# identifiers, or from both. 每组请求要么与名册顺序不同，要么与标识的字母顺序不同，要么两者都不同。
 @pytest.mark.parametrize(
   "order",
   [

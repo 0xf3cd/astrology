@@ -54,7 +54,7 @@ class _Case(TypedDict):
 
 
 class _CaseResult(TypedDict):
-  """A fetched reference case. 已取得的参考案例。"""
+  """A fetched reference case. 取回的参考案例。"""
 
   identifier: str
   utc: str
@@ -142,7 +142,7 @@ def source_marker(result: str, body_line: str) -> str:
 
   Horizons names the kernel that provided a body's data on its own line; the
   target line names the body's kernel, the center line the geocenter's.
-  Horizons 把所用星历核写在各自那一行：目标行是该天体的核，地心行是地心的核。
+  Horizons 在各自的一行里写出所用的星历核：目标行是该天体的核，地心行是地心的核。
   """
   for line in result.splitlines():
     if line.strip().startswith(body_line) and "{source: " in line:

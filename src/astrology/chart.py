@@ -1,6 +1,6 @@
 """Composition of a modern tropical natal chart from resolved input and configuration.
 
-由已解析输入与请求配置组合现代热带本命盘。
+把已解析的输入和请求的配置组合成现代热带本命盘。
 """
 
 from __future__ import annotations
@@ -23,8 +23,9 @@ class ChartDomainError(ValueError):
   requested house system and the upstream operation, recording status and
   message. No partial chart is ever returned and no substitution occurs.
 
-  请求的命盘超出支持的计算域。调用前拒绝（极点纬度、2100 年及以后的民用年）不携带上游细节；
-  天文库报告的失败携带请求的宫制及上游操作、记录状态与消息。绝不返回部分命盘，也不发生替代。
+  请求的命盘超出了支持的计算范围。调用前就拒绝的情形（纬度在极点、民用年为 2100 年或更晚）
+  不带上游细节；天文库报告的失败则带有请求的宫制，以及上游的操作、记录状态和消息。
+  从不返回部分命盘，也不做任何替换。
   """
 
   def __init__(
@@ -47,7 +48,7 @@ class ChartDomainError(ValueError):
 class ChartTimes:
   """UT1-based Julian Day and TT-based Julian Ephemeris Day of the calculated instant.
 
-  计算时刻的 UT1 儒略日与 TT 儒略历书日。
+  所算时刻的 UT1 儒略日与 TT 儒略历书日。
   """
 
   jd_ut1: float
@@ -62,8 +63,9 @@ class EclipticPosition:
   by definition. The longitude rate is degrees per TT day; negative means
   decreasing at that instant. Positions do not depend on the birth location.
 
-  瞬时真黄道与真春分点上的地心视状态。距离单位 AU，月交点按定义无距离（`None`）、黄纬为零。
-  黄经速率为每 TT 日度数，负值表示该瞬间递减。位置不依赖出生地点。
+  以该时刻的真黄道和真春分点为基准的地心视位置与速率。距离以 AU 计；月交点按定义没有
+  距离（为 `None`），黄纬为零。黄经速率以每 TT 日的度数计，负值表示此刻黄经在减小。
+  位置与出生地点无关。
   """
 
   identity: Body | LunarNode
@@ -79,7 +81,8 @@ class ChartHouses:
 
   The cusps are copied into a tuple, so a list given by the caller is not aliased.
 
-  四轴与十二个按循环顺序排列的宫头，均为 [0, 360) 度。宫头被复制进元组，调用方给出的列表不被引用。
+  四轴与十二个宫头，宫头按循环顺序排列，度数都在 [0, 360) 内。宫头会复制成元组，
+  不会引用调用方传入的列表。
   """
 
   system: HouseSystem
@@ -102,7 +105,7 @@ class ChartHouses:
 class Placement:
   """Derived sign and house membership of one chart object; unrounded degrees retained.
 
-  单个盘对象派生出的星座与宫位成员关系；保留未舍入度数。
+  单个盘上对象推出的星座和落宫；度数保留未舍入的值。
   """
 
   identity: Body | LunarNode
@@ -120,9 +123,9 @@ class EffectiveConfiguration:
   evaluation that produced the positions: selecting a subset of the requested
   objects filters that output and does not narrow the evaluated domain.
 
-  实际使用的已解析选择；请求的宫制不会以另一种宫制出现在这里。`delta_t_model` 是适配层为本次计算
-  固定的上游 ΔT 模型成员值，不是调用方请求；`evaluation` 标明产出位置的联合求值方式：
-  选取请求对象的子集只是过滤输出，不缩小求值域。
+  实际采用的已确定选择。请求的宫制不会在这里变成另一种宫制。`delta_t_model` 是适配层为
+  这次计算固定下来的上游 ΔT 模型取值，不是调用方的请求；`evaluation` 说明位置来自哪种
+  联合求值：只选一部分对象时，只是筛选输出，不缩小求值域。
   """
 
   house_system: HouseSystem
@@ -134,7 +137,7 @@ class EffectiveConfiguration:
 class ChartProvenance:
   """Astronomy version and coordinate conventions retained with the result.
 
-  随结果保存的天文库版本与坐标约定。
+  随结果一起保存的天文库版本和坐标约定。
   """
 
   celestial_version: str
@@ -149,7 +152,8 @@ class NatalChart:
   The positions and placements are copied into tuples, so lists given by the
   caller are not aliased.
 
-  完整的不可变命盘结果；对象遵循请求顺序。位置与落宫被复制进元组，调用方给出的列表不被引用。
+  完整且不可变的本命盘结果；对象按请求的顺序排列。位置和落宫会复制成元组，不会引用
+  调用方传入的列表。
   """
 
   requested: ChartConfig
@@ -177,9 +181,10 @@ def natal_chart(resolved: ResolvedBirth, config: ChartConfig) -> NatalChart:
   A requested geometry outside the joint upstream domain raises
   `ChartDomainError` and never falls back to another house system.
 
-  为已解析的出生时刻计算热带地心本命盘。记录必须带地点；未知时辰已在准备阶段拒绝。
-  天文适配器在此处导入而非包导入时导入，因此导入 astrology 或查询知识永不起初始化原生天文库。
-  联合上游域之外的请求几何抛出 `ChartDomainError`，绝不回退到其他宫制。
+  为已解析的出生时刻计算热带地心本命盘。出生记录必须带地点；时间未知的记录在准备阶段
+  就已被拒绝。天文适配层在这个函数里才导入，不在导入包时导入，所以导入 astrology 或查询
+  知识都不会初始化原生天文库。请求的几何超出上游的联合求值范围时，抛出
+  `ChartDomainError`，绝不退回到别的宫制。
   """
   if type(resolved) is not ResolvedBirth:
     raise TypeError("resolved must be a ResolvedBirth")

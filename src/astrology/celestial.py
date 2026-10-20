@@ -5,9 +5,10 @@ so it depends on `chart`; `chart` imports it only inside `natal_chart`. That is
 deliberate while `natal_chart` is the only consumer: a second one would be the
 reason to give the adapter its own result type.
 
-已解析出生输入与 celestial-calendar 之间的具体适配。它直接产出 chart 模块的结果值并抛出
-其 `ChartDomainError`，因此依赖 `chart`；`chart` 仅在 `natal_chart` 内导入它。在
-`natal_chart` 是唯一消费者时这是有意为之；出现第二个消费者才有理由给适配层单独的结果类型。
+已解析的出生输入与 celestial-calendar 之间的具体适配层。它直接产出 `chart` 模块的结果值，
+并抛出该模块的 `ChartDomainError`，所以依赖 `chart`；`chart` 只在 `natal_chart` 内部才导入
+它。目前 `natal_chart` 是唯一的使用方，这样做是有意的；出现第二个使用方时，才有理由给
+适配层单独定义结果类型。
 """
 
 from __future__ import annotations
@@ -32,8 +33,9 @@ _BODY_TARGETS: dict[Body, ChartTarget] = {
   Body.PLUTO: ChartTarget.PLUTO,
 }
 
-# The upstream true node is the Meeus five-term true node named in our config.
-# 上游的 true node 即本仓配置具名的 Meeus 五项真交点。
+# The upstream names it only "true node"; this project identifies it with the
+# Meeus five-term true node named in our config.
+# 上游只称它 true node；本项目把它认定为配置里具名的 Meeus 五项真交点。
 _NODE_TARGETS: dict[LunarNode, ChartTarget] = {
   LunarNode.MEAN_ASCENDING: ChartTarget.MEAN_ASCENDING,
   LunarNode.MEAN_DESCENDING: ChartTarget.MEAN_DESCENDING,
@@ -49,8 +51,9 @@ _HOUSE_SYSTEMS: dict[HouseSystem, celestial.HouseSystem] = {
 
 # The ΔT model is fixed here, not requested by the caller, and is passed
 # explicitly so the recorded identity stays true if the upstream renames its
-# default. 上游的 ΔT 模型由本层固定，不由调用方请求；显式传参，
-# 使上游改动默认模型时已记录的标识仍为真。
+# default.
+# ΔT 模型由本层固定，不让调用方选择，并显式传给上游：即使上游改了默认模型，
+# 记录下来的模型标识仍然是真的。
 _DELTA_T_MODEL = celestial.DeltaTModel.ALGO5
 
 _MAX_CIVIL_YEAR = 2099
@@ -64,13 +67,13 @@ def celestial_version() -> str:
 def delta_t_model_id() -> str:
   """Return the ΔT model identity the adapter uses, named by the upstream member.
 
-  返回适配层使用的 ΔT 模型标识，取自上游枚举成员。
+  返回适配层所用 ΔT 模型的标识，取值就是上游枚举成员的值。
   """
   return _DELTA_T_MODEL.value
 
 
 def _target(identity: Body | LunarNode) -> ChartTarget:
-  """Map a requested identity to the fixed upstream roster. 将请求标识映射到上游固定名册。"""
+  """Map a requested identity to the fixed upstream roster. 把请求的标识映射到上游固定的名册。"""
   if isinstance(identity, Body):
     return _BODY_TARGETS[identity]
   return _NODE_TARGETS[identity]
@@ -84,9 +87,10 @@ def _precheck(resolved: ResolvedBirth, config: ChartConfig) -> Location:
   native call; returns the validated location. The JDE(TT) upper bound inside 2099 is
   left to the native domain check; both surfaces raise ChartDomainError.
 
-  拒绝上游 Python 层会以裸 ValueError 拒绝的输入：要求地点、纬度严格在 ±90 内（记录允许
-  端点，几何要求开区间）、民用年至 2099 年，均在原生调用前拒绝并返回已校验的地点。
-  2099 年内的 JDE(TT) 上界留给原生域检查；两个入口抛出同一个 ChartDomainError。
+  在调用原生库之前，先拒绝上游 Python 层会用裸 ValueError 拒绝的输入：缺少地点；纬度不在
+  ±90 的开区间内（出生记录允许取到端点，宫位几何不允许）；民用年超过 2099。通过时返回
+  校验过的地点。2099 年内 JDE(TT) 的上界留给原生库自己的域检查；两处拒绝抛出的都是
+  ChartDomainError。
   """
   location = resolved.record.location
   if location is None:
@@ -105,7 +109,7 @@ def _precheck(resolved: ResolvedBirth, config: ChartConfig) -> Location:
 
 
 def _position(identity: Body | LunarNode, body: BodyState) -> EclipticPosition:
-  """Copy one upstream state under the requested identity. 按请求标识复制一个上游状态。"""
+  """Copy one upstream state under the requested identity. 把上游一个天体的状态复制出来，标识用请求里给的那个。"""
   return EclipticPosition(
     identity,
     body.longitude_deg,
@@ -126,9 +130,10 @@ def snapshot(
   by the caller. Failures raise ChartDomainError with the requested house system and never
   a partial result or a substituted geometry.
 
-  为已解析时刻与请求配置计算上游联合快照。快照始终联合求值全部十四个上游对象与请求的宫几何；
-  选取 `config.objects` 的子集只是过滤其输出，不缩小求值域。ΔT 模型 Algo5 为显式传入，
-  由调用方记录。失败抛出携带请求宫制的 ChartDomainError，绝不返回部分结果或替代几何。
+  为已解析的时刻和请求的配置计算上游的联合快照。快照总是把上游十四个对象和请求的宫几何
+  一起求值；`config.objects` 只选一部分时，只是从结果里筛出这些，求值域不会缩小。ΔT 模型
+  固定为 Algo5 并显式传入，由调用方记录。失败时抛出带有请求宫制的 ChartDomainError，
+  绝不返回部分结果，也绝不换用别的宫几何。
   """
   location = _precheck(resolved, config)
   second_of_day = (

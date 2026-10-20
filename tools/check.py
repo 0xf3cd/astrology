@@ -52,7 +52,7 @@ PACKAGE_FILES = (
 )
 
 # Files outside the package that the tests in the source distribution read.
-# 源码分发包中的测试所读取的、包外的文件。
+# 源码分发包里的测试要读取、但不在包内的文件。
 SDIST_FILES = ("tests/reference/natal_reference.json",)
 
 
@@ -190,8 +190,8 @@ def check_package_files(root: Path = ROOT) -> None:
   The wheel and sdist checks only look for the listed files, so an unlisted new
   module would be missing from the artifacts without any check noticing.
 
-  要求包源码下的每个文件都列入 PACKAGE_FILES。wheel 与 sdist 检查只找已列出的文件，
-  未列入的新模块缺席制品时没有任何检查会发现。
+  要求包源码下的每个文件都列在 PACKAGE_FILES 里。wheel 和 sdist 的检查只找列出的文件，
+  新增的模块如果没列进去，即使制品里缺了它，也不会有任何检查发现。
   """
   package = root / "src" / "astrology"
   present = {
@@ -224,7 +224,7 @@ def check_wheel(wheel: Path, expected_version: str) -> None:
 def check_sdist(sdist: Path) -> None:
   """Require the complete package, corpus and reference fixture in the source distribution.
 
-  要求源码分发包包含完整包、语料及参考夹具。
+  要求源码分发包里有完整的包、语料和参考夹具。
   """
   with tarfile.open(sdist) as archive:
     names = {name.partition("/")[2] for name in archive.getnames()}
