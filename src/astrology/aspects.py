@@ -36,17 +36,18 @@ _ANGLES: dict[MajorAspect, float] = {
 class AspectMotion(StrEnum):
   """Local motion of an aspect at the instant, from the sign of the deviation and its rate.
 
-  The relative longitude rate is the second object's rate minus the first's. The
-  deviation shrinks in magnitude when the relative rate and the deviation have
-  opposite signs (applying) and grows when they have the same sign (separating).
-  Statuses compare exact floats, with no
+  The relative longitude rate is the second object's rate minus the first's. Away
+  from a deviation of 180 degrees, the deviation shrinks in magnitude when the
+  relative rate and the deviation have opposite signs (applying) and grows when
+  they have the same sign (separating). Statuses compare exact floats, with no
   hidden tolerance. `STATIONARY` means the relative rate is exactly zero, which is not
-  a planet's own station. `INDETERMINATE` means a rate is missing.
+  a planet's own station. `INDETERMINATE` means a rate is missing, or the deviation
+  is 180 degrees with nonzero relative motion: its magnitude has no two-sided derivative there.
 
   某一时刻相位的局部运动，由偏差的符号及其变化率得出。相对黄经速率是第二个对象的速率减去
-  第一个的速率。相对速率与偏差异号时，偏差的绝对值在缩小（入相）；同号时在增大（离相）。
+  第一个的速率。偏差不为 180 度时，相对速率与偏差异号，偏差的绝对值在缩小（入相）；同号时在增大（离相）。
   各状态比较的是确切的浮点数，没有隐含的容差。`STATIONARY` 指相对速率恰为零，不是某颗行星自己的留。
-  `INDETERMINATE` 指缺少速率。
+  `INDETERMINATE` 指缺少速率，或偏差恰为 180 度且存在相对运动，此时偏差的绝对值没有双侧导数。
   """
 
   APPLYING = "applying"
@@ -200,6 +201,8 @@ def _motion(deviation: float, first: AspectObject, second: AspectObject) -> Aspe
   relative = second.longitude_rate_deg_per_day - first.longitude_rate_deg_per_day
   if relative == 0.0:
     return AspectMotion.STATIONARY
+  if deviation == 180.0:
+    return AspectMotion.INDETERMINATE
   return AspectMotion.SEPARATING if (deviation > 0.0) == (relative > 0.0) else AspectMotion.APPLYING
 
 

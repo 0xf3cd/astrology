@@ -249,6 +249,82 @@ def test_a_deviation_of_180_is_its_own_mirror_and_is_reported_as_plus_180(
   assert (hit.branch_deg, hit.deviation_deg) == (0.0, 180.0)
 
 
+ANTIPODAL_BRANCHES = (
+  (MajorAspect.CONJUNCTION, 0.0, 180.0),
+  (MajorAspect.SEXTILE, -60.0, 120.0),
+  (MajorAspect.SEXTILE, 60.0, 240.0),
+  (MajorAspect.SQUARE, -90.0, 90.0),
+  (MajorAspect.SQUARE, 90.0, 270.0),
+  (MajorAspect.TRINE, -120.0, 60.0),
+  (MajorAspect.TRINE, 120.0, 300.0),
+  (MajorAspect.OPPOSITION, 180.0, 0.0),
+)
+
+
+@pytest.mark.parametrize("aspect,branch,second", ANTIPODAL_BRANCHES)
+@pytest.mark.parametrize(
+  "first_rate,second_rate,expected",
+  [
+    (0.0, 1.0, AspectMotion.INDETERMINATE),
+    (1.0, 0.0, AspectMotion.INDETERMINATE),
+    (-1.0, 1.0, AspectMotion.INDETERMINATE),
+    (1.0, -1.0, AspectMotion.INDETERMINATE),
+    (1.0, 1.0, AspectMotion.STATIONARY),
+    (0.0, 0.0, AspectMotion.STATIONARY),
+    (None, 1.0, AspectMotion.INDETERMINATE),
+    (1.0, None, AspectMotion.INDETERMINATE),
+    (None, None, AspectMotion.INDETERMINATE),
+  ],
+)
+def test_motion_at_each_branch_antipode_is_the_same_in_both_object_orders(
+  aspect: MajorAspect,
+  branch: float,
+  second: float,
+  first_rate: float | None,
+  second_rate: float | None,
+  expected: AspectMotion,
+) -> None:
+  pair = [obj(SUN, 0.0, first_rate), obj(MARS, second, second_rate)]
+  rules = [rule(aspect, 180.0)]
+  mirror = branch if branch in (0.0, 180.0) else -branch
+  for objects, target in ((pair, branch), (pair[::-1], mirror)):
+    hit = next(hit for hit in find_aspects(objects, rules) if hit.branch_deg == target)
+    assert hit.deviation_deg == 180.0
+    assert hit.motion is expected
+
+
+@pytest.mark.parametrize("aspect,branch,second", ANTIPODAL_BRANCHES)
+@pytest.mark.parametrize("side", [-1.0, 1.0])
+def test_motion_near_each_branch_antipode_still_has_a_direction(
+  aspect: MajorAspect, branch: float, second: float, side: float
+) -> None:
+  pair = [obj(SUN, 0.0, 0.0), obj(MARS, second + side * math.ulp(360.0), 1.0)]
+  rules = [rule(aspect, 180.0)]
+  mirror = branch if branch in (0.0, 180.0) else -branch
+  expected = AspectMotion.SEPARATING if side < 0.0 else AspectMotion.APPLYING
+  for objects, target in ((pair, branch), (pair[::-1], mirror)):
+    hit = next(hit for hit in find_aspects(objects, rules) if hit.branch_deg == target)
+    assert 0.0 < abs(hit.deviation_deg) < 180.0
+    assert hit.motion is expected
+
+
+@pytest.mark.parametrize("aspect,branch,second", ANTIPODAL_BRANCHES)
+@pytest.mark.parametrize(
+  "orb", [math.nextafter(180.0, 0.0), 180.0, math.nextafter(180.0, math.inf)]
+)
+def test_the_branch_antipode_is_a_hit_only_when_the_orb_reaches_180(
+  aspect: MajorAspect, branch: float, second: float, orb: float
+) -> None:
+  pair = [obj(SUN, 0.0, 0.0), obj(MARS, second, 1.0)]
+  rules = [rule(aspect, orb)]
+  mirror = branch if branch in (0.0, 180.0) else -branch
+  for objects, target in ((pair, branch), (pair[::-1], mirror)):
+    hits = [hit for hit in find_aspects(objects, rules) if hit.branch_deg == target]
+    assert len(hits) == (1 if orb >= 180.0 else 0)
+    if hits:
+      assert hits[0].motion is AspectMotion.INDETERMINATE
+
+
 def test_both_branches_are_returned_in_a_fixed_order() -> None:
   hits = find_aspects([obj(SUN, 0.0), obj(MARS, 0.0)], [rule(MajorAspect.SEXTILE, 60.0)])
   assert [(hit.branch_deg, hit.deviation_deg) for hit in hits] == [(-60.0, 60.0), (60.0, -60.0)]

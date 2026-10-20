@@ -56,9 +56,10 @@ a nearer match.
 
 ## Applying, separating and the other statuses
 
-At the instant, the deviation changes at the second object's rate minus the first's.
-When that relative rate and the deviation have opposite signs the aspect is
-applying; with the same sign it is separating. This holds for retrograde motion too.
+Away from a deviation of 180 degrees, the deviation changes at the second object's
+rate minus the first's. When that relative rate and the deviation have opposite
+signs the aspect is applying; with the same sign it is separating. This holds for
+retrograde motion too.
 
 | Status | When |
 |---|---|
@@ -66,7 +67,7 @@ applying; with the same sign it is separating. This holds for retrograde motion 
 | `separating` | The deviation grows in size. |
 | `exact` | The deviation is exactly zero, whatever the rates. |
 | `stationary` | The relative rate is exactly zero and the deviation is not. |
-| `indeterminate` | The caller gave no rate for an object. |
+| `indeterminate` | A rate is missing, or the deviation is 180 degrees with nonzero relative motion. |
 
 ```{doctest}
 >>> exact = AspectObject(Body.MARS, 70.0, 1.0)
@@ -83,6 +84,11 @@ applying; with the same sign it is separating. This holds for retrograde motion 
 The statuses compare exact numbers and use no tolerance. `stationary` means no
 relative motion; it is not a planet's own station. The status describes the instant
 only. It does not say that an aspect will become exact before a later station.
+
+At a deviation of 180 degrees, the absolute wrapped deviation has a cusp and no
+two-sided derivative when the relative rate is nonzero, so the status is
+`indeterminate` in both object orders. Equal rates still give `stationary`.
+This boundary can be a hit only with an orb of at least 180 degrees.
 
 ## Combine orbs when objects differ
 
