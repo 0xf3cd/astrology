@@ -133,7 +133,8 @@ def test_a_civil_year_beyond_the_supported_range_is_rejected() -> None:
 
 def test_the_upper_jde_bound_is_reported_as_a_domain_error() -> None:
   # The upstream JDE(TT) domain ends inside 2099-12-31; 14:00 UTC is still
-  # inside it and 16:00 UTC is not. 上游 JDE(TT) 的有效范围在 2099-12-31 当天结束。
+  # inside it and 16:00 UTC is not.
+  # 上游 JDE(TT) 的有效域在 2099-12-31 当天之内结束：14:00 UTC 仍在域内，16:00 UTC 已在域外。
   inside = natal_chart(resolved_at(date(2099, 12, 31), time(14, 0), 0.0), config_for())
   assert inside.positions[0].longitude_deg >= 0.0
   with pytest.raises(ChartDomainError) as caught:

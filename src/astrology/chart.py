@@ -183,7 +183,7 @@ def natal_chart(resolved: ResolvedBirth, config: ChartConfig) -> NatalChart:
 
   为已解析的出生时刻计算热带地心本命盘。出生记录必须带地点；时间未知的记录在准备阶段
   就已被拒绝。天文适配层在这个函数里才导入，不在导入包时导入，所以导入 astrology 或查询
-  知识都不会初始化原生天文库。请求的几何超出上游的联合求值范围时，抛出
+  知识都不会初始化原生天文库。请求的几何超出上游的联合求值域时，抛出
   `ChartDomainError`，绝不退回到别的宫制。
   """
   if type(resolved) is not ResolvedBirth:

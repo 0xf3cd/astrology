@@ -109,7 +109,7 @@ def _precheck(resolved: ResolvedBirth, config: ChartConfig) -> Location:
 
 
 def _position(identity: Body | LunarNode, body: BodyState) -> EclipticPosition:
-  """Copy one upstream state under the requested identity. 把上游一个天体的状态复制出来，标识用请求里给的那个。"""
+  """Copy one upstream state under the requested identity. 复制上游的一个状态，标识换成请求里给的那个。"""
   return EclipticPosition(
     identity,
     body.longitude_deg,

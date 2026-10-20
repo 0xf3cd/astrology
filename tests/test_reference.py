@@ -1,6 +1,6 @@
 """Agreement with independent JPL Horizons references and definition-level node references.
 
-与 JPL Horizons 的独立参考、以及按定义重算的交点参考是否一致。
+与 JPL Horizons 的独立参考以及按定义重算的交点参考是否一致。
 """
 
 import hashlib
@@ -93,7 +93,7 @@ NODE_TOLERANCE_ARCSEC = 1.0
 # arcseconds, about four times that, and rejects a mean sidereal time used for the
 # apparent one.
 # 上升点、中天和 Placidus 宫头都随 UT1 变化：本库按模型由民用 UTC 推出 UT1，Horizons 的
-# 恒星时用的是观测到的 UT1。两个夹具时刻最多差 0.91″，而 0.001° 是 3.6″，约有四倍余量。
+# 恒星时用的是观测到的 UT1。两个夹具时刻最多差 0.91″，而 0.001° 是 3.6″，约有四倍余量，也足以拒绝把平恒星时当视恒星时用。
 AXIS_TOLERANCE_DEGREES = 0.001
 CUSP_TOLERANCE_DEGREES = 0.001
 # JDE(TT) - JD(UTC) is an exact leap-second relation, not an approximation.
@@ -225,7 +225,7 @@ def _angle_difference(first: float, second: float) -> float:
 
 
 def _substantive_digest(fixture: _Fixture) -> str:
-  """Hash the fixture without its retrieval time. 夹具去掉取数时间后的摘要。"""
+  """Hash the fixture without its retrieval time. 对去掉取数时间后的夹具取摘要。"""
   payload = {key: value for key, value in fixture.items() if key != "retrieved_utc"}
   canonical = json.dumps(payload, sort_keys=True, ensure_ascii=False).encode("utf-8")
   return hashlib.sha256(canonical).hexdigest()
