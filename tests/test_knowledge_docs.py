@@ -146,7 +146,11 @@ def test_catalog_artifact_defects(catalog_html: Path, language: Language, defect
   text = page.read_text(encoding="utf-8")
   replacements = {
     "anchor": (f'id="{catalog_anchor("body.sun", language)}"', 'id="omitted"'),
-    "description": ("Physical-body request for the Sun; no position is calculated.", "omitted"),
+    "description": (
+      "Physical-body request for the Sun. The chart adapter calculates its apparent geocentric"
+      " position; this catalog computes none.",
+      "omitted",
+    ),
     "alias": ("Sol", "omitted"),
     "locator": ("complete equinoctial-sign sentence", "omitted"),
     "condition": ("makes the day and night equal.", "omitted"),
@@ -162,7 +166,7 @@ def test_catalog_artifact_defects(catalog_html: Path, language: Language, defect
   old, new = replacements[defect]
   # Chinese fixtures retain English originals too; removing the selected description must target Chinese.
   if language == "zh-CN" and defect == "description":
-    old = "太阳的物理天体请求，不计算位置。"
+    old = "太阳的物理天体请求。排盘适配层计算它的地心视位置；本目录不计算位置。"
   page.write_text(text.replace(old, new), encoding="utf-8")
   with pytest.raises(ValueError):
     check_catalog_html(catalog_html)

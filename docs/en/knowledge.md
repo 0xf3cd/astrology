@@ -25,7 +25,7 @@ True
 >>> catalog.filter_entries(concept_id="body.sun")[0].identifier
 'entry.body_requests'
 >>> len(catalog.filter_sources(verification=SourceVerification.VERIFIED))
-2
+3
 >>> bool(catalog.version)
 True
 ```
