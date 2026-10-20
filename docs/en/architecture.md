@@ -3,9 +3,9 @@
 [简体中文](../zh-CN/architecture.md) · [Project](../../README.md) · [Knowledge](knowledge.md)
 
 Birth records, modern time resolution, requested configuration, the tropical
-natal chart and independent knowledge are implemented; their contracts are in
-the [birth](birth.md), [configuration](configuration.md), [chart](chart.md) and
-[knowledge](knowledge.md) guides. The remaining layout below is planned. The
+natal chart, major aspects and independent knowledge are implemented; their
+contracts are in the [birth](birth.md), [configuration](configuration.md),
+[chart](chart.md), [aspect](aspects.md) and [knowledge](knowledge.md) guides. The remaining layout below is planned. The
 current chart is
 a reproducible modern tropical, geocentric natal chart, with independent access
 to its underlying knowledge.
@@ -107,8 +107,8 @@ aspects, and undefined house geometry.
 
 ## Delivery order
 
-Birth/configuration values, the independent knowledge catalog and the tropical
-natal chart are implemented. Next add aspects, then complete serialization and
+Birth/configuration values, the independent knowledge catalog, the tropical
+natal chart and major aspects are implemented. Next complete serialization and
 text output, extending bilingual documentation and installed-package verification
 with those features.
 

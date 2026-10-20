@@ -240,8 +240,8 @@ can and cannot detect.
 
 ## Limits
 
-- Aspect angles, orbs and applying or separating motion are not calculated
-  here; see the [configuration guide](configuration.md).
+- Requested aspects are judged among the participating objects; the
+  [aspect guide](aspects.md) explains the rules and their limits.
 - Results are not serialized and have no text output yet.
 - The repository keeps no external reference values for Placidus cusps. Cusps 2, 3, 11 and 12 are checked
   against the definition, which the check and the library read alike; cusps 5, 6,

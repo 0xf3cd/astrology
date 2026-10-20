@@ -7,7 +7,7 @@ import math
 import subprocess
 import sys
 from dataclasses import FrozenInstanceError, replace
-from datetime import date, time, timedelta
+from datetime import date, datetime, time, timedelta
 from importlib.metadata import version
 
 import pytest
@@ -644,3 +644,35 @@ def test_the_result_does_not_alias_aspect_sequences_given_by_the_caller() -> Non
   assert effective.aspect_objects == chart.effective.aspect_objects
   with pytest.raises(TypeError, match="aspect_objects"):
     replace(chart.effective, aspect_objects="sun")  # type: ignore[arg-type]
+
+
+# The status of an aspect rests on these rates, so they are checked against the reported
+# longitudes: a central difference over one hour agrees to about 1e-6 degrees per day
+# (the Moon and the true node), while a sign, a unit of hours or a day of the wrong
+# length would be off by 0.01 degrees per day or more even for the slowest object.
+# 相位的状态建立在这些速率上，所以把它们和报告出的黄经对照：一小时的中心差分与速率相差约
+# 1e-6 度/日（月亮和真交点），而符号、以小时为单位或日长错了，即使对最慢的对象也会差 0.01
+# 度/日以上。
+RATE_TOLERANCE_DEGREES_PER_DAY = 1e-5
+
+
+def test_longitude_rates_are_the_derivative_of_the_longitudes_per_tt_day() -> None:
+  middle = datetime.combine(_NORTH[0], _NORTH[1])
+  half_hour = timedelta(minutes=30)
+  charts = [
+    natal_chart(
+      resolved_at(instant.date(), instant.time(), *_NORTH[2:]),
+      config_for(HouseSystem.WHOLE_SIGN, _ALL_OBJECTS),
+    )
+    for instant in (middle - half_hour, middle, middle + half_hour)
+  ]
+  one_hour = 1 / 24
+  assert math.isclose(
+    charts[2].times.jde_tt - charts[0].times.jde_tt, one_hour, rel_tol=0, abs_tol=1e-8
+  )
+  before, now, after = (chart.positions for chart in charts)
+  for early, current, late in zip(before, now, after, strict=True):
+    difference = (late.longitude_deg - early.longitude_deg + 180.0) % 360.0 - 180.0
+    derivative = difference / one_hour
+    assert abs(derivative - current.longitude_rate_deg_per_tt_day) < RATE_TOLERANCE_DEGREES_PER_DAY
+    assert abs(current.longitude_rate_deg_per_tt_day) > 0.01

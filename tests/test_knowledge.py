@@ -10,6 +10,7 @@ from typing import Any
 
 import pytest
 
+from astrology import OrbCombination, aspect_angle
 from astrology.config import Body, HouseSystem, LunarNode, MajorAspect, NodeDefinition
 from astrology.knowledge import (
   Catalog,
@@ -72,6 +73,8 @@ def test_query_contracts(catalog: Catalog) -> None:
     entry.identifier
     for entry in catalog.filter_entries(prerequisite_status=PrerequisiteStatus.COMPLETE)
   } == {
+    "entry.aspect_evaluation",
+    "entry.aspect_requests",
     "entry.body_requests",
     "entry.house_requests",
     "entry.node_directions",
@@ -458,3 +461,27 @@ def test_invalid_packaged_config_reference(
   monkeypatch.setattr(module, "files", lambda package: tmp_path)
   with pytest.raises(error):
     load_catalog()
+
+
+@pytest.mark.parametrize("aspect", list(MajorAspect), ids=lambda aspect: aspect.value)
+def test_aspect_descriptions_state_the_angle_the_code_uses(
+  catalog: Catalog, aspect: MajorAspect
+) -> None:
+  concept = catalog.concept(f"aspect.{aspect.value}")
+  angle = aspect_angle(aspect)
+  assert f"Exact angle {angle:g} degrees" in concept.description.en
+  assert f"精确角度 {angle:g} 度" in (concept.description.zh or "")
+
+
+def test_every_orb_combination_has_one_named_rule_variant(catalog: Catalog) -> None:
+  named = {
+    variant.identifier.removeprefix("rule.project.orb_")
+    for variant in catalog.variants
+    if variant.identifier.startswith("rule.project.orb_")
+  }
+  assert named == {combination.value for combination in OrbCombination}
+  entry = catalog.entry("entry.aspect_evaluation")
+  assert {f"rule.project.orb_{combination.value}" for combination in OrbCombination} <= set(
+    entry.rule_ids
+  )
+  assert set(entry.concept_ids) == {f"aspect.{aspect.value}" for aspect in MajorAspect}

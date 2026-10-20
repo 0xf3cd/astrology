@@ -48,7 +48,7 @@ The corpus contains project configuration contracts, the project conventions for
 sign sectors and house placement, and one single-source historical grouping. It
 names every admitted configuration identity and twelve sign concepts, and points
 at the executable rules in the chart implementation instead of restating them.
-It provides no aspect angles, default orbs, dignity or interpretation rules.
+It states the project's own aspect evaluation, but provides no default orbs, dignity or interpretation rules.
 Request variants reference actual config enum members and the implementation
 that owns them.
 
