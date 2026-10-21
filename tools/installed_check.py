@@ -76,8 +76,21 @@ def _check_knowledge(expected_corpus_version: str | None = None) -> None:
     or catalog.lookup("日轮")[0].identifier != "body.sun"
   ):
     raise ValueError("Installed bilingual lookup did not preserve identity")
-  if not catalog.list_concepts() or not catalog.list_variants(concept_id="body.sun"):
+  if (
+    not catalog.list_concepts()
+    or catalog.concept("body.sun").configuration is not astrology.Body.SUN
+    or "body.sun" not in catalog.entry("entry.body_requests").concept_ids
+    or catalog.list_variants(concept_id="body.sun") != ()
+  ):
     raise ValueError("Installed knowledge listing is empty")
+  if (
+    catalog.variant("rule.house.whole_sign").configuration is not astrology.HouseSystem.WHOLE_SIGN
+    or catalog.variant("rule.node_definition.mean").configuration
+    is not astrology.NodeDefinition.MEAN
+    or catalog.variant("rule.aspect.conjunction").configuration
+    is not astrology.MajorAspect.CONJUNCTION
+  ):
+    raise ValueError("Installed knowledge lost a named rule configuration")
   if not catalog.filter_sources(verification=SourceVerification.VERIFIED):
     raise ValueError("Installed source filtering lost verified sources")
   entry = catalog.entry("entry.equinoctial_example")

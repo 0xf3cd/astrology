@@ -22,6 +22,9 @@ from astrology.birth import (
   TimePrecision,
 )
 from astrology.chart import (
+  _EVALUATION,
+  _POSITION_FRAME,
+  _UT1_DERIVATION,
   ChartHouses,
   ChartProvenance,
   ChartTimes,
@@ -421,7 +424,7 @@ def _read_chart(value: object) -> NatalChart:
     effective=EffectiveConfiguration(
       _enum(HouseSystem, effective["house_system"]),
       _text(effective["delta_t_model"]),
-      _literal(effective["evaluation"], "fixed_fourteen_object_joint_snapshot"),
+      _literal(effective["evaluation"], _EVALUATION),
       tuple(_identity(item) for item in _array(effective["aspect_objects"])),
       None
       if effective["orb_combination"] is None
@@ -429,8 +432,8 @@ def _read_chart(value: object) -> NatalChart:
     ),
     provenance=ChartProvenance(
       _text(provenance["celestial_version"]),
-      _literal(provenance["position_frame"], "apparent_geocentric_true_ecliptic_of_date"),
-      _literal(provenance["ut1_derivation"], "delta_t_model_from_civil_utc"),
+      _literal(provenance["position_frame"], _POSITION_FRAME),
+      _literal(provenance["ut1_derivation"], _UT1_DERIVATION),
       _text(provenance["astrology_version"]),
     ),
     times=ChartTimes(

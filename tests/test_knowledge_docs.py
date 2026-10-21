@@ -272,3 +272,34 @@ def test_node_definition_relation_comes_from_configuration() -> None:
   values = tuple(changed if c.identifier == node.identifier else c for c in catalog.concepts)
   with pytest.raises(ValueError, match="owning node-definition relation"):
     check_catalog_data(replace(catalog, concepts=values))
+
+
+@pytest.mark.parametrize("defect", ["missing", "duplicate", "extra", "wrong"])
+def test_rule_configuration_coverage_is_independent_of_concepts(defect: str) -> None:
+  from astrology import Body, HouseSystem
+
+  catalog = load_catalog()
+  first = catalog.variant("rule.house.whole_sign")
+  variants = list(catalog.variants)
+  if defect == "missing":
+    variants.remove(first)
+  elif defect == "duplicate":
+    variants.append(replace(first, identifier="rule.synthetic.duplicate"))
+  elif defect == "extra":
+    variants.append(
+      replace(
+        first, identifier="rule.synthetic.body", concept_ids=("body.sun",), configuration=Body.SUN
+      )
+    )
+  else:
+    variants[0] = replace(first, concept_ids=("house.equal",), configuration=HouseSystem.EQUAL)
+  changed = replace(catalog, variants=variants, entries=())
+  with pytest.raises(ValueError, match="rule-bearing configuration"):
+    check_catalog_data(changed)
+
+
+def test_generated_aspect_angles_come_from_executable_rules() -> None:
+  for language in ("en", "zh-CN"):
+    rendered = render_catalog(load_catalog(), language, "0")
+    for angle in (0, 60, 90, 120, 180):
+      assert f"Exact angle / 精确角度：{angle}°" in rendered

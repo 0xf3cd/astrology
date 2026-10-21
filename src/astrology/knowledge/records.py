@@ -9,11 +9,12 @@ import re
 from collections.abc import Sequence
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Literal, TypeVar
+from typing import Literal, TypeVar, get_args
 
 from astrology.config import Body, HouseSystem, LunarNode, MajorAspect, NodeDefinition
 
 Language = Literal["en", "zh-CN"]
+_LANGUAGES: tuple[Language, ...] = get_args(Language)
 ConfigurationIdentity = Body | HouseSystem | LunarNode | MajorAspect | NodeDefinition
 _T = TypeVar("_T")
 CONFIGURATION_TYPES = (Body, HouseSystem, LunarNode, MajorAspect, NodeDefinition)
@@ -33,7 +34,7 @@ def _identifier(value: str) -> None:
 
 
 def _language(value: Language) -> None:
-  if type(value) is not str or value not in ("en", "zh-CN"):
+  if type(value) is not str or value not in _LANGUAGES:
     raise ValueError("Language must be en or zh-CN")
 
 

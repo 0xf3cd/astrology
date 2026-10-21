@@ -12,7 +12,8 @@ from astrology.birth import Location
 from astrology.chart import NatalChart
 from astrology.config import Body, HouseSystem, LunarNode, MajorAspect
 from astrology.knowledge import Catalog, TranslationStatus
-from astrology.knowledge.records import Language
+from astrology.knowledge.catalog import _sign_concept
+from astrology.knowledge.records import _LANGUAGES, Language
 from astrology.zodiac import Sign, _whole_arcseconds, sign_of
 
 _HEADINGS = {
@@ -119,7 +120,7 @@ def _name(
   language: Language,
 ) -> str:
   if isinstance(identity, Sign):
-    concept = catalog.concept(f"sign.{identity.value}")
+    concept = _sign_concept(catalog, identity)
   else:
     matches = [concept for concept in catalog.concepts if concept.configuration is identity]
     if len(matches) != 1:
@@ -159,7 +160,7 @@ def format_chart(chart: NatalChart, catalog: Catalog, *, language: Language = "e
   """
   if type(chart) is not NatalChart or type(catalog) is not Catalog:
     raise TypeError("chart and catalog must be NatalChart and Catalog values")
-  if type(language) is not str or language not in _HEADINGS:
+  if type(language) is not str or language not in _LANGUAGES:
     raise ValueError("language must be en or zh-CN")
   labels = _HEADINGS[language]
   record = chart.resolved.record

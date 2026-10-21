@@ -17,8 +17,10 @@
 True
 >>> len(catalog.list_concepts(kind=ConceptKind.SIGN))
 12
->>> catalog.list_variants(concept_id="body.sun")[0].configuration.name
+>>> catalog.concept("body.sun").configuration.name
 'SUN'
+>>> catalog.list_variants(concept_id="body.sun")
+()
 >>> catalog.filter_entries(concept_id="body.sun")[0].identifier
 'entry.body_requests'
 >>> len(catalog.filter_sources(verification=SourceVerification.VERIFIED))
@@ -26,6 +28,9 @@ True
 >>> bool(catalog.version)
 True
 ```
+
+内置目录中的天体和交点方向概念没有单独的规则变体，因此 `body.sun` 返回空元组是预期结果。
+身份信息仍保留在概念和条目中，参见[规则标识变更](#首发前的规则标识变更)。
 
 每次 `load_catalog()` 均显式读取包内 JSON，不使用缓存或网络。构造时将序列复制为元组。
 非法记录类型、重复标识、悬空链接和别名冲突会抛出 `TypeError` 或 `ValueError`，
@@ -42,7 +47,9 @@ True
 语料收录项目配置合同、星座区间与落宫的项目约定，以及一条单源历史分组，
 列出全部接纳的配置身份和十二个星座概念，并链接排盘实现中的可执行规则。
 本项目的相位规则各有名称和文字说明，并链接对应的实现。语料不提供默认容许度、尊贵或解释规则。
-请求变体引用实际配置枚举成员及其所属实现。
+概念引用实际配置枚举成员。宫制绑定、具名交点定义与相位角规则另有变体，各自说明适用限制。
+参考页从可执行定义读取并添加精确角度一行；概念说明中的角度也会与该定义核对。
+天体和交点方向身份不需要另一份规则记录。
 
 ```{doctest}
 >>> entry = catalog.entry("entry.equinoctial_example")
@@ -69,6 +76,10 @@ True
 来源记录说明版次、扫描文件哈希、转录规范化及有限的转载状态；仅收录一段短文，
 不附带扫描图、水印或现代网站说明。镜像及书目可旁证版本，不能算规则的独立作者。
 配置引用标明包版本及固定提交中的符号；项目定义名称含作者名，不表示已核验该作者书中的公式。
+
+项目实现来源记录保留已查核的提交，不跟随包版本改写。排盘来源记录还定位到同一提交中
+`tests/test_reference.py` 的交点对拍测试。测试按其中记录的公式计算交点参考黄经，再与上游
+结果比较。这不等于核验 Meeus 印刷原文、确立误差界或证明与密切轨道交点等价。
 
 下方是合成的部分证据，不是传统断言或判别 API。目录不消费它，也不将条目提升为适用：
 
@@ -107,8 +118,9 @@ True
 1. 查可取得的版本及转载条件，记录作品、作者或译者、版本、语言、定位、谱系、所支持的陈述及限度。
    未核材料如实标注，两个镜像不算两份来源。
 2. 在 `src/astrology/knowledge/catalog.json` 添加稳定记录。引用所属枚举类与成员，
-   不抄其值，也不虚构算法。加载器从同一链接生成 `rule.<concept-id>` 请求变体。
-   月交点的定义关联从 `LunarNode.definition` 派生。
+   不抄其值，也不虚构算法。只有承载规则时才另加显式变体，写明其定义与限制；配置链接本身
+   不会生成变体。月交点的定义关联从 `LunarNode.definition` 派生，加载器还检查内置语料中
+   十二个 Sign 与概念的身份对应。
    纯来源变体没有配置引用；条目关联变体标识及引用。
 3. 区分引文、译文及原作陈述。`text_defaults` 提供初始修订 1 及项目译者署名，各文本可覆盖它们。
    文本改动时递增 `revision`；译文未经复核前保留原 `zh_revision`，复核后再更新修订及署名。
@@ -117,6 +129,36 @@ True
    缺乏依据的解释不进入默认语料。
 5. 补充边界与来源测试，运行[完整检查](contributing.md)，核双语生成页。
    检查覆盖当前译文、完整配置／目录／API 及安装资源；语义审阅仍须核译意与来源保真。
+
+## 首发前的规则标识变更
+
+语料 `2026.10.21.1` 移除十四条仅重复请求身份的自动变体，保留其概念、别名、配置链接和条目。
+`entry.body_requests` 与 `entry.node_directions` 的 `rule_ids` 现为空；条目原本就允许这种形状。
+移除的标识如下：
+
+```text
+rule.body.sun
+rule.body.moon
+rule.body.mercury
+rule.body.venus
+rule.body.mars
+rule.body.jupiter
+rule.body.saturn
+rule.body.uranus
+rule.body.neptune
+rule.body.pluto
+rule.node.mean_ascending
+rule.node.mean_descending
+rule.node.meeus_five_term_true_ascending
+rule.node.meeus_five_term_true_descending
+```
+
+`variant()` 遇到这些标识会抛出 `KeyError`，不提供别名或隐式转换为概念。
+按对应概念调用 `list_variants()` 会返回 `()`；保留的身份信息可用 `concept()`、`lookup()`
+或 `filter_entries()` 查询。三条 `rule.house.*`、两条 `rule.node_definition.*`、五条
+`rule.aspect.*` 以及原有九条显式规则标识均保留，相对顺序不变：十条带配置链接的规则在前，
+原有九条显式规则在后。当前有 19 条变体，概念、来源和条目数量仍为 36、3 和 8。
+来源状态、前提完整性、输出资格和命盘适用性仍各自独立。
 
 ## 记录与归属
 

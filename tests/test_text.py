@@ -25,6 +25,7 @@ from astrology import (
   ObjectOrb,
   OrbCombination,
   Placement,
+  Sign,
   dumps_chart,
   find_aspects,
   format_chart,
@@ -44,6 +45,7 @@ def test_presentation_tables_cover_supported_languages_and_motion() -> None:
   from astrology import text
 
   assert set(text._HEADINGS) == set(text._MOTIONS) == set(text._AXES) == set(get_args(Language))
+  assert get_args(Language) == ("en", "zh-CN")
   for motions in text._MOTIONS.values():
     assert set(motions) == set(AspectMotion)
 
@@ -358,6 +360,46 @@ def test_unusable_catalog_fails(recorded_chart: NatalChart, defect: str) -> None
 def test_invalid_language(recorded_chart: NatalChart, language: object) -> None:
   with pytest.raises(ValueError):
     format_chart(recorded_chart, load_catalog(), language=language)  # type: ignore[arg-type]
+
+
+@pytest.mark.parametrize(
+  "identity,english,chinese",
+  [
+    (Sign.ARIES, "Aries", "白羊座"),
+    (Sign.TAURUS, "Taurus", "金牛座"),
+    (Sign.GEMINI, "Gemini", "双子座"),
+    (Sign.CANCER, "Cancer", "巨蟹座"),
+    (Sign.LEO, "Leo", "狮子座"),
+    (Sign.VIRGO, "Virgo", "处女座"),
+    (Sign.LIBRA, "Libra", "天秤座"),
+    (Sign.SCORPIO, "Scorpio", "天蝎座"),
+    (Sign.SAGITTARIUS, "Sagittarius", "射手座"),
+    (Sign.CAPRICORN, "Capricorn", "摩羯座"),
+    (Sign.AQUARIUS, "Aquarius", "水瓶座"),
+    (Sign.PISCES, "Pisces", "双鱼座"),
+  ],
+)
+def test_all_sign_names_use_the_catalog_relationship(
+  identity: Sign, english: str, chinese: str
+) -> None:
+  from astrology.text import _name
+
+  catalog = load_catalog()
+  assert _name(identity, catalog, "en") == english
+  assert _name(identity, catalog, "zh-CN") == chinese
+  missing = Catalog("custom", (), (), (), ())
+  with pytest.raises(KeyError):
+    _name(identity, missing, "en")
+
+
+def test_language_string_subclass_is_not_a_supported_plain_string(
+  recorded_chart: NatalChart,
+) -> None:
+  class Label(str):
+    pass
+
+  with pytest.raises(ValueError):
+    format_chart(recorded_chart, load_catalog(), language=Label("en"))  # type: ignore[arg-type]
 
 
 def test_invalid_types(recorded_chart: NatalChart) -> None:

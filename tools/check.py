@@ -14,6 +14,7 @@ from enum import Enum
 from html.parser import HTMLParser
 from inspect import isfunction
 from pathlib import Path
+from typing import get_args
 from urllib.parse import unquote, urlsplit
 from zipfile import ZipFile
 
@@ -132,7 +133,7 @@ def check_examples(report: str) -> None:
 
   要求双语开发指南与 API 指南均有已执行的例子。
   """
-  for language in ("en", "zh-CN"):
+  for language in get_args(Language):
     for page in (
       "contributing",
       "birth",
@@ -199,7 +200,8 @@ def check_api_html(directory: Path) -> None:
           for name, member in vars(value).items()
           if not name.startswith("_") and (isfunction(member) or isinstance(member, property))
         )
-  for language, counterpart in (("en", "zh-CN"), ("zh-CN", "en")):
+  for language in get_args(Language):
+    counterpart = "zh-CN" if language == "en" else "en"
     page = directory / "docs" / language / "reference.html"
     if not page.is_file():
       raise ValueError(f"Missing API HTML for {language}")
@@ -332,7 +334,7 @@ def check_catalog_html(directory: Path) -> None:
   code_version = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"][
     "version"
   ]
-  languages: tuple[Language, ...] = ("en", "zh-CN")
+  languages: tuple[Language, ...] = get_args(Language)
   for language in languages:
     counterpart = "zh-CN" if language == "en" else "en"
     page = directory / "docs" / language / "catalog.html"

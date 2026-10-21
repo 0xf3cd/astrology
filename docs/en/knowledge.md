@@ -20,8 +20,10 @@ See the generated [catalog](catalog.md) and [API](reference.md).
 True
 >>> len(catalog.list_concepts(kind=ConceptKind.SIGN))
 12
->>> catalog.list_variants(concept_id="body.sun")[0].configuration.name
+>>> catalog.concept("body.sun").configuration.name
 'SUN'
+>>> catalog.list_variants(concept_id="body.sun")
+()
 >>> catalog.filter_entries(concept_id="body.sun")[0].identifier
 'entry.body_requests'
 >>> len(catalog.filter_sources(verification=SourceVerification.VERIFIED))
@@ -29,6 +31,10 @@ True
 >>> bool(catalog.version)
 True
 ```
+
+In the built-in catalog, body and node-direction concepts have no separate rule
+variants, so the empty tuple for `body.sun` is expected. Their identity information
+remains on the concepts and entries; see [rule-ID changes](#pre-release-rule-id-changes).
 
 Each `load_catalog()` explicitly reads the packaged JSON, without a cache or
 network. Constructors copy sequences into tuples. Invalid record types, duplicate
@@ -50,8 +56,12 @@ names every admitted configuration identity and twelve sign concepts, and links 
 executable rules in the chart implementation. Each project-defined aspect rule has
 a name, a written definition and a link to its implementation. The corpus provides
 no default orbs, dignity or interpretation rules.
-Request variants reference actual config enum members and the implementation
-that owns them.
+Concepts reference actual configuration enum members. Separate variants describe
+house-system bindings, named node definitions and aspect-angle rules, with limits
+specific to each rule. Reference pages add an exact-angle line from the executable
+definition; the angles in concept descriptions are checked against that definition.
+Body and node-direction identities do not
+need a second rule record.
 
 ```{doctest}
 >>> entry = catalog.entry("entry.equinoctial_example")
@@ -84,6 +94,13 @@ watermarks or modern website prose. Mirrors/catalogs corroborate the edition,
 not independent rule authorship. Config citations identify package version and
 symbols at a fixed commit; they do not verify an author's book formula merely
 because a project definition bears that author's name.
+
+Implementation source records stay pinned to the inspected commits instead of
+following the package version. The chart source record locates the node-comparison
+test in `tests/test_reference.py` at that same commit. The test calculates reference
+node longitudes from the formulas recorded there and compares them with upstream
+results. This does not verify Meeus's printed text, establish an error bound or show
+equivalence to an osculating node.
 
 The following is synthetic partial evidence, not a traditional claim or matching
 API. The catalog does not consume it or promote the entry to applicable:
@@ -130,8 +147,10 @@ substring matching is not supported. Use `Catalog.lookup()` for exact identity l
    Mark unverified material honestly; two mirrors are not two sources.
 2. Add stable records to `src/astrology/knowledge/catalog.json`. Reference an
    owning enum class/member instead of copying its value or inventing an algorithm.
-   The loader derives `rule.<concept-id>` request variants from those same links.
-   Lunar-node definition links are derived from `LunarNode.definition`.
+   Add a separate explicit variant only when it carries a rule, with its own
+   definition and limits; configuration links alone do not generate variants.
+   Lunar-node definition links are derived from `LunarNode.definition`, and the
+   loader checks all twelve Sign-to-concept identities in the built-in corpus.
    Source-only variants have no config reference; entries link variant IDs and citations.
 3. Keep excerpts, translations and authored statements distinct. `text_defaults`
    supplies initial revision 1 and project translation credit; each text can
@@ -145,6 +164,40 @@ substring matching is not supported. Use `Catalog.lookup()` for exact identity l
    both generated language pages. Checks cover current translations, complete
    config/catalog/API references and installed resources. Semantic review still
    verifies translation meaning and source fidelity.
+
+## Pre-release rule-ID changes
+
+Corpus `2026.10.21.1` removes fourteen automatically generated variants that only
+repeated request identities. Their concepts, aliases, configuration links and
+entries remain. `entry.body_requests` and `entry.node_directions` now have empty
+`rule_ids`; entries already permitted that shape. The removed IDs are:
+
+```text
+rule.body.sun
+rule.body.moon
+rule.body.mercury
+rule.body.venus
+rule.body.mars
+rule.body.jupiter
+rule.body.saturn
+rule.body.uranus
+rule.body.neptune
+rule.body.pluto
+rule.node.mean_ascending
+rule.node.mean_descending
+rule.node.meeus_five_term_true_ascending
+rule.node.meeus_five_term_true_descending
+```
+
+`variant()` raises `KeyError` for these IDs; there is no alias or conversion to a
+concept. `list_variants()` for their concepts returns `()`. Use `concept()`,
+`lookup()` or `filter_entries()` to retrieve the preserved identity information.
+The three `rule.house.*`, two `rule.node_definition.*`, five `rule.aspect.*` and
+nine original authored rule IDs remain. Their relative order is unchanged:
+the ten configuration-linked rules precede the original nine authored rules.
+There are now 19 variants, with 36 concepts, 3 sources and 8 entries unchanged in
+count. Source status, prerequisite completeness, output eligibility and chart
+applicability retain their separate meanings.
 
 ## Records and ownership
 

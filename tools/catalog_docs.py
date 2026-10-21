@@ -7,8 +7,10 @@ from __future__ import annotations
 
 from collections.abc import Iterator
 from dataclasses import fields, is_dataclass
+from typing import get_args
 
-from astrology.config import LunarNode, NodeDefinition
+from astrology.aspects import aspect_angle
+from astrology.config import HouseSystem, LunarNode, MajorAspect, NodeDefinition
 from astrology.knowledge import Catalog, LocalizedText, TranslationStatus
 from astrology.knowledge.records import CONFIGURATION_TYPES, ConfigurationIdentity, Language
 
@@ -26,9 +28,9 @@ def localized_texts(value: object, path: str = "catalog") -> Iterator[tuple[str,
 
 
 def check_catalog_data(catalog: Catalog) -> None:
-  """Check config coverage, node ownership and current bilingual corpus text.
+  """Check concept/rule config coverage, node ownership and current bilingual text.
 
-  检查配置覆盖、交点定义归属及语料的当前双语文本。
+  检查概念和规则的配置覆盖、交点定义归属及语料的当前双语文本。
   """
   expected = {(type(member), member.name) for enum in CONFIGURATION_TYPES for member in enum}
   actual = [
@@ -38,6 +40,15 @@ def check_catalog_data(catalog: Catalog) -> None:
   ]
   if set(actual) != expected or len(actual) != len(expected):
     raise ValueError("Catalog must cover each actual configuration identity exactly once")
+  rule_types = (HouseSystem, NodeDefinition, MajorAspect)
+  expected_rules = {(type(member), member.name) for enum in rule_types for member in enum}
+  actual_rules = [
+    (type(variant.configuration), variant.configuration.name)
+    for variant in catalog.variants
+    if variant.configuration is not None
+  ]
+  if set(actual_rules) != expected_rules or len(actual_rules) != len(expected_rules):
+    raise ValueError("Catalog must cover each rule-bearing configuration exactly once")
   definition_ids = {
     concept.configuration: concept.identifier
     for concept in catalog.concepts
@@ -49,7 +60,7 @@ def check_catalog_data(catalog: Catalog) -> None:
     ):
       raise ValueError(f"Missing owning node-definition relation: {concept.identifier}")
   for path, text in localized_texts(catalog):
-    for language in ("en", "zh-CN"):
+    for language in get_args(Language):
       if text.status(language) is not TranslationStatus.CURRENT:
         raise ValueError(f"Required translation {language} is {text.status(language)}: {path}")
 
@@ -101,6 +112,8 @@ def render_catalog(catalog: Catalog, language: Language, code_version: str) -> s
           "",
         ]
       )
+      if isinstance(value, MajorAspect):
+        lines.extend([f"Exact angle / 精确角度：{aspect_angle(value):g}°", ""])
 
   for concept in catalog.concepts:
     heading(concept.identifier, text(concept.name))
