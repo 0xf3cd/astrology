@@ -19,18 +19,34 @@ uv run --locked python tools/check.py
 支持 Python 3.11–3.14，下限与 celestial-calendar 0.8.0 一致；该库是本包的硬依赖。
 CI 在 Linux 3.11／3.14 和 macOS／Windows 3.14 上运行同一命令。
 本地验证下限时使用 `uv sync --locked --python 3.11`。
+开发检查使用当前补丁版。sdist 的安全解压要求 Python 3.11.4 或更高版本；
+安装后库的次版本支持范围仍为 3.11–3.14。
 
 天文依赖只发布 Linux x86_64 与 aarch64、macOS 14+ arm64、Windows amd64 的轮子，没有源码分发包。
 因此本包在其他平台无法安装，浏览知识目录也需要同样的安装。
 
 该命令检查 Ruff lint／两空格格式、严格 mypy、普通与优化模式下的 pytest、文档对页／本地链接、
 从头生成的严格 HTML／doctest 构建及带声明运行依赖的隔离 wheel 安装。
-`python -m build` 经 sdist 构建 wheel；安装后的消费者程序在仓外验证出生、时区来源与配置。
+
+分发检查先运行 `python -m build --sdist` 并解压归档，再在解压目录运行 `python -m build --wheel`。
+严格 HTML／doctest 构建也在该目录运行，导入其中的包源码。随后检查 API／知识目录页面、
+生成的搜索索引及查询代码，以及 doctest 结果。
+
+安装后的消费者程序在仓外验证出生、时区来源与配置。
 完整盘、恢复、重算及文本检查见[记录指南](records.md#验证与限度)。
 另有仅查知识的消费者，执行列举、名称查询、筛选及引用解析，不初始化时间或原生库。
 两者均以隔离导入运行普通与优化模式；wheel 和 sdist 检查要求实际包含语料资源。
+
 临时 HTML、doctest 报告、分发包和消费者环境优先使用 `SCRATCH`，否则使用系统临时目录，
 退出时删除。构建元数据和工具缓存可能保留在仓内已忽略的目录中。
+严格文档构建可能从 `docs.python.org` 获取 Python intersphinx 清单；除安装构建依赖外，还需允许联网。
+
+CI 安装 uv 0.12.5，按平台归档使用其[上游发布](https://github.com/astral-sh/uv/releases/tag/0.12.5)
+的 SHA-256 摘要。安装步骤使用新的工具缓存目录，避免 setup-uv 命中缓存后跳过归档校验。
+
+uv、setup-uv 或 runner 平台变化时，在临时分支复验反例：把矩阵中每个 `uv-checksum`
+改为带引号的 64 个零字符串并推送。每个 setup-uv 步骤都应以摘要不匹配报错，后续 uv 命令应被跳过。
+无关的下载或网络错误不能作为通过依据。不要合并该分支。
 
 工具版本由 `uv.lock` 锁定：Python 3.11 使用 Sphinx 8.2.3，较新 Python 使用 Sphinx 9.1.0。
 覆盖率报告用于定位遗漏，但不能认证天文数值，那由参考案例负责。
@@ -50,6 +66,9 @@ Python 与 JavaScript 使用对应的中文相邻双字切分。限制见[知识
 检查核实际生成的搜索索引、输出的分词及词干接口、页面语言与对页导航、完整目录锚点及当前译文。
 构建成功不能代替这些检查。独立核验可以执行生成的 JavaScript 查询及索引代码；
 Python 分词单测不能证明浏览器行为。
+
+Sphinx 只发现根目录的两个 README 和 `docs/` 下的源文档。虚拟环境应放在 `docs/` 之外：
+该目录内任意位置的源文档都是文档输入，与它同级的目录则不是。上述源文档中的警告仍会使严格构建失败。
 
 按上面的 `uv sync` 从本仓安装开发包，本地分发名／版本为 `astrology`／`0.0.0`。
 PyPI 的 `astrology` 属于另一个无关项目；首次发布前须确定发布名。
@@ -90,6 +109,16 @@ PyPI 的 `astrology` 属于另一个无关项目；首次发布前须确定发�
 `tests/reference/natal_reference.json` 中的本命盘案例覆盖南北半球各一个时刻，
 与 JPL Horizons 及定义级检查比对。夹具记录查询 URL、Horizons 为每个天体及地心给出的
 星历核（太阳、月亮、水星与金星用 DE441，其余天体用各自的核）、取数时间及所用口径。
+
+若要重新取回两组 Horizons 数据而不改动已提交的夹具：
+
+```sh
+uv run --locked python tools/fetch_reference.py --output build/natal_reference.json
+```
+
+取数需要联网，仅依赖 Python 标准库。必须指定输出路径；工具不读取本地参考或审阅文件。
+输出包含查询 URL、来源星历核、计算口径、取数时间和值，随后打印该文件的 SHA-256。
+有意替换版本化夹具之前，先检查数值和来源信息的变化。离线测试使用受控响应，与真实联网取数分开。
 
 天体容差取自上游模型对 Horizons 的自身误差，而不是这两个时刻。太阳与行星在
 2000—2002 年 24 个时刻的经度一致到约 0.8 角秒，在 2020 年夹具时刻为 1.3；

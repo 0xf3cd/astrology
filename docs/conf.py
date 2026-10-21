@@ -15,6 +15,7 @@ extensions = ["myst_parser", "sphinx.ext.doctest", "sphinx.ext.autodoc", "sphinx
 intersphinx_mapping = {"python": ("https://docs.python.org/3.11", None)}
 autodoc_typehints = "description"
 root_doc = "docs/index"
+include_patterns = ["README.md", "README.zh-CN.md", "docs/**"]
 exclude_patterns = [
   ".venv/**",
   ".review/**",

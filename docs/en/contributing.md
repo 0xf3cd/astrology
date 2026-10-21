@@ -23,6 +23,9 @@ Python 3.11–3.14 is supported. The lower bound matches celestial-calendar 0.8.
 which is a hard dependency of the package. CI runs the
 same command on Linux 3.11/3.14 and macOS/Windows 3.14. Use
 `uv sync --locked --python 3.11` to check the lower endpoint locally.
+Use a current patch release for development checks. Their safe sdist extraction
+requires Python 3.11.4 or later; the installed library's supported minor versions
+remain 3.11–3.14.
 
 The astronomy dependency publishes wheels for Linux x86_64 and aarch64, macOS 14+
 arm64 and Windows amd64, and no source distribution. This package therefore
@@ -31,17 +34,37 @@ needs the same install.
 
 The command checks Ruff lint/two-space formatting, strict mypy, pytest in normal
 and optimized modes, document pairs/local links, fresh strict HTML/doctest builds,
-and an isolated wheel install with its declared runtime dependencies. `python -m
-build` builds the wheel through the sdist. The installed consumer exercises birth,
+and an isolated wheel install with its declared runtime dependencies.
+
+The distribution check runs `python -m build --sdist`, extracts the archive, and
+runs `python -m build --wheel` inside the extracted tree. Strict HTML/doctest builds
+also run there and import the extracted package sources. The check then validates
+the API/catalog pages, generated search index and query code, and doctest results.
+
+The installed consumer exercises birth,
 timezone provenance and configuration outside the checkout; its complete-chart,
 restoration, replay and text checks are described in the
 [record guide](records.md#verification-and-limits). A separate knowledge-only
 consumer lists, looks up, filters and resolves citations without time/native
 initialization. Both use isolated imports in normal and optimized modes; wheel
-and sdist checks require the actual corpus resources. Temporary HTML, doctest reports,
+and sdist checks require the actual corpus resources.
+
+Temporary HTML, doctest reports,
 distributions, and consumer environments use `SCRATCH` when set, otherwise the
 system temporary directory, and are removed on exit. Build metadata and tool
 caches may remain in ignored checkout directories.
+Strict documentation builds may fetch the Python intersphinx inventory from
+`docs.python.org`; allow network access as well as installing the build dependencies.
+
+CI installs uv 0.12.5 with a SHA-256 digest for each platform archive from its
+[upstream release](https://github.com/astral-sh/uv/releases/tag/0.12.5). A fresh
+tool-cache directory prevents setup-uv from skipping archive verification on a cache hit.
+
+When uv, setup-uv or the runner platform changes, repeat the negative check on a
+temporary branch: replace every matrix `uv-checksum` with a quoted string of 64
+zeros and push it. Each setup-uv step must fail with a checksum-mismatch error,
+and subsequent uv commands must be skipped. An unrelated download/network failure
+is not sufficient. Do not merge this branch.
 
 Tool versions are locked in `uv.lock`. Sphinx 8.2.3 serves Python 3.11; Sphinx
 9.1.0 serves newer Python versions. Coverage is reported to locate gaps; it
@@ -67,6 +90,11 @@ contract, per-page language/counterpart navigation, complete catalog anchors and
 current translations. A successful build alone is insufficient. Independent
 verification can execute the generated JavaScript query/index code; a Python
 tokenizer unit test does not prove browser behavior.
+
+Sphinx discovers only the two root READMEs and sources under `docs/`. Keep virtual
+environments outside `docs/`: sources anywhere under that directory are documentation
+inputs, while sibling directories are not. Warnings in these document sources still
+fail the strict build.
 
 Install this development package from the checkout using `uv sync` above. Its
 local distribution name/version is `astrology` / `0.0.0`. The PyPI name
@@ -120,6 +148,18 @@ checks. The fixture records the query URLs, the ephemeris kernel Horizons names
 for each body and for the geocenter (the Sun, the Moon, Mercury and Venus use
 DE441, the other bodies their own kernels), the retrieval time and the
 conventions used.
+
+To fetch the two Horizons cases again without changing the committed fixture:
+
+```sh
+uv run --locked python tools/fetch_reference.py --output build/natal_reference.json
+```
+
+This requires network access and only the Python standard library. The output path
+is required; the tool reads no local reference or review files. It writes query URLs,
+source kernels, conventions, retrieval time and values, then prints the output file's
+SHA-256. Inspect numerical and provenance changes before deliberately replacing the
+versioned fixture. Offline tests use controlled responses and are separate from a live fetch.
 
 The body tolerances follow the upstream's own model error against Horizons, not
 the two instants. The Sun and the planets agree to about 0.8 arcseconds in
