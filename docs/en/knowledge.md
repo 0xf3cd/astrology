@@ -32,6 +32,10 @@ True
 True
 ```
 
+In the built-in catalog, body and node-direction concepts have no separate rule
+variants, so the empty tuple for `body.sun` is expected. Their identity information
+remains on the concepts and entries; see [rule-ID changes](#pre-release-rule-id-changes).
+
 Each `load_catalog()` explicitly reads the packaged JSON, without a cache or
 network. Constructors copy sequences into tuples. Invalid record types, duplicate
 IDs, dangling links and conflicting aliases raise `TypeError` or `ValueError`,
@@ -54,8 +58,9 @@ a name, a written definition and a link to its implementation. The corpus provid
 no default orbs, dignity or interpretation rules.
 Concepts reference actual configuration enum members. Separate variants describe
 house-system bindings, named node definitions and aspect-angle rules, with limits
-specific to each rule. Reference pages read aspect angles from the executable
-definition rather than a second table. Body and node-direction identities do not
+specific to each rule. Reference pages add an exact-angle line from the executable
+definition; the angles in concept descriptions are checked against that definition.
+Body and node-direction identities do not
 need a second rule record.
 
 ```{doctest}
@@ -90,11 +95,12 @@ not independent rule authorship. Config citations identify package version and
 symbols at a fixed commit; they do not verify an author's book formula merely
 because a project definition bears that author's name.
 
-The project implementation sources retain their inspected development commits,
-not the latest package version. The chart source also locates the node-comparison
-test in `tests/test_reference.py` at that same commit. Comparing the same formulas
-does not verify Meeus's printed text, establish an error bound or show equivalence
-to an osculating node.
+Implementation source records stay pinned to the inspected commits instead of
+following the package version. The chart source record locates the node-comparison
+test in `tests/test_reference.py` at that same commit. The test calculates reference
+node longitudes from the formulas recorded there and compares them with upstream
+results. This does not verify Meeus's printed text, establish an error bound or show
+equivalence to an osculating node.
 
 The following is synthetic partial evidence, not a traditional claim or matching
 API. The catalog does not consume it or promote the entry to applicable:
@@ -187,7 +193,7 @@ rule.node.meeus_five_term_true_descending
 concept. `list_variants()` for their concepts returns `()`. Use `concept()`,
 `lookup()` or `filter_entries()` to retrieve the preserved identity information.
 The three `rule.house.*`, two `rule.node_definition.*`, five `rule.aspect.*` and
-nine explicitly authored rule IDs remain. Their relative order is unchanged:
+nine original authored rule IDs remain. Their relative order is unchanged:
 the ten configuration-linked rules precede the original nine authored rules.
 There are now 19 variants, with 36 concepts, 3 sources and 8 entries unchanged in
 count. Source status, prerequisite completeness, output eligibility and chart

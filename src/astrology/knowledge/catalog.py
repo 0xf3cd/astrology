@@ -364,8 +364,6 @@ def load_catalog() -> Catalog:
   )
   catalog = Catalog(data["version"], concepts, variants, sources, entries)
   sign_concepts = tuple(_sign_concept(catalog, sign) for sign in Sign)
-  if any(concept.kind is not ConceptKind.SIGN for concept in sign_concepts) or set(
-    catalog.list_concepts(kind=ConceptKind.SIGN)
-  ) != set(sign_concepts):
+  if set(catalog.list_concepts(kind=ConceptKind.SIGN)) != set(sign_concepts):
     raise ValueError("The built-in catalog must map exactly the twelve Sign identities")
   return catalog
