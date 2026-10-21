@@ -1,4 +1,5 @@
 include AGENTS.md README.zh-CN.md uv.lock
+include .github/workflows/checks.yml
 recursive-include docs *.md *.py
 recursive-include tests *.py
 recursive-include tests/reference *.json *.txt

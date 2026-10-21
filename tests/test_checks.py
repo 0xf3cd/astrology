@@ -4,7 +4,7 @@ import os
 import subprocess
 import sys
 import tarfile
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from io import BytesIO
 from pathlib import Path
 from zipfile import ZipFile
@@ -115,6 +115,18 @@ def test_command_failure_propagates(tmp_path: Path) -> None:
   with pytest.raises(subprocess.CalledProcessError) as caught:
     run((sys.executable, "-c", "raise SystemExit(7)"), cwd=tmp_path)
   assert caught.value.returncode == 7
+
+
+def test_command_receives_explicit_environment(tmp_path: Path) -> None:
+  run(
+    (
+      sys.executable,
+      "-c",
+      "import os; raise SystemExit(0 if os.environ['ASTROLOGY_CHECK_TEST'] == 'source' else 1)",
+    ),
+    cwd=tmp_path,
+    env={**os.environ, "ASTROLOGY_CHECK_TEST": "source"},
+  )
 
 
 def test_direct_script_import_path() -> None:
@@ -271,23 +283,66 @@ def test_distribution_keeps_dependency_install_and_both_consumer_modes(
 ) -> None:
   (tmp_path / "pyproject.toml").write_text('[project]\nversion = "0.0.0"\n', encoding="utf-8")
   commands: list[tuple[str, ...]] = []
+  contexts: list[tuple[Path, Mapping[str, str] | None]] = []
+  validations: list[tuple[str, Path]] = []
 
-  def capture(command: Sequence[str], *, cwd: Path = checker.ROOT) -> None:
+  def capture(
+    command: Sequence[str], *, cwd: Path = checker.ROOT, env: Mapping[str, str] | None = None
+  ) -> None:
     commands.append(tuple(command))
-    if "build" in command:
+    contexts.append((cwd, env))
+    if "--sdist" in command:
       artifacts = Path(command[-1])
       artifacts.mkdir(parents=True)
       with tarfile.open(artifacts / "astrology.tar.gz", "w:gz") as archive:
         for name in SDIST_PATHS:
           archive.addfile(tarfile.TarInfo("astrology/" + name), BytesIO())
+    if "--wheel" in command:
+      artifacts = Path(command[-1])
       with ZipFile(artifacts / "astrology.whl", "w") as archive:
         for name in (*PACKAGE_FILES, "a.dist-info/licenses/LICENSE"):
           archive.writestr(name, "")
         archive.writestr("a.dist-info/METADATA", "Name: astrology\nVersion: 0.0.0\n")
+    if "-b" in command and command[command.index("-b") + 1] == "doctest":
+      output = Path(command[-1])
+      output.mkdir(parents=True)
+      (output / "output.txt").write_text(valid_example_report(), encoding="utf-8")
 
   monkeypatch.setattr(checker, "ROOT", tmp_path)
   monkeypatch.setattr(checker, "run", capture)
+  monkeypatch.setattr(
+    checker, "check_documents", lambda root: validations.append(("documents", root))
+  )
+  monkeypatch.setattr(checker, "check_api_html", lambda root: validations.append(("api", root)))
+  monkeypatch.setattr(
+    checker, "check_catalog_html", lambda root: validations.append(("catalog", root))
+  )
+  monkeypatch.setattr(
+    checker, "check_search_html", lambda root: validations.append(("search", root))
+  )
   checker.check_distribution(tmp_path)
+  source = tmp_path / "source/astrology"
+  wheel_index = next(index for index, command in enumerate(commands) if "--wheel" in command)
+  assert contexts[wheel_index][0] == source
+  documentation = [
+    (command, context)
+    for command, context in zip(commands, contexts, strict=True)
+    if "sphinx" in command
+  ]
+  assert [command[command.index("-b") + 1] for command, _ in documentation] == [
+    "html",
+    "doctest",
+  ]
+  for command, (cwd, env) in documentation:
+    assert cwd == source
+    assert env is not None and env["PYTHONPATH"] == str(source / "src")
+    assert {"-E", "-a", "-n", "-W", "--keep-going"}.issubset(command)
+  assert ("documents", source) in validations
+  assert {name for name, path in validations if path == tmp_path / "source-html"} == {
+    "api",
+    "catalog",
+    "search",
+  }
   install = next(command for command in commands if command[:3] == ("uv", "pip", "install"))
   environment = tmp_path / "consumer"
   python = environment / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
@@ -301,7 +356,7 @@ def test_distribution_keeps_dependency_install_and_both_consumer_modes(
     str(tmp_path / "artifacts/astrology.whl"),
   )
   consumers = [
-    command for command in commands if str(tmp_path / "tools/installed_check.py") in command
+    command for command in commands if str(source / "tools/installed_check.py") in command
   ]
   assert len(consumers) == 4
   assert all(command[0] == str(python) for command in consumers)

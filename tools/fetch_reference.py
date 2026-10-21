@@ -1,21 +1,24 @@
-"""Fetch JPL Horizons reference data for two natal-chart reference cases.
+"""Fetch two natal-chart references from JPL Horizons to an explicit output file.
 
-Reuses the exact query shape validated by the batch-2 plan review:
-apparent geocentric ecliptic lon/lat (QUANTITIES=31, DE440/441, TIME_TYPE=TT at
-the upstream jde_tt) and local apparent sidereal time at the site (QUANTITIES=7,
-TIME_TYPE=UT). Writes tests/reference/natal_reference.json; compares northern
-case B against the plan-review raw files kept in .review/probes/.
+Requests apparent geocentric ecliptic lon/lat (QUANTITIES=31, TIME_TYPE=TT at
+JDE(TT)) and local apparent sidereal time (QUANTITIES=7, TIME_TYPE=UT).
+No local reference or review files are read. Only the standard library is needed.
 
-Stdlib only; no key required. Run: python3 tools/fetch_reference.py
+从 JPL Horizons 取回两张本命盘的参考数据，写到显式指定的文件。
+请求地心视黄道经纬度（TT）和当地视恒星时（UT），不读取本地参考或审阅文件；仅依赖标准库。
+
+Run: python3 tools/fetch_reference.py --output /path/to/reference.json
 """
 
 from __future__ import annotations
 
+import argparse
 import hashlib
 import json
 import pathlib
 import urllib.parse
 import urllib.request
+from collections.abc import Sequence
 from datetime import UTC, datetime
 from typing import TypedDict
 
@@ -225,9 +228,14 @@ def fetch_case(case: _Case) -> _CaseResult:
   }
 
 
-def main() -> None:
-  """Fetch every case, write the fixture and check it against the plan-review fetch."""
-  root = pathlib.Path(__file__).resolve().parents[1]
+def main(arguments: Sequence[str] | None = None) -> None:
+  """Fetch all cases and write only the requested destination.
+
+  取回所有案例，只写到调用方指定的目标文件。
+  """
+  parser = argparse.ArgumentParser(description=__doc__)
+  parser.add_argument("--output", type=pathlib.Path, required=True)
+  target: pathlib.Path = parser.parse_args(arguments).output
   cases = [fetch_case(case) for case in CASES]
   fixture = {
     "retrieved_utc": datetime.now(UTC).isoformat(timespec="seconds"),
@@ -252,27 +260,10 @@ def main() -> None:
     },
     "cases": cases,
   }
-  target = root / "tests" / "reference" / "natal_reference.json"
   target.parent.mkdir(parents=True, exist_ok=True)
   target.write_text(json.dumps(fixture, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
   digest = hashlib.sha256(target.read_bytes()).hexdigest()
   print(f"wrote {target} sha256={digest}")
-
-  # Consistency: northern case against the plan-review raw fetch kept in .review/probes.
-  probes = root / ".review" / "probes"
-  north = cases[0]
-  if probes.is_dir():
-    for name, command in BODIES.items():
-      raw = (probes / f"horizons_{command}.txt").read_text(encoding="utf-8")
-      row = rows(raw)[0]
-      old = (float(row[3]), float(row[4]))
-      new = (north["bodies"][name]["longitude_deg"], north["bodies"][name]["latitude_deg"])
-      if old != new:
-        raise RuntimeError(f"Northern {name} differs from plan-review raw data: {old} vs {new}")
-    raw_last = rows((probes / "horizons_last.txt").read_text(encoding="utf-8"))[0]
-    if float(raw_last[3]) * 15.0 != north["local_apparent_sidereal_time_deg"]:
-      raise RuntimeError("Northern LAST differs from plan-review raw data")
-    print("northern case matches plan-review raw fetch bit for bit")
 
 
 if __name__ == "__main__":

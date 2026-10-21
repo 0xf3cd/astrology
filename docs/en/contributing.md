@@ -38,10 +38,17 @@ restoration, replay and text checks are described in the
 [record guide](records.md#verification-and-limits). A separate knowledge-only
 consumer lists, looks up, filters and resolves citations without time/native
 initialization. Both use isolated imports in normal and optimized modes; wheel
-and sdist checks require the actual corpus resources. Temporary HTML, doctest reports,
+and sdist checks require the actual corpus resources. The check extracts the sdist,
+builds its wheel, and runs strict HTML/doctest builds with imports from that extracted
+source. It also checks those rendered API/catalog pages and search output.
+Temporary HTML, doctest reports,
 distributions, and consumer environments use `SCRATCH` when set, otherwise the
 system temporary directory, and are removed on exit. Build metadata and tool
 caches may remain in ignored checkout directories.
+
+CI installs uv 0.12.5 with a SHA-256 digest for each platform archive from its
+[upstream release](https://github.com/astral-sh/uv/releases/tag/0.12.5). A fresh
+tool-cache directory prevents setup-uv from skipping archive verification on a cache hit.
 
 Tool versions are locked in `uv.lock`. Sphinx 8.2.3 serves Python 3.11; Sphinx
 9.1.0 serves newer Python versions. Coverage is reported to locate gaps; it
@@ -67,6 +74,10 @@ contract, per-page language/counterpart navigation, complete catalog anchors and
 current translations. A successful build alone is insufficient. Independent
 verification can execute the generated JavaScript query/index code; a Python
 tokenizer unit test does not prove browser behavior.
+
+Sphinx discovers only the two root READMEs and sources under `docs/`. Other local
+directories, including virtual environments with different names, are not documentation
+inputs; warnings in the intended sources still fail the strict build.
 
 Install this development package from the checkout using `uv sync` above. Its
 local distribution name/version is `astrology` / `0.0.0`. The PyPI name
@@ -120,6 +131,18 @@ checks. The fixture records the query URLs, the ephemeris kernel Horizons names
 for each body and for the geocenter (the Sun, the Moon, Mercury and Venus use
 DE441, the other bodies their own kernels), the retrieval time and the
 conventions used.
+
+To fetch the two Horizons cases again without changing the committed fixture:
+
+```sh
+uv run --locked python tools/fetch_reference.py --output build/natal_reference.json
+```
+
+This requires network access and only the Python standard library. The output path
+is required; the tool reads no local reference or review files. It writes query URLs,
+source kernels, conventions, retrieval time and values, then prints the output file's
+SHA-256. Inspect numerical and provenance changes before deliberately replacing the
+versioned fixture. Offline tests use controlled responses and are separate from a live fetch.
 
 The body tolerances follow the upstream's own model error against Horizons, not
 the two instants. The Sun and the planets agree to about 0.8 arcseconds in

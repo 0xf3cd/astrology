@@ -9,7 +9,7 @@ import sys
 import tarfile
 import tempfile
 import tomllib
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from enum import Enum
 from html.parser import HTMLParser
 from inspect import isfunction
@@ -55,9 +55,21 @@ PACKAGE_FILES = (
   "astrology/knowledge/catalog.json",
 )
 
-# Files outside the package that the tests in the source distribution read.
-# 源码分发包里的测试要读取、但不在包内的文件。
+# Build, documentation and test inputs outside the package itself.
+# 不在包内的构建、文档和测试输入。
 SDIST_FILES = (
+  ".github/workflows/checks.yml",
+  "pyproject.toml",
+  "uv.lock",
+  "MANIFEST.in",
+  "README.md",
+  "README.zh-CN.md",
+  "docs/conf.py",
+  "tools/check.py",
+  "tools/installed_check.py",
+  "tools/fetch_reference.py",
+  "tools/catalog_docs.py",
+  "tools/docs_search.py",
   "tests/reference/natal_reference.json",
   "tests/reference/complete_chart_reference.json",
   "tests/reference/chart_record_v1.json",
@@ -66,10 +78,10 @@ SDIST_FILES = (
 )
 
 
-def run(command: Sequence[str], *, cwd: Path = ROOT) -> None:
+def run(command: Sequence[str], *, cwd: Path = ROOT, env: Mapping[str, str] | None = None) -> None:
   """Run a command and propagate failure. 执行命令并传播失败。"""
   print(f"+ {' '.join(command)}", flush=True)
-  subprocess.run(command, cwd=cwd, check=True)
+  subprocess.run(command, cwd=cwd, env=env, check=True)
 
 
 def document_errors(root: Path) -> tuple[str, ...]:
@@ -251,9 +263,9 @@ def check_wheel(wheel: Path, expected_version: str) -> None:
 
 
 def check_sdist(sdist: Path) -> None:
-  """Require the complete package, corpus and reference fixture in the source distribution.
+  """Require package resources and the inputs for source builds, docs and tests.
 
-  要求源码分发包里有完整的包、语料和参考夹具。
+  要求源码分发包包含包资源及构建、文档和测试所需的输入。
   """
   with tarfile.open(sdist) as archive:
     names = {name.partition("/")[2] for name in archive.getnames()}
@@ -392,15 +404,68 @@ def check_catalog_html(directory: Path) -> None:
 
 
 def check_distribution(directory: Path) -> None:
-  """Build via sdist and test an isolated install. 经 sdist 构建并验证隔离安装。"""
+  """Build the wheel and docs from an extracted sdist, then test an isolated install.
+
+  从解压后的源码分发包构建 wheel 和文档，再验证隔离安装。
+  """
   metadata = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]
   artifacts = directory / "artifacts"
-  run((sys.executable, "-m", "build", "--outdir", str(artifacts)))
+  run((sys.executable, "-m", "build", "--sdist", "--outdir", str(artifacts)))
+  sdists = tuple(artifacts.glob("*.tar.gz"))
+  if len(sdists) != 1:
+    raise ValueError("Expected one sdist")
+  check_sdist(sdists[0])
+  source_directory = directory / "source"
+  with tarfile.open(sdists[0]) as archive:
+    archive.extractall(source_directory, filter="data")
+  roots = tuple(source_directory.iterdir())
+  if len(roots) != 1 or not roots[0].is_dir():
+    raise ValueError("Sdist must contain one source directory")
+  source = roots[0]
+  run((sys.executable, "-m", "build", "--wheel", "--outdir", str(artifacts)), cwd=source)
   wheels = tuple(artifacts.glob("*.whl"))
-  if len(wheels) != 1 or len(tuple(artifacts.glob("*.tar.gz"))) != 1:
-    raise ValueError("Expected one wheel and one sdist")
+  if len(wheels) != 1:
+    raise ValueError("Expected one wheel")
   check_wheel(wheels[0], metadata["version"])
-  check_sdist(next(artifacts.glob("*.tar.gz")))
+
+  source_environment = {**os.environ, "PYTHONPATH": str(source / "src")}
+  run(
+    (
+      sys.executable,
+      "-c",
+      "from pathlib import Path\nimport astrology\n"
+      "if not Path(astrology.__file__).resolve().is_relative_to(Path.cwd() / 'src'):\n"
+      "  raise RuntimeError('Documentation imported astrology outside the extracted sdist')",
+    ),
+    cwd=source,
+    env=source_environment,
+  )
+  check_documents(source)
+  for builder in ("html", "doctest"):
+    run(
+      (
+        sys.executable,
+        "-m",
+        "sphinx",
+        "-E",
+        "-a",
+        "-n",
+        "-W",
+        "--keep-going",
+        "-b",
+        builder,
+        "-c",
+        "docs",
+        ".",
+        str(directory / f"source-{builder}"),
+      ),
+      cwd=source,
+      env=source_environment,
+    )
+  check_api_html(directory / "source-html")
+  check_catalog_html(directory / "source-html")
+  check_search_html(directory / "source-html")
+  check_examples((directory / "source-doctest/output.txt").read_text(encoding="utf-8"))
 
   environment = directory / "consumer"
   run(("uv", "venv", "--python", sys.executable, str(environment)))
@@ -417,7 +482,7 @@ def check_distribution(directory: Path) -> None:
         str(python),
         *mode,
         "-I",
-        str(ROOT / "tools/installed_check.py"),
+        str(source / "tools/installed_check.py"),
         metadata["version"],
         corpus_version,
         "--knowledge-only",
@@ -429,7 +494,7 @@ def check_distribution(directory: Path) -> None:
         str(python),
         *mode,
         "-I",
-        str(ROOT / "tools/installed_check.py"),
+        str(source / "tools/installed_check.py"),
         metadata["version"],
         corpus_version,
         "--expected-chart",
