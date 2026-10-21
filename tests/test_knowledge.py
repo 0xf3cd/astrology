@@ -605,7 +605,9 @@ def test_packaged_sign_relationship_is_checked(
 ) -> None:
   from astrology.knowledge import catalog as module
 
-  data = json.loads(files("astrology.knowledge").joinpath("catalog.json").read_text())
+  data = json.loads(
+    files("astrology.knowledge").joinpath("catalog.json").read_text(encoding="utf-8")
+  )
   if defect == "missing":
     # A consistent rename keeps cross-record links valid but breaks the Sign identity.
     next(row for row in data["concepts"] if row["identifier"] == "sign.leo")["identifier"] = (
@@ -627,7 +629,7 @@ def test_packaged_sign_relationship_is_checked(
         "description": {"en": "Synthetic", "zh": "合成"},
       }
     )
-  (tmp_path / "catalog.json").write_text(json.dumps(data))
+  (tmp_path / "catalog.json").write_text(json.dumps(data), encoding="utf-8")
   monkeypatch.setattr(module, "files", lambda package: tmp_path)
   with pytest.raises(KeyError if defect == "missing" else ValueError):
     load_catalog()
