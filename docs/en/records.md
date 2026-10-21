@@ -45,7 +45,7 @@ Mercury [mercury] | Pisces 17°05'04" | 8 | D
 
 The Sun's orb is 10° and the other bodies use 6°; their mean is 8° for pairs with
 the Sun and 6° otherwise. The explicit participant list excludes the node and
-records the bodies in reverse order; effective participants still follow the
+lists the bodies in reverse order; effective participants still follow the
 requested object order. The exact replay equality above holds in this same code
 tree. For comparisons across trees, compare numerical fields with stated
 tolerances, as in [Verification and limits](#verification-and-limits).
