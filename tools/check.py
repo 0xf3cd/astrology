@@ -434,8 +434,10 @@ def check_distribution(directory: Path) -> None:
       sys.executable,
       "-c",
       "from pathlib import Path\nimport astrology\n"
-      "if not Path(astrology.__file__).resolve().is_relative_to(Path.cwd() / 'src'):\n"
-      "  raise RuntimeError('Documentation imported astrology outside the extracted sdist')",
+      "actual = Path(astrology.__file__).resolve()\n"
+      "expected = (Path.cwd() / 'src').resolve()\n"
+      "if not actual.is_relative_to(expected):\n"
+      "  raise RuntimeError(f'Documentation imported astrology from {actual}, expected {expected}')",
     ),
     cwd=source,
     env=source_environment,

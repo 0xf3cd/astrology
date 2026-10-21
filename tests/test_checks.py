@@ -1,5 +1,7 @@
 """Failures the development checks must catch. 开发检查必须发现的失败。"""
 
+import ast
+import inspect
 import os
 import subprocess
 import sys
@@ -371,6 +373,48 @@ def test_distribution_keeps_dependency_install_and_both_consumer_modes(
     if "--expected-chart" in command
   )
   assert (tmp_path / "development-chart.json").is_file()
+
+
+@pytest.mark.parametrize("mode", ["direct", "alias", "outside"])
+def test_sdist_import_guard_resolves_both_paths_and_rejects_outside_imports(
+  tmp_path: Path, mode: str
+) -> None:
+  tree = ast.parse(inspect.getsource(checker.check_distribution))
+  scripts = [
+    node.value
+    for node in ast.walk(tree)
+    if isinstance(node, ast.Constant)
+    and isinstance(node.value, str)
+    and node.value.startswith("from pathlib import Path\nimport astrology\n")
+  ]
+  assert len(scripts) == 1
+  source = tmp_path / "source"
+  source.mkdir()
+  actual = source / "src/astrology/__init__.py"
+  cwd = source
+  if mode == "alias":
+    cwd = tmp_path / "alias"
+    try:
+      cwd.symlink_to(source, target_is_directory=True)
+    except OSError as exc:
+      pytest.skip(f"Directory symlinks unavailable: {exc}")
+  elif mode == "outside":
+    actual = tmp_path / "other/astrology/__init__.py"
+  prefix = (
+    "import sys\nfrom pathlib import Path\nimport astrology\n"
+    "astrology.__file__ = sys.argv[1]\n"
+    "Path.cwd = classmethod(lambda cls: Path(sys.argv[2]))\n"
+  )
+  result = subprocess.run(
+    [sys.executable, "-c", prefix + scripts[0], str(actual), str(cwd)],
+    capture_output=True,
+    text=True,
+  )
+  if mode == "outside":
+    assert result.returncode == 1
+    assert "Documentation imported astrology from" in result.stderr
+  else:
+    assert result.returncode == 0, result.stdout + result.stderr
 
 
 @pytest.mark.parametrize("missing", [None, *SDIST_PATHS])
