@@ -4,8 +4,8 @@
 
 These development APIs are rendered from their defining modules. Public summaries
 and contracts are bilingual; both language views use the same definitions.
-See [birth inputs](birth.md), [requested configuration](configuration.md) and
-[the chart guide](chart.md) and [the aspect guide](aspects.md) for executed examples. The
+See [birth inputs](birth.md), [requested configuration](configuration.md),
+[charts](chart.md), [aspects](aspects.md) and [chart records](records.md) for executed examples. The
 [knowledge guide](knowledge.md) covers chart-independent queries.
 
 ## Birth records and resolution
@@ -33,6 +33,20 @@ See [birth inputs](birth.md), [requested configuration](configuration.md) and
    :members: ChartDomainError, ChartTimes, EclipticPosition, ChartHouses, Placement, EffectiveConfiguration, ChartProvenance, NatalChart, natal_chart
    :undoc-members:
    :member-order: bysource
+```
+
+## Chart records and text
+
+See the [complete example and record contract](records.md).
+
+```{eval-rst}
+.. automodule:: astrology.serialization
+   :members: ChartRecordError, ChartReplayError, dumps_chart, loads_chart, recompute_chart
+   :undoc-members:
+   :member-order: bysource
+
+.. automodule:: astrology.text
+   :members: format_chart
 ```
 
 ## Zodiac classification
@@ -65,7 +79,7 @@ See [birth inputs](birth.md), [requested configuration](configuration.md) and
 ## Independent knowledge
 
 Field roles are explained in the
-[record guide](knowledge.md#records-and-ownership).
+[knowledge record fields](knowledge.md#records-and-ownership).
 
 ```{eval-rst}
 .. automodule:: astrology.knowledge

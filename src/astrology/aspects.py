@@ -17,9 +17,9 @@ import sys
 from collections.abc import Sequence
 from dataclasses import dataclass
 from enum import StrEnum
-from math import isfinite, remainder
-from typing import cast
+from math import remainder
 
+from astrology._validation import finite_number
 from astrology.config import AspectRule, Body, LunarNode, MajorAspect, OrbCombination
 
 _HALF_MAXIMUM = sys.float_info.max / 2.0
@@ -77,12 +77,12 @@ class AspectObject:
   def __post_init__(self) -> None:
     if not isinstance(self.identity, (Body, LunarNode)):
       raise TypeError("identity must be a Body or LunarNode")
-    object.__setattr__(self, "longitude_deg", _finite(self.longitude_deg, "longitude_deg"))
+    object.__setattr__(self, "longitude_deg", finite_number(self.longitude_deg, "longitude_deg"))
     if self.longitude_rate_deg_per_day is not None:
       object.__setattr__(
         self,
         "longitude_rate_deg_per_day",
-        _finite(self.longitude_rate_deg_per_day, "longitude_rate_deg_per_day"),
+        finite_number(self.longitude_rate_deg_per_day, "longitude_rate_deg_per_day"),
       )
 
 
@@ -111,17 +111,27 @@ class AspectHit:
   orb_limit_deg: float
   motion: AspectMotion
 
-
-def _finite(value: object, name: str) -> float:
-  if type(value) not in (int, float):
-    raise TypeError(f"{name} must be a number, not bool")
-  try:
-    number = float(cast("int | float", value))
-  except OverflowError as exc:
-    raise ValueError(f"{name} must be finite") from exc
-  if not isfinite(number):
-    raise ValueError(f"{name} must be finite")
-  return number
+  def __post_init__(self) -> None:
+    if not isinstance(self.first, (Body, LunarNode)) or not isinstance(
+      self.second, (Body, LunarNode)
+    ):
+      raise TypeError("Aspect endpoints must be Body or LunarNode values")
+    if self.first == self.second or (
+      isinstance(self.first, LunarNode) and isinstance(self.second, LunarNode)
+    ):
+      raise ValueError("An aspect needs distinct endpoints, not two lunar nodes")
+    if type(self.aspect) is not MajorAspect or type(self.motion) is not AspectMotion:
+      raise TypeError("aspect and motion must use their owning enum types")
+    for name in ("branch_deg", "deviation_deg", "orb_limit_deg"):
+      object.__setattr__(self, name, finite_number(getattr(self, name), name))
+    if self.branch_deg not in _branches(aspect_angle(self.aspect)):
+      raise ValueError("branch_deg does not belong to the aspect")
+    if not -180.0 < self.deviation_deg <= 180.0:
+      raise ValueError("deviation_deg must be in (-180, 180]")
+    if self.orb_limit_deg < 0.0 or abs(self.deviation_deg) > self.orb_limit_deg:
+      raise ValueError("The aspect deviation must be within its nonnegative orb limit")
+    if (self.deviation_deg == 0.0) != (self.motion is AspectMotion.EXACT):
+      raise ValueError("Only a zero deviation has exact motion status")
 
 
 def _signed(angle: float) -> float:

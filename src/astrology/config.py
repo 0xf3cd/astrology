@@ -8,8 +8,9 @@ from __future__ import annotations
 from collections.abc import Sequence
 from dataclasses import dataclass
 from enum import StrEnum
-from math import isfinite
-from typing import Literal, cast
+from typing import Literal
+
+from astrology._validation import finite_number
 
 
 class HouseSystem(StrEnum):
@@ -100,13 +101,11 @@ class OrbCombination(StrEnum):
 
 def _orb(value: object) -> float:
   """Return a finite nonnegative orb as a float. 返回有限且非负的容许度，类型为 float。"""
-  if type(value) not in (int, float):
-    raise TypeError("orb_degrees must be a number, not bool")
   try:
-    orb = float(cast("int | float", value))
-  except OverflowError as exc:
+    orb = finite_number(value, "orb_degrees")
+  except ValueError as exc:
     raise ValueError("orb_degrees must be finite and nonnegative") from exc
-  if not isfinite(orb) or orb < 0:
+  if orb < 0:
     raise ValueError("orb_degrees must be finite and nonnegative")
   return orb
 
@@ -226,8 +225,9 @@ class ChartConfig:
       if not set(participants) <= set(objects):
         raise ValueError("aspect_objects must be a subset of objects")
       object.__setattr__(self, "aspect_objects", participants)
-    else:
-      participants = objects
+    object.__setattr__(self, "objects", objects)
+    object.__setattr__(self, "aspects", aspects)
+    participants = self.aspect_participants()
     has_object_orbs = any(rule.object_orbs for rule in aspects)
     if self.orb_combination is not None and not isinstance(self.orb_combination, OrbCombination):
       raise TypeError("orb_combination must be an OrbCombination")
@@ -238,5 +238,16 @@ class ChartConfig:
     for rule in aspects:
       if any(entry.identity not in participants for entry in rule.object_orbs):
         raise ValueError("object orbs may name only objects that take part in aspects")
-    object.__setattr__(self, "objects", objects)
-    object.__setattr__(self, "aspects", aspects)
+
+  def aspect_participants(self) -> tuple[Body | LunarNode, ...]:
+    """Return participants in requested object order, or an empty tuple without rules.
+
+    按请求对象的顺序返回参与相位的对象；没有相位规则时返回空元组。
+    """
+    if not self.aspects:
+      return ()
+    return tuple(
+      identity
+      for identity in self.objects
+      if self.aspect_objects is None or identity in self.aspect_objects
+    )

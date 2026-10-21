@@ -1,0 +1,47 @@
+Tropical geocentric natal chart
+Recorded clock / timezone: 2026-04-05 01:45:00 / Australia/Lord_Howe
+Resolved UTC: 2026-04-04T14:45:00+00:00
+Latitude / longitude (degrees, north/east positive): 0.0 / 0.0
+
+Positions
+Object | Sign and longitude within sign | House | Motion
+Sun [sun] | Aries 0°00'00" | 1 | R
+Mars [mars] | Aries 7°00'00" | 1 | D
+R: decreasing longitude; D: increasing; S: zero rate (unrounded).
+
+Axes and house cusps
+Ascendant: Aries 0°00'00"
+Midheaven: Cancer 0°00'00"
+Descendant: Libra 0°00'00"
+Imum Coeli: Capricorn 0°00'00"
+House cusp 1: Aries 0°00'00"
+House cusp 2: Taurus 0°00'00"
+House cusp 3: Gemini 0°00'00"
+House cusp 4: Cancer 0°00'00"
+House cusp 5: Leo 0°00'00"
+House cusp 6: Virgo 0°00'00"
+House cusp 7: Libra 0°00'00"
+House cusp 8: Scorpio 0°00'00"
+House cusp 9: Sagittarius 0°00'00"
+House cusp 10: Capricorn 0°00'00"
+House cusp 11: Aquarius 0°00'00"
+House cusp 12: Pisces 0°00'00"
+
+Aspects
+First | Second | Aspect | Branch | Deviation | Orb limit | Motion
+Sun | Mars | Conjunction | 0°00'00" | +7°00'00" | 8°00'00" | separating
+
+Configuration
+Requested / effective house system: Whole Sign / Whole Sign
+Requested aspect objects: All requested objects (selection omitted)
+Effective aspect objects (requested object order): Sun, Mars
+Orb combination (identifier): mean_of_orbs
+Aspect rule / base orb / object overrides: Conjunction / 6°00'00" / Sun=10°00'00"
+
+Provenance
+tzdata package / IANA release / fold: 2026.5 / 2026e / 0
+JD(UT1) / JDE(TT): 2461135.1145838792 / 2461135.115384074
+Delta-T model / evaluation: algo5 / fixed_fourteen_object_joint_snapshot
+astrology / celestial-calendar versions: 0.0.0 / 0.8.0
+Position frame / UT1 derivation: apparent_geocentric_true_ecliptic_of_date / delta_t_model_from_civil_utc
+Angles are truncated toward zero to whole arcseconds; stored classifications are unchanged.

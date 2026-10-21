@@ -13,6 +13,7 @@ import pytest
 
 from astrology.knowledge import load_catalog
 from tools import check as checker
+from tools import installed_check
 from tools.check import (
   PACKAGE_FILES,
   SDIST_FILES,
@@ -26,6 +27,31 @@ from tools.check import (
 )
 
 SDIST_PATHS = (*("src/" + name for name in PACKAGE_FILES), *SDIST_FILES)
+_EXAMPLE_PAGES = (
+  "contributing",
+  "birth",
+  "configuration",
+  "chart",
+  "aspects",
+  "records",
+  "knowledge",
+)
+
+
+@pytest.mark.parametrize(
+  "modules",
+  [
+    installed_check.MODULES[:-1],
+    (*installed_check.MODULES, "invented"),
+    (*installed_check.MODULES, installed_check.MODULES[0]),
+  ],
+)
+def test_consumer_module_guard_rejects_missing_extra_and_duplicate(
+  monkeypatch: pytest.MonkeyPatch, modules: tuple[str, ...]
+) -> None:
+  monkeypatch.setattr(installed_check, "MODULES", modules)
+  with pytest.raises(ValueError, match="module coverage"):
+    check_package_files()
 
 
 @pytest.fixture
@@ -110,14 +136,12 @@ def valid_example_report() -> str:
   return "".join(
     f"Document: docs/{language}/{page}\n2 tests in 1 items.\n"
     for language in ("en", "zh-CN")
-    for page in ("contributing", "birth", "configuration", "chart", "aspects", "knowledge")
+    for page in _EXAMPLE_PAGES
   )
 
 
 @pytest.mark.parametrize("language", ["en", "zh-CN"])
-@pytest.mark.parametrize(
-  "page", ["contributing", "birth", "configuration", "chart", "aspects", "knowledge"]
-)
+@pytest.mark.parametrize("page", _EXAMPLE_PAGES)
 @pytest.mark.parametrize("count", [None, 0])
 def test_examples_cannot_be_empty(language: str, page: str, count: int | None) -> None:
   section = f"Document: docs/{language}/{page}\n2 tests in 1 items.\n"
@@ -285,6 +309,13 @@ def test_distribution_keeps_dependency_install_and_both_consumer_modes(
   assert all(load_catalog().version in command for command in consumers)
   assert ["-O" in command for command in consumers] == [False, False, True, True]
   assert ["--knowledge-only" in command for command in consumers] == [True, False, True, False]
+  assert ["--expected-chart" in command for command in consumers] == [False, True, False, True]
+  assert all(
+    str(tmp_path / "development-chart.json") in command
+    for command in consumers
+    if "--expected-chart" in command
+  )
+  assert (tmp_path / "development-chart.json").is_file()
 
 
 @pytest.mark.parametrize("missing", [None, *SDIST_PATHS])

@@ -1,6 +1,6 @@
 include AGENTS.md README.zh-CN.md uv.lock
 recursive-include docs *.md *.py
 recursive-include tests *.py
-recursive-include tests/reference *.json
+recursive-include tests/reference *.json *.txt
 recursive-include tools *.py
 prune .review

@@ -2,14 +2,14 @@
 
 [English](README.md) | [简体中文](README.zh-CN.md)
 
-开发中的 Python 西方占星排盘与知识库。天文计算将由
+开发中的 Python 西方占星排盘与知识库。天文计算由
 [celestial-calendar](https://github.com/0xf3cd/celestial-calendar) 提供；本仓记录占星规则、
 出处和流派变体，并组织可复现的星盘结果。
 
 开发包提供不可变的[出生记录与现代时刻解析](docs/zh-CN/birth.md)、
 [排盘请求配置](docs/zh-CN/configuration.md)、[热带本命盘计算](docs/zh-CN/chart.md)、
-独立[知识目录](docs/zh-CN/knowledge.md)、质量检查和双语 [API 文档](docs/zh-CN/reference.md)。
-天文库只在排盘时导入，导入本包或查询知识都不会初始化它。
+[命盘记录与文本输出](docs/zh-CN/records.md)、独立[知识目录](docs/zh-CN/knowledge.md)、质量检查和双语 [API 文档](docs/zh-CN/reference.md)。
+天文库只在请求排盘或重算时导入，导入本包或查询知识都不会初始化它。
 运行检查见[参与开发](docs/zh-CN/contributing.md)。
 
 安装随天文依赖而定：celestial-calendar 0.8.0 只发布 Linux x86_64 与 aarch64、
@@ -23,10 +23,11 @@ macOS 14+ arm64、Windows amd64 的轮子，没有源码分发包。其他平台
 - 保存出生原始记录，显式处理时区，保留最终时标与计算来源。
 - 计算太阳、月亮、八颗行星及明确选择的月交点。
 - 支持 Whole Sign（整宫制）、Equal（等宫制）、Placidus；请求的几何无定义时显式失败。
-- 计算星座、二维黄经落宫、五大相位，以及可配置容许度和局部入相／出相状态。
+- 计算星座、二维黄经落宫（只用黄经，不用对象黄纬）、五大相位，以及可配置容许度和局部入相／离相状态。
 - 输出不可变结构、文本表格与带版本的序列化，保留输入、配置、天文原值和模型身份。
 
-位置、四轴、宫头、星座、落宫与相位已实现；文本输出与序列化在同一里程碑内继续交付。
+位置、四轴、宫头、星座、落宫、相位、文本输出及带版本的记录已实现。
+恢复保留存储值，不调用原生天文库；重算则显式检查版本和模型是否可用。
 
 交付任务与验收见 [v0.1.0 milestone](https://github.com/0xf3cd/astrology/milestone/1)。
 

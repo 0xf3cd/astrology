@@ -203,4 +203,5 @@ records what the references can and cannot detect.
   aspect will become exact, or describe its meaning or strength.
 - The library supplies no default orb. The corpus describes the evaluation as a
   project definition; it makes no claim about any tradition's orbs.
-- Results are not serialized and have no text output yet.
+
+See the [record guide](records.md) for saving, restoring, replaying and text output.

@@ -50,6 +50,14 @@ from astrology.config import (
 )
 from astrology.houses import house_of
 from astrology.knowledge import Catalog, load_catalog
+from astrology.serialization import (
+  ChartRecordError,
+  ChartReplayError,
+  dumps_chart,
+  loads_chart,
+  recompute_chart,
+)
+from astrology.text import format_chart
 from astrology.zodiac import Sign, sign_degree, sign_of, truncate_display
 
 __all__ = [
@@ -65,6 +73,8 @@ __all__ = [
   "ChartDomainError",
   "ChartHouses",
   "ChartProvenance",
+  "ChartRecordError",
+  "ChartReplayError",
   "ChartTimes",
   "EclipticPosition",
   "EffectiveConfiguration",
@@ -86,11 +96,15 @@ __all__ = [
   "Sign",
   "TimePrecision",
   "aspect_angle",
+  "dumps_chart",
   "find_aspects",
+  "format_chart",
   "house_of",
   "load_catalog",
+  "loads_chart",
   "natal_chart",
   "prepare_natal_input",
+  "recompute_chart",
   "resolve_birth_time",
   "sign_degree",
   "sign_of",
