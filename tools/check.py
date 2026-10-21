@@ -437,7 +437,7 @@ def check_distribution(directory: Path) -> None:
       "actual = Path(astrology.__file__).resolve()\n"
       "expected = (Path.cwd() / 'src').resolve()\n"
       "if not actual.is_relative_to(expected):\n"
-      "  raise RuntimeError(f'Documentation imported astrology from {actual}, expected {expected}')",
+      "  raise RuntimeError(f'astrology imported from {actual}, expected source under {expected}')",
     ),
     cwd=source,
     env=source_environment,

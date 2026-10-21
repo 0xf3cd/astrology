@@ -1,6 +1,8 @@
 """Reference fetching without author-local inputs. 不依赖作者本地文件的参考抓取。"""
 
 import json
+import subprocess
+import sys
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -23,6 +25,23 @@ BODY_NAMES = {
   "899": "neptune",
   "999": "pluto",
 }
+
+
+def test_fetch_help_keeps_bilingual_paragraphs_and_the_example_command() -> None:
+  result = subprocess.run(
+    [sys.executable, "-I", "-X", "utf8", fetcher.__file__, "--help"],
+    check=True,
+    capture_output=True,
+    text=True,
+    encoding="utf-8",
+  )
+  assert "\n\n从 JPL Horizons" in result.stdout
+  assert (
+    "Run: python3 tools/fetch_reference.py --output /path/to/reference.json"
+    in result.stdout.splitlines()
+  )
+  assert "QUANTITIES=31" in result.stdout and "TIME_TYPE=TT" in result.stdout
+  assert not result.stderr
 
 
 @pytest.fixture

@@ -233,7 +233,9 @@ def main(arguments: Sequence[str] | None = None) -> None:
 
   取回所有案例，只写到调用方指定的目标文件。
   """
-  parser = argparse.ArgumentParser(description=__doc__)
+  parser = argparse.ArgumentParser(
+    description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+  )
   parser.add_argument("--output", type=pathlib.Path, required=True)
   target: pathlib.Path = parser.parse_args(arguments).output
   cases = [fetch_case(case) for case in CASES]

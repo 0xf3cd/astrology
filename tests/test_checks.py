@@ -312,6 +312,13 @@ def test_distribution_keeps_dependency_install_and_both_consumer_modes(
 
   monkeypatch.setattr(checker, "ROOT", tmp_path)
   monkeypatch.setattr(checker, "run", capture)
+  original_check_sdist = checker.check_sdist
+
+  def validate_sdist(sdist: Path) -> None:
+    original_check_sdist(sdist)
+    validations.append(("sdist", sdist))
+
+  monkeypatch.setattr(checker, "check_sdist", validate_sdist)
   monkeypatch.setattr(
     checker, "check_documents", lambda root: validations.append(("documents", root))
   )
@@ -339,6 +346,8 @@ def test_distribution_keeps_dependency_install_and_both_consumer_modes(
     assert cwd == source
     assert env is not None and env["PYTHONPATH"] == str(source / "src")
     assert {"-E", "-a", "-n", "-W", "--keep-going"}.issubset(command)
+    assert command[-4:-1] == ("-c", "docs", ".")
+  assert ("sdist", tmp_path / "artifacts/astrology.tar.gz") in validations
   assert ("documents", source) in validations
   assert {name for name, path in validations if path == tmp_path / "source-html"} == {
     "api",
@@ -373,6 +382,51 @@ def test_distribution_keeps_dependency_install_and_both_consumer_modes(
     if "--expected-chart" in command
   )
   assert (tmp_path / "development-chart.json").is_file()
+
+
+@pytest.mark.parametrize(
+  ("stage", "shape", "message"),
+  [
+    ("sdist", "empty", "Expected one sdist"),
+    ("sdist", "multiple", "Expected one sdist"),
+    ("source", "multiple", "Sdist must contain one source directory"),
+    ("source", "file", "Sdist must contain one source directory"),
+    ("wheel", "empty", "Expected one wheel"),
+    ("wheel", "multiple", "Expected one wheel"),
+  ],
+)
+def test_distribution_rejects_malformed_build_outputs(
+  tmp_path: Path, monkeypatch: pytest.MonkeyPatch, stage: str, shape: str, message: str
+) -> None:
+  (tmp_path / "pyproject.toml").write_text('[project]\nversion = "0.0.0"\n', encoding="utf-8")
+
+  def capture(
+    command: Sequence[str], *, cwd: Path = checker.ROOT, env: Mapping[str, str] | None = None
+  ) -> None:
+    artifacts = tmp_path / "artifacts"
+    if "--sdist" in command:
+      artifacts.mkdir()
+      count = (0 if shape == "empty" else 2) if stage == "sdist" else 1
+      for index in range(count):
+        with tarfile.open(artifacts / f"source-{index}.tar.gz", "w:gz") as archive:
+          roots = 2 if stage == "source" else 1
+          if stage == "source" and shape == "file":
+            archive.addfile(tarfile.TarInfo("not-a-directory"), BytesIO())
+          else:
+            for root in range(roots):
+              member = tarfile.TarInfo(f"source-{root}")
+              member.type = tarfile.DIRTYPE
+              archive.addfile(member)
+    elif "--wheel" in command:
+      count = (0 if shape == "empty" else 2) if stage == "wheel" else 1
+      for index in range(count):
+        (artifacts / f"wheel-{index}.whl").write_bytes(b"")
+
+  monkeypatch.setattr(checker, "ROOT", tmp_path)
+  monkeypatch.setattr(checker, "run", capture)
+  monkeypatch.setattr(checker, "check_sdist", lambda _sdist: None)
+  with pytest.raises(ValueError, match=message):
+    checker.check_distribution(tmp_path)
 
 
 @pytest.mark.parametrize("mode", ["direct", "alias", "outside"])
@@ -412,7 +466,7 @@ def test_sdist_import_guard_resolves_both_paths_and_rejects_outside_imports(
   )
   if mode == "outside":
     assert result.returncode == 1
-    assert "Documentation imported astrology from" in result.stderr
+    assert "astrology imported from" in result.stderr
   else:
     assert result.returncode == 0, result.stdout + result.stderr
 
