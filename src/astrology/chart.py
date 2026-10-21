@@ -8,7 +8,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 from dataclasses import dataclass, field
 from importlib.metadata import version
-from typing import Literal
+from typing import Final, Literal, get_args
 
 from astrology._validation import finite_number
 from astrology.aspects import AspectHit, AspectObject, find_aspects
@@ -16,6 +16,14 @@ from astrology.birth import MissingBirthDataError, ResolvedBirth
 from astrology.config import Body, ChartConfig, HouseSystem, LunarNode, OrbCombination
 from astrology.houses import _cusps, house_of
 from astrology.zodiac import Sign, _longitude, sign_degree, sign_of
+
+_Evaluation = Literal["fixed_fourteen_object_joint_snapshot"]
+_PositionFrame = Literal["apparent_geocentric_true_ecliptic_of_date"]
+_UT1Derivation = Literal["delta_t_model_from_civil_utc"]
+
+_EVALUATION: Final[_Evaluation] = get_args(_Evaluation)[0]
+_POSITION_FRAME: Final[_PositionFrame] = get_args(_PositionFrame)[0]
+_UT1_DERIVATION: Final[_UT1Derivation] = get_args(_UT1Derivation)[0]
 
 
 class ChartDomainError(ValueError):
@@ -176,7 +184,7 @@ class EffectiveConfiguration:
 
   house_system: HouseSystem
   delta_t_model: str
-  evaluation: Literal["fixed_fourteen_object_joint_snapshot"]
+  evaluation: _Evaluation
   aspect_objects: tuple[Body | LunarNode, ...]
   orb_combination: OrbCombination | None
 
@@ -185,9 +193,7 @@ class EffectiveConfiguration:
       raise TypeError("house_system must be a HouseSystem")
     if type(self.delta_t_model) is not str or not self.delta_t_model.strip():
       raise ValueError("delta_t_model must be a nonempty plain string")
-    if (
-      type(self.evaluation) is not str or self.evaluation != "fixed_fourteen_object_joint_snapshot"
-    ):
+    if type(self.evaluation) is not str or self.evaluation != _EVALUATION:
       raise ValueError("Unknown chart evaluation")
     if not isinstance(self.aspect_objects, Sequence) or isinstance(
       self.aspect_objects, (str, bytes)
@@ -211,8 +217,8 @@ class ChartProvenance:
   """
 
   celestial_version: str
-  position_frame: Literal["apparent_geocentric_true_ecliptic_of_date"]
-  ut1_derivation: Literal["delta_t_model_from_civil_utc"]
+  position_frame: _PositionFrame
+  ut1_derivation: _UT1Derivation
   astrology_version: str
 
   def __post_init__(self) -> None:
@@ -220,14 +226,9 @@ class ChartProvenance:
       value = getattr(self, name)
       if type(value) is not str or not value.strip():
         raise ValueError(f"{name} must be a nonempty plain string")
-    if (
-      type(self.position_frame) is not str
-      or self.position_frame != "apparent_geocentric_true_ecliptic_of_date"
-    ):
+    if type(self.position_frame) is not str or self.position_frame != _POSITION_FRAME:
       raise ValueError("Unknown position frame")
-    if (
-      type(self.ut1_derivation) is not str or self.ut1_derivation != "delta_t_model_from_civil_utc"
-    ):
+    if type(self.ut1_derivation) is not str or self.ut1_derivation != _UT1_DERIVATION:
       raise ValueError("Unknown UT1 derivation")
 
 
@@ -370,14 +371,14 @@ def natal_chart(resolved: ResolvedBirth, config: ChartConfig) -> NatalChart:
     effective=EffectiveConfiguration(
       house_system=config.house_system,
       delta_t_model=delta_t_model_id(),
-      evaluation="fixed_fourteen_object_joint_snapshot",
+      evaluation=_EVALUATION,
       aspect_objects=config.aspect_participants(),
       orb_combination=config.orb_combination,
     ),
     provenance=ChartProvenance(
       celestial_version=celestial_version(),
-      position_frame="apparent_geocentric_true_ecliptic_of_date",
-      ut1_derivation="delta_t_model_from_civil_utc",
+      position_frame=_POSITION_FRAME,
+      ut1_derivation=_UT1_DERIVATION,
       astrology_version=version("astrology"),
     ),
     times=times,

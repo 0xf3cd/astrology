@@ -3,6 +3,7 @@
 直接构造和恢复遵守同一套结果约束。
 """
 
+import json
 from collections.abc import Iterator, Sequence
 from dataclasses import replace
 from typing import Any
@@ -13,6 +14,7 @@ from astrology import (
   AspectHit,
   AspectMotion,
   Body,
+  ChartRecordError,
   HouseSystem,
   LunarNode,
   MajorAspect,
@@ -175,3 +177,31 @@ def test_chart_hashing_preserves_equality_and_distinct_birth_metadata(
   assert other != recorded_chart
   assert len({recorded_chart, restored, other}) == 2
   assert {recorded_chart: "original", other: "other"}[other] == "other"
+
+
+class StringSubclass(str):
+  pass
+
+
+@pytest.mark.parametrize(
+  "member,field,expected",
+  [
+    ("effective", "evaluation", "fixed_fourteen_object_joint_snapshot"),
+    ("provenance", "position_frame", "apparent_geocentric_true_ecliptic_of_date"),
+    ("provenance", "ut1_derivation", "delta_t_model_from_civil_utc"),
+  ],
+)
+def test_fixed_result_identities_are_plain_exact_strings(
+  recorded_chart: NatalChart, member: str, field: str, expected: str
+) -> None:
+  original = getattr(recorded_chart, member)
+  assert type(getattr(original, field)) is str
+  assert getattr(original, field) == expected
+  assert replace(original, **{field: expected}) == original
+  for invalid in (StringSubclass(expected), None, True, 1, "unknown"):
+    with pytest.raises(ValueError):
+      replace(original, **{field: invalid})
+    raw: Any = json.loads(dumps_chart(recorded_chart))
+    raw[member][field] = "unknown" if isinstance(invalid, StringSubclass) else invalid
+    with pytest.raises(ChartRecordError):
+      loads_chart(json.dumps(raw))

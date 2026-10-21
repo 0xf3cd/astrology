@@ -395,6 +395,8 @@ def test_knowledge_only_does_not_run_birth_consumer(
 @pytest.mark.parametrize(
   "defect",
   [
+    "body_link",
+    "rule_link",
     "alias",
     "translation",
     "source_condition",
@@ -406,7 +408,12 @@ def test_knowledge_only_does_not_run_birth_consumer(
 def test_installed_knowledge_defects(consumer: Path, defect: str) -> None:
   path = consumer / "knowledge/catalog.json"
   data = json.loads(path.read_text(encoding="utf-8"))
-  if defect == "alias":
+  if defect == "body_link":
+    data["entries"][0]["concept_ids"] = ["body.moon"]
+  elif defect == "rule_link":
+    data["variants"][0]["configuration"] = {"enum": "Body", "member": "SUN"}
+    data["variants"][0]["concept_ids"] = ["body.sun"]
+  elif defect == "alias":
     data["concepts"][0]["en_aliases"] = ["different"]
   elif defect == "translation":
     del data["entries"][-1]["citations"][0]["excerpt"]["zh"]

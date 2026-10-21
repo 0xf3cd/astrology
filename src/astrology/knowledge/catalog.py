@@ -14,6 +14,7 @@ from typing import Any
 
 from astrology.config import LunarNode, NodeDefinition
 from astrology.knowledge.records import (
+  _LANGUAGES,
   CONFIGURATION_TYPES,
   Citation,
   Concept,
@@ -32,6 +33,7 @@ from astrology.knowledge.records import (
   _text,
   _tuple,
 )
+from astrology.zodiac import Sign
 
 
 def _name_key(name: str) -> str:
@@ -105,7 +107,7 @@ class Catalog:
     names: dict[str, set[str]] = {}
     aliases: dict[str, str] = {}
     for concept in self.concepts:
-      for language in ("en", "zh-CN"):
+      for language in _LANGUAGES:
         if (display := concept.name.text(language)) is not None:
           names.setdefault(_name_key(display), set()).add(concept.identifier)
     for concept in self.concepts:
@@ -184,7 +186,7 @@ class Catalog:
     非法或空名称抛出 TypeError 或 ValueError。
     """
     key = _name_key(name)
-    languages: tuple[Language, ...] = ("en", "zh-CN") if language is None else (language,)
+    languages = _LANGUAGES if language is None else (language,)
     if language is not None:
       _language(language)
     result = []
@@ -250,6 +252,10 @@ class Catalog:
     return tuple(
       (citation, self.source(citation.source_id)) for citation in self.entry(entry_id).citations
     )
+
+
+def _sign_concept(catalog: Catalog, sign: Sign) -> Concept:
+  return catalog.concept(f"sign.{sign.value}")
 
 
 def _config_reference(raw: Any) -> ConfigurationIdentity | None:
@@ -319,22 +325,6 @@ def load_catalog() -> Catalog:
     )
     for row in data["variants"]
   )
-  variants = (
-    tuple(
-      RuleVariant(
-        f"rule.{concept.identifier}",
-        concept.name,
-        (concept.identifier,),
-        concept.description,
-        localized(data["configuration_tradition"]),
-        localized(data["configuration_limits"]),
-        concept.configuration,
-      )
-      for concept in concepts
-      if concept.configuration is not None
-    )
-    + variants
-  )
   sources = tuple(
     Source(
       identifier=row["identifier"],
@@ -372,4 +362,10 @@ def load_catalog() -> Catalog:
     )
     for row in data["entries"]
   )
-  return Catalog(data["version"], concepts, variants, sources, entries)
+  catalog = Catalog(data["version"], concepts, variants, sources, entries)
+  sign_concepts = tuple(_sign_concept(catalog, sign) for sign in Sign)
+  if any(concept.kind is not ConceptKind.SIGN for concept in sign_concepts) or set(
+    catalog.list_concepts(kind=ConceptKind.SIGN)
+  ) != set(sign_concepts):
+    raise ValueError("The built-in catalog must map exactly the twelve Sign identities")
+  return catalog

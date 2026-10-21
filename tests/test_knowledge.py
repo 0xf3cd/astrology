@@ -4,6 +4,7 @@ import json
 import subprocess
 import sys
 from dataclasses import FrozenInstanceError, replace
+from enum import StrEnum
 from importlib.resources import files
 from pathlib import Path
 from typing import Any
@@ -27,6 +28,14 @@ from astrology.knowledge import (
   TranslationStatus,
   load_catalog,
 )
+
+
+class LanguageString(str):
+  pass
+
+
+class LanguageEnum(StrEnum):
+  EN = "en"
 
 
 @pytest.fixture
@@ -60,7 +69,8 @@ def test_query_contracts(catalog: Catalog) -> None:
   assert len(catalog.list_concepts(kind=ConceptKind.SIGN)) == 12
   sign_rules = catalog.list_variants(concept_id="sign.taurus")
   assert [rule.identifier for rule in sign_rules] == ["rule.project.tropical_sign_sectors"]
-  assert catalog.list_variants(concept_id="body.sun")[0].configuration is Body.SUN
+  assert catalog.list_variants(concept_id="body.sun") == ()
+  assert catalog.concept("body.sun").configuration is Body.SUN
   assert len(catalog.list_variants()) == len(catalog.variants)
   assert catalog.filter_entries() == tuple(catalog.entries)
   assert len(catalog.filter_entries(concept_id="sign.aries")) == 2
@@ -87,7 +97,7 @@ def test_query_contracts(catalog: Catalog) -> None:
   assert catalog.filter_entries(concept_id="body.sun", source_id="source.ptolemy.ashmand1822") == ()
   assert catalog.filter_sources() == tuple(catalog.sources)
   assert catalog.filter_sources(verification=SourceVerification.UNVERIFIED) == ()
-  assert catalog.variant("rule.body.sun") in catalog.variants
+  assert catalog.variant("rule.house.whole_sign") in catalog.variants
   with pytest.raises(FrozenInstanceError):
     catalog.version = "mutated"  # type: ignore[misc]
 
@@ -105,7 +115,7 @@ def test_complete_owning_configuration_coverage(catalog: Catalog) -> None:
   assert len(actual) == len(expected)
   assert {
     variant.configuration for variant in catalog.variants if variant.configuration is not None
-  } == expected
+  } == {member for enum in (HouseSystem, MajorAspect, NodeDefinition) for member in enum}
   assert all(c.configuration is None for c in catalog.list_concepts(kind=ConceptKind.SIGN))
   assert catalog.variant("rule.ptolemy_ashmand.equinoctial_signs").configuration is None
 
@@ -485,3 +495,139 @@ def test_every_orb_combination_has_one_named_rule_variant(catalog: Catalog) -> N
     entry.rule_ids
   )
   assert set(entry.concept_ids) == {f"aspect.{aspect.value}" for aspect in MajorAspect}
+
+
+@pytest.mark.parametrize(
+  "identifier",
+  [
+    "rule.body.sun",
+    "rule.body.moon",
+    "rule.body.mercury",
+    "rule.body.venus",
+    "rule.body.mars",
+    "rule.body.jupiter",
+    "rule.body.saturn",
+    "rule.body.uranus",
+    "rule.body.neptune",
+    "rule.body.pluto",
+    "rule.node.mean_ascending",
+    "rule.node.mean_descending",
+    "rule.node.meeus_five_term_true_ascending",
+    "rule.node.meeus_five_term_true_descending",
+  ],
+)
+def test_retired_identity_variants_keep_their_concepts(catalog: Catalog, identifier: str) -> None:
+  concept_id = identifier.removeprefix("rule.")
+  with pytest.raises(KeyError):
+    catalog.variant(identifier)
+  concept = catalog.concept(concept_id)
+  assert concept.configuration is not None
+  assert catalog.lookup(concept.name.en) == (concept,)
+  assert catalog.list_variants(concept_id=concept_id) == ()
+  assert catalog.filter_entries(concept_id=concept_id)[0].rule_ids == ()
+  entry = catalog.filter_entries(concept_id=concept_id)[0]
+  with pytest.raises(ValueError, match="Dangling"):
+    replace(catalog, entries=(replace(entry, rule_ids=(identifier,)),))
+
+
+def test_retained_rule_ids_and_order(catalog: Catalog) -> None:
+  expected = (
+    ("rule.house.whole_sign", HouseSystem.WHOLE_SIGN),
+    ("rule.house.equal", HouseSystem.EQUAL),
+    ("rule.house.placidus", HouseSystem.PLACIDUS),
+    ("rule.node_definition.mean", NodeDefinition.MEAN),
+    ("rule.node_definition.meeus_five_term_true", NodeDefinition.MEEUS_FIVE_TERM_TRUE),
+    ("rule.aspect.conjunction", MajorAspect.CONJUNCTION),
+    ("rule.aspect.sextile", MajorAspect.SEXTILE),
+    ("rule.aspect.square", MajorAspect.SQUARE),
+    ("rule.aspect.trine", MajorAspect.TRINE),
+    ("rule.aspect.opposition", MajorAspect.OPPOSITION),
+  )
+  assert [(v.identifier, v.configuration) for v in catalog.variants[:10]] == list(expected)
+  assert [v.identifier for v in catalog.variants[10:]] == [
+    "rule.project.tropical_sign_sectors",
+    "rule.project.cusp_ownership",
+    "rule.ptolemy_ashmand.equinoctial_signs",
+    "rule.project.aspect_deviation",
+    "rule.project.aspect_motion",
+    "rule.project.aspect_participation",
+    "rule.project.orb_either_within_own_orb",
+    "rule.project.orb_both_within_own_orb",
+    "rule.project.orb_mean_of_orbs",
+  ]
+  for identifier, configuration in expected:
+    variant = catalog.variant(identifier)
+    concept = catalog.concept(variant.concept_ids[0])
+    assert concept.configuration is configuration
+    assert variant.definition != concept.description
+    assert variant.configuration is configuration
+    if isinstance(configuration, (HouseSystem, NodeDefinition)):
+      assert "orb" not in variant.limits.en.lower()
+
+
+def test_fixed_implementation_source_and_node_test_locator(catalog: Catalog) -> None:
+  source = catalog.source("source.astrology.chart.fc845fa")
+  commit = "fc845fa1aa786f7e1eda7b4d901e70e9a505add5"
+  assert source.url == f"https://github.com/0xf3cd/astrology/tree/{commit}"
+  assert commit in source.edition
+  citation = catalog.entry("entry.node_definitions").citations[1]
+  assert citation.source_id == source.identifier
+  assert "tests/test_reference.py" in citation.locator
+  for symbol in (
+    "_meeus_nodes",
+    "_nodes_agree",
+    "test_the_lunar_nodes_agree_with_the_meeus_definition",
+  ):
+    assert symbol in citation.locator
+  assert "does not verify printed Meeus formulas" in source.scope.en
+  assert (
+    catalog.entry("entry.node_definitions").prerequisite_status is PrerequisiteStatus.UNRESOLVED
+  )
+
+
+@pytest.mark.parametrize(
+  "value", [None, True, 1, [], "zh", "EN", "en-US", LanguageString("en"), LanguageEnum.EN]
+)
+def test_language_boundaries_preserve_value_errors(catalog: Catalog, value: Any) -> None:
+  for method in (LocalizedText("text").text, LocalizedText("text").status):
+    with pytest.raises(ValueError):
+      method(value)
+  if value is not None:
+    with pytest.raises(ValueError):
+      catalog.lookup("Sun", language=value)
+  else:
+    assert catalog.lookup("Sun", language=value) == catalog.lookup("Sun")
+
+
+@pytest.mark.parametrize("defect", ["missing", "kind", "extra"])
+def test_packaged_sign_relationship_is_checked(
+  tmp_path: Path, monkeypatch: pytest.MonkeyPatch, defect: str
+) -> None:
+  from astrology.knowledge import catalog as module
+
+  data = json.loads(files("astrology.knowledge").joinpath("catalog.json").read_text())
+  if defect == "missing":
+    # A consistent rename keeps cross-record links valid but breaks the Sign identity.
+    next(row for row in data["concepts"] if row["identifier"] == "sign.leo")["identifier"] = (
+      "sign.lion"
+    )
+    for group in ("concepts", "variants", "entries"):
+      for row in data[group]:
+        for field in ("concept_ids", "related"):
+          if field in row:
+            row[field] = ["sign.lion" if key == "sign.leo" else key for key in row[field]]
+  elif defect == "kind":
+    next(row for row in data["concepts"] if row["identifier"] == "sign.leo")["kind"] = "body"
+  else:
+    data["concepts"].append(
+      {
+        "identifier": "sign.extra",
+        "kind": "sign",
+        "name": {"en": "Extra", "zh": "额外"},
+        "description": {"en": "Synthetic", "zh": "合成"},
+      }
+    )
+  (tmp_path / "catalog.json").write_text(json.dumps(data))
+  monkeypatch.setattr(module, "files", lambda package: tmp_path)
+  with pytest.raises(KeyError if defect == "missing" else ValueError):
+    load_catalog()
