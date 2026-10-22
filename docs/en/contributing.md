@@ -248,5 +248,36 @@ failure behavior, unnecessary abstractions, and translation meaning. Passing
 lint or achieving high coverage does not answer these questions. When changing
 a check, demonstrate both an accepted input and a defect it rejects.
 
-Merge and publication require maintainer approval. CI reports checks; repository
-rules must separately require them if merging is to be blocked automatically.
+## Merge policy
+
+Changes to `main` require a pull request and these four checks:
+
+- `quality (ubuntu-latest, 3.11)`
+- `quality (ubuntu-latest, 3.14)`
+- `quality (macos-latest, 3.14)`
+- `quality (windows-latest, 3.14)`
+
+The strict check policy also requires the branch to be up to date with `main`.
+The configured number of required approving reviews is zero; this does not
+authorize an automated agent to merge. Merge and publication still require
+maintainer approval.
+
+These requirements include administrators. No merge-time bypass is configured;
+force pushes and deletion of `main` are disabled. Changing these settings is a
+separate administrative operation that requires maintainer authorization.
+Only squash merges are enabled, using the pull request's title and body.
+
+To check enforcement safely, use a temporary, non-draft pull request that is
+never merged. Compare a successful required check, an intentionally failed
+check restricted to that probe branch, and a successful reversal on the same
+pull request. Record the tested revisions, exact check names and results,
+current base, effective rules and both REST and GraphQL merge states. Exclude
+other blockers such as conflicts, an outdated branch or blocking reviews.
+An unchanged configuration alone does not establish execution behavior.
+
+`mergeable` describes conflicts, not permission to merge. A computed `BLOCKED`
+merge state with the controlled check failure is distinct from an actual merge
+request being rejected. Do not attempt to merge a deliberately failing probe or
+relax protection to obtain an expected result. Retain ambiguous results as
+incomplete evidence; the repository-local acceptance is tracked in
+[#15](https://github.com/0xf3cd/astrology/issues/15).
