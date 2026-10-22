@@ -3,6 +3,7 @@
 import html
 import json
 from dataclasses import fields, is_dataclass, replace
+from importlib.metadata import version
 from pathlib import Path
 
 import pytest
@@ -115,7 +116,9 @@ def catalog_html(tmp_path: Path) -> Path:
     directory.mkdir(parents=True)
     (directory / "catalog.html").write_text(
       f'<html lang="{language}"><a href="../{other}/catalog.html">Other</a>'
-      f"<p>code=0.0.0 corpus={catalog.version}</p>" + "".join(blocks) + "</html>",
+      f"<p>code={version('celestial-astrology')} corpus={catalog.version}</p>"
+      + "".join(blocks)
+      + "</html>",
       encoding="utf-8",
     )
   return tmp_path

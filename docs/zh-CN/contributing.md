@@ -58,10 +58,12 @@ uv、setup-uv 或 runner 平台变化时，在临时分支复验反例：把矩�
 若要保留 HTML 供检查，可构建到已忽略的 `build/` 目录：
 
 ```sh
-uv run python -m sphinx -E -a -n -W -b html -c docs . build/docs
+uv run python -m sphinx \
+  -E -a -n -W -b html -c docs \
+  -d build/docs-doctrees . build/docs
 ```
 
-打开 `build/docs/docs/index.html`，可进入两种语言。共用索引保留英文词干处理，
+打开 `build/docs/index.html`，可进入两种语言。共用索引保留英文词干处理，
 Python 与 JavaScript 使用对应的中文相邻双字切分。限制见[知识指南](knowledge.md#译文修订与搜索)。
 检查核实际生成的搜索索引、输出的分词及词干接口、页面语言与对页导航、完整目录锚点及当前译文。
 构建成功不能代替这些检查。独立核验可以执行生成的 JavaScript 查询及索引代码；
@@ -70,15 +72,26 @@ Python 分词单测不能证明浏览器行为。
 Sphinx 只发现根目录的两个 README 和 `docs/` 下的源文档。虚拟环境应放在 `docs/` 之外：
 该目录内任意位置的源文档都是文档输入，与它同级的目录则不是。上述源文档中的警告仍会使严格构建失败。
 
-按上面的 `uv sync` 从本仓安装开发包，本地分发名／版本为 `astrology`／`0.0.0`。
-PyPI 的 `astrology` 属于另一个无关项目；首次发布前须确定发布名。
-可检查已安装的开发版本：
+按上面的 `uv sync` 从本仓安装开发包，分发名／版本为 `celestial-astrology`／`0.1.0`，
+Python 导入名仍为 `astrology`。此候选尚未发布到 PyPI；PyPI 的 `astrology` 是另一个无关项目，
+不是本库。可检查已安装的身份：
 
 ```{doctest}
 >>> from importlib.metadata import version
->>> version("astrology")
-'0.0.0'
+>>> version("celestial-astrology")
+'0.1.0'
 ```
+
+检查会在隔离的 wheel 安装环境中执行两份 README，比较文档中的输出，检查 wheel 实际保存的
+Markdown 链接，并在构建后的站点中解析两种语言的路径。还会在一次性安装环境中分别隐藏两个
+分发包的元数据，按普通／优化模式检查恢复、计算和重算的失败合同，随后恢复元数据。
+
+手动发布 Pages 时，从干净且已提交的源码构建，将 `ASTROLOGY_DOCS_SOURCE_SHA` 设为完整的小写提交号。
+根页据此生成源码归档链接和安装命令；普通本地构建则明确没有固定版本。
+doctrees、缓存及其他构建控制文件不进入站点成品。检查所有生成的源文档、下载文件和静态资源后，
+再手动更新带有 `.nojekyll` 的独立 `gh-pages` 分支。这是手动更新站点，不是自动发布源码或发行包。
+实际验收还须检查已部署的根页、每条 README URL 和中英文浏览器搜索，不能只看本地 HTML 构建成功。
+快照安装和 Python intersphinx 索引需要联网。
 
 ## 设计
 

@@ -79,10 +79,12 @@ pass both Python endpoints. Keep suppressions narrow and explain their reason.
 To keep HTML for inspection, build it into the ignored `build/` directory:
 
 ```sh
-uv run python -m sphinx -E -a -n -W -b html -c docs . build/docs
+uv run python -m sphinx \
+  -E -a -n -W -b html -c docs \
+  -d build/docs-doctrees . build/docs
 ```
 
-Open `build/docs/docs/index.html` for both language entries. The current combined
+Open `build/docs/index.html` for both language entries. The current combined
 search index keeps English stemming and uses matching Python/JavaScript Chinese
 character-bigram tokenization. See [search limits](knowledge.md#translation-revisions-and-search).
 The gate checks the actual generated search index and emitted splitter/stemmer
@@ -97,15 +99,32 @@ inputs, while sibling directories are not. Warnings in these document sources st
 fail the strict build.
 
 Install this development package from the checkout using `uv sync` above. Its
-local distribution name/version is `astrology` / `0.0.0`. The PyPI name
-`astrology` belongs to an unrelated project; choose a publishing name before the
-first release. Confirm the installed development identity:
+distribution name/version is `celestial-astrology` / `0.1.0`; the Python import
+remains `astrology`. This candidate has not been published on PyPI. The unrelated
+PyPI project `astrology` is not this library. Confirm the installed identity:
 
 ```{doctest}
 >>> from importlib.metadata import version
->>> version("astrology")
-'0.0.0'
+>>> version("celestial-astrology")
+'0.1.0'
 ```
+
+The checks execute both READMEs against an isolated wheel install, compare their
+documented output, inspect the wheel's actual Markdown links, and resolve both
+language paths against the built site. They also hide each distribution's metadata
+separately in a disposable install and check restoration, calculation and replay
+failures in normal and optimized Python, restoring the metadata afterwards.
+
+For manual Pages delivery, build from a clean committed checkout and set
+`ASTROLOGY_DOCS_SOURCE_SHA` to its full lowercase commit SHA. The root page then
+renders that source archive and its install command; an ordinary local build is
+labeled without a fixed revision. Keep doctrees, caches and other build-control
+files outside the exported site. Inspect all generated sources/downloads/assets
+before updating the dedicated `gh-pages` branch with `.nojekyll`. This is a manual
+site update, not automatic source publishing or a package release. Actual acceptance
+also checks the deployed root, every README URL and English/Chinese browser search;
+local HTML success alone is insufficient. Snapshot installation and the Python
+intersphinx inventory require network access.
 
 ## Design
 

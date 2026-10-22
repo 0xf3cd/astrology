@@ -48,6 +48,7 @@ lookup; omission searches both. Unknown well-formed IDs in getters/filters raise
 `KeyError`; malformed strings raise `ValueError`, non-string IDs `TypeError`.
 Entry filters combine all selected criteria; they never evaluate prerequisites.
 
+(knowledge-source-definitions-en)=
 ## Follow a source to a definition
 
 The corpus contains project configuration contracts, the project conventions for

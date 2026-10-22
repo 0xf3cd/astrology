@@ -55,7 +55,7 @@ def test_document_discovery_keeps_all_project_pages_and_ignores_other_environmen
 ) -> None:
   source = tmp_path / "source"
   shutil.copytree(ROOT / "docs", source / "docs", ignore=shutil.ignore_patterns("__pycache__"))
-  for filename in ("README.md", "README.zh-CN.md"):
+  for filename in ("README.md", "README.zh-CN.md", "pyproject.toml"):
     shutil.copy2(ROOT / filename, source / filename)
   stray = source / "another-environment/share/doc/unrelated.rst"
   stray.parent.mkdir(parents=True)

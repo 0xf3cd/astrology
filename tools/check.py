@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import os
 import re
 import subprocess
@@ -39,6 +40,7 @@ from tools.docs_search import check_search_html
 ROOT = Path(__file__).resolve().parents[1]
 PACKAGE_FILES = (
   "astrology/__init__.py",
+  "astrology/_distribution.py",
   "astrology/_validation.py",
   "astrology/py.typed",
   "astrology/aspects.py",
@@ -66,6 +68,7 @@ SDIST_FILES = (
   "README.md",
   "README.zh-CN.md",
   "docs/conf.py",
+  "docs/_templates/site_index.html",
   "tools/check.py",
   "tools/installed_check.py",
   "tools/fetch_reference.py",
@@ -85,6 +88,47 @@ def run(command: Sequence[str], *, cwd: Path = ROOT, env: Mapping[str, str] | No
   subprocess.run(command, cwd=cwd, env=env, check=True)
 
 
+class _LinkHtml(HTMLParser):
+  def __init__(self) -> None:
+    super().__init__()
+    self.targets: list[str] = []
+
+  def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+    self.targets.extend(value for name, value in attrs if name in ("href", "src") and value)
+
+
+def _link_targets(text: str) -> tuple[str, ...]:
+  targets: list[str] = []
+  html = _LinkHtml()
+  for token in MarkdownIt("commonmark").parse(text):
+    if token.type == "html_block":
+      html.feed(token.content)
+    for child in token.children or ():
+      if child.type == "html_inline":
+        html.feed(child.content)
+      target = child.attrGet("href") if child.type == "link_open" else child.attrGet("src")
+      if isinstance(target, str) and target:
+        targets.append(target)
+  return (*targets, *html.targets)
+
+
+def readme_links(text: str) -> tuple[str, ...]:
+  """Require context-independent web URLs in package-index Markdown.
+
+  要求包索引中的 Markdown 使用不依赖当前页面位置的网页 URL。
+  """
+  targets = _link_targets(text)
+  if not targets:
+    raise ValueError("README must link to its documentation")
+  for target in targets:
+    url = urlsplit(target)
+    if url.username is not None or url.password is not None:
+      raise ValueError("README URLs must not embed credentials")
+    if url.scheme not in ("https", "http") or not url.netloc:
+      raise ValueError(f"README link must be an absolute HTTP(S) URL: {target}")
+  return targets
+
+
 def document_errors(root: Path) -> tuple[str, ...]:
   """Check paired pages and local file links. 检查双语页面与本地文件链接。"""
   errors: list[str] = []
@@ -102,22 +146,17 @@ def document_errors(root: Path) -> tuple[str, ...]:
       path = (directory / missing).relative_to(root).as_posix()
       errors.append(f"Missing language counterpart: {path}")
 
-  parser = MarkdownIt("commonmark")
   pages = (root / "README.md", root / "README.zh-CN.md", *sorted((root / "docs").rglob("*.md")))
   for page in pages:
     if not page.is_file():
       errors.append(f"Missing document: {page.relative_to(root)}")
       continue
-    for token in parser.parse(page.read_text(encoding="utf-8")):
-      for child in token.children or ():
-        target = child.attrGet("href") if child.type == "link_open" else child.attrGet("src")
-        if not isinstance(target, str) or not target:
-          continue
-        url = urlsplit(target)
-        if url.scheme or url.netloc or not url.path:
-          continue
-        if not (page.parent / unquote(url.path)).exists():
-          errors.append(f"Broken local link in {page.relative_to(root)}: {target}")
+    for target in _link_targets(page.read_text(encoding="utf-8")):
+      url = urlsplit(target)
+      if url.scheme or url.netloc or not url.path:
+        continue
+      if not (page.parent / unquote(url.path)).exists():
+        errors.append(f"Broken local link in {page.relative_to(root)}: {target}")
   return tuple(errors)
 
 
@@ -156,12 +195,15 @@ class _ApiHtml(HTMLParser):
     super().__init__()
     self.names: set[str] = set()
     self.links: set[str] = set()
+    self.identifiers: set[str] = set()
     self.language: str | None = None
     self._name_depth = 0
     self._name_parts: list[str] = []
 
   def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
     attributes = dict(attrs)
+    if identifier := attributes.get("id"):
+      self.identifiers.add(identifier)
     if tag == "html":
       self.language = attributes.get("lang")
     if tag == "a" and (target := attributes.get("href")):
@@ -256,12 +298,18 @@ def check_wheel(wheel: Path, expected_version: str) -> None:
     if len(metadata_paths) != 1:
       raise ValueError("Wheel must contain one METADATA file")
     metadata = Parser().parsestr(archive.read(metadata_paths[0]).decode("utf-8"))
-    if metadata["Name"] != "astrology" or metadata["Version"] != expected_version:
+    if metadata["Name"] != "celestial-astrology" or metadata["Version"] != expected_version:
       raise ValueError("Wheel identity differs from project metadata")
     if missing := set(PACKAGE_FILES) - set(names):
       raise ValueError(f"Wheel is missing package resources: {sorted(missing)}")
     if not any(name.endswith(".dist-info/licenses/LICENSE") for name in names):
       raise ValueError("Wheel is missing its license")
+    if (metadata["Description-Content-Type"] or "").split(";", 1)[0].strip() != "text/markdown":
+      raise ValueError("Wheel README must declare Markdown content")
+    description = metadata.get_payload()
+    if not isinstance(description, str):
+      raise ValueError("Wheel README must be text")
+    readme_links(description)
 
 
 def check_sdist(sdist: Path) -> None:
@@ -405,6 +453,166 @@ def check_catalog_html(directory: Path) -> None:
         raise ValueError(f"Dangling rendered catalog link: {target}")
 
 
+def check_site_html(directory: Path, *, root: Path = ROOT, source_revision: str = "") -> None:
+  """Check the bilingual root and resolve both README paths against the built site.
+
+  检查双语根入口，并在构建产物中解析两份 README 的链接路径。
+  """
+  project = tomllib.loads((root / "pyproject.toml").read_text(encoding="utf-8"))["project"]
+  base = project["urls"]["Documentation"]
+  repository = project["urls"]["Repository"]
+  index = directory / "index.html"
+  if not index.is_file():
+    raise ValueError("Missing site-root index.html")
+  parser = _CatalogHtml()
+  parser.feed(index.read_text(encoding="utf-8"))
+  text = " ".join("".join(parser.text).split())
+  if f"{project['name']} {project['version']}" not in text or "开发版文档" not in text:
+    raise ValueError("Site root must identify its candidate version in both languages")
+  if not {"docs/en/index.html", "docs/zh-CN/index.html"}.issubset(parser.links):
+    raise ValueError("Site root must link both languages")
+  if source_revision:
+    source_url = repository + "/tree/" + source_revision
+    archive_url = repository + "/archive/" + source_revision + ".zip"
+    if (
+      source_url not in parser.links
+      or source_revision not in text
+      or archive_url not in text
+      or "安装这一源码快照" not in text
+    ):
+      raise ValueError("Site root is missing its fixed source or bilingual snapshot installation")
+  counterparts = {base + "README.html", base + "README.zh-CN.html"}
+  sections = (
+    ("README.md", "en", ("Install from source", "First chart", "First knowledge lookup")),
+    ("README.zh-CN.md", "zh-CN", ("从源码安装", "第一张命盘", "第一次查询知识")),
+  )
+  for name, language, required in sections:
+    content = (root / name).read_text(encoding="utf-8")
+    tokens = MarkdownIt("commonmark").parse(content)
+    headings = {
+      tokens[i + 1].content for i, token in enumerate(tokens) if token.type == "heading_open"
+    }
+    if not set(required).issubset(headings):
+      raise ValueError(f"Missing installation/first-use sections: {name}")
+    links = readme_links(content)
+    expected = counterparts | {
+      base + f"docs/{language}/reference.html",
+      base + f"docs/{language}/catalog.html",
+    }
+    if not expected.issubset(links):
+      raise ValueError(f"Missing readable references or counterpart navigation: {name}")
+    for target in links:
+      if target.startswith(base):
+        url = urlsplit(target)
+        relative = unquote(url.path.removeprefix(urlsplit(base).path)) or "index.html"
+        page = (directory / relative).resolve()
+        if not page.is_relative_to(directory.resolve()) or not page.is_file():
+          raise ValueError(f"README links to an absent built page: {target}")
+        if url.fragment:
+          destination = _ApiHtml()
+          destination.feed(page.read_text(encoding="utf-8"))
+          if unquote(url.fragment) not in destination.identifiers:
+            raise ValueError(f"README links to an absent built anchor: {target}")
+      elif target.startswith(repository + "/blob/main/"):
+        relative = unquote(urlsplit(target).path.partition("/blob/main/")[2])
+        page = (root / relative).resolve()
+        if not page.is_relative_to(root.resolve()) or not page.is_file():
+          raise ValueError(f"README links to an absent repository file: {target}")
+
+
+def readme_examples(text: str) -> tuple[tuple[str, str], ...]:
+  """Read Python scripts and their immediately following output fences.
+
+  读取 Python 脚本及紧随其后的输出代码块。
+  """
+  fences = [token for token in MarkdownIt("commonmark").parse(text) if token.type == "fence"]
+  examples: list[tuple[str, str]] = []
+  for index, token in enumerate(fences):
+    if token.info.strip() != "python":
+      continue
+    if index + 1 == len(fences) or fences[index + 1].info.strip() != "text":
+      raise ValueError("Every README Python script must have a following text output block")
+    examples.append((token.content, fences[index + 1].content))
+  if len(examples) < 2:
+    raise ValueError("README must execute chart and knowledge examples")
+  return tuple(examples)
+
+
+def check_readme_examples(root: Path, python: Path, directory: Path, mode: tuple[str, ...]) -> None:
+  """Execute both READMEs against the isolated installed package and compare output.
+
+  使用隔离安装包执行两份 README，并比较实际输出。
+  """
+  for name in ("README.md", "README.zh-CN.md"):
+    for index, (code, expected) in enumerate(
+      readme_examples((root / name).read_text(encoding="utf-8"))
+    ):
+      script = directory / f"{name}-{index}.py"
+      script.write_text(code, encoding="utf-8")
+      result = subprocess.run(
+        (str(python), *mode, "-I", "-X", "utf8", str(script)),
+        cwd=directory,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        check=True,
+      )
+      if result.stdout.rstrip("\n") != expected.rstrip("\n") or result.stderr:
+        raise ValueError(f"README example output differs: {name}, example {index}")
+
+
+def check_missing_metadata(
+  environment: Path, python: Path, consumer_script: Path, chart: Path
+) -> None:
+  """Hide each distribution's metadata in a disposable install and restore it on exit.
+
+  在一次性安装环境中分别隐藏两个分发包的元数据，并在退出时恢复。
+  """
+  locate = """
+import json, sys
+from importlib.metadata import distribution
+metadata = distribution(sys.argv[1])
+paths = [metadata.locate_file(p).parent for p in metadata.files or ()
+         if str(p).endswith('.dist-info/METADATA')]
+if len(paths) != 1:
+  raise RuntimeError('Expected one installed dist-info directory')
+print(json.dumps(str(paths[0])))
+"""
+  for package in ("celestial-astrology", "celestial-calendar"):
+    output = subprocess.check_output(
+      (str(python), "-I", "-c", locate, package), text=True, encoding="utf-8"
+    )
+    value: object = json.loads(output)
+    if not isinstance(value, str):
+      raise ValueError("Installed metadata location must be a path")
+    metadata = Path(value).resolve()
+    hidden = metadata.with_name(metadata.name + ".hidden")
+    if (
+      not metadata.is_relative_to(environment.resolve())
+      or metadata.suffix != ".dist-info"
+      or not metadata.is_dir()
+      or hidden.exists()
+    ):
+      raise ValueError("Unsafe disposable metadata location")
+    metadata.rename(hidden)
+    try:
+      for mode in ((), ("-O",)):
+        run(
+          (
+            str(python),
+            *mode,
+            "-I",
+            str(consumer_script),
+            "--missing-metadata",
+            package,
+            str(chart),
+          ),
+          cwd=environment.parent,
+        )
+    finally:
+      hidden.rename(metadata)
+
+
 def check_distribution(directory: Path) -> None:
   """Build the wheel and docs from an extracted sdist, then test an isolated install.
 
@@ -469,6 +677,11 @@ def check_distribution(directory: Path) -> None:
   check_api_html(directory / "source-html")
   check_catalog_html(directory / "source-html")
   check_search_html(directory / "source-html")
+  check_site_html(
+    directory / "source-html",
+    root=source,
+    source_revision=os.environ.get("ASTROLOGY_DOCS_SOURCE_SHA", ""),
+  )
   check_examples((directory / "source-doctest/output.txt").read_text(encoding="utf-8"))
 
   environment = directory / "consumer"
@@ -493,6 +706,7 @@ def check_distribution(directory: Path) -> None:
       ),
       cwd=directory,
     )
+    check_readme_examples(source, python, directory, mode)
     run(
       (
         str(python),
@@ -506,6 +720,7 @@ def check_distribution(directory: Path) -> None:
       ),
       cwd=directory,
     )
+  check_missing_metadata(environment, python, source / "tools/installed_check.py", expected_chart)
 
 
 def main() -> None:
@@ -555,6 +770,9 @@ def main() -> None:
     check_api_html(directory / "html")
     check_catalog_html(directory / "html")
     check_search_html(directory / "html")
+    check_site_html(
+      directory / "html", source_revision=os.environ.get("ASTROLOGY_DOCS_SOURCE_SHA", "")
+    )
     results = (directory / "doctest/output.txt").read_text(encoding="utf-8")
     check_examples(results)
     check_distribution(directory)

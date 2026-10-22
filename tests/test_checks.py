@@ -2,6 +2,7 @@
 
 import ast
 import inspect
+import json
 import os
 import subprocess
 import sys
@@ -213,12 +214,15 @@ def test_incomplete_wheel(tmp_path: Path, missing: str) -> None:
     for path in (*PACKAGE_FILES, "a.dist-info/licenses/LICENSE"):
       if path != missing:
         archive.writestr(path, "")
-    archive.writestr("a.dist-info/METADATA", "Name: astrology\nVersion: 0.0.0\n")
+    archive.writestr("a.dist-info/METADATA", "Name: celestial-astrology\nVersion: 0.0.0\n")
   with pytest.raises(ValueError, match="missing"):
     check_wheel(wheel, "0.0.0")
 
 
-@pytest.mark.parametrize("name, version", [("astrology", "9.0.0"), ("other", "0.0.0")])
+@pytest.mark.parametrize(
+  "name, version",
+  [("celestial-astrology", "9.0.0"), ("astrology", "0.0.0"), ("other", "0.0.0")],
+)
 def test_wrong_wheel_identity(tmp_path: Path, name: str, version: str) -> None:
   wheel = tmp_path / "test.whl"
   with ZipFile(wheel, "w") as archive:
@@ -234,13 +238,18 @@ def test_wheel_metadata_count(tmp_path: Path, count: int) -> None:
   wheel = tmp_path / "test.whl"
   with ZipFile(wheel, "w") as archive:
     for index in range(count):
-      archive.writestr(f"{index}.dist-info/METADATA", "Name: astrology\nVersion: 0.0.0\n")
+      archive.writestr(f"{index}.dist-info/METADATA", "Name: celestial-astrology\nVersion: 0.0.0\n")
   with pytest.raises(ValueError, match="one METADATA"):
     check_wheel(wheel, "0.0.0")
 
 
 def test_main_keeps_required_validation_stages(monkeypatch: pytest.MonkeyPatch) -> None:
   commands: list[tuple[str, ...]] = []
+  monkeypatch.setenv("ASTROLOGY_DOCS_SOURCE_SHA", "a" * 40)
+
+  def site(directory: Path, *, source_revision: str) -> None:
+    assert source_revision == "a" * 40
+    commands.append(("site_html",))
 
   def capture(command: Sequence[str], *, cwd: Path = checker.ROOT) -> None:
     commands.append(tuple(command))
@@ -258,6 +267,7 @@ def test_main_keeps_required_validation_stages(monkeypatch: pytest.MonkeyPatch) 
   monkeypatch.setattr(
     checker, "check_search_html", lambda directory: commands.append(("search_html",))
   )
+  monkeypatch.setattr(checker, "check_site_html", site)
   monkeypatch.setattr(
     checker, "check_distribution", lambda directory: commands.append(("distribution",))
   )
@@ -277,6 +287,7 @@ def test_main_keeps_required_validation_stages(monkeypatch: pytest.MonkeyPatch) 
   assert ("api_html",) in commands
   assert ("catalog_html",) in commands
   assert ("search_html",) in commands
+  assert ("site_html",) in commands
   assert ("distribution",) in commands
 
 
@@ -287,6 +298,13 @@ def test_distribution_keeps_dependency_install_and_both_consumer_modes(
   commands: list[tuple[str, ...]] = []
   contexts: list[tuple[Path, Mapping[str, str] | None]] = []
   validations: list[tuple[str, Path]] = []
+  readme_calls: list[tuple[Path, Path, Path, tuple[str, ...]]] = []
+  metadata_calls: list[tuple[Path, Path, Path, Path]] = []
+  site_calls: list[tuple[Path, Path, str]] = []
+  monkeypatch.setenv("ASTROLOGY_DOCS_SOURCE_SHA", "b" * 40)
+
+  def site(directory: Path, *, root: Path, source_revision: str) -> None:
+    site_calls.append((directory, root, source_revision))
 
   def capture(
     command: Sequence[str], *, cwd: Path = checker.ROOT, env: Mapping[str, str] | None = None
@@ -304,7 +322,11 @@ def test_distribution_keeps_dependency_install_and_both_consumer_modes(
       with ZipFile(artifacts / "astrology.whl", "w") as archive:
         for name in (*PACKAGE_FILES, "a.dist-info/licenses/LICENSE"):
           archive.writestr(name, "")
-        archive.writestr("a.dist-info/METADATA", "Name: astrology\nVersion: 0.0.0\n")
+        archive.writestr(
+          "a.dist-info/METADATA",
+          "Name: celestial-astrology\nVersion: 0.0.0\n"
+          "Description-Content-Type: text/markdown\n\n[Docs](https://example.org/)\n",
+        )
     if "-b" in command and command[command.index("-b") + 1] == "doctest":
       output = Path(command[-1])
       output.mkdir(parents=True)
@@ -328,6 +350,19 @@ def test_distribution_keeps_dependency_install_and_both_consumer_modes(
   )
   monkeypatch.setattr(
     checker, "check_search_html", lambda root: validations.append(("search", root))
+  )
+  monkeypatch.setattr(checker, "check_site_html", site)
+  monkeypatch.setattr(
+    checker,
+    "check_readme_examples",
+    lambda root, python, directory, mode: readme_calls.append((root, python, directory, mode)),
+  )
+  monkeypatch.setattr(
+    checker,
+    "check_missing_metadata",
+    lambda environment, python, script, chart: metadata_calls.append(
+      (environment, python, script, chart)
+    ),
   )
   checker.check_distribution(tmp_path)
   source = tmp_path / "source/astrology"
@@ -382,6 +417,14 @@ def test_distribution_keeps_dependency_install_and_both_consumer_modes(
     if "--expected-chart" in command
   )
   assert (tmp_path / "development-chart.json").is_file()
+  assert site_calls == [(tmp_path / "source-html", source, "b" * 40)]
+  assert readme_calls == [
+    (source, python, tmp_path, ()),
+    (source, python, tmp_path, ("-O",)),
+  ]
+  assert metadata_calls == [
+    (environment, python, source / "tools/installed_check.py", tmp_path / "development-chart.json")
+  ]
 
 
 @pytest.mark.parametrize(
@@ -483,3 +526,79 @@ def test_sdist_resource_contents(tmp_path: Path, missing: str | None) -> None:
   else:
     with pytest.raises(ValueError, match="Sdist is missing"):
       check_sdist(sdist)
+
+
+@pytest.mark.parametrize("failure", [False, True])
+def test_metadata_is_hidden_separately_and_restored_on_failure(
+  tmp_path: Path, monkeypatch: pytest.MonkeyPatch, failure: bool
+) -> None:
+  environment = tmp_path / "consumer"
+  environment.mkdir()
+  packages = ("celestial-astrology", "celestial-calendar")
+  paths = {package: environment / f"{package}.dist-info" for package in packages}
+  for path in paths.values():
+    path.mkdir()
+    (path / "METADATA").write_text("original", encoding="utf-8")
+  commands: list[tuple[str, ...]] = []
+
+  def locate(command: Sequence[str], **kwargs: object) -> str:
+    assert "-I" in command
+    return json.dumps(str(paths[command[-1]]))
+
+  def execute(command: Sequence[str], *, cwd: Path) -> None:
+    package = command[-2]
+    assert cwd == tmp_path
+    assert not paths[package].exists()
+    assert paths[package].with_suffix(".dist-info.hidden").is_dir()
+    assert all(paths[other].is_dir() for other in packages if other != package)
+    commands.append(tuple(command))
+    if failure:
+      raise subprocess.CalledProcessError(7, command)
+
+  monkeypatch.setattr(subprocess, "check_output", locate)
+  monkeypatch.setattr(checker, "run", execute)
+  arguments = (environment, Path(sys.executable), tmp_path / "consumer.py", tmp_path / "chart.json")
+  if failure:
+    with pytest.raises(subprocess.CalledProcessError):
+      checker.check_missing_metadata(*arguments)
+  else:
+    checker.check_missing_metadata(*arguments)
+    assert [command[-2] for command in commands] == [
+      packages[0],
+      packages[0],
+      packages[1],
+      packages[1],
+    ]
+    assert ["-O" in command for command in commands] == [False, True, False, True]
+  assert all(
+    path.is_dir() and (path / "METADATA").read_text(encoding="utf-8") == "original"
+    for path in paths.values()
+  )
+  assert not list(environment.glob("*.hidden"))
+
+
+@pytest.mark.parametrize("defect", ["outside", "suffix", "file", "occupied", "non-string"])
+def test_metadata_hiding_refuses_unsafe_locations(
+  tmp_path: Path, monkeypatch: pytest.MonkeyPatch, defect: str
+) -> None:
+  environment = tmp_path / "consumer"
+  environment.mkdir()
+  path = (tmp_path if defect == "outside" else environment) / "package.dist-info"
+  if defect == "suffix":
+    path = environment / "package"
+  if defect == "file":
+    path.touch()
+  else:
+    path.mkdir()
+  if defect == "occupied":
+    path.with_suffix(".dist-info.hidden").mkdir()
+  monkeypatch.setattr(
+    subprocess,
+    "check_output",
+    lambda *args, **kwargs: json.dumps(None if defect == "non-string" else str(path)),
+  )
+  with pytest.raises(ValueError, match="metadata location"):
+    checker.check_missing_metadata(
+      environment, Path(sys.executable), tmp_path / "script.py", tmp_path / "chart.json"
+    )
+  assert path.exists()

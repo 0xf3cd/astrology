@@ -108,10 +108,18 @@ ChartRecordError
 ChartReplayError
 ```
 
-重算要求 astrology、celestial-calendar 版本一致，并且固定的 ΔT 模型可用。
+重算要求 celestial-astrology、celestial-calendar 的版本精确匹配，并且固定的 ΔT 模型可用。
 它使用记录中的已解析 UTC 和请求，不查今天的时区库；返回新盘，不改存储盘。
-版本或模型不可用时抛出 `ChartReplayError`；请求超出上游计算域时仍抛出 `ChartDomainError`，
-不替换宫制。版本相等只是一项兼容性检查：开发版本号 `0.0.0` 不能唯一标识代码修订，
+已安装元数据缺失、版本或模型不可用时抛出 `ChartReplayError`；元数据失败保留
+`PackageNotFoundError` 作为异常原因。请求超出上游计算域时仍抛出 `ChartDomainError`，不替换宫制。
+直接调用 `natal_chart` 需要已安装分发包的元数据；缺失时抛出
+`importlib.metadata.PackageNotFoundError`，不编造版本号。
+
+Python 导入名仍是 `astrology`，查询安装元数据时使用 `celestial-astrology`；
+结构版本 v1 的字段名仍为 `astrology_version`。
+历史 `0.0.0` 记录仍可恢复、显示，但不能在 `0.1.0` 下重算；恢复不会改写来源版本。
+用其中保存的已解析输入和请求进行新计算，是另一项计算，不是历史记录重算。
+版本相等只是一项兼容性检查：`0.0.0`、`0.1.0` 这类开发／候选版本号不能唯一标识源码修订，
 也不保证不同代码树的结果逐位相等。
 
 ## 显示不改分类
@@ -128,8 +136,9 @@ ChartReplayError
 JSON 与开发入口输出，不删来源字段。还会执行恢复、重算、双语显示、不可用模型及请求 Placidus
 失败的用例，并检查导入来源，包括显式加载后的原生适配层。
 
-`tests/reference/chart_record_v1.json` 是项目计算的重算夹具，不是独立天文参考。
-重算采用绝对容差：角度 1e-8 度、距离 1e-9 AU、速率 1e-9 度/TT 日、儒略日 1e-8 日；
+`tests/reference/chart_record_v1.json` 是项目在开发版本 `0.0.0` 计算的历史夹具，不是独立天文参考。
+原始来源版本和字节保持不变。另用其保存的输入进行当前计算，采用绝对容差：
+角度 1e-8 度、距离 1e-9 AU、速率 1e-9 度/TT 日、儒略日 1e-8 日；
 标识及分类须相同。精确保真的恢复测试另做，不使用这些容差。
 
 `tests/reference/complete_chart_reference.json` 保存独立执行 Swiss Ephemeris 2.10.03 /

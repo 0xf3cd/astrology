@@ -6,7 +6,7 @@ from collections.abc import Iterator, Sequence
 from dataclasses import replace
 from datetime import UTC, date, datetime, timedelta
 from importlib import import_module
-from importlib.metadata import version
+from importlib.metadata import PackageNotFoundError, version
 from importlib.resources import files
 from pathlib import Path
 from types import ModuleType, SimpleNamespace
@@ -75,12 +75,88 @@ def consumer(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
 def test_import_outside_consumer_rejected(consumer: Path, monkeypatch: pytest.MonkeyPatch) -> None:
   monkeypatch.setattr(sys, "prefix", str(consumer.parent / "other-environment"))
   with pytest.raises(ValueError, match="outside the consumer environment"):
-    installed_check.main(version("astrology"))
+    installed_check.main(version("celestial-astrology"))
 
 
 def test_wrong_installed_version_rejected(consumer: Path) -> None:
   with pytest.raises(ValueError, match="Installed version"):
     installed_check.main("unrelated-version")
+
+
+def test_wrong_chart_distribution_version_is_rejected(
+  consumer: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+  original = astrology.natal_chart
+
+  def wrong_version(
+    resolved: astrology.ResolvedBirth, config: astrology.ChartConfig
+  ) -> astrology.NatalChart:
+    chart = original(resolved, config)
+    return replace(chart, provenance=replace(chart.provenance, astrology_version="0.0.0"))
+
+  monkeypatch.setattr(astrology, "natal_chart", wrong_version)
+  with pytest.raises(ValueError, match="distribution version"):
+    installed_check.main(version("celestial-astrology"))
+
+
+@pytest.mark.parametrize("package", ["celestial-astrology", "celestial-calendar"])
+@pytest.mark.parametrize(
+  "defect",
+  [
+    "none",
+    "present",
+    "untranslated",
+    "no-cause",
+    "wrong-cause",
+    "replay-accepts",
+    "calculation-accepts",
+  ],
+)
+def test_missing_metadata_consumer_checks_replay_not_just_initial_lookup(
+  tmp_path: Path,
+  recorded_chart: astrology.NatalChart,
+  monkeypatch: pytest.MonkeyPatch,
+  package: str,
+  defect: str,
+) -> None:
+  chart_path = tmp_path / "chart.json"
+  chart_path.write_text(astrology.dumps_chart(recorded_chart), encoding="utf-8")
+  monkeypatch.setattr(installed_check, "_check_knowledge", lambda: None)
+  monkeypatch.setattr(installed_check, "_check_native_isolation", lambda: None)
+
+  def metadata(name: str) -> object:
+    if defect == "present":
+      return object()
+    raise PackageNotFoundError(name)
+
+  def replay(chart: astrology.NatalChart) -> astrology.NatalChart:
+    if defect == "replay-accepts":
+      return chart
+    if defect == "untranslated":
+      raise PackageNotFoundError(package)
+    if defect == "no-cause":
+      raise astrology.ChartReplayError("unavailable")
+    missing = "other" if defect == "wrong-cause" else package
+    raise astrology.ChartReplayError("unavailable") from PackageNotFoundError(missing)
+
+  def calculate(
+    resolved: astrology.ResolvedBirth, config: astrology.ChartConfig
+  ) -> astrology.NatalChart:
+    if defect == "calculation-accepts":
+      return recorded_chart
+    raise PackageNotFoundError(package)
+
+  monkeypatch.setattr(installed_check, "distribution", metadata)
+  monkeypatch.setattr(astrology, "recompute_chart", replay)
+  monkeypatch.setattr(astrology, "natal_chart", calculate)
+  if defect == "none" or (package == "celestial-calendar" and defect == "calculation-accepts"):
+    installed_check.check_missing_metadata(package, chart_path)
+  elif defect == "untranslated":
+    with pytest.raises(PackageNotFoundError):
+      installed_check.check_missing_metadata(package, chart_path)
+  else:
+    with pytest.raises(ValueError, match=r"still has|lost|accepted|invented"):
+      installed_check.check_missing_metadata(package, chart_path)
 
 
 @pytest.mark.parametrize(
@@ -92,13 +168,13 @@ def test_submodule_outside_consumer_rejected(
 ) -> None:
   monkeypatch.setattr(import_module(module), "__file__", str(consumer.parent.parent / "outside.py"))
   with pytest.raises(ValueError, match="outside the consumer environment"):
-    installed_check.main(version("astrology"))
+    installed_check.main(version("celestial-astrology"))
 
 
 def test_missing_installed_typing_marker_rejected(consumer: Path) -> None:
   (consumer / "py.typed").unlink()
   with pytest.raises(ValueError, match=r"missing py\.typed"):
-    installed_check.main(version("astrology"))
+    installed_check.main(version("celestial-astrology"))
 
 
 @pytest.mark.parametrize(
@@ -109,14 +185,14 @@ def test_loaded_astronomy_rejected(
 ) -> None:
   monkeypatch.setitem(sys.modules, module, ModuleType(module))
   with pytest.raises(ValueError, match="astronomy adapter"):
-    installed_check.main(version("astrology"))
+    installed_check.main(version("celestial-astrology"))
 
 
 def test_similar_module_name_allowed(consumer: Path, monkeypatch: pytest.MonkeyPatch) -> None:
   monkeypatch.setitem(
     sys.modules, "celestial_calendar_extra", ModuleType("celestial_calendar_extra")
   )
-  installed_check.main(version("astrology"))
+  installed_check.main(version("celestial-astrology"))
 
 
 @pytest.mark.parametrize(
@@ -157,7 +233,7 @@ def test_installed_consumer_rejects_wrong_resolution_metadata(
 
   monkeypatch.setattr(astrology, "prepare_natal_input", incorrect)
   with pytest.raises(ValueError, match=message):
-    installed_check.main(version("astrology"))
+    installed_check.main(version("celestial-astrology"))
 
 
 def test_installed_consumer_rejects_automatic_fold_choice(
@@ -172,7 +248,7 @@ def test_installed_consumer_rejects_automatic_fold_choice(
 
   monkeypatch.setattr(astrology, "resolve_birth_time", chooses_first)
   with pytest.raises(ValueError, match="ambiguous input"):
-    installed_check.main(version("astrology"))
+    installed_check.main(version("celestial-astrology"))
 
 
 @pytest.mark.parametrize("defect", ["utc", "provenance"])
@@ -207,7 +283,7 @@ def test_installed_consumer_rejects_fixed_offset_faults(
   monkeypatch.setattr(astrology, "resolve_birth_time", incorrect)
   message = "UTC date rollover" if defect == "utc" else "timezone-database provenance"
   with pytest.raises(ValueError, match=message):
-    installed_check.main(version("astrology"))
+    installed_check.main(version("celestial-astrology"))
 
 
 def test_installed_consumer_rejects_missing_location_acceptance(
@@ -224,7 +300,7 @@ def test_installed_consumer_rejects_missing_location_acceptance(
 
   monkeypatch.setattr(astrology, "prepare_natal_input", accepts_partial)
   with pytest.raises(ValueError, match="missing location"):
-    installed_check.main(version("astrology"))
+    installed_check.main(version("celestial-astrology"))
 
 
 def test_installed_consumer_rejects_missing_coordinate_validation(
@@ -237,7 +313,7 @@ def test_installed_consumer_rejects_missing_coordinate_validation(
 
   monkeypatch.setattr(astrology, "Location", accepts_nan)
   with pytest.raises(ValueError, match="accepted NaN"):
-    installed_check.main(version("astrology"))
+    installed_check.main(version("celestial-astrology"))
 
 
 @pytest.mark.parametrize("defect", ["alias", "house"])
@@ -259,7 +335,7 @@ def test_installed_consumer_rejects_configuration_defects(
 
   monkeypatch.setattr(astrology, "ChartConfig", incorrect)
   with pytest.raises(ValueError, match=r"mutable input alias|substituted"):
-    installed_check.main(version("astrology"))
+    installed_check.main(version("celestial-astrology"))
 
 
 def test_installed_consumer_calculates_a_chart(
@@ -275,7 +351,7 @@ def test_installed_consumer_calculates_a_chart(
     return original(resolved, config)
 
   monkeypatch.setattr(astrology, "natal_chart", record)
-  installed_check.main(version("astrology"))
+  installed_check.main(version("celestial-astrology"))
   assert len(calls) == 2
   assert calls[0].house_system is astrology.HouseSystem.WHOLE_SIGN
   assert calls[1].house_system is astrology.HouseSystem.PLACIDUS
@@ -287,7 +363,7 @@ def test_installed_comparison_rejects_different_development_output(consumer: Pat
   expected = consumer.parent / "wrong-chart.json"
   expected.write_text("{}", encoding="utf-8")
   with pytest.raises(ValueError, match="differs from the development"):
-    installed_check.main(version("astrology"), expected_chart=expected)
+    installed_check.main(version("celestial-astrology"), expected_chart=expected)
 
 
 @pytest.mark.parametrize("defect", ["schema", "duplicates"])
@@ -309,7 +385,7 @@ def test_installed_consumer_rejects_a_permissive_record_loader(
 
   monkeypatch.setattr(astrology, "loads_chart", permissive)
   with pytest.raises(ValueError, match="unsupported schema or duplicate key"):
-    installed_check.main(version("astrology"))
+    installed_check.main(version("celestial-astrology"))
 
 
 def test_installed_consumer_checks_native_adapter_origin(
@@ -328,7 +404,7 @@ def test_installed_consumer_checks_native_adapter_origin(
 
   monkeypatch.setattr(astrology, "natal_chart", outside)
   with pytest.raises(ValueError, match=r"astrology\.celestial from outside"):
-    installed_check.main(version("astrology"))
+    installed_check.main(version("celestial-astrology"))
 
 
 def test_installed_consumer_rejects_a_misreported_astronomy_version(
@@ -344,7 +420,7 @@ def test_installed_consumer_rejects_a_misreported_astronomy_version(
 
   monkeypatch.setattr(astrology, "natal_chart", incorrect)
   with pytest.raises(ValueError, match="astronomy library version"):
-    installed_check.main(version("astrology"))
+    installed_check.main(version("celestial-astrology"))
 
 
 def test_knowledge_resource_outside_consumer_rejected(
@@ -389,7 +465,7 @@ def test_knowledge_only_does_not_run_birth_consumer(
       if not name.startswith(("tzdata", "zoneinfo", "celestial", "ctypes"))
     },
   )
-  installed_check.main(version("astrology"), knowledge_only=True)
+  installed_check.main(version("celestial-astrology"), knowledge_only=True)
 
 
 @pytest.mark.parametrize(
