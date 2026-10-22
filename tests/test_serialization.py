@@ -7,6 +7,8 @@ import sys
 from collections.abc import Iterator
 from dataclasses import FrozenInstanceError, replace
 from datetime import date, time, timedelta
+from importlib import import_module
+from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 from typing import Any
 
@@ -48,15 +50,19 @@ def test_complete_round_trip(recorded_chart: NatalChart) -> None:
     restored.resolved.record.source["new"] = "value"  # type: ignore[index]
 
 
-def test_stored_development_fixture_recomputes_with_explicit_tolerances() -> None:
+def test_historical_fixture_restores_and_independent_calculation_retains_numerics() -> None:
   text = (Path(__file__).parent / "reference/chart_record_v1.json").read_text(encoding="utf-8")
   stored = loads_chart(text)
   assert dumps_chart(stored) == text
-  fresh = recompute_chart(stored)
+  assert stored.provenance.astrology_version == "0.0.0"
+  with pytest.raises(ChartReplayError, match="astrology version"):
+    recompute_chart(stored)
+  fresh = natal_chart(stored.resolved, stored.requested)
   assert fresh.resolved == stored.resolved
   assert fresh.requested == stored.requested
   assert fresh.effective == stored.effective
-  assert fresh.provenance == stored.provenance
+  assert fresh.provenance.astrology_version == version("celestial-astrology")
+  assert replace(fresh.provenance, astrology_version="0.0.0") == stored.provenance
   assert fresh.times.jd_ut1 == pytest.approx(stored.times.jd_ut1, abs=1e-8, rel=0)
   assert fresh.times.jde_tt == pytest.approx(stored.times.jde_tt, abs=1e-8, rel=0)
   for actual, expected in zip(fresh.positions, stored.positions, strict=True):
@@ -294,6 +300,52 @@ def test_unknown_executable_version_restores_but_cannot_replay(
   assert "unavailable" in dumps_chart(restored)
   with pytest.raises(ChartReplayError):
     recompute_chart(restored)
+
+
+@pytest.mark.parametrize("package", ["celestial-astrology", "celestial-calendar"])
+def test_missing_metadata_has_replay_contract_and_preserved_cause(
+  recorded_chart: NatalChart, monkeypatch: pytest.MonkeyPatch, package: str
+) -> None:
+  import astrology._distribution as identity
+  import astrology.serialization as serialization
+
+  missing = PackageNotFoundError(package)
+  original = version
+
+  def lookup(name: str) -> str:
+    if name == package:
+      raise missing
+    return original(name)
+
+  monkeypatch.setattr(identity, "version", lookup)
+  monkeypatch.setattr(serialization, "version", lookup)
+  with pytest.raises(ChartReplayError, match="metadata") as error:
+    recompute_chart(recorded_chart)
+  assert error.value.__cause__ is missing
+  assert loads_chart(dumps_chart(recorded_chart)) == recorded_chart
+
+
+def test_calculation_requires_installed_metadata(
+  recorded_chart: NatalChart, monkeypatch: pytest.MonkeyPatch
+) -> None:
+  import astrology._distribution as identity
+
+  def missing(name: str) -> str:
+    raise PackageNotFoundError(name)
+
+  monkeypatch.setattr(identity, "version", missing)
+  with pytest.raises(PackageNotFoundError, match="celestial-astrology"):
+    natal_chart(recorded_chart.resolved, recorded_chart.requested)
+
+
+def test_native_version_mismatch_is_rejected(
+  recorded_chart: NatalChart, monkeypatch: pytest.MonkeyPatch
+) -> None:
+  celestial = import_module("astrology.celestial")
+
+  monkeypatch.setattr(celestial, "celestial_version", lambda: "unavailable")
+  with pytest.raises(ChartReplayError, match="native astronomy version"):
+    recompute_chart(recorded_chart)
 
 
 def test_restore_and_replay_do_not_reresolve_timezone(

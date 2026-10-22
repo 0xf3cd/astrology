@@ -125,13 +125,23 @@ ChartRecordError
 ChartReplayError
 ```
 
-Replay requires matching astrology and celestial-calendar versions and the
+Replay requires exact matching celestial-astrology and celestial-calendar versions and the
 available fixed Delta-T model. It uses the stored resolved UTC and request, not
 today's timezone database, and returns a fresh chart without modifying the record.
-An unavailable version/model raises `ChartReplayError`; a requested computation
+Missing installed metadata or an unavailable version/model raises `ChartReplayError`;
+metadata failures retain `PackageNotFoundError` as their cause. A requested computation
 outside the upstream domain still raises `ChartDomainError`, with no house fallback.
-Version equality is only a compatibility check: the development label `0.0.0`
-does not identify a unique code revision or guarantee bitwise equality between trees.
+Direct `natal_chart` calculation requires installed distribution metadata and raises
+`importlib.metadata.PackageNotFoundError` if it is absent; it does not invent a version.
+
+The import remains `astrology`, while installed project metadata is read under
+`celestial-astrology`. Schema v1 keeps the field name `astrology_version`.
+Historical `0.0.0` records remain restorable and displayable, but cannot be replayed
+under `0.1.0`; restoration never changes their provenance. A new calculation from
+their saved resolved input and request is a separate calculation, not historical replay.
+Version equality is only a compatibility check: development/candidate labels such
+as `0.0.0` or `0.1.0` do not identify a unique source revision or guarantee bitwise
+equality between trees.
 
 ## Display does not change classification
 
@@ -152,8 +162,9 @@ development entry point, without dropping provenance fields. They also exercise
 restoration, replay, both text languages, unavailable models and requested Placidus
 failure. Import origins, including the explicitly loaded native adapter, are checked.
 
-`tests/reference/chart_record_v1.json` is a project-calculated replay fixture, not an
-independent astronomy reference. Recalculation uses absolute tolerances of 1e-8
+`tests/reference/chart_record_v1.json` is a project-calculated historical development
+fixture from `0.0.0`, not an independent astronomy reference. Its original provenance
+and bytes stay intact. A separate current calculation from its saved input uses absolute tolerances of 1e-8
 degrees for angles, 1e-9 AU for distances, 1e-9 degrees/TT day for rates and 1e-8 days
 for Julian dates; identities and classifications must agree. Exact restoration is
 tested separately, without these tolerances.

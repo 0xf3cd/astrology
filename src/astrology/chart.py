@@ -7,9 +7,9 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from dataclasses import dataclass, field
-from importlib.metadata import version
 from typing import Final, Literal, get_args
 
+from astrology._distribution import installed_version
 from astrology._validation import finite_number
 from astrology.aspects import AspectHit, AspectObject, find_aspects
 from astrology.birth import MissingBirthDataError, ResolvedBirth
@@ -341,13 +341,15 @@ def natal_chart(resolved: ResolvedBirth, config: ChartConfig) -> NatalChart:
   `ChartDomainError` and never falls back to another house system. Requested
   aspect rules are judged among the objects of `config.aspect_objects`, or among
   all requested objects when it is unset, from the positions and longitude rates
-  of this calculation.
+  of this calculation. The distribution must be installed: missing package metadata
+  raises `importlib.metadata.PackageNotFoundError` rather than inventing a version.
 
   为已解析的出生时刻计算热带地心本命盘。出生记录必须带地点；时间未知的记录在准备阶段
   就已被拒绝。天文适配层在这个函数里才导入，不在导入包时导入，所以导入 astrology 或查询
   知识都不会初始化原生天文库。请求的几何超出上游的联合求值域时，抛出
   `ChartDomainError`，不会改用别的宫制。根据这次计算的位置和黄经速率，
   在 `config.aspect_objects` 指定的对象之间计算相位；未设置时，所有请求的对象都参与。
+  分发包必须已安装；元数据缺失时抛出 `importlib.metadata.PackageNotFoundError`，不编造版本号。
   """
   if type(resolved) is not ResolvedBirth:
     raise TypeError("resolved must be a ResolvedBirth")
@@ -379,7 +381,7 @@ def natal_chart(resolved: ResolvedBirth, config: ChartConfig) -> NatalChart:
       celestial_version=celestial_version(),
       position_frame=_POSITION_FRAME,
       ut1_derivation=_UT1_DERIVATION,
-      astrology_version=version("astrology"),
+      astrology_version=installed_version(),
     ),
     times=times,
     positions=positions,

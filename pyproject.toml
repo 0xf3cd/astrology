@@ -3,8 +3,8 @@ requires = ["setuptools==84.0.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "astrology"
-version = "0.0.0"
+name = "celestial-astrology"
+version = "0.1.0"
 description = "Western astrology charts and sourced knowledge (in development)"
 readme = "README.md"
 requires-python = ">=3.11,<3.15"
@@ -13,6 +13,7 @@ license-files = ["LICENSE"]
 dependencies = ["celestial-calendar==0.8.0", "tzdata==2026.5"]
 
 [project.urls]
+Documentation = "https://0xf3cd.github.io/astrology/"
 Repository = "https://github.com/0xf3cd/astrology"
 Issues = "https://github.com/0xf3cd/astrology/issues"
 

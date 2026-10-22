@@ -42,6 +42,7 @@ True
 获取及筛选遇到格式正确但未知的标识时抛出 `KeyError`；格式不合法的字符串抛出 `ValueError`，
 非字符串标识抛出 `TypeError`。条目筛选同时应用全部所选条件，从不判断前提。
 
+(knowledge-source-definitions-zh-cn)=
 ## 从来源查到定义
 
 语料收录项目配置合同、星座区间与落宫的项目约定，以及一条单源历史分组，

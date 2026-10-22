@@ -5,7 +5,7 @@ import sys
 from dataclasses import replace
 from datetime import UTC, date, datetime, time, timedelta
 from importlib import import_module
-from importlib.metadata import distribution, version
+from importlib.metadata import PackageNotFoundError, distribution, version
 from importlib.resources import files
 from pathlib import Path
 from typing import Literal
@@ -14,6 +14,7 @@ import astrology
 from astrology.knowledge import Catalog, OutputEligibility, PrerequisiteStatus, SourceVerification
 
 MODULES = (
+  "_distribution",
   "_validation",
   "aspects",
   "birth",
@@ -219,6 +220,8 @@ def _check_natal_chart(expected_chart: Path | None = None) -> None:
     raise ValueError("Installed chart calculation did not return the requested result")
   if chart.provenance.celestial_version != version("celestial-calendar"):
     raise ValueError("Installed chart misreported the astronomy library version")
+  if chart.provenance.astrology_version != distribution("celestial-astrology").version:
+    raise ValueError("Installed chart misreported the astrology distribution version")
   if chart.effective.delta_t_model != "algo5":
     raise ValueError("Installed chart misreported the delta T model")
   adapter = Path(str(import_module("astrology.celestial").__file__)).resolve()
@@ -274,6 +277,43 @@ def _check_natal_chart(expected_chart: Path | None = None) -> None:
     raise ValueError("Installed Placidus calculation did not report undefined geometry")
 
 
+def check_missing_metadata(package: str, chart_path: Path) -> None:
+  """Verify real lookup failures after one distribution's metadata has been hidden.
+
+  在一个分发包的元数据已被隐藏后，核验真实查询失败的合同。
+  """
+  if package not in ("celestial-astrology", "celestial-calendar"):
+    raise ValueError("Unsupported missing-metadata case")
+  stored = chart_path.read_text(encoding="utf-8")
+  chart = astrology.loads_chart(stored)
+  if astrology.dumps_chart(chart) != stored:
+    raise ValueError("Restoration changed a chart without distribution metadata")
+  _check_knowledge()
+  _check_native_isolation()
+  try:
+    distribution(package)
+  except PackageNotFoundError:
+    pass
+  else:
+    raise ValueError("Missing-metadata case still has installed metadata")
+  try:
+    astrology.recompute_chart(chart)
+  except astrology.ChartReplayError as exc:
+    if not isinstance(exc.__cause__, PackageNotFoundError) or exc.__cause__.name != package:
+      raise ValueError("Replay lost the missing-metadata cause") from exc
+  else:
+    raise ValueError("Replay accepted missing distribution metadata")
+  if package == "celestial-astrology":
+    try:
+      astrology.natal_chart(chart.resolved, chart.requested)
+    except PackageNotFoundError as exc:
+      if exc.name != package:
+        raise ValueError("Calculation reported a different missing distribution") from exc
+    else:
+      raise ValueError("Calculation invented an installed distribution version")
+  print(f"Missing {package} metadata rejected; optimized={sys.flags.optimize}")
+
+
 def main(
   expected_version: str,
   *,
@@ -290,7 +330,7 @@ def main(
   CLI 参数顺序：CODE_VERSION CORPUS_VERSION [--knowledge-only] [--expected-chart PATH]。
   命盘文件保存开发入口产出的 JSON。
   """
-  metadata = distribution("astrology")
+  metadata = distribution("celestial-astrology")
   for module in (astrology, *(import_module("astrology." + name) for name in MODULES)):
     origin = Path(str(module.__file__)).resolve()
     if not origin.is_relative_to(Path(sys.prefix).resolve()):
@@ -309,15 +349,18 @@ def main(
   _check_birth_and_configuration()
   _check_native_isolation()
   _check_natal_chart(expected_chart)
-  print(f"Installed astrology {metadata.version}; optimized={sys.flags.optimize}")
+  print(f"Installed celestial-astrology {metadata.version}; optimized={sys.flags.optimize}")
 
 
 if __name__ == "__main__":
-  main(
-    sys.argv[1],
-    expected_corpus_version=sys.argv[2],
-    knowledge_only="--knowledge-only" in sys.argv[3:],
-    expected_chart=Path(sys.argv[sys.argv.index("--expected-chart") + 1])
-    if "--expected-chart" in sys.argv[3:]
-    else None,
-  )
+  if sys.argv[1] == "--missing-metadata":
+    check_missing_metadata(sys.argv[2], Path(sys.argv[3]))
+  else:
+    main(
+      sys.argv[1],
+      expected_corpus_version=sys.argv[2],
+      knowledge_only="--knowledge-only" in sys.argv[3:],
+      expected_chart=Path(sys.argv[sys.argv.index("--expected-chart") + 1])
+      if "--expected-chart" in sys.argv[3:]
+      else None,
+    )

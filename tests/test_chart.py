@@ -218,6 +218,7 @@ def test_the_delta_t_model_and_the_astronomy_version_are_recorded() -> None:
   chart = natal_chart(resolved_at(*_NORTH[:2], *_NORTH[2:]), config_for())
   assert chart.effective.delta_t_model == "algo5"
   assert chart.provenance.celestial_version == version("celestial-calendar")
+  assert chart.provenance.astrology_version == version("celestial-astrology")
   assert chart.provenance.ut1_derivation == "delta_t_model_from_civil_utc"
 
 

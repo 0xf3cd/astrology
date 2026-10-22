@@ -4,7 +4,10 @@ import re
 import shutil
 from io import StringIO
 from pathlib import Path
+from runpy import run_path
 
+import pytest
+from jinja2 import DictLoader, Environment
 from sphinx.application import Sphinx
 from sphinx.project import Project
 
@@ -55,7 +58,7 @@ def test_document_discovery_keeps_all_project_pages_and_ignores_other_environmen
 ) -> None:
   source = tmp_path / "source"
   shutil.copytree(ROOT / "docs", source / "docs", ignore=shutil.ignore_patterns("__pycache__"))
-  for filename in ("README.md", "README.zh-CN.md"):
+  for filename in ("README.md", "README.zh-CN.md", "pyproject.toml"):
     shutil.copy2(ROOT / filename, source / filename)
   stray = source / "another-environment/share/doc/unrelated.rst"
   stray.parent.mkdir(parents=True)
@@ -79,3 +82,61 @@ def test_document_discovery_keeps_all_project_pages_and_ignores_other_environmen
   }
   assert found == expected
   assert config.root_doc in found
+
+
+@pytest.mark.parametrize(
+  "revision", ["a" * 39, "a" * 41, "A" * 40, "g" * 40, "a" * 40 + "\n", "main", "$(command)"]
+)
+def test_documentation_rejects_invalid_source_revision(
+  monkeypatch: pytest.MonkeyPatch, revision: str
+) -> None:
+  monkeypatch.setenv("ASTROLOGY_DOCS_SOURCE_SHA", revision)
+  with pytest.raises(ValueError, match="full lowercase Git commit SHA"):
+    run_path(str(ROOT / "docs/conf.py"))
+
+
+@pytest.mark.parametrize("revision", ["", "a" * 40])
+def test_snapshot_template_uses_metadata_urls_and_explicit_environment_interpreters(
+  tmp_path: Path, monkeypatch: pytest.MonkeyPatch, revision: str
+) -> None:
+  docs = tmp_path / "docs"
+  docs.mkdir()
+  shutil.copyfile(ROOT / "docs/conf.py", docs / "conf.py")
+  (tmp_path / "pyproject.toml").write_text(
+    '[project.urls]\nDocumentation = "https://example.org/docs/"\n'
+    'Repository = "https://example.org/project"\n',
+    encoding="utf-8",
+  )
+  monkeypatch.setenv("ASTROLOGY_DOCS_SOURCE_SHA", revision)
+  config = run_path(str(docs / "conf.py"))
+  assert config["html_baseurl"] == "https://example.org/docs/"
+  context = config["html_context"]
+  archive = f"https://example.org/project/archive/{revision}.zip" if revision else ""
+  tree = f"https://example.org/project/tree/{revision}" if revision else ""
+  assert context["source_archive_url"] == archive
+  assert context["source_tree_url"] == tree
+  template = (ROOT / "docs/_templates/site_index.html").read_text(encoding="utf-8")
+  environment = Environment(
+    loader=DictLoader(
+      {
+        "layout.html": "<title>{{ title }}</title>{% block body %}{% endblock %}",
+        "site_index.html": template,
+      }
+    )
+  )
+  page = environment.get_template("site_index.html").render(
+    project="celestial-astrology", release="0.1.0", pathto=lambda name: name + ".html", **context
+  )
+  assert "<title>Documentation / 文档</title>" in page
+  commands = re.findall(r"<pre>(.*?)</pre>", page, flags=re.DOTALL)
+  if revision:
+    assert commands == [
+      f'.venv/bin/python -m pip install "{archive}"',
+      f'.venv\\Scripts\\python.exe -m pip install "{archive}"',
+    ]
+    assert f'href="{tree}"' in page
+    chinese = re.findall(r'<p lang="zh-CN">(.*?)</p>', page, flags=re.DOTALL)
+    assert any('href="README.zh-CN.html"' in paragraph for paragraph in chinese)
+  else:
+    assert not commands
+    assert "This local build has no fixed source revision" in page
