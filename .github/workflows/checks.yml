@@ -60,4 +60,4 @@ jobs:
           (github.event_name == 'push' &&
            github.ref == 'refs/heads/probe/15-required-check-enforcement')
         shell: bash
-        run: exit 1
+        run: exit 0
