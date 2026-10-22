@@ -60,9 +60,9 @@ class ChartRecordError(ValueError):
 
 
 class ChartReplayError(ValueError):
-  """A replay needs unavailable package metadata, a package version or a fixed model.
+  """Required metadata is missing, or recorded versions/models do not match this installation.
 
-  重算需要的包元数据、包版本或固定模型不可用。
+  缺少必需的包元数据，或记录的版本或固定模型与当前安装不匹配。
   """
 
 
@@ -489,14 +489,16 @@ def loads_chart(data: str) -> NatalChart:
 def recompute_chart(chart: NatalChart) -> NatalChart:
   """Recalculate from recorded UTC and request after checking versions and fixed models.
 
-  No timezone database is consulted and the stored chart is not changed. Unavailable
-  package metadata, versions or Delta-T model raise ChartReplayError; upstream domain failures
+  No timezone database is consulted and the stored chart is not changed. Recorded package
+  versions must exactly match the installed versions. Missing package metadata, a version
+  mismatch or an unsupported Delta-T model raises ChartReplayError; upstream domain failures
   remain ChartDomainError. Equal development version labels (such as 0.0.0) do not
   identify identical code. The caller compares the fresh result with suitable tolerances.
   A non-NatalChart argument raises TypeError.
 
   检查包版本及固定模型后，按记录中的 UTC 和请求重新计算。不查询时区库，也不改存储盘。
-  包元数据、版本或 ΔT 模型不可用时抛出 ChartReplayError；上游域失败仍抛出 ChartDomainError。
+  记录的包版本须与当前安装的版本完全相同。缺少包元数据、版本不匹配或不支持记录的 ΔT 模型时
+  抛出 ChartReplayError；上游域失败仍抛出 ChartDomainError。
   相同的开发版本号（例如 0.0.0）不代表代码完全相同；调用方按合适的容差比较新结果。
   参数不是 NatalChart 时抛出 TypeError。
   """

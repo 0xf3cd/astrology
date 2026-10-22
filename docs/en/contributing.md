@@ -23,7 +23,7 @@ Python 3.11–3.14 is supported. The lower bound matches celestial-calendar 0.8.
 which is a hard dependency of the package. CI runs the
 same command on Linux 3.11/3.14 and macOS/Windows 3.14. Use
 `uv sync --locked --python 3.11` to check the lower endpoint locally.
-Use a current patch release for development checks. Their safe sdist extraction
+Use a current patch release for development checks. Safe sdist extraction in these checks
 requires Python 3.11.4 or later; the installed library's supported minor versions
 remain 3.11–3.14.
 
@@ -112,8 +112,9 @@ PyPI project `astrology` is not this library. Confirm the installed identity:
 The checks execute both READMEs against an isolated wheel install, compare their
 documented output, inspect the wheel's actual Markdown links, and resolve both
 language paths against the built site. They also hide each distribution's metadata
-separately in a disposable install and check restoration, calculation and replay
-failures in normal and optimized Python, restoring the metadata afterwards.
+separately in a disposable install. With metadata hidden they verify unchanged restoration,
+`ChartReplayError` on replay, and `PackageNotFoundError` on direct calculation when project
+metadata is missing. Both Python modes run before the metadata is restored.
 
 For manual Pages delivery, build from a clean committed checkout and set
 `ASTROLOGY_DOCS_SOURCE_SHA` to its full lowercase commit SHA. The root page then

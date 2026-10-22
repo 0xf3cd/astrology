@@ -155,5 +155,5 @@ body.sun
 
 ## 许可证
 
-项目代码、译文及原作说明采用 [MIT](https://github.com/0xf3cd/astrology/blob/main/LICENSE)。历史引文保留其
+项目代码、译文及本项目撰写的说明采用 [MIT](https://github.com/0xf3cd/astrology/blob/main/LICENSE)。历史引文保留其
 [来源记录](https://0xf3cd.github.io/astrology/docs/zh-CN/knowledge.html#knowledge-source-definitions-zh-cn)注明的转载状态。

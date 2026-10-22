@@ -35,9 +35,10 @@ myst_heading_anchors = 6
 nitpicky = True
 html_theme = "alabaster"
 html_title = f"{project} {release} (development / 开发版)"
-html_baseurl = tomllib.loads(
+project_urls = tomllib.loads(
   (Path(__file__).resolve().parents[1] / "pyproject.toml").read_text(encoding="utf-8")
-)["project"]["urls"]["Documentation"]
+)["project"]["urls"]
+html_baseurl = project_urls["Documentation"]
 html_search_language = "en-zh-bigrams"
 templates_path = ["_templates"]
 html_additional_pages = {"index": "site_index.html"}
@@ -46,8 +47,11 @@ if source_revision and re.fullmatch(r"[0-9a-f]{40}", source_revision) is None:
   raise ValueError("ASTROLOGY_DOCS_SOURCE_SHA must be a full lowercase Git commit SHA")
 html_context = {
   "source_revision": source_revision,
+  "source_tree_url": f"{project_urls['Repository']}/tree/{source_revision}"
+  if source_revision
+  else "",
   "source_archive_url": (
-    f"https://github.com/0xf3cd/astrology/archive/{source_revision}.zip" if source_revision else ""
+    f"{project_urls['Repository']}/archive/{source_revision}.zip" if source_revision else ""
   ),
 }
 

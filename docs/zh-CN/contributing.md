@@ -19,7 +19,7 @@ uv run --locked python tools/check.py
 支持 Python 3.11–3.14，下限与 celestial-calendar 0.8.0 一致；该库是本包的硬依赖。
 CI 在 Linux 3.11／3.14 和 macOS／Windows 3.14 上运行同一命令。
 本地验证下限时使用 `uv sync --locked --python 3.11`。
-开发检查使用当前补丁版。sdist 的安全解压要求 Python 3.11.4 或更高版本；
+开发检查使用当前补丁版。检查中的 sdist 安全解压要求 Python 3.11.4 或更高版本；
 安装后库的次版本支持范围仍为 3.11–3.14。
 
 天文依赖只发布 Linux x86_64 与 aarch64、macOS 14+ arm64、Windows amd64 的轮子，没有源码分发包。
@@ -84,7 +84,8 @@ Python 导入名仍为 `astrology`。此候选尚未发布到 PyPI；PyPI 的 `a
 
 检查会在隔离的 wheel 安装环境中执行两份 README，比较文档中的输出，检查 wheel 实际保存的
 Markdown 链接，并在构建后的站点中解析两种语言的路径。还会在一次性安装环境中分别隐藏两个
-分发包的元数据，按普通／优化模式检查恢复、计算和重算的失败合同，随后恢复元数据。
+分发包的元数据，确认恢复结果不变、重算抛出 `ChartReplayError`，并在缺少本项目元数据时
+确认直接计算抛出 `PackageNotFoundError`。普通／优化模式都执行，随后恢复元数据。
 
 手动发布 Pages 时，从干净且已提交的源码构建，将 `ASTROLOGY_DOCS_SOURCE_SHA` 设为完整的小写提交号。
 根页据此生成源码归档链接和安装命令；普通本地构建则明确没有固定版本。
