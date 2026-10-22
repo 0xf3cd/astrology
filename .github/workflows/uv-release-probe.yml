@@ -1,0 +1,81 @@
+name: Release uv checksum control
+
+on:
+  push:
+    branches: [probe/v010-release-uv-checksum]
+
+permissions: {}
+
+jobs:
+  checksum-build:
+    name: uv checksum (build)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.14"
+      - uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7.6.0
+        env:
+          RUNNER_TOOL_CACHE: ${{ runner.temp }}/astrology-release-build-${{ github.run_id }}-${{ github.run_attempt }}
+        with:
+          version: "0.12.5"
+          checksum: "68a509da24b06b4223a1c0175fb5eb5bc79342b76cbeff0cfe51ac3f5b17b6b2"
+          enable-cache: false
+      - name: Show verified uv
+        run: uv --version
+
+  checksum-consume:
+    name: uv checksum (${{ matrix.os }}, ${{ matrix.python }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            python: "3.11"
+            uv-checksum: "68a509da24b06b4223a1c0175fb5eb5bc79342b76cbeff0cfe51ac3f5b17b6b2"
+          - os: ubuntu-latest
+            python: "3.12"
+            uv-checksum: "68a509da24b06b4223a1c0175fb5eb5bc79342b76cbeff0cfe51ac3f5b17b6b2"
+          - os: ubuntu-latest
+            python: "3.13"
+            uv-checksum: "68a509da24b06b4223a1c0175fb5eb5bc79342b76cbeff0cfe51ac3f5b17b6b2"
+          - os: ubuntu-latest
+            python: "3.14"
+            uv-checksum: "68a509da24b06b4223a1c0175fb5eb5bc79342b76cbeff0cfe51ac3f5b17b6b2"
+          - os: ubuntu-24.04-arm
+            python: "3.14"
+            uv-checksum: "9bf43b4d1a07665bf64d4c4e710930b382321a785e0eb10aac07f46471f86a31"
+          - os: macos-latest
+            python: "3.14"
+            uv-checksum: "5bb0e5fe008a773c3dbcb97ff79cd89e1241464fe9d2f986d52ad8f1b037bd62"
+          - os: windows-latest
+            python: "3.14"
+            uv-checksum: "4c4d49d8738847d9b71ba319e49a5688c93eac0fe6204b1df24e98528dddf39a"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: 6d4106a8af0e02295c25cb1143860777799dd03b
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: ${{ matrix.python }}
+      - uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7.6.0
+        env:
+          RUNNER_TOOL_CACHE: ${{ runner.temp }}/astrology-release-consume-${{ github.run_id }}-${{ github.run_attempt }}
+        with:
+          version: "0.12.5"
+          checksum: ${{ matrix.uv-checksum }}
+          enable-cache: false
+      - name: Show verified uv
+        run: uv --version
