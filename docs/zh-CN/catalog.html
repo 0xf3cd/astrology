@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>知识目录参考 &#8212; celestial-astrology 0.1.0 (development / 开发版)</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
+    <script src="../../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/zh-CN/catalog.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="参与开发" href="contributing.html" />
+    <link rel="prev" title="知识组织与双语文档" href="knowledge.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="id1">
+<h1>知识目录参考<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h1>
+<p><a class="reference internal" href="../en/catalog.html"><span class="std std-doc">English</span></a> · <a class="reference internal" href="knowledge.html"><span class="std std-doc">指南</span></a> · <a class="reference internal" href="reference.html"><span class="std std-doc">API</span></a></p>
+<p>这是开发版目录，构建文档时从包内记录生成，下方列出全部接纳的概念、变体、版本和条目。
+配置链接标识已实现的<strong>请求值</strong>，不表示天文算法已实现；历史变体没有可执行实现。</p>
+<p><a class="reference internal" href="knowledge.html"><span class="std std-doc">知识指南</span></a>说明查询、来源范围、译文修订和搜索限制。
+原文引述、项目译文和原作陈述分别标明；检索从不确立命盘适用性。
+下方来源、前提、输出及命盘状态见指南的<a class="reference internal" href="knowledge.html#id8"><span class="std std-ref">状态说明</span></a>，
+译文状态见<a class="reference internal" href="knowledge.html#id4"><span class="std std-ref">翻译修订</span></a>。书目及版本内定位保留来源语言。</p>
+<p><code class="docutils literal notranslate"><span class="pre">code=0.1.0</span></code> · <code class="docutils literal notranslate"><span class="pre">corpus=2026.10.21.1</span></code></p>
+<section id="body-sun">
+<span id="catalog-zh-cn-body-sun"></span><h2>body.sun · 太阳<a class="headerlink" href="#body-sun" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=body</span></code></p>
+<p>太阳的物理天体请求。排盘适配层计算它的地心视位置；本目录不计算位置。</p>
+<p>English names / 英文名称：Sun, Sol</p>
+<p>Chinese names / 中文名称：太阳、日轮、日</p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.Body.SUN</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">sun</span></code></p>
+</section>
+<section id="body-moon">
+<span id="catalog-zh-cn-body-moon"></span><h2>body.moon · 月亮<a class="headerlink" href="#body-moon" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=body</span></code></p>
+<p>月亮的物理天体请求，与数学月交点区分。排盘适配层计算它的地心视位置。</p>
+<p>English names / 英文名称：Moon, Luna</p>
+<p>Chinese names / 中文名称：月亮、太阴、月</p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.Body.MOON</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">moon</span></code></p>
+</section>
+<section id="body-mercury">
+<span id="catalog-zh-cn-body-mercury"></span><h2>body.mercury · 水星<a class="headerlink" href="#body-mercury" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=body</span></code></p>
+<p>水星的物理天体请求。排盘适配层计算它的地心视位置；本目录不计算位置。</p>
+<p>English names / 英文名称：Mercury</p>
+<p>Chinese names / 中文名称：水星</p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.Body.MERCURY</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">mercury</span></code></p>
+</section>
+<section id="body-venus">
+<span id="catalog-zh-cn-body-venus"></span><h2>body.venus · 金星<a class="headerlink" href="#body-venus" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=body</span></code></p>
+<p>金星的物理天体请求。排盘适配层计算它的地心视位置；本目录不计算位置。</p>
+<p>English names / 英文名称：Venus</p>
+<p>Chinese names / 中文名称：金星</p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.Body.VENUS</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">venus</span></code></p>
+</section>
+<section id="body-mars">
+<span id="catalog-zh-cn-body-mars"></span><h2>body.mars · 火星<a class="headerlink" href="#body-mars" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=body</span></code></p>
+<p>火星的物理天体请求。排盘适配层计算它的地心视位置；本目录不计算位置。</p>
+<p>English names / 英文名称：Mars</p>
+<p>Chinese names / 中文名称：火星</p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.Body.MARS</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">mars</span></code></p>
+</section>
+<section id="body-jupiter">
+<span id="catalog-zh-cn-body-jupiter"></span><h2>body.jupiter · 木星<a class="headerlink" href="#body-jupiter" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=body</span></code></p>
+<p>木星的物理天体请求。排盘适配层计算它的地心视位置；本目录不计算位置。</p>
+<p>English names / 英文名称：Jupiter</p>
+<p>Chinese names / 中文名称：木星</p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.Body.JUPITER</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">jupiter</span></code></p>
+</section>
+<section id="body-saturn">
+<span id="catalog-zh-cn-body-saturn"></span><h2>body.saturn · 土星<a class="headerlink" href="#body-saturn" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=body</span></code></p>
+<p>土星的物理天体请求。排盘适配层计算它的地心视位置；本目录不计算位置。</p>
+<p>English names / 英文名称：Saturn</p>
+<p>Chinese names / 中文名称：土星</p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.Body.SATURN</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">saturn</span></code></p>
+</section>
+<section id="body-uranus">
+<span id="catalog-zh-cn-body-uranus"></span><h2>body.uranus · 天王星<a class="headerlink" href="#body-uranus" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=body</span></code></p>
+<p>天王星的物理天体请求。排盘适配层计算它的地心视位置；本目录不计算位置。</p>
+<p>English names / 英文名称：Uranus</p>
+<p>Chinese names / 中文名称：天王星</p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.Body.URANUS</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">uranus</span></code></p>
+</section>
+<section id="body-neptune">
+<span id="catalog-zh-cn-body-neptune"></span><h2>body.neptune · 海王星<a class="headerlink" href="#body-neptune" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=body</span></code></p>
+<p>海王星的物理天体请求。排盘适配层计算它的地心视位置；本目录不计算位置。</p>
+<p>English names / 英文名称：Neptune</p>
+<p>Chinese names / 中文名称：海王星</p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.Body.NEPTUNE</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">neptune</span></code></p>
+</section>
+<section id="body-pluto">
+<span id="catalog-zh-cn-body-pluto"></span><h2>body.pluto · 冥王星<a class="headerlink" href="#body-pluto" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=body</span></code></p>
+<p>冥王星的物理天体请求。排盘适配层计算它的地心视位置；本目录不计算位置。</p>
+<p>English names / 英文名称：Pluto</p>
+<p>Chinese names / 中文名称：冥王星</p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.Body.PLUTO</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">pluto</span></code></p>
+</section>
+<section id="sign-aries">
+<span id="catalog-zh-cn-sign-aries"></span><h2>sign.aries · 白羊座<a class="headerlink" href="#sign-aries" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=sign</span></code></p>
+<p>黄道星座词汇，不是天文星座。热带黄经归属在排盘实现中可执行；30 度区间边界是项目约定。</p>
+<p>English names / 英文名称：Aries</p>
+<p>Chinese names / 中文名称：白羊座、牡羊座</p>
+<p>Related / 关联：<a class="reference internal" href="#catalog-zh-cn-sign-libra"><span class="std std-ref">sign.libra</span></a></p>
+</section>
+<section id="sign-taurus">
+<span id="catalog-zh-cn-sign-taurus"></span><h2>sign.taurus · 金牛座<a class="headerlink" href="#sign-taurus" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=sign</span></code></p>
+<p>黄道星座词汇。热带黄经归属在排盘实现中可执行；30 度区间边界是项目约定。</p>
+<p>English names / 英文名称：Taurus</p>
+<p>Chinese names / 中文名称：金牛座</p>
+</section>
+<section id="sign-gemini">
+<span id="catalog-zh-cn-sign-gemini"></span><h2>sign.gemini · 双子座<a class="headerlink" href="#sign-gemini" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=sign</span></code></p>
+<p>黄道星座词汇。热带黄经归属在排盘实现中可执行；30 度区间边界是项目约定。</p>
+<p>English names / 英文名称：Gemini</p>
+<p>Chinese names / 中文名称：双子座</p>
+</section>
+<section id="sign-cancer">
+<span id="catalog-zh-cn-sign-cancer"></span><h2>sign.cancer · 巨蟹座<a class="headerlink" href="#sign-cancer" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=sign</span></code></p>
+<p>黄道星座词汇。热带黄经归属在排盘实现中可执行；30 度区间边界是项目约定。</p>
+<p>English names / 英文名称：Cancer</p>
+<p>Chinese names / 中文名称：巨蟹座</p>
+</section>
+<section id="sign-leo">
+<span id="catalog-zh-cn-sign-leo"></span><h2>sign.leo · 狮子座<a class="headerlink" href="#sign-leo" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=sign</span></code></p>
+<p>黄道星座词汇。热带黄经归属在排盘实现中可执行；30 度区间边界是项目约定。</p>
+<p>English names / 英文名称：Leo</p>
+<p>Chinese names / 中文名称：狮子座</p>
+</section>
+<section id="sign-virgo">
+<span id="catalog-zh-cn-sign-virgo"></span><h2>sign.virgo · 处女座<a class="headerlink" href="#sign-virgo" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=sign</span></code></p>
+<p>黄道星座词汇。热带黄经归属在排盘实现中可执行；30 度区间边界是项目约定。</p>
+<p>English names / 英文名称：Virgo</p>
+<p>Chinese names / 中文名称：处女座</p>
+</section>
+<section id="sign-libra">
+<span id="catalog-zh-cn-sign-libra"></span><h2>sign.libra · 天秤座<a class="headerlink" href="#sign-libra" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=sign</span></code></p>
+<p>黄道星座词汇。热带黄经归属在排盘实现中可执行；30 度区间边界是项目约定。</p>
+<p>English names / 英文名称：Libra</p>
+<p>Chinese names / 中文名称：天秤座、天平座</p>
+<p>Related / 关联：<a class="reference internal" href="#catalog-zh-cn-sign-aries"><span class="std std-ref">sign.aries</span></a></p>
+</section>
+<section id="sign-scorpio">
+<span id="catalog-zh-cn-sign-scorpio"></span><h2>sign.scorpio · 天蝎座<a class="headerlink" href="#sign-scorpio" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=sign</span></code></p>
+<p>黄道星座词汇。热带黄经归属在排盘实现中可执行；30 度区间边界是项目约定。</p>
+<p>English names / 英文名称：Scorpio</p>
+<p>Chinese names / 中文名称：天蝎座</p>
+</section>
+<section id="sign-sagittarius">
+<span id="catalog-zh-cn-sign-sagittarius"></span><h2>sign.sagittarius · 射手座<a class="headerlink" href="#sign-sagittarius" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=sign</span></code></p>
+<p>黄道星座词汇。热带黄经归属在排盘实现中可执行；30 度区间边界是项目约定。</p>
+<p>English names / 英文名称：Sagittarius</p>
+<p>Chinese names / 中文名称：射手座、人马座</p>
+</section>
+<section id="sign-capricorn">
+<span id="catalog-zh-cn-sign-capricorn"></span><h2>sign.capricorn · 摩羯座<a class="headerlink" href="#sign-capricorn" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=sign</span></code></p>
+<p>黄道星座词汇。热带黄经归属在排盘实现中可执行；30 度区间边界是项目约定。</p>
+<p>English names / 英文名称：Capricorn</p>
+<p>Chinese names / 中文名称：摩羯座</p>
+</section>
+<section id="sign-aquarius">
+<span id="catalog-zh-cn-sign-aquarius"></span><h2>sign.aquarius · 水瓶座<a class="headerlink" href="#sign-aquarius" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=sign</span></code></p>
+<p>黄道星座词汇。热带黄经归属在排盘实现中可执行；30 度区间边界是项目约定。</p>
+<p>English names / 英文名称：Aquarius</p>
+<p>Chinese names / 中文名称：水瓶座、宝瓶座</p>
+</section>
+<section id="sign-pisces">
+<span id="catalog-zh-cn-sign-pisces"></span><h2>sign.pisces · 双鱼座<a class="headerlink" href="#sign-pisces" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=sign</span></code></p>
+<p>黄道星座词汇。热带黄经归属在排盘实现中可执行；30 度区间边界是项目约定。</p>
+<p>English names / 英文名称：Pisces</p>
+<p>Chinese names / 中文名称：双鱼座</p>
+</section>
+<section id="house-whole-sign">
+<span id="catalog-zh-cn-house-whole-sign"></span><h2>house.whole_sign · 整宫制<a class="headerlink" href="#house-whole-sign" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=house_system</span></code></p>
+<p>Whole Sign 宫制请求。排盘适配层计算其宫头与落宫；上升点不必与第一宫头重合。</p>
+<p>English names / 英文名称：Whole Sign, whole sign houses</p>
+<p>Chinese names / 中文名称：整宫制、整宫</p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.HouseSystem.WHOLE_SIGN</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">whole_sign</span></code></p>
+</section>
+<section id="house-equal">
+<span id="catalog-zh-cn-house-equal"></span><h2>house.equal · 等宫制<a class="headerlink" href="#house-equal" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=house_system</span></code></p>
+<p>Equal 宫制请求。排盘适配层计算其宫头与落宫。</p>
+<p>English names / 英文名称：Equal, equal houses</p>
+<p>Chinese names / 中文名称：等宫制</p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.HouseSystem.EQUAL</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">equal</span></code></p>
+</section>
+<section id="house-placidus">
+<span id="catalog-zh-cn-house-placidus"></span><h2>house.placidus · 普拉西德制<a class="headerlink" href="#house-placidus" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=house_system</span></code></p>
+<p>Placidus 宫制请求。排盘适配层计算其宫头与落宫；几何不可用时明确报告，绝不替换为另一宫制。</p>
+<p>English names / 英文名称：Placidus, placidus houses</p>
+<p>Chinese names / 中文名称：普拉西德制、普拉西度制</p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.HouseSystem.PLACIDUS</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">placidus</span></code></p>
+</section>
+<section id="node-definition-mean">
+<span id="catalog-zh-cn-node-definition-mean"></span><h2>node_definition.mean · 平均月交点<a class="headerlink" href="#node-definition-mean" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=node_definition</span></code></p>
+<p>项目的平均交点定义标识。排盘适配层将其对应到天文库的平交点；Meeus 印刷公式本身尚未对原文核验。</p>
+<p>English names / 英文名称：Mean lunar node, mean node</p>
+<p>Chinese names / 中文名称：平均月交点、平均交点</p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.NodeDefinition.MEAN</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">mean</span></code></p>
+</section>
+<section id="node-definition-meeus-five-term-true-meeus">
+<span id="catalog-zh-cn-node-definition-meeus-five-term-true"></span><h2>node_definition.meeus_five_term_true · Meeus 五项真月交点<a class="headerlink" href="#node-definition-meeus-five-term-true-meeus" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=node_definition</span></code></p>
+<p>项目定义标识 MEEUS_FIVE_TERM_TRUE。排盘适配层将其对应到天文库的真交点。该交点即五项级数是本项目的认定，已用同一组 Meeus 公式对拍，天文库本身并未指明级数。此处未确立误差界或与密切轨道交点的等价关系。</p>
+<p>English names / 英文名称：Meeus five-term true lunar node, meeus five-term node</p>
+<p>Chinese names / 中文名称：Meeus 五项真月交点、五项真交点</p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.NodeDefinition.MEEUS_FIVE_TERM_TRUE</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">meeus_five_term_true</span></code></p>
+</section>
+<section id="node-mean-ascending">
+<span id="catalog-zh-cn-node-mean-ascending"></span><h2>node.mean_ascending · 平均升交点<a class="headerlink" href="#node-mean-ascending" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=lunar_node</span></code></p>
+<p>采用具名 MEAN 定义的数学升交点标识，不是物理天体。</p>
+<p>English names / 英文名称：Mean ascending lunar node, mean north node</p>
+<p>Chinese names / 中文名称：平均升交点、平均北交点</p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.LunarNode.MEAN_ASCENDING</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">mean_ascending_node</span></code></p>
+<p>Related / 关联：<a class="reference internal" href="#catalog-zh-cn-node-definition-mean"><span class="std std-ref">node_definition.mean</span></a></p>
+</section>
+<section id="node-mean-descending">
+<span id="catalog-zh-cn-node-mean-descending"></span><h2>node.mean_descending · 平均降交点<a class="headerlink" href="#node-mean-descending" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=lunar_node</span></code></p>
+<p>采用具名 MEAN 定义的数学降交点标识，不是物理天体。</p>
+<p>English names / 英文名称：Mean descending lunar node, mean south node</p>
+<p>Chinese names / 中文名称：平均降交点、平均南交点</p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.LunarNode.MEAN_DESCENDING</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">mean_descending_node</span></code></p>
+<p>Related / 关联：<a class="reference internal" href="#catalog-zh-cn-node-definition-mean"><span class="std std-ref">node_definition.mean</span></a></p>
+</section>
+<section id="node-meeus-five-term-true-ascending-meeus">
+<span id="catalog-zh-cn-node-meeus-five-term-true-ascending"></span><h2>node.meeus_five_term_true_ascending · Meeus 五项真升交点<a class="headerlink" href="#node-meeus-five-term-true-ascending-meeus" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=lunar_node</span></code></p>
+<p>采用 MEEUS_FIVE_TERM_TRUE 的数学升交点标识，不是物理天体。</p>
+<p>English names / 英文名称：Meeus five-term true ascending node</p>
+<p>Chinese names / 中文名称：Meeus 五项真升交点</p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.LunarNode.MEEUS_FIVE_TERM_TRUE_ASCENDING</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">meeus_five_term_true_ascending_node</span></code></p>
+<p>Related / 关联：<a class="reference internal" href="#catalog-zh-cn-node-definition-meeus-five-term-true"><span class="std std-ref">node_definition.meeus_five_term_true</span></a></p>
+</section>
+<section id="node-meeus-five-term-true-descending-meeus">
+<span id="catalog-zh-cn-node-meeus-five-term-true-descending"></span><h2>node.meeus_five_term_true_descending · Meeus 五项真降交点<a class="headerlink" href="#node-meeus-five-term-true-descending-meeus" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=lunar_node</span></code></p>
+<p>采用 MEEUS_FIVE_TERM_TRUE 的数学降交点标识，不是物理天体。</p>
+<p>English names / 英文名称：Meeus five-term true descending node</p>
+<p>Chinese names / 中文名称：Meeus 五项真降交点</p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.LunarNode.MEEUS_FIVE_TERM_TRUE_DESCENDING</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">meeus_five_term_true_descending_node</span></code></p>
+<p>Related / 关联：<a class="reference internal" href="#catalog-zh-cn-node-definition-meeus-five-term-true"><span class="std std-ref">node_definition.meeus_five_term_true</span></a></p>
+</section>
+<section id="aspect-conjunction">
+<span id="catalog-zh-cn-aspect-conjunction"></span><h2>aspect.conjunction · 合相<a class="headerlink" href="#aspect-conjunction" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=aspect</span></code></p>
+<p>合相请求标识。精确角度 0 度；排盘实现按黄经和显式容许度判断。</p>
+<p>English names / 英文名称：Conjunction</p>
+<p>Chinese names / 中文名称：合相、合相位</p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.MajorAspect.CONJUNCTION</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">conjunction</span></code></p>
+<p>Exact angle / 精确角度：0°</p>
+</section>
+<section id="aspect-sextile">
+<span id="catalog-zh-cn-aspect-sextile"></span><h2>aspect.sextile · 六分相<a class="headerlink" href="#aspect-sextile" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=aspect</span></code></p>
+<p>六分相请求标识。精确角度 60 度；排盘实现按黄经和显式容许度判断。</p>
+<p>English names / 英文名称：Sextile</p>
+<p>Chinese names / 中文名称：六分相</p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.MajorAspect.SEXTILE</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">sextile</span></code></p>
+<p>Exact angle / 精确角度：60°</p>
+</section>
+<section id="aspect-square">
+<span id="catalog-zh-cn-aspect-square"></span><h2>aspect.square · 四分相<a class="headerlink" href="#aspect-square" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=aspect</span></code></p>
+<p>四分相请求标识。精确角度 90 度；排盘实现按黄经和显式容许度判断。</p>
+<p>English names / 英文名称：Square</p>
+<p>Chinese names / 中文名称：四分相、刑相</p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.MajorAspect.SQUARE</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">square</span></code></p>
+<p>Exact angle / 精确角度：90°</p>
+</section>
+<section id="aspect-trine">
+<span id="catalog-zh-cn-aspect-trine"></span><h2>aspect.trine · 三分相<a class="headerlink" href="#aspect-trine" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=aspect</span></code></p>
+<p>三分相请求标识。精确角度 120 度；排盘实现按黄经和显式容许度判断。</p>
+<p>English names / 英文名称：Trine</p>
+<p>Chinese names / 中文名称：三分相</p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.MajorAspect.TRINE</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">trine</span></code></p>
+<p>Exact angle / 精确角度：120°</p>
+</section>
+<section id="aspect-opposition">
+<span id="catalog-zh-cn-aspect-opposition"></span><h2>aspect.opposition · 对分相<a class="headerlink" href="#aspect-opposition" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=aspect</span></code></p>
+<p>对分相请求标识。精确角度 180 度；排盘实现按黄经和显式容许度判断。</p>
+<p>English names / 英文名称：Opposition</p>
+<p>Chinese names / 中文名称：对分相、冲相</p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.MajorAspect.OPPOSITION</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">opposition</span></code></p>
+<p>Exact angle / 精确角度：180°</p>
+</section>
+<section id="rule-house-whole-sign">
+<span id="catalog-zh-cn-rule-house-whole-sign"></span><h2>rule.house.whole_sign · 整宫制<a class="headerlink" href="#rule-house-whole-sign" title="Link to this heading">¶</a></h2>
+<p>排盘适配层显式选择 celestial-calendar 的 WHOLE_SIGN 几何，再按 rule.project.cusp_ownership 将黄经归入给定宫头所界定的宫。上升点不必与第一宫头重合。</p>
+<p>项目对具名上游宫制的绑定，不是独立的历史推导。</p>
+<p>须满足适配层的共同有效域，且四轴有定义。选择整宫制不会绕过上游几何限制，也不提供替代策略。</p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-zh-cn-house-whole-sign"><span class="std std-ref">house.whole_sign</span></a></p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.HouseSystem.WHOLE_SIGN</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">whole_sign</span></code></p>
+</section>
+<section id="rule-house-equal">
+<span id="catalog-zh-cn-rule-house-equal"></span><h2>rule.house.equal · 等宫制<a class="headerlink" href="#rule-house-equal" title="Link to this heading">¶</a></h2>
+<p>排盘适配层显式选择 celestial-calendar 的 EQUAL 几何，再按 rule.project.cusp_ownership 将黄经归入给定宫头所界定的宫。</p>
+<p>项目对具名上游宫制的绑定，不是独立的历史推导。</p>
+<p>须满足适配层的共同有效域，且四轴有定义。所请求宫制不可用时，不会改用等宫制。</p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-zh-cn-house-equal"><span class="std std-ref">house.equal</span></a></p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.HouseSystem.EQUAL</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">equal</span></code></p>
+</section>
+<section id="rule-house-placidus">
+<span id="catalog-zh-cn-rule-house-placidus"></span><h2>rule.house.placidus · 普拉西德制<a class="headerlink" href="#rule-house-placidus" title="Link to this heading">¶</a></h2>
+<p>排盘适配层显式选择 celestial-calendar 的 PLACIDUS 几何，再按 rule.project.cusp_ownership 将黄经归入给定宫头所界定的宫。几何不可用时，排盘请求失败。</p>
+<p>项目对具名上游宫制的绑定，不是独立的历史推导。</p>
+<p>须满足适配层的共同有效域，且普拉西德几何有定义。失败时既不返回部分命盘，也不换用另一宫制。</p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-zh-cn-house-placidus"><span class="std std-ref">house.placidus</span></a></p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.HouseSystem.PLACIDUS</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">placidus</span></code></p>
+</section>
+<section id="rule-node-definition-mean">
+<span id="catalog-zh-cn-rule-node-definition-mean"></span><h2>rule.node_definition.mean · 平均月交点<a class="headerlink" href="#rule-node-definition-mean" title="Link to this heading">¶</a></h2>
+<p>适配层将 MEAN 交点定义对应到上游的平升交点和平降交点。方向由各 LunarNode 身份保留；此定义不选用五项修正。</p>
+<p>项目定义绑定，不是精度档位。</p>
+<p>项目测试按参考公式计算平交点，加上章动项，再与上游结果比较。这不表示已核验 Meeus 印刷原文或确立误差界，也不表示它可与真交点或密切轨道交点互换。</p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-zh-cn-node-definition-mean"><span class="std std-ref">node_definition.mean</span></a></p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.NodeDefinition.MEAN</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">mean</span></code></p>
+</section>
+<section id="rule-node-definition-meeus-five-term-true-meeus">
+<span id="catalog-zh-cn-rule-node-definition-meeus-five-term-true"></span><h2>rule.node_definition.meeus_five_term_true · Meeus 五项真月交点<a class="headerlink" href="#rule-node-definition-meeus-five-term-true-meeus" title="Link to this heading">¶</a></h2>
+<p>适配层将 MEEUS_FIVE_TERM_TRUE 对应到上游的真升交点和真降交点。项目以平交点加五项正弦修正及章动项对照结果，据此认定级数；上游目标名称本身未指明该级数。</p>
+<p>项目定义绑定，不是精度档位。</p>
+<p>这是实现对拍，不是独立天文互证。Meeus 印刷原文、误差界及与密切轨道交点的等价性仍未核验。</p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-zh-cn-node-definition-meeus-five-term-true"><span class="std std-ref">node_definition.meeus_five_term_true</span></a></p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.NodeDefinition.MEEUS_FIVE_TERM_TRUE</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">meeus_five_term_true</span></code></p>
+</section>
+<section id="rule-aspect-conjunction">
+<span id="catalog-zh-cn-rule-aspect-conjunction"></span><h2>rule.aspect.conjunction · 合相<a class="headerlink" href="#rule-aspect-conjunction" title="Link to this heading">¶</a></h2>
+<p>合相使用 astrology.aspects.aspect_angle 为 MajorAspect.CONJUNCTION 定义的精确角度；唯一的有向分支按 rule.project.aspect_deviation 判断。</p>
+<p>项目的黄经相位分类，不指定传统容许度。</p>
+<p>须由调用方显式给出容许度；按对象设置容许度时，须选定合成规则。角度规则本身不提供运动状态、强度或解释。</p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-zh-cn-aspect-conjunction"><span class="std std-ref">aspect.conjunction</span></a></p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.MajorAspect.CONJUNCTION</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">conjunction</span></code></p>
+<p>Exact angle / 精确角度：0°</p>
+</section>
+<section id="rule-aspect-sextile">
+<span id="catalog-zh-cn-rule-aspect-sextile"></span><h2>rule.aspect.sextile · 六分相<a class="headerlink" href="#rule-aspect-sextile" title="Link to this heading">¶</a></h2>
+<p>六分相使用 astrology.aspects.aspect_angle 为 MajorAspect.SEXTILE 定义的精确角度；正负两个有向分支均按 rule.project.aspect_deviation 判断。</p>
+<p>项目的黄经相位分类，不指定传统容许度。</p>
+<p>须由调用方显式给出容许度；按对象设置容许度时，须选定合成规则。角度规则本身不提供运动状态、强度或解释。</p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-zh-cn-aspect-sextile"><span class="std std-ref">aspect.sextile</span></a></p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.MajorAspect.SEXTILE</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">sextile</span></code></p>
+<p>Exact angle / 精确角度：60°</p>
+</section>
+<section id="rule-aspect-square">
+<span id="catalog-zh-cn-rule-aspect-square"></span><h2>rule.aspect.square · 四分相<a class="headerlink" href="#rule-aspect-square" title="Link to this heading">¶</a></h2>
+<p>四分相使用 astrology.aspects.aspect_angle 为 MajorAspect.SQUARE 定义的精确角度；正负两个有向分支均按 rule.project.aspect_deviation 判断。</p>
+<p>项目的黄经相位分类，不指定传统容许度。</p>
+<p>须由调用方显式给出容许度；按对象设置容许度时，须选定合成规则。角度规则本身不提供运动状态、强度或解释。</p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-zh-cn-aspect-square"><span class="std std-ref">aspect.square</span></a></p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.MajorAspect.SQUARE</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">square</span></code></p>
+<p>Exact angle / 精确角度：90°</p>
+</section>
+<section id="rule-aspect-trine">
+<span id="catalog-zh-cn-rule-aspect-trine"></span><h2>rule.aspect.trine · 三分相<a class="headerlink" href="#rule-aspect-trine" title="Link to this heading">¶</a></h2>
+<p>三分相使用 astrology.aspects.aspect_angle 为 MajorAspect.TRINE 定义的精确角度；正负两个有向分支均按 rule.project.aspect_deviation 判断。</p>
+<p>项目的黄经相位分类，不指定传统容许度。</p>
+<p>须由调用方显式给出容许度；按对象设置容许度时，须选定合成规则。角度规则本身不提供运动状态、强度或解释。</p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-zh-cn-aspect-trine"><span class="std std-ref">aspect.trine</span></a></p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.MajorAspect.TRINE</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">trine</span></code></p>
+<p>Exact angle / 精确角度：120°</p>
+</section>
+<section id="rule-aspect-opposition">
+<span id="catalog-zh-cn-rule-aspect-opposition"></span><h2>rule.aspect.opposition · 对分相<a class="headerlink" href="#rule-aspect-opposition" title="Link to this heading">¶</a></h2>
+<p>对分相使用 astrology.aspects.aspect_angle 为 MajorAspect.OPPOSITION 定义的精确角度；唯一的有向分支按 rule.project.aspect_deviation 判断。</p>
+<p>项目的黄经相位分类，不指定传统容许度。</p>
+<p>须由调用方显式给出容许度；按对象设置容许度时，须选定合成规则。角度规则本身不提供运动状态、强度或解释。</p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-zh-cn-aspect-opposition"><span class="std std-ref">aspect.opposition</span></a></p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.MajorAspect.OPPOSITION</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">opposition</span></code></p>
+<p>Exact angle / 精确角度：180°</p>
+</section>
+<section id="rule-project-tropical-sign-sectors">
+<span id="catalog-zh-cn-rule-project-tropical-sign-sectors"></span><h2>rule.project.tropical_sign_sectors · 热带星座区间<a class="headerlink" href="#rule-project-tropical-sign-sectors" title="Link to this heading">¶</a></h2>
+<p>热带黄道把黄经分为十二个半开的 30 度区间；恰好落在区间边界上的黄经归入后一个星座。</p>
+<p>热带黄道的项目约定；不表示关于天文星座或历史星座划分的断言。</p>
+<p>只适用于热带黄经。恒星黄道及本目录中的历史分组未实现。</p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-zh-cn-sign-aries"><span class="std std-ref">sign.aries</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-taurus"><span class="std std-ref">sign.taurus</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-gemini"><span class="std std-ref">sign.gemini</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-cancer"><span class="std std-ref">sign.cancer</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-leo"><span class="std std-ref">sign.leo</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-virgo"><span class="std std-ref">sign.virgo</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-libra"><span class="std std-ref">sign.libra</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-scorpio"><span class="std std-ref">sign.scorpio</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-sagittarius"><span class="std std-ref">sign.sagittarius</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-capricorn"><span class="std std-ref">sign.capricorn</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-aquarius"><span class="std std-ref">sign.aquarius</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-pisces"><span class="std std-ref">sign.pisces</span></a></p>
+</section>
+<section id="rule-project-cusp-ownership">
+<span id="catalog-zh-cn-rule-project-cusp-ownership"></span><h2>rule.project.cusp_ownership · 宫头归属与回绕<a class="headerlink" href="#rule-project-cusp-ownership" title="Link to this heading">¶</a></h2>
+<p>落宫使用半开区间 [宫头, 下一宫头)：恰好落在宫头上的黄经归入从该宫头开始的宫，成员关系跨 0/360 环绕。</p>
+<p>二维落宫的项目约定；宫制本身是具名请求。</p>
+<p>只使用给定的宫头几何。四轴是否与宫头重合是所请求宫制的性质。</p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-zh-cn-house-whole-sign"><span class="std std-ref">house.whole_sign</span></a>, <a class="reference internal" href="#catalog-zh-cn-house-equal"><span class="std std-ref">house.equal</span></a>, <a class="reference internal" href="#catalog-zh-cn-house-placidus"><span class="std std-ref">house.placidus</span></a></p>
+</section>
+<section id="rule-ptolemy-ashmand-equinoctial-signs-ashmand">
+<span id="catalog-zh-cn-rule-ptolemy-ashmand-equinoctial-signs"></span><h2>rule.ptolemy_ashmand.equinoctial_signs · Ashmand 所译托勒密的分点星座<a class="headerlink" href="#rule-ptolemy-ashmand-equinoctial-signs-ashmand" title="Link to this heading">¶</a></h2>
+<p>此版本称白羊座与天秤座为分点星座，所引整句保留其解释理由。</p>
+<p>托勒密经被归于 Proclus 的转述本，由 Ashmand 于 1822 年译为英文；单源历史记录。</p>
+<p>不可执行。历史原文的昼夜等长说法不保证实际日照时长；它不定义现代星座归属算法、宫制或命盘解释。</p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-zh-cn-sign-aries"><span class="std std-ref">sign.aries</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-libra"><span class="std std-ref">sign.libra</span></a></p>
+</section>
+<section id="rule-project-aspect-deviation">
+<span id="catalog-zh-cn-rule-project-aspect-deviation"></span><h2>rule.project.aspect_deviation · 相位偏差与分支<a class="headerlink" href="#rule-project-aspect-deviation" title="Link to this heading">¶</a></h2>
+<p>有向间距从第一个对象指向第二个，是黄经上取值在 (-180, 180] 度内的差。精确角度为 θ 的相位，在间距与某个分支的差不超过限度时成立，限度本身包含在内。六分、四分、三分相的分支是 −θ 和 +θ，合相与对分相只有 0 或 180 这一个角度。凡成立的分支都会报告，顺序是先按对象，再按相位角，同一相位里负分支在正分支之前。</p>
+<p>项目约定，不归于某个传统。</p>
+<p>仅限黄经。黄纬、赤纬、次要相位、整宫相位及与轴线的相位都不判断。</p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-zh-cn-aspect-conjunction"><span class="std std-ref">aspect.conjunction</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-sextile"><span class="std std-ref">aspect.sextile</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-square"><span class="std std-ref">aspect.square</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-trine"><span class="std std-ref">aspect.trine</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-opposition"><span class="std std-ref">aspect.opposition</span></a></p>
+</section>
+<section id="rule-project-aspect-motion">
+<span id="catalog-zh-cn-rule-project-aspect-motion"></span><h2>rule.project.aspect_motion · 入相与离相状态<a class="headerlink" href="#rule-project-aspect-motion" title="Link to this heading">¶</a></h2>
+<p>相对黄经速率是第二个对象的速率减去第一个的速率。偏差不为 180 度时，相对速率与偏差异号表示入相，同号表示离相。偏差恰为零表示精确；相对速率恰为零且偏差不为零表示静止，意思是两个对象没有相对运动，不表示某颗行星的黄经速率为零。缺少速率时为不确定。偏差恰为 180 度且存在相对运动时，回绕后的绝对偏差没有双侧导数，状态为不确定。直接比较浮点数，不使用容差。</p>
+<p>项目定义，不归于某个传统。</p>
+<p>只描述当前时刻，不预测相位之后会不会变得精确；任一对象都可能在达到精确相位前改变运动方向。</p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-zh-cn-aspect-conjunction"><span class="std std-ref">aspect.conjunction</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-sextile"><span class="std std-ref">aspect.sextile</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-square"><span class="std std-ref">aspect.square</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-trine"><span class="std std-ref">aspect.trine</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-opposition"><span class="std std-ref">aspect.opposition</span></a></p>
+</section>
+<section id="rule-project-aspect-participation">
+<span id="catalog-zh-cn-rule-project-aspect-participation"></span><h2>rule.project.aspect_participation · 参与相位的对象<a class="headerlink" href="#rule-project-aspect-participation" title="Link to this heading">¶</a></h2>
+<p>相位在已请求的对象之间判断，或在其中选出的子集之间判断。两个月交点之间不构成相位：四个交点标识只是同一对交点的两种定义和两个方向。月交点可以与天体构成相位。轴线不是排盘请求里的对象，不参与。</p>
+<p>项目约定，不归于某个传统。</p>
+<p>不判月交点之间的相位，是项目约定。某个惯例若根本不为月交点画相位，就把它排除在所选子集之外。</p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-zh-cn-aspect-conjunction"><span class="std std-ref">aspect.conjunction</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-sextile"><span class="std std-ref">aspect.sextile</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-square"><span class="std std-ref">aspect.square</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-trine"><span class="std std-ref">aspect.trine</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-opposition"><span class="std std-ref">aspect.opposition</span></a></p>
+</section>
+<section id="rule-project-orb-either-within-own-orb">
+<span id="catalog-zh-cn-rule-project-orb-either-within-own-orb"></span><h2>rule.project.orb_either_within_own_orb · 任一对象自己的容许度<a class="headerlink" href="#rule-project-orb-either-within-own-orb" title="Link to this heading">¶</a></h2>
+<p>每个对象使用单独设置的容许度；未单独设置时，使用相位规则的容许度。偏差在至少一个对象的容许度内就算符合，因此上限取两个容许度中较大的值。</p>
+<p>项目定义，不归于某个传统。</p>
+<p>仅在相位规则给出按对象的容许度时需要。目录不提供默认容许度。</p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-zh-cn-aspect-conjunction"><span class="std std-ref">aspect.conjunction</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-sextile"><span class="std std-ref">aspect.sextile</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-square"><span class="std std-ref">aspect.square</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-trine"><span class="std std-ref">aspect.trine</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-opposition"><span class="std std-ref">aspect.opposition</span></a></p>
+</section>
+<section id="rule-project-orb-both-within-own-orb">
+<span id="catalog-zh-cn-rule-project-orb-both-within-own-orb"></span><h2>rule.project.orb_both_within_own_orb · 两个对象各自的容许度<a class="headerlink" href="#rule-project-orb-both-within-own-orb" title="Link to this heading">¶</a></h2>
+<p>每个对象使用单独设置的容许度；未单独设置时，使用相位规则的容许度。偏差必须在两个对象各自的容许度内才算符合，因此上限取两个容许度中较小的值。</p>
+<p>项目定义，不归于某个传统。</p>
+<p>仅在相位规则给出按对象的容许度时需要。目录不提供默认容许度。</p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-zh-cn-aspect-conjunction"><span class="std std-ref">aspect.conjunction</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-sextile"><span class="std std-ref">aspect.sextile</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-square"><span class="std std-ref">aspect.square</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-trine"><span class="std std-ref">aspect.trine</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-opposition"><span class="std std-ref">aspect.opposition</span></a></p>
+</section>
+<section id="rule-project-orb-mean-of-orbs">
+<span id="catalog-zh-cn-rule-project-orb-mean-of-orbs"></span><h2>rule.project.orb_mean_of_orbs · 两个容许度的平均<a class="headerlink" href="#rule-project-orb-mean-of-orbs" title="Link to this heading">¶</a></h2>
+<p>每个对象使用单独设置的容许度；未单独设置时，使用相位规则的容许度。偏差不超过两个容许度的平均值就算符合。</p>
+<p>项目定义，不归于某个传统。</p>
+<p>仅在相位规则给出按对象的容许度时需要。目录不提供默认容许度。</p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-zh-cn-aspect-conjunction"><span class="std std-ref">aspect.conjunction</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-sextile"><span class="std std-ref">aspect.sextile</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-square"><span class="std std-ref">aspect.square</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-trine"><span class="std std-ref">aspect.trine</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-opposition"><span class="std std-ref">aspect.opposition</span></a></p>
+</section>
+<section id="source-astrology-chart-fc845fa-astrology-chart-implementation">
+<span id="catalog-zh-cn-source-astrology-chart-fc845fa"></span><h2>source.astrology.chart.fc845fa · astrology chart implementation<a class="headerlink" href="#source-astrology-chart-fc845fa-astrology-chart-implementation" title="Link to this heading">¶</a></h2>
+<p>astrology contributors. Development package 0.0.0; src/astrology/ and tests/test_reference.py at fc845fa1aa786f7e1eda7b4d901e70e9a505add5. <code class="docutils literal notranslate"><span class="pre">language=en</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">source_verification=verified</span></code></p>
+<p><a class="reference external" href="https://github.com/0xf3cd/astrology/tree/fc845fa1aa786f7e1eda7b4d901e70e9a505add5"><code class="docutils literal notranslate"><span class="pre">https://github.com/0xf3cd/astrology/tree/fc845fa1aa786f7e1eda7b4d901e70e9a505add5</span></code></a></p>
+<p>项目自写的适配层、星座区间、给定宫头的落宫判断、相位分类及交点对拍测试；不是独立的天文或传统互证。</p>
+<p>项目自写文本，采用本仓 MIT 许可证。</p>
+<p>支持此固定提交中的可执行星座、落宫、适配层和相位规则，以及该版本中交点对拍测试的存在；不表示核验了 Meeus 印刷公式、误差界、历史定义或解释。</p>
+</section>
+<section id="source-astrology-config-fa2e985-astrology-configuration-contracts">
+<span id="catalog-zh-cn-source-astrology-config-fa2e985"></span><h2>source.astrology.config.fa2e985 · astrology configuration contracts<a class="headerlink" href="#source-astrology-config-fa2e985-astrology-configuration-contracts" title="Link to this heading">¶</a></h2>
+<p>astrology contributors. Development package 0.0.0; config.py at fa2e985c964dab653a6aa0f5771062ad9fd956dc. <code class="docutils literal notranslate"><span class="pre">language=en</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">source_verification=verified</span></code></p>
+<p><a class="reference external" href="https://github.com/0xf3cd/astrology/blob/fa2e985c964dab653a6aa0f5771062ad9fd956dc/src/astrology/config.py"><code class="docutils literal notranslate"><span class="pre">https://github.com/0xf3cd/astrology/blob/fa2e985c964dab653a6aa0f5771062ad9fd956dc/src/astrology/config.py</span></code></a></p>
+<p>项目自写的请求标识与双语合同，不是独立的天文或传统互证。</p>
+<p>项目自写文本，采用本仓 MIT 许可证。</p>
+<p>仅支持已有配置身份及校验合同，不支持在别处实现的排盘计算，也不支持历史定义。</p>
+</section>
+<section id="source-ptolemy-ashmand1822-ptolemy-s-tetrabiblos-or-quadripartite">
+<span id="catalog-zh-cn-source-ptolemy-ashmand1822"></span><h2>source.ptolemy.ashmand1822 · Ptolemy’s Tetrabiblos, or Quadripartite<a class="headerlink" href="#source-ptolemy-ashmand1822-ptolemy-s-tetrabiblos-or-quadripartite" title="Link to this heading">¶</a></h2>
+<p>Ptolemy; paraphrase attributed to Proclus; English translator J. M. Ashmand. Davis and Dickson, London, 1822. <code class="docutils literal notranslate"><span class="pre">language=en</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">source_verification=verified</span></code></p>
+<p><a class="reference external" href="https://commons.wikimedia.org/w/index.php?title=File:Ptolemy%27s_Tetrabiblos_or_Quadripartite_(1822).pdf&amp;oldid=1078168290"><code class="docutils literal notranslate"><span class="pre">https://commons.wikimedia.org/w/index.php?title=File:Ptolemy%27s_Tetrabiblos_or_Quadripartite_(1822).pdf&amp;oldid=1078168290</span></code></a></p>
+<p>直接转录 Wikimedia Commons 托管的 Google Books 扫描本印刷页 34–35（PDF 第 72–73 页）。下载文件 SHA-256：8ab3073b2200ba85b3dd812acc0b2edd2d2757f196cc641de42e9a46293189cb。合并换行、断词连字符及规范标点空格，保留措辞。纯文本转录不编码排版强调。不是 1900 年重印本或现代网页转录。版本旁证：https://wdl.warburg.sas.ac.uk/object-wdl-awa-aaan 。镜像及目录不算独立规则作者。</p>
+<p>1822 年文本：Commons 文件修订 1078168290 标为原出版国、作者终身加 70 年或更短保护期地区及美国的公版（模板 PD-old-70-1923，并显示 Public Domain Mark 1.0 声明）；不作全球权限保证。仅收录一段人工转录短文，不再分发扫描图、水印或网站说明。项目中文翻译及原作说明采用 MIT 许可证。</p>
+<p>《第一卷》第 XIV 章的一条历史星座分组陈述，不是实证主张、多源共识或适用于命盘的结论。</p>
+</section>
+<section id="entry-body-requests-statement">
+<span id="catalog-zh-cn-entry-body-requests"></span><h2>entry.body_requests · Statement / 陈述<a class="headerlink" href="#entry-body-requests-statement" title="Link to this heading">¶</a></h2>
+<p>Body 提供物理对象的请求标识，数学月交点另有身份。</p>
+<p><code class="docutils literal notranslate"><span class="pre">prerequisites=complete</span></code> · <code class="docutils literal notranslate"><span class="pre">output=reference_only</span></code> · <code class="docutils literal notranslate"><span class="pre">chart=not_assessed</span></code></p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-zh-cn-body-sun"><span class="std std-ref">body.sun</span></a>, <a class="reference internal" href="#catalog-zh-cn-body-moon"><span class="std std-ref">body.moon</span></a>, <a class="reference internal" href="#catalog-zh-cn-body-mercury"><span class="std std-ref">body.mercury</span></a>, <a class="reference internal" href="#catalog-zh-cn-body-venus"><span class="std std-ref">body.venus</span></a>, <a class="reference internal" href="#catalog-zh-cn-body-mars"><span class="std std-ref">body.mars</span></a>, <a class="reference internal" href="#catalog-zh-cn-body-jupiter"><span class="std std-ref">body.jupiter</span></a>, <a class="reference internal" href="#catalog-zh-cn-body-saturn"><span class="std std-ref">body.saturn</span></a>, <a class="reference internal" href="#catalog-zh-cn-body-uranus"><span class="std std-ref">body.uranus</span></a>, <a class="reference internal" href="#catalog-zh-cn-body-neptune"><span class="std std-ref">body.neptune</span></a>, <a class="reference internal" href="#catalog-zh-cn-body-pluto"><span class="std std-ref">body.pluto</span></a></p>
+<p>Variants / 变体：</p>
+<p>Prerequisites / 前提：</p>
+<p>No prerequisites recorded / 未记录前提</p>
+<p>Exceptions / 例外：数学交点不能当作 Body 传入。</p>
+<p>Limits / 限度：这些是请求标识。位置由排盘适配层计算；本条目不给出位置，也不给出分类表。</p>
+<p><a class="reference internal" href="#catalog-zh-cn-source-astrology-config-fa2e985"><span class="std std-ref">source.astrology.config.fa2e985</span></a>: astrology 0.0.0 / config.Body and config.LunarNode at the recorded commit</p>
+<p><a class="reference internal" href="#catalog-zh-cn-source-astrology-chart-fc845fa"><span class="std std-ref">source.astrology.chart.fc845fa</span></a>: astrology 0.0.0 / src/astrology/celestial.py and src/astrology/chart.py at the recorded commit</p>
+</section>
+<section id="entry-house-requests-statement">
+<span id="catalog-zh-cn-entry-house-requests"></span><h2>entry.house_requests · Statement / 陈述<a class="headerlink" href="#entry-house-requests-statement" title="Link to this heading">¶</a></h2>
+<p>HouseSystem 标识显式的 Whole Sign、Equal 或 Placidus 请求；失败时不静默替换。</p>
+<p><code class="docutils literal notranslate"><span class="pre">prerequisites=complete</span></code> · <code class="docutils literal notranslate"><span class="pre">output=reference_only</span></code> · <code class="docutils literal notranslate"><span class="pre">chart=not_assessed</span></code></p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-zh-cn-house-whole-sign"><span class="std std-ref">house.whole_sign</span></a>, <a class="reference internal" href="#catalog-zh-cn-house-equal"><span class="std std-ref">house.equal</span></a>, <a class="reference internal" href="#catalog-zh-cn-house-placidus"><span class="std std-ref">house.placidus</span></a></p>
+<p>Variants / 变体：<a class="reference internal" href="#catalog-zh-cn-rule-house-whole-sign"><span class="std std-ref">rule.house.whole_sign</span></a>, <a class="reference internal" href="#catalog-zh-cn-rule-house-equal"><span class="std std-ref">rule.house.equal</span></a>, <a class="reference internal" href="#catalog-zh-cn-rule-house-placidus"><span class="std std-ref">rule.house.placidus</span></a>, <a class="reference internal" href="#catalog-zh-cn-rule-project-cusp-ownership"><span class="std std-ref">rule.project.cusp_ownership</span></a></p>
+<p>Prerequisites / 前提：</p>
+<ul class="simple">
+<li><p>调用方选择一个 HouseSystem 成员。</p></li>
+</ul>
+<p>Exceptions / 例外：请求合同不提供宫位几何；排盘适配层提供。</p>
+<p>Limits / 限度：此条目不确立宫制算法或适用域；排盘适配层及其有效域检查确立这些。不存在默认宫制。</p>
+<p><a class="reference internal" href="#catalog-zh-cn-source-astrology-config-fa2e985"><span class="std std-ref">source.astrology.config.fa2e985</span></a>: astrology 0.0.0 / config.HouseSystem and config.ChartConfig at the recorded commit</p>
+<p><a class="reference internal" href="#catalog-zh-cn-source-astrology-chart-fc845fa"><span class="std std-ref">source.astrology.chart.fc845fa</span></a>: astrology 0.0.0 / src/astrology/houses.py at the recorded commit</p>
+</section>
+<section id="entry-node-definitions-statement">
+<span id="catalog-zh-cn-entry-node-definitions"></span><h2>entry.node_definitions · Statement / 陈述<a class="headerlink" href="#entry-node-definitions-statement" title="Link to this heading">¶</a></h2>
+<p>MEAN 与 MEEUS_FIVE_TERM_TRUE 是不同的具名项目定义标识，不是精度档位。</p>
+<p><code class="docutils literal notranslate"><span class="pre">prerequisites=unresolved</span></code> · <code class="docutils literal notranslate"><span class="pre">output=reference_only</span></code> · <code class="docutils literal notranslate"><span class="pre">chart=not_assessed</span></code></p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-zh-cn-node-definition-mean"><span class="std std-ref">node_definition.mean</span></a>, <a class="reference internal" href="#catalog-zh-cn-node-definition-meeus-five-term-true"><span class="std std-ref">node_definition.meeus_five_term_true</span></a></p>
+<p>Variants / 变体：<a class="reference internal" href="#catalog-zh-cn-rule-node-definition-mean"><span class="std std-ref">rule.node_definition.mean</span></a>, <a class="reference internal" href="#catalog-zh-cn-rule-node-definition-meeus-five-term-true"><span class="std std-ref">rule.node_definition.meeus_five_term_true</span></a></p>
+<p>Prerequisites / 前提：</p>
+<ul class="simple">
+<li><p>天文计算需要排盘适配层及其具名模型；本目录不提供该模型。</p></li>
+</ul>
+<p>Exceptions / 例外：两种定义不得静默互换。</p>
+<p>Limits / 限度：此处未核验 Meeus 书中方程、误差界或与密切轨道交点的等价关系。</p>
+<p><a class="reference internal" href="#catalog-zh-cn-source-astrology-config-fa2e985"><span class="std std-ref">source.astrology.config.fa2e985</span></a>: astrology 0.0.0 / config.NodeDefinition at the recorded commit</p>
+<p><a class="reference internal" href="#catalog-zh-cn-source-astrology-chart-fc845fa"><span class="std std-ref">source.astrology.chart.fc845fa</span></a>: astrology 0.0.0 / src/astrology/celestial.py (_NODE_TARGETS); tests/test_reference.py (_meeus_nodes, _nodes_agree, test_the_lunar_nodes_agree_with_the_meeus_definition) at fc845fa1aa786f7e1eda7b4d901e70e9a505add5</p>
+</section>
+<section id="entry-node-directions-statement">
+<span id="catalog-zh-cn-entry-node-directions"></span><h2>entry.node_directions · Statement / 陈述<a class="headerlink" href="#entry-node-directions-statement" title="Link to this heading">¶</a></h2>
+<p>LunarNode 身份同时保留具名定义及升／降方向。</p>
+<p><code class="docutils literal notranslate"><span class="pre">prerequisites=complete</span></code> · <code class="docutils literal notranslate"><span class="pre">output=reference_only</span></code> · <code class="docutils literal notranslate"><span class="pre">chart=not_assessed</span></code></p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-zh-cn-node-mean-ascending"><span class="std std-ref">node.mean_ascending</span></a>, <a class="reference internal" href="#catalog-zh-cn-node-mean-descending"><span class="std std-ref">node.mean_descending</span></a>, <a class="reference internal" href="#catalog-zh-cn-node-meeus-five-term-true-ascending"><span class="std std-ref">node.meeus_five_term_true_ascending</span></a>, <a class="reference internal" href="#catalog-zh-cn-node-meeus-five-term-true-descending"><span class="std std-ref">node.meeus_five_term_true_descending</span></a></p>
+<p>Variants / 变体：</p>
+<p>Prerequisites / 前提：</p>
+<p>No prerequisites recorded / 未记录前提</p>
+<p>Exceptions / 例外：物理天体身份不带交点定义。</p>
+<p>Limits / 限度：命名方向不等于定义交点运动；排盘适配层计算交点及其黄经速率。</p>
+<p><a class="reference internal" href="#catalog-zh-cn-source-astrology-config-fa2e985"><span class="std std-ref">source.astrology.config.fa2e985</span></a>: astrology 0.0.0 / config.LunarNode.definition at the recorded commit</p>
+</section>
+<section id="entry-aspect-requests-statement">
+<span id="catalog-zh-cn-entry-aspect-requests"></span><h2>entry.aspect_requests · Statement / 陈述<a class="headerlink" href="#entry-aspect-requests-statement" title="Link to this heading">¶</a></h2>
+<p>MajorAspect 提供五种接纳的标识；AspectRule 要求调用方给出以度为单位、有限且非负的容许度。</p>
+<p><code class="docutils literal notranslate"><span class="pre">prerequisites=complete</span></code> · <code class="docutils literal notranslate"><span class="pre">output=reference_only</span></code> · <code class="docutils literal notranslate"><span class="pre">chart=not_assessed</span></code></p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-zh-cn-aspect-conjunction"><span class="std std-ref">aspect.conjunction</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-sextile"><span class="std std-ref">aspect.sextile</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-square"><span class="std std-ref">aspect.square</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-trine"><span class="std std-ref">aspect.trine</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-opposition"><span class="std std-ref">aspect.opposition</span></a></p>
+<p>Variants / 变体：<a class="reference internal" href="#catalog-zh-cn-rule-aspect-conjunction"><span class="std std-ref">rule.aspect.conjunction</span></a>, <a class="reference internal" href="#catalog-zh-cn-rule-aspect-sextile"><span class="std std-ref">rule.aspect.sextile</span></a>, <a class="reference internal" href="#catalog-zh-cn-rule-aspect-square"><span class="std std-ref">rule.aspect.square</span></a>, <a class="reference internal" href="#catalog-zh-cn-rule-aspect-trine"><span class="std std-ref">rule.aspect.trine</span></a>, <a class="reference internal" href="#catalog-zh-cn-rule-aspect-opposition"><span class="std std-ref">rule.aspect.opposition</span></a></p>
+<p>Prerequisites / 前提：</p>
+<ul class="simple">
+<li><p>请求相位须显式给出容许度。</p></li>
+</ul>
+<p>Exceptions / 例外：ChartConfig 允许空的相位请求序列。</p>
+<p>Limits / 限度：此条目只列出请求标识；判断见 entry.aspect_evaluation。不提供默认容许度或解释。</p>
+<p><a class="reference internal" href="#catalog-zh-cn-source-astrology-config-fa2e985"><span class="std std-ref">source.astrology.config.fa2e985</span></a>: astrology 0.0.0 / config.MajorAspect and config.AspectRule at the recorded commit</p>
+</section>
+<section id="entry-aspect-evaluation-statement">
+<span id="catalog-zh-cn-entry-aspect-evaluation"></span><h2>entry.aspect_evaluation · Statement / 陈述<a class="headerlink" href="#entry-aspect-evaluation-statement" title="Link to this heading">¶</a></h2>
+<p>主要相位按黄经和显式容许度判断，结果里保留有向分支和局部的入相或离相状态。</p>
+<p><code class="docutils literal notranslate"><span class="pre">prerequisites=complete</span></code> · <code class="docutils literal notranslate"><span class="pre">output=reference_only</span></code> · <code class="docutils literal notranslate"><span class="pre">chart=not_assessed</span></code></p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-zh-cn-aspect-conjunction"><span class="std std-ref">aspect.conjunction</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-sextile"><span class="std std-ref">aspect.sextile</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-square"><span class="std std-ref">aspect.square</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-trine"><span class="std std-ref">aspect.trine</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-opposition"><span class="std std-ref">aspect.opposition</span></a></p>
+<p>Variants / 变体：<a class="reference internal" href="#catalog-zh-cn-rule-project-aspect-deviation"><span class="std std-ref">rule.project.aspect_deviation</span></a>, <a class="reference internal" href="#catalog-zh-cn-rule-project-aspect-motion"><span class="std std-ref">rule.project.aspect_motion</span></a>, <a class="reference internal" href="#catalog-zh-cn-rule-project-aspect-participation"><span class="std std-ref">rule.project.aspect_participation</span></a>, <a class="reference internal" href="#catalog-zh-cn-rule-project-orb-either-within-own-orb"><span class="std std-ref">rule.project.orb_either_within_own_orb</span></a>, <a class="reference internal" href="#catalog-zh-cn-rule-project-orb-both-within-own-orb"><span class="std std-ref">rule.project.orb_both_within_own_orb</span></a>, <a class="reference internal" href="#catalog-zh-cn-rule-project-orb-mean-of-orbs"><span class="std std-ref">rule.project.orb_mean_of_orbs</span></a></p>
+<p>Prerequisites / 前提：</p>
+<ul class="simple">
+<li><p>每个容许度都由调用方给出；此条目不提供任何容许度。</p></li>
+<li><p>按对象的容许度需要选定一种合成规则。</p></li>
+</ul>
+<p>Exceptions / 例外：两个月交点之间不构成相位。</p>
+<p>Limits / 限度：此条目是项目定义，不是独立互证或传统规则。不提供默认容许度、强度或解释，检索也从不判断命盘。</p>
+<p><a class="reference internal" href="#catalog-zh-cn-source-astrology-chart-fc845fa"><span class="std std-ref">source.astrology.chart.fc845fa</span></a>: astrology 0.0.0 / src/astrology/aspects.py at the recorded commit</p>
+</section>
+<section id="entry-sign-vocabulary-statement">
+<span id="catalog-zh-cn-entry-sign-vocabulary"></span><h2>entry.sign_vocabulary · Statement / 陈述<a class="headerlink" href="#entry-sign-vocabulary-statement" title="Link to this heading">¶</a></h2>
+<p>白羊座与天秤座出现在所引历史分点星座分组中；本目录将星座名称与计算分开。</p>
+<p><code class="docutils literal notranslate"><span class="pre">prerequisites=complete</span></code> · <code class="docutils literal notranslate"><span class="pre">output=reference_only</span></code> · <code class="docutils literal notranslate"><span class="pre">chart=not_assessed</span></code></p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-zh-cn-sign-aries"><span class="std std-ref">sign.aries</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-libra"><span class="std std-ref">sign.libra</span></a></p>
+<p>Variants / 变体：<a class="reference internal" href="#catalog-zh-cn-rule-ptolemy-ashmand-equinoctial-signs"><span class="std std-ref">rule.ptolemy_ashmand.equinoctial_signs</span></a>, <a class="reference internal" href="#catalog-zh-cn-rule-project-tropical-sign-sectors"><span class="std std-ref">rule.project.tropical_sign_sectors</span></a></p>
+<p>Prerequisites / 前提：</p>
+<p>No prerequisites recorded / 未记录前提</p>
+<p>Exceptions / 例外：来源是一个具名历史版本，不是跨流派通用定义。</p>
+<p>Limits / 限度：其余星座名称仅作词汇；30 度区间边界与可执行归属是排盘实现中的项目约定，不是所引版本的主张。</p>
+<p><a class="reference internal" href="#catalog-zh-cn-source-ptolemy-ashmand1822"><span class="std std-ref">source.ptolemy.ashmand1822</span></a>: Book I, chapter XIV, printed pp. 34–35; PDF pages 72–73</p>
+<p><a class="reference internal" href="#catalog-zh-cn-source-astrology-chart-fc845fa"><span class="std std-ref">source.astrology.chart.fc845fa</span></a>: astrology 0.0.0 / src/astrology/zodiac.py at the recorded commit</p>
+</section>
+<section id="entry-equinoctial-example-statement">
+<span id="catalog-zh-cn-entry-equinoctial-example"></span><h2>entry.equinoctial_example · Statement / 陈述<a class="headerlink" href="#entry-equinoctial-example-statement" title="Link to this heading">¶</a></h2>
+<p>所引版本将白羊座与天秤座列为分点星座；查到这段话不表示某张命盘满足任何条件。</p>
+<p><code class="docutils literal notranslate"><span class="pre">prerequisites=unresolved</span></code> · <code class="docutils literal notranslate"><span class="pre">output=reference_only</span></code> · <code class="docutils literal notranslate"><span class="pre">chart=not_assessed</span></code></p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-zh-cn-sign-aries"><span class="std std-ref">sign.aries</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-libra"><span class="std std-ref">sign.libra</span></a></p>
+<p>Variants / 变体：<a class="reference internal" href="#catalog-zh-cn-rule-ptolemy-ashmand-equinoctial-signs"><span class="std std-ref">rule.ptolemy_ashmand.equinoctial_signs</span></a></p>
+<p>Prerequisites / 前提：</p>
+<ul class="simple">
+<li><p>若用于命盘，需要显式黄道约定、已计算的位置，以及另行明确的历史分组用法；此处未判断这些前提。</p></li>
+</ul>
+<p>Exceptions / 例外：保留历史原文的昼夜等长理由，不将其认可为实际日照时长保证。</p>
+<p>Limits / 限度：单源、仅供参考、不可执行的例子。缺少的前提保持未决；算出一个条件不能使检索结果变为完全适用。</p>
+<p><a class="reference internal" href="#catalog-zh-cn-source-ptolemy-ashmand1822"><span class="std std-ref">source.ptolemy.ashmand1822</span></a>: Book I, chapter XIV, printed pp. 34–35; PDF pages 72–73; complete equinoctial-sign sentence</p>
+<p>Original excerpt (English) / 原文引述（英文）：</p>
+<blockquote>
+<div><p>There are also two equinoctial signs: Aries, the first after the vernal equinox; and Libra, the first after the autumnal equinox: they are so called, because the Sun, when in the first point of either, makes the day and night equal.</p>
+</div></blockquote>
+<p>Chinese translation / 中文译文: <code class="docutils literal notranslate"><span class="pre">current</span></code>, revision=1; astrology contributors (project Chinese translation of Ashmand’s English)</p>
+<blockquote>
+<div><p>分点星座也有两个：白羊座，春分之后的第一个；天秤座，秋分之后的第一个。它们如此命名，是因为太阳位于二者任一的起点时，使昼与夜等长。</p>
+</div></blockquote>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">celestial-astrology</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../en/index.html">Documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">文档入口</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../README.zh-CN.html">celestial-astrology</a></li>
+<li class="toctree-l2"><a class="reference internal" href="birth.html">出生记录与现代时刻解析</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html">排盘请求配置</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chart.html">本命盘</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aspects.html">相位</a></li>
+<li class="toctree-l2"><a class="reference internal" href="records.html">保存、恢复、重算和查看命盘</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference.html">公开 API 参考</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html">仓库结构与计算边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="knowledge.html">知识组织与双语文档</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">知识目录参考</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html">参与开发</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">文档入口</a><ul>
+      <li>Previous: <a href="knowledge.html" title="previous chapter">知识组织与双语文档</a></li>
+      <li>Next: <a href="contributing.html" title="next chapter">参与开发</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 9.1.0</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../../_sources/docs/zh-CN/catalog.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

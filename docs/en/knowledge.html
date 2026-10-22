@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Knowledge organization and bilingual documentation &#8212; celestial-astrology 0.1.0 (development / 开发版)</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
+    <script src="../../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/en/knowledge.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Knowledge catalog reference" href="catalog.html" />
+    <link rel="prev" title="Repository structure and calculation boundaries" href="architecture.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="knowledge-organization-and-bilingual-documentation">
+<h1>Knowledge organization and bilingual documentation<a class="headerlink" href="#knowledge-organization-and-bilingual-documentation" title="Link to this heading">¶</a></h1>
+<p><a class="reference internal" href="../zh-CN/knowledge.html"><span class="std std-doc">简体中文</span></a> · <a class="reference internal" href="../../README.html"><span class="std std-doc">Project</span></a> · <a class="reference internal" href="architecture.html"><span class="std std-doc">Architecture</span></a></p>
+<p>The development package provides a chart-independent knowledge catalog. List
+concepts and variants, find bilingual names/aliases, filter entries and sources,
+and inspect citations without birth data or native astronomy. Chart calculation
+is available through the <a class="reference internal" href="chart.html"><span class="std std-doc">chart guide</span></a> and is never needed to browse
+the catalog.
+See the generated <a class="reference internal" href="catalog.html"><span class="std std-doc">catalog</span></a> and <a class="reference internal" href="reference.html"><span class="std std-doc">API</span></a>.</p>
+<section id="browse-without-a-chart">
+<h2>Browse without a chart<a class="headerlink" href="#browse-without-a-chart" title="Link to this heading">¶</a></h2>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">astrology.knowledge</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConceptKind</span><span class="p">,</span> <span class="n">SourceVerification</span><span class="p">,</span> <span class="n">load_catalog</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">catalog</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">catalog</span><span class="o">.</span><span class="n">lookup</span><span class="p">(</span><span class="s2">"Sol"</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">identifier</span>
+<span class="go">'body.sun'</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">catalog</span><span class="o">.</span><span class="n">lookup</span><span class="p">(</span><span class="s2">"日轮"</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="n">catalog</span><span class="o">.</span><span class="n">lookup</span><span class="p">(</span><span class="s2">"Sun"</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">catalog</span><span class="o">.</span><span class="n">list_concepts</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="n">ConceptKind</span><span class="o">.</span><span class="n">SIGN</span><span class="p">))</span>
+<span class="go">12</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">catalog</span><span class="o">.</span><span class="n">concept</span><span class="p">(</span><span class="s2">"body.sun"</span><span class="p">)</span><span class="o">.</span><span class="n">configuration</span><span class="o">.</span><span class="n">name</span>
+<span class="go">'SUN'</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">catalog</span><span class="o">.</span><span class="n">list_variants</span><span class="p">(</span><span class="n">concept_id</span><span class="o">=</span><span class="s2">"body.sun"</span><span class="p">)</span>
+<span class="go">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">catalog</span><span class="o">.</span><span class="n">filter_entries</span><span class="p">(</span><span class="n">concept_id</span><span class="o">=</span><span class="s2">"body.sun"</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">identifier</span>
+<span class="go">'entry.body_requests'</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">catalog</span><span class="o">.</span><span class="n">filter_sources</span><span class="p">(</span><span class="n">verification</span><span class="o">=</span><span class="n">SourceVerification</span><span class="o">.</span><span class="n">VERIFIED</span><span class="p">))</span>
+<span class="go">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">bool</span><span class="p">(</span><span class="n">catalog</span><span class="o">.</span><span class="n">version</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>In the built-in catalog, body and node-direction concepts have no separate rule
+variants, so the empty tuple for <code class="docutils literal notranslate"><span class="pre">body.sun</span></code> is expected. Their identity information
+remains on the concepts and entries; see <a class="reference internal" href="#pre-release-rule-id-changes">rule-ID changes</a>.</p>
+<p>Each <code class="docutils literal notranslate"><span class="pre">load_catalog()</span></code> explicitly reads the packaged JSON, without a cache or
+network. Constructors copy sequences into tuples. Invalid record types, duplicate
+IDs, dangling links and conflicting aliases raise <code class="docutils literal notranslate"><span class="pre">TypeError</span></code> or <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>,
+including under <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-O</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">lookup()</span></code> normalizes NFC, trims and case-folds, then matches exact names/aliases.
+It returns an immutable tuple: <code class="docutils literal notranslate"><span class="pre">()</span></code> for no match, several distinct identities for
+ambiguous display names. Select <code class="docutils literal notranslate"><span class="pre">language=&quot;en&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">language=&quot;zh-CN&quot;</span></code> to restrict
+lookup; omission searches both. Unknown well-formed IDs in getters/filters raise
+<code class="docutils literal notranslate"><span class="pre">KeyError</span></code>; malformed strings raise <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>, non-string IDs <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>.
+Entry filters combine all selected criteria; they never evaluate prerequisites.</p>
+</section>
+<section id="follow-a-source-to-a-definition">
+<span id="knowledge-source-definitions-en"></span><h2>Follow a source to a definition<a class="headerlink" href="#follow-a-source-to-a-definition" title="Link to this heading">¶</a></h2>
+<p>The corpus contains project configuration contracts, the project conventions for
+sign sectors and house placement, and one single-source historical grouping. It
+names every admitted configuration identity and twelve sign concepts, and links the
+executable rules in the chart implementation. Each project-defined aspect rule has
+a name, a written definition and a link to its implementation. The corpus provides
+no default orbs, dignity or interpretation rules.
+Concepts reference actual configuration enum members. Separate variants describe
+house-system bindings, named node definitions and aspect-angle rules, with limits
+specific to each rule. Reference pages add an exact-angle line from the executable
+definition; the angles in concept descriptions are checked against that definition.
+Body and node-direction identities do not
+need a second rule record.</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">entry</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">entry</span><span class="p">(</span><span class="s2">"entry.equinoctial_example"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">citation</span><span class="p">,</span> <span class="n">source</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">citations</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">identifier</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">edition</span>
+<span class="go">'Davis and Dickson, London, 1822'</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">citation</span><span class="o">.</span><span class="n">excerpt</span><span class="o">.</span><span class="n">en</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"There are also two equinoctial signs:"</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">citation</span><span class="o">.</span><span class="n">excerpt</span><span class="o">.</span><span class="n">zh</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">verification</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">entry</span><span class="o">.</span><span class="n">prerequisite_status</span><span class="o">.</span><span class="n">value</span>
+<span class="go">('verified', 'unresolved')</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">entry</span><span class="o">.</span><span class="n">output_eligibility</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">entry</span><span class="o">.</span><span class="n">chart_applicability</span>
+<span class="go">('reference_only', 'not_assessed')</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">catalog</span><span class="o">.</span><span class="n">variant</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">rule_ids</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">configuration</span> <span class="ow">is</span> <span class="kc">None</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>The citation locates Book I, chapter XIV, printed pp. 34–35 (PDF pages 72–73)
+of Ashmand’s English translation of the paraphrase attributed to Proclus. The
+<a class="reference internal" href="catalog.html#catalog-en-entry-equinoctial-example"><span class="std std-ref">catalog example</span></a> preserves the complete
+English sentence and a separately credited project Chinese translation. The
+historical equal-day/night rationale is retained, not endorsed as an observed
+daylight guarantee. Statements, definitions and limitations are project
+explanations, not additional quotations.</p>
+<p>The source records the edition, scan hash, transcription normalization and bounded
+reproduction status. Only a short transcription is included, not scan images,
+watermarks or modern website prose. Mirrors/catalogs corroborate the edition,
+not independent rule authorship. Config citations identify package version and
+symbols at a fixed commit; they do not verify an author’s book formula merely
+because a project definition bears that author’s name.</p>
+<p>Implementation source records stay pinned to the inspected commits instead of
+following the package version. The chart source record locates the node-comparison
+test in <code class="docutils literal notranslate"><span class="pre">tests/test_reference.py</span></code> at that same commit. The test calculates reference
+node longitudes from the formulas recorded there and compares them with upstream
+results. This does not verify Meeus’s printed text, establish an error bound or show
+equivalence to an osculating node.</p>
+<p>The following is synthetic partial evidence, not a traditional claim or matching
+API. The catalog does not consume it or promote the entry to applicable:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">partial_evidence</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"condition_a"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">"condition_b"</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">partial_evidence</span><span class="p">[</span><span class="s2">"condition_a"</span><span class="p">],</span> <span class="n">partial_evidence</span><span class="p">[</span><span class="s2">"condition_b"</span><span class="p">]</span>
+<span class="go">(True, None)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">catalog</span><span class="o">.</span><span class="n">entry</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">identifier</span><span class="p">)</span><span class="o">.</span><span class="n">chart_applicability</span>
+<span class="go">'not_assessed'</span>
+</pre></div>
+</div>
+<p>All built-in entries are reference-only. This package has no matcher or
+chart-evidence store.</p>
+</section>
+<section id="translation-revisions-and-search">
+<h2>Translation revisions and search<a class="headerlink" href="#translation-revisions-and-search" title="Link to this heading">¶</a></h2>
+<p>The current text schema uses English originals/canonical text and separately
+credited Chinese translations. Missing text is <code class="docutils literal notranslate"><span class="pre">None</span></code>; stale text retains its
+old revision, without an English fallback counted as Chinese:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">astrology.knowledge</span><span class="w"> </span><span class="kn">import</span> <span class="n">LocalizedText</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">LocalizedText</span><span class="p">(</span><span class="s2">"Original"</span><span class="p">)</span><span class="o">.</span><span class="n">status</span><span class="p">(</span><span class="s2">"zh-CN"</span><span class="p">)</span><span class="o">.</span><span class="n">value</span>
+<span class="go">'missing'</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">old</span> <span class="o">=</span> <span class="n">LocalizedText</span><span class="p">(</span><span class="s2">"Revised"</span><span class="p">,</span> <span class="s2">"旧译"</span><span class="p">,</span> <span class="n">revision</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">zh_revision</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">translation_credit</span><span class="o">=</span><span class="s2">"example translator"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">old</span><span class="o">.</span><span class="n">status</span><span class="p">(</span><span class="s2">"zh-CN"</span><span class="p">)</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">old</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">"zh-CN"</span><span class="p">)</span>
+<span class="go">('stale', '旧译')</span>
+</pre></div>
+</div>
+<p>The required-translation check rejects missing/stale text in the built-in corpus.
+Constructors and reference rendering can still represent those states explicitly.</p>
+<p>Documentation search uses English word stems and Chinese character pairs, not
+dictionary segmentation, exact phrase search or semantic alias expansion.
+Single-character queries only find single-character
+index entries, such as the explicit aliases <code class="docutils literal notranslate"><span class="pre">日</span></code> and <code class="docutils literal notranslate"><span class="pre">月</span></code>. Arbitrary single-character
+substring matching is not supported. Use <code class="docutils literal notranslate"><span class="pre">Catalog.lookup()</span></code> for exact identity lookup.</p>
+</section>
+<section id="add-a-sourced-variant">
+<h2>Add a sourced variant<a class="headerlink" href="#add-a-sourced-variant" title="Link to this heading">¶</a></h2>
+<ol class="arabic simple">
+<li><p>Inspect a retrievable edition and reproduction terms. Record work, author or
+translator, edition, language, locator, lineage, supported claim and limits.
+Mark unverified material honestly; two mirrors are not two sources.</p></li>
+<li><p>Add stable records to <code class="docutils literal notranslate"><span class="pre">src/astrology/knowledge/catalog.json</span></code>. Reference an
+owning enum class/member instead of copying its value or inventing an algorithm.
+Add a separate explicit variant only when it carries a rule, with its own
+definition and limits; configuration links alone do not generate variants.
+Lunar-node definition links are derived from <code class="docutils literal notranslate"><span class="pre">LunarNode.definition</span></code>, and the
+loader checks all twelve Sign-to-concept identities in the built-in corpus.
+Source-only variants have no config reference; entries link variant IDs and citations.</p></li>
+<li><p>Keep excerpts, translations and authored statements distinct. <code class="docutils literal notranslate"><span class="pre">text_defaults</span></code>
+supplies initial revision 1 and project translation credit; each text can
+override them. Increment a changed text’s <code class="docutils literal notranslate"><span class="pre">revision</span></code>; retain its old <code class="docutils literal notranslate"><span class="pre">zh_revision</span></code>
+until translation review, then update revision and credit together.</p></li>
+<li><p>State prerequisites, exceptions and limits. Select source verification,
+prerequisite completeness and output eligibility independently. Retrieval must
+leave chart applicability <code class="docutils literal notranslate"><span class="pre">not_assessed</span></code> even when one condition is computable.
+Leave unsupported interpretations out of the default corpus.</p></li>
+<li><p>Add boundary/source tests, run the <a class="reference internal" href="contributing.html"><span class="std std-doc">complete checks</span></a> and inspect
+both generated language pages. Checks cover current translations, complete
+config/catalog/API references and installed resources. Semantic review still
+verifies translation meaning and source fidelity.</p></li>
+</ol>
+</section>
+<section id="pre-release-rule-id-changes">
+<h2>Pre-release rule-ID changes<a class="headerlink" href="#pre-release-rule-id-changes" title="Link to this heading">¶</a></h2>
+<p>Corpus <code class="docutils literal notranslate"><span class="pre">2026.10.21.1</span></code> removes fourteen automatically generated variants that only
+repeated request identities. Their concepts, aliases, configuration links and
+entries remain. <code class="docutils literal notranslate"><span class="pre">entry.body_requests</span></code> and <code class="docutils literal notranslate"><span class="pre">entry.node_directions</span></code> now have empty
+<code class="docutils literal notranslate"><span class="pre">rule_ids</span></code>; entries already permitted that shape. The removed IDs are:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>rule.body.sun
+rule.body.moon
+rule.body.mercury
+rule.body.venus
+rule.body.mars
+rule.body.jupiter
+rule.body.saturn
+rule.body.uranus
+rule.body.neptune
+rule.body.pluto
+rule.node.mean_ascending
+rule.node.mean_descending
+rule.node.meeus_five_term_true_ascending
+rule.node.meeus_five_term_true_descending
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">variant()</span></code> raises <code class="docutils literal notranslate"><span class="pre">KeyError</span></code> for these IDs; there is no alias or conversion to a
+concept. <code class="docutils literal notranslate"><span class="pre">list_variants()</span></code> for their concepts returns <code class="docutils literal notranslate"><span class="pre">()</span></code>. Use <code class="docutils literal notranslate"><span class="pre">concept()</span></code>,
+<code class="docutils literal notranslate"><span class="pre">lookup()</span></code> or <code class="docutils literal notranslate"><span class="pre">filter_entries()</span></code> to retrieve the preserved identity information.
+The three <code class="docutils literal notranslate"><span class="pre">rule.house.*</span></code>, two <code class="docutils literal notranslate"><span class="pre">rule.node_definition.*</span></code>, five <code class="docutils literal notranslate"><span class="pre">rule.aspect.*</span></code> and
+nine original authored rule IDs remain. Their relative order is unchanged:
+the ten configuration-linked rules precede the original nine authored rules.
+There are now 19 variants, with 36 concepts, 3 sources and 8 entries unchanged in
+count. Source status, prerequisite completeness, output eligibility and chart
+applicability retain their separate meanings.</p>
+</section>
+<section id="records-and-ownership">
+<h2>Records and ownership<a class="headerlink" href="#records-and-ownership" title="Link to this heading">¶</a></h2>
+<p>Use stable, language-independent identifiers for concepts, rule variants, sources,
+and knowledge entries. These are record roles, not a requirement for one class or
+file per role.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Record</p></th>
+<th class="head"><p>Holds</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Concept</p></td>
+<td><p>Identity, kind, Chinese/English names and aliases, related concepts</p></td>
+</tr>
+<tr class="row-odd"><td><p>Rule variant</p></td>
+<td><p>Definition, tradition, applicability, implementation reference if executable</p></td>
+</tr>
+<tr class="row-even"><td><p>Source</p></td>
+<td><p>Work/author, edition, locator, original language, source lineage, supported claims and limits</p></td>
+</tr>
+<tr class="row-odd"><td><p>Knowledge entry</p></td>
+<td><p>Statement, linked concepts/rules/sources, prerequisites, exceptions, limits, and editorial status</p></td>
+</tr>
+</tbody>
+</table>
+<p>Keep executable constants and tables with the domain implementation. Knowledge
+entries link to the rule identifier; generated reference tables read the
+executable definition. Explanations provide the reasons and scope without becoming
+a second computational rule table.</p>
+<p>Original quotations, translations, and project-authored explanations are different
+text layers. A translation must identify its original; citing the same source
+through several translations does not provide independent evidence. Preserve the
+source’s wording and locator, and document reproduction rights for included material.</p>
+</section>
+<section id="status-has-several-dimensions">
+<h2>Status has several dimensions<a class="headerlink" href="#status-has-several-dimensions" title="Link to this heading">¶</a></h2>
+<p>This catalog uses <code class="docutils literal notranslate"><span class="pre">verified</span></code> / <code class="docutils literal notranslate"><span class="pre">unverified</span></code> for source inspection,
+<code class="docutils literal notranslate"><span class="pre">complete</span></code> / <code class="docutils literal notranslate"><span class="pre">unresolved</span></code> for prerequisite representation, and
+<code class="docutils literal notranslate"><span class="pre">eligible</span></code> / <code class="docutils literal notranslate"><span class="pre">reference_only</span></code> for editorial output eligibility. <code class="docutils literal notranslate"><span class="pre">eligible</span></code> does
+not mean that a chart satisfies the prerequisites. Retrieval leaves chart
+applicability <code class="docutils literal notranslate"><span class="pre">not_assessed</span></code>, regardless of the other fields. The questions are:</p>
+<ol class="arabic simple">
+<li><p>Has the stated source been checked?</p></li>
+<li><p>Are the entry’s prerequisites understood and represented?</p></li>
+<li><p>Is the entry eligible for the default output?</p></li>
+<li><p>Does a particular chart satisfy the represented prerequisites?</p></li>
+</ol>
+<p>An eventual matcher must distinguish satisfied, not satisfied, and unknown.
+Matching part of a condition must remain partial evidence. For example, a
+calculated aspect alone cannot establish a statement that also requires sect and
+dignity when those conditions have not been evaluated.</p>
+<p>Related design: <a class="reference external" href="https://github.com/0xf3cd/bazi">bazi</a>.</p>
+</section>
+<section id="bilingual-surfaces">
+<h2>Bilingual surfaces<a class="headerlink" href="#bilingual-surfaces" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">README.md</span></code> and <code class="docutils literal notranslate"><span class="pre">README.zh-CN.md</span></code> provide equivalent project entry points.</p></li>
+<li><p>Guides and explanations use matching paths in <code class="docutils literal notranslate"><span class="pre">docs/en/</span></code> and <code class="docutils literal notranslate"><span class="pre">docs/zh-CN/</span></code>, with
+links to their language counterpart. Both cover the same supported behavior.</p></li>
+<li><p>Public API documentation exposes Chinese and English descriptions, constraints,
+and examples. Signatures, units, defaults, identifiers, and error contracts have
+one source. Keep public docstring summaries/contracts bilingual; render language
+views without maintaining separate signature or parameter tables.</p></li>
+<li><p>A concept or entry has one semantic identity with localized text. Record which
+semantic revision a translation covers; absence or staleness is visible rather
+than silently replaced with text in another language.</p></li>
+<li><p>Original excerpts remain in their source language. A reader may choose a
+translation without losing access to that original.</p></li>
+<li><p>The generated <a class="reference internal" href="catalog.html"><span class="std std-doc">catalog</span></a> identifies its code and corpus versions and
+is labeled as development documentation. Checks and semantic review are described
+in <a class="reference internal" href="contributing.html"><span class="std std-doc">contributing</span></a>.</p></li>
+</ul>
+<p>Language labels must not change calculation. Distinct definitions must not be
+collapsed merely because a translation gives them the same display name. Search
+should support both languages and aliases while returning stable identities.</p>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">celestial-astrology</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../README.html">celestial-astrology</a></li>
+<li class="toctree-l2"><a class="reference internal" href="birth.html">Birth records and modern time resolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html">Requested chart configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chart.html">Natal charts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aspects.html">Aspects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="records.html">Save, restore, replay and inspect a chart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference.html">Public API reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html">Repository structure and calculation boundaries</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Knowledge organization and bilingual documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="catalog.html">Knowledge catalog reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html">Contributing</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../zh-CN/index.html">文档入口</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Documentation</a><ul>
+      <li>Previous: <a href="architecture.html" title="previous chapter">Repository structure and calculation boundaries</a></li>
+      <li>Next: <a href="catalog.html" title="next chapter">Knowledge catalog reference</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 9.1.0</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../../_sources/docs/en/knowledge.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

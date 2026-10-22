@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Save, restore, replay and inspect a chart &#8212; celestial-astrology 0.1.0 (development / 开发版)</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
+    <script src="../../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/en/records.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Public API reference" href="reference.html" />
+    <link rel="prev" title="Aspects" href="aspects.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="save-restore-replay-and-inspect-a-chart">
+<h1>Save, restore, replay and inspect a chart<a class="headerlink" href="#save-restore-replay-and-inspect-a-chart" title="Link to this heading">¶</a></h1>
+<p><a class="reference internal" href="../zh-CN/records.html"><span class="std std-doc">简体中文</span></a> · <a class="reference internal" href="chart.html"><span class="std std-doc">Chart</span></a> · <a class="reference internal" href="reference.html"><span class="std std-doc">API</span></a></p>
+<p><code class="docutils literal notranslate"><span class="pre">NatalChart.resolved</span></code> retains the actual resolved birth input, including its
+original record. Save it with <code class="docutils literal notranslate"><span class="pre">dumps_chart</span></code>, restore the stored values with
+<code class="docutils literal notranslate"><span class="pre">loads_chart</span></code>, or calculate a fresh result explicitly with <code class="docutils literal notranslate"><span class="pre">recompute_chart</span></code>.
+Restoration never resolves the timezone again or imports native astronomy.</p>
+<section id="a-complete-example">
+<h2>A complete example<a class="headerlink" href="#a-complete-example" title="Link to this heading">¶</a></h2>
+<p>This synthetic record falls in the repeated half-hour on Lord Howe Island.
+Choose the earlier occurrence with <code class="docutils literal notranslate"><span class="pre">fold=0</span></code>. The location here is deliberately
+synthetic, not inferred from the timezone. There are no default aspect orbs.</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">date</span><span class="p">,</span> <span class="n">time</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">astrology</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">AspectRule</span><span class="p">,</span> <span class="n">BirthRecord</span><span class="p">,</span> <span class="n">Body</span><span class="p">,</span> <span class="n">ChartConfig</span><span class="p">,</span> <span class="n">HouseSystem</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">IanaTimezone</span><span class="p">,</span> <span class="n">Location</span><span class="p">,</span> <span class="n">LunarNode</span><span class="p">,</span> <span class="n">MajorAspect</span><span class="p">,</span> <span class="n">ObjectOrb</span><span class="p">,</span> <span class="n">OrbCombination</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">TimePrecision</span><span class="p">,</span> <span class="n">dumps_chart</span><span class="p">,</span> <span class="n">format_chart</span><span class="p">,</span> <span class="n">load_catalog</span><span class="p">,</span> <span class="n">loads_chart</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">natal_chart</span><span class="p">,</span> <span class="n">prepare_natal_input</span><span class="p">,</span> <span class="n">recompute_chart</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span> <span class="o">=</span> <span class="n">BirthRecord</span><span class="p">(</span><span class="n">date</span><span class="p">(</span><span class="mi">2026</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">time</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">45</span><span class="p">),</span> <span class="n">IanaTimezone</span><span class="p">(</span><span class="s2">"Australia/Lord_Howe"</span><span class="p">),</span>
+<span class="gp">... </span>  <span class="n">Location</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">TimePrecision</span><span class="o">.</span><span class="n">MINUTE</span><span class="p">,</span> <span class="p">{</span><span class="s2">"record"</span><span class="p">:</span> <span class="s2">"synthetic"</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config</span> <span class="o">=</span> <span class="n">ChartConfig</span><span class="p">(</span><span class="n">HouseSystem</span><span class="o">.</span><span class="n">WHOLE_SIGN</span><span class="p">,</span> <span class="p">(</span><span class="o">*</span><span class="n">Body</span><span class="p">,</span> <span class="n">LunarNode</span><span class="o">.</span><span class="n">MEAN_ASCENDING</span><span class="p">),</span>
+<span class="gp">... </span>  <span class="nb">tuple</span><span class="p">(</span><span class="n">AspectRule</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="p">(</span><span class="n">ObjectOrb</span><span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">SUN</span><span class="p">,</span> <span class="mi">10</span><span class="p">),))</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">MajorAspect</span><span class="p">),</span>
+<span class="gp">... </span>  <span class="n">aspect_objects</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">Body</span><span class="p">))),</span> <span class="n">orb_combination</span><span class="o">=</span><span class="n">OrbCombination</span><span class="o">.</span><span class="n">MEAN_OF_ORBS</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">chart</span> <span class="o">=</span> <span class="n">natal_chart</span><span class="p">(</span><span class="n">prepare_natal_input</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="n">fold</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">config</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">chart</span><span class="o">.</span><span class="n">resolved</span><span class="o">.</span><span class="n">utc</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
+<span class="go">'2026-04-04T14:45:00+00:00'</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">positions</span><span class="p">),</span> <span class="nb">bool</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">aspects</span><span class="p">),</span> <span class="nb">sorted</span><span class="p">({</span><span class="n">h</span><span class="o">.</span><span class="n">orb_limit_deg</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">chart</span><span class="o">.</span><span class="n">aspects</span><span class="p">})</span>
+<span class="go">(11, True, [6.0, 8.0])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">packed</span> <span class="o">=</span> <span class="n">dumps_chart</span><span class="p">(</span><span class="n">chart</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">restored</span> <span class="o">=</span> <span class="n">loads_chart</span><span class="p">(</span><span class="n">packed</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">restored</span> <span class="o">==</span> <span class="n">chart</span><span class="p">,</span> <span class="n">dumps_chart</span><span class="p">(</span><span class="n">restored</span><span class="p">)</span> <span class="o">==</span> <span class="n">packed</span>
+<span class="go">(True, True)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">recompute_chart</span><span class="p">(</span><span class="n">restored</span><span class="p">)</span> <span class="o">==</span> <span class="n">chart</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">catalog</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">table</span> <span class="o">=</span> <span class="n">format_chart</span><span class="p">(</span><span class="n">restored</span><span class="p">,</span> <span class="n">catalog</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()[</span><span class="mi">7</span><span class="p">:</span><span class="mi">10</span><span class="p">]))</span>
+<span class="go">Sun [sun] | Aries 14°50'21" | 9 | D</span>
+<span class="go">Moon [moon] | Scorpio 13°32'41" | 4 | D</span>
+<span class="go">Mercury [mercury] | Pisces 17°05'04" | 8 | D</span>
+</pre></div>
+</div>
+<p>The Sun’s orb is 10° and the other bodies use 6°; their mean is 8° for pairs with
+the Sun and 6° otherwise. The explicit participant list excludes the node and
+lists the bodies in reverse order; effective participants still follow the
+requested object order. The exact replay equality above holds in this same code
+tree. For comparisons across trees, compare numerical fields with stated
+tolerances, as in <a class="reference internal" href="#verification-and-limits">Verification and limits</a>.</p>
+<p>The full table also includes all requested objects, four axes, twelve cusps,
+aspects with their oriented branches, deviations, limits and motion labels,
+requested/effective configuration and provenance. Pass <code class="docutils literal notranslate"><span class="pre">language=&quot;zh-CN&quot;</span></code> for
+Chinese output. The supplied catalog must contain current names in that language;
+missing or ambiguous names fail rather than fall back to another language.
+Loading the catalog is explicit; formatting itself performs no resource I/O.</p>
+</section>
+<section id="what-schema-v1-preserves">
+<h2>What schema v1 preserves<a class="headerlink" href="#what-schema-v1-preserves" title="Link to this heading">¶</a></h2>
+<p>The JSON root has <code class="docutils literal notranslate"><span class="pre">schema_version</span></code>, <code class="docutils literal notranslate"><span class="pre">input</span></code>, <code class="docutils literal notranslate"><span class="pre">requested</span></code>, <code class="docutils literal notranslate"><span class="pre">effective</span></code>, <code class="docutils literal notranslate"><span class="pre">provenance</span></code>,
+<code class="docutils literal notranslate"><span class="pre">times</span></code>, <code class="docutils literal notranslate"><span class="pre">positions</span></code>, <code class="docutils literal notranslate"><span class="pre">houses</span></code>, <code class="docutils literal notranslate"><span class="pre">placements</span></code> and <code class="docutils literal notranslate"><span class="pre">aspects</span></code>. These encode the
+corresponding public result values, not a rounded text table.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">input.record</span></code> retains the Gregorian date, clock, stated precision, timezone
+form, location and string source metadata. <code class="docutils literal notranslate"><span class="pre">input.resolved</span></code> separately retains
+UTC, the offset, IANA key, fold and both timezone-data versions. Dates/clocks use
+canonical ISO text. UTC uses an explicit <code class="docutils literal notranslate"><span class="pre">+00:00</span></code> offset. Offset values are exact
+signed integer microseconds, not floating seconds.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">requested</span></code> retains object/rule order, per-object orbs, their combination, and
+the distinction between omitted (<code class="docutils literal notranslate"><span class="pre">null</span></code>) and explicit aspect participants.
+<code class="docutils literal notranslate"><span class="pre">effective.aspect_objects</span></code> gives the actual participants in requested object order.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">positions</span></code> retains unrounded longitude/latitude in degrees, physical distance
+in AU, and longitude rate in degrees per TT day. Nodes have no distance (<code class="docutils literal notranslate"><span class="pre">null</span></code>).
+<code class="docutils literal notranslate"><span class="pre">times</span></code> retains JD(UT1) and JDE(TT). Axes/cusps, placements and every aspect field
+are stored, including the branch, signed deviation, limit and motion status.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">provenance</span></code> retains astrology/celestial-calendar versions, position frame and
+UT1 derivation; <code class="docutils literal notranslate"><span class="pre">effective</span></code> retains the resolved Delta-T model and evaluation.</p></li>
+</ul>
+<p>JSON object keys are sorted and output formatting is deterministic. Array order
+is preserved; finite floats round-trip without decimal rounding, including signed
+zero. Input JSON may use different whitespace or object-key order, but timestamps
+must be canonical. This API accepts strings, not files or arbitrary byte encodings.
+The caller owns file/network I/O and any resource limits for untrusted input.</p>
+</section>
+<section id="restoration-is-not-recalculation">
+<h2>Restoration is not recalculation<a class="headerlink" href="#restoration-is-not-recalculation" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">loads_chart</span></code> rejects duplicate, unknown or missing fields, wrong types (including
+booleans used as numbers), nonfinite numbers, unsupported schema/enum/frame identities
+and inconsistent pure results with <code class="docutils literal notranslate"><span class="pre">ChartRecordError</span></code>. Direct result construction
+uses the same domain checks: signs, house membership and aspects must agree with
+the stored positions and rules. Stored values are checked, not replaced.</p>
+<p>This does <strong>not</strong> authenticate the original timezone choice, astronomical values,
+their relationship to the claimed UTC/location, or the claimed software versions.
+No native time/house computation occurs at restoration. If a later version changes
+a pure rule, its schema compatibility must be handled explicitly; old values must
+not silently acquire new meanings.</p>
+<p>Unknown nonempty package-version or Delta-T-model strings remain restorable because
+their stored results are still inspectable. Unknown frame, UT1-derivation or
+evaluation identities are not restorable under schema v1: the interpretation of
+the values would be unknown.</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">replace</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">astrology</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChartRecordError</span><span class="p">,</span> <span class="n">ChartReplayError</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unsupported</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">packed</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unsupported</span><span class="p">[</span><span class="s2">"schema_version"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">999</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
+<span class="gp">... </span>  <span class="n">loads_chart</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">unsupported</span><span class="p">))</span>
+<span class="gp">... </span><span class="k">except</span> <span class="n">ChartRecordError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+<span class="gp">... </span>  <span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">error</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="go">ChartRecordError</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">old_model</span> <span class="o">=</span> <span class="n">replace</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">effective</span><span class="o">=</span><span class="n">replace</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">effective</span><span class="p">,</span> <span class="n">delta_t_model</span><span class="o">=</span><span class="s2">"unavailable"</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">old_model</span> <span class="o">=</span> <span class="n">loads_chart</span><span class="p">(</span><span class="n">dumps_chart</span><span class="p">(</span><span class="n">old_model</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">old_model</span><span class="o">.</span><span class="n">effective</span><span class="o">.</span><span class="n">delta_t_model</span>
+<span class="go">'unavailable'</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
+<span class="gp">... </span>  <span class="n">recompute_chart</span><span class="p">(</span><span class="n">old_model</span><span class="p">)</span>
+<span class="gp">... </span><span class="k">except</span> <span class="n">ChartReplayError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+<span class="gp">... </span>  <span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">error</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="go">ChartReplayError</span>
+</pre></div>
+</div>
+<p>Replay requires exact matching celestial-astrology and celestial-calendar versions and the
+available fixed Delta-T model. It uses the stored resolved UTC and request, not
+today’s timezone database, and returns a fresh chart without modifying the record.
+Missing installed metadata or an unavailable version/model raises <code class="docutils literal notranslate"><span class="pre">ChartReplayError</span></code>;
+metadata failures retain <code class="docutils literal notranslate"><span class="pre">PackageNotFoundError</span></code> as their cause. A requested computation
+outside the upstream domain still raises <code class="docutils literal notranslate"><span class="pre">ChartDomainError</span></code>, with no house fallback.
+Direct <code class="docutils literal notranslate"><span class="pre">natal_chart</span></code> calculation requires installed distribution metadata and raises
+<code class="docutils literal notranslate"><span class="pre">importlib.metadata.PackageNotFoundError</span></code> if it is absent; it does not invent a version.</p>
+<p>The import remains <code class="docutils literal notranslate"><span class="pre">astrology</span></code>, while installed project metadata is read under
+<code class="docutils literal notranslate"><span class="pre">celestial-astrology</span></code>. Schema v1 keeps the field name <code class="docutils literal notranslate"><span class="pre">astrology_version</span></code>.
+Historical <code class="docutils literal notranslate"><span class="pre">0.0.0</span></code> records remain restorable and displayable, but cannot be replayed
+under <code class="docutils literal notranslate"><span class="pre">0.1.0</span></code>; restoration never changes their provenance. A new calculation from
+their saved resolved input and request is a separate calculation, not historical replay.
+Version equality is only a compatibility check: development/candidate labels such
+as <code class="docutils literal notranslate"><span class="pre">0.0.0</span></code> or <code class="docutils literal notranslate"><span class="pre">0.1.0</span></code> do not identify a unique source revision or guarantee bitwise
+equality between trees.</p>
+</section>
+<section id="display-does-not-change-classification">
+<h2>Display does not change classification<a class="headerlink" href="#display-does-not-change-classification" title="Link to this heading">¶</a></h2>
+<p>Angles use the named <code class="docutils literal notranslate"><span class="pre">truncate_display</span></code> rule: truncate toward zero to whole
+arcseconds. Aries 29.9999999° displays as Aries 29°59’59”, not Taurus 0°00’00”.
+House and aspect-motion labels always come from the stored result. An object’s
+displayed longitude can match a cusp’s while its unrounded position is still in
+the preceding house; a nonzero deviation displayed as zero
+can still be applying or separating. <code class="docutils literal notranslate"><span class="pre">R</span></code> uses the sign of the unrounded rate, <code class="docutils literal notranslate"><span class="pre">D</span></code>
+means increasing longitude, and <code class="docutils literal notranslate"><span class="pre">S</span></code> means exactly zero rate. The text is not a
+lossless alternative to JSON.</p>
+</section>
+<section id="verification-and-limits">
+<h2>Verification and limits<a class="headerlink" href="#verification-and-limits" title="Link to this heading">¶</a></h2>
+<p>The <a class="reference internal" href="contributing.html"><span class="std std-doc">complete checks</span></a> build through an sdist, install the wheel
+outside the checkout, and compare a complete installed chart’s JSON with the
+development entry point, without dropping provenance fields. They also exercise
+restoration, replay, both text languages, unavailable models and requested Placidus
+failure. Import origins, including the explicitly loaded native adapter, are checked.</p>
+<p><code class="docutils literal notranslate"><span class="pre">tests/reference/chart_record_v1.json</span></code> is a project-calculated historical development
+fixture from <code class="docutils literal notranslate"><span class="pre">0.0.0</span></code>, not an independent astronomy reference. Its original provenance
+and bytes stay intact. A separate current calculation from its saved input uses absolute tolerances of 1e-8
+degrees for angles, 1e-9 AU for distances, 1e-9 degrees/TT day for rates and 1e-8 days
+for Julian dates; identities and classifications must agree. Exact restoration is
+tested separately, without these tolerances.</p>
+<p><code class="docutils literal notranslate"><span class="pre">tests/reference/complete_chart_reference.json</span></code> contains independently executed
+Swiss Ephemeris 2.10.03 / pyswisseph 2.10.3.2 numeric states for four synthetic
+instants, each with three house systems. It records the pyswisseph Python wheel’s
+SHA-256 hash, flags,
+coordinate/time conventions, source URLs, separate calibration and per-field
+tolerances. Moshier is requested explicitly; returned <code class="docutils literal notranslate"><span class="pre">calc</span></code> flags are checked.
+Swiss houses use Swiss UT1 and Delta-T, not Algo5, the fixed Delta-T model used
+by this adapter. Their tolerance includes that
+time-model difference. Signs, two-dimensional house membership (using longitude,
+not object latitude), aspects and motion
+were derived by separate project-authored arithmetic from the Swiss states;
+Swiss itself does not supply an aspect table. Mean-node longitude/rate are compared
+as named models, not assumed identical formulas. Node distance and true nodes are
+not equivalent comparisons; zero node latitude is a definition-level check.</p>
+<p>If a reference point is within the combined longitude/cusp tolerances of a cusp,
+the comparison accepts either adjoining house. It does not claim an exact
+independent house label for that point.</p>
+<p>The <a class="reference external" href="https://www.astro.com/swisseph/swisseph.htm">Swiss documentation</a> describes
+Moshier’s precision class. The recorded thresholds include both implementations’
+model differences and finite calibration; they are not global accuracy guarantees.
+The source tool was isolated and is not a runtime/dev dependency. Only generated
+numbers and project-authored metadata are included, not Swiss code or ephemeris
+files; see the <a class="reference external" href="https://www.gnu.org/licenses/gpl-faq.html#WhatCaseIsOutputGPL">GNU output FAQ</a>.
+This does not change the project’s MIT license or constitute a general license assurance.</p>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">celestial-astrology</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../README.html">celestial-astrology</a></li>
+<li class="toctree-l2"><a class="reference internal" href="birth.html">Birth records and modern time resolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html">Requested chart configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chart.html">Natal charts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aspects.html">Aspects</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Save, restore, replay and inspect a chart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference.html">Public API reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html">Repository structure and calculation boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="knowledge.html">Knowledge organization and bilingual documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="catalog.html">Knowledge catalog reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html">Contributing</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../zh-CN/index.html">文档入口</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Documentation</a><ul>
+      <li>Previous: <a href="aspects.html" title="previous chapter">Aspects</a></li>
+      <li>Next: <a href="reference.html" title="next chapter">Public API reference</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 9.1.0</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../../_sources/docs/en/records.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

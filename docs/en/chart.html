@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Natal charts &#8212; celestial-astrology 0.1.0 (development / 开发版)</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
+    <script src="../../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/en/chart.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Aspects" href="aspects.html" />
+    <link rel="prev" title="Requested chart configuration" href="configuration.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="natal-charts">
+<h1>Natal charts<a class="headerlink" href="#natal-charts" title="Link to this heading">¶</a></h1>
+<p><a class="reference internal" href="../zh-CN/chart.html"><span class="std std-doc">简体中文</span></a> · <a class="reference internal" href="index.html"><span class="std std-doc">Documentation</span></a> · <a class="reference internal" href="reference.html"><span class="std std-doc">API reference</span></a></p>
+<p><code class="docutils literal notranslate"><span class="pre">natal_chart</span></code> is the single entry point for a modern tropical, geocentric natal
+chart. It takes a resolved birth instant and a requested configuration and
+returns an immutable result that keeps the requested choices, the effective
+choices, the astronomical values and their provenance apart. The aspects a
+request asks for are in <code class="docutils literal notranslate"><span class="pre">chart.aspects</span></code>; the <a class="reference internal" href="aspects.html"><span class="std std-doc">aspect guide</span></a> explains them.</p>
+<section id="calculate-one-chart">
+<h2>Calculate one chart<a class="headerlink" href="#calculate-one-chart" title="Link to this heading">¶</a></h2>
+<p>Prepare the input first. A chart needs a known clock, an explicit timezone and
+a location; the <a class="reference internal" href="birth.html"><span class="std std-doc">birth guide</span></a> explains that preparation.</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">date</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">astrology</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+<span class="gp">... </span>  <span class="n">Body</span><span class="p">,</span> <span class="n">BirthRecord</span><span class="p">,</span> <span class="n">ChartConfig</span><span class="p">,</span> <span class="n">FixedOffset</span><span class="p">,</span> <span class="n">HouseSystem</span><span class="p">,</span> <span class="n">Location</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">TimePrecision</span><span class="p">,</span> <span class="n">natal_chart</span><span class="p">,</span> <span class="n">prepare_natal_input</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span> <span class="o">=</span> <span class="n">BirthRecord</span><span class="p">(</span>
+<span class="gp">... </span>  <span class="n">date</span><span class="p">(</span><span class="mi">2003</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">17</span><span class="p">),</span> <span class="n">time</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">37</span><span class="p">,</span> <span class="mi">13</span><span class="p">),</span> <span class="n">FixedOffset</span><span class="p">(</span><span class="n">timedelta</span><span class="p">(</span><span class="mi">0</span><span class="p">)),</span>
+<span class="gp">... </span>  <span class="n">Location</span><span class="p">(</span><span class="mf">64.15</span><span class="p">,</span> <span class="o">-</span><span class="mf">21.94</span><span class="p">),</span> <span class="n">TimePrecision</span><span class="o">.</span><span class="n">SECOND</span><span class="p">,</span> <span class="p">{</span><span class="s2">"record"</span><span class="p">:</span> <span class="s2">"synthetic"</span><span class="p">},</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">resolved</span> <span class="o">=</span> <span class="n">prepare_natal_input</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">request</span> <span class="o">=</span> <span class="n">ChartConfig</span><span class="p">(</span><span class="n">HouseSystem</span><span class="o">.</span><span class="n">PLACIDUS</span><span class="p">,</span> <span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">SUN</span><span class="p">,</span> <span class="n">Body</span><span class="o">.</span><span class="n">MOON</span><span class="p">),</span> <span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">chart</span> <span class="o">=</span> <span class="n">natal_chart</span><span class="p">(</span><span class="n">resolved</span><span class="p">,</span> <span class="n">request</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">chart</span><span class="o">.</span><span class="n">requested</span><span class="o">.</span><span class="n">house_system</span><span class="o">.</span><span class="n">value</span>
+<span class="go">'placidus'</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">chart</span><span class="o">.</span><span class="n">effective</span><span class="o">.</span><span class="n">house_system</span><span class="o">.</span><span class="n">value</span>
+<span class="go">'placidus'</span>
+</pre></div>
+</div>
+<p>Positions are apparent geocentric ecliptic longitudes and latitudes of date.
+The result keeps the unrounded values; the derived sign and house follow from
+them.</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sun</span><span class="p">,</span> <span class="n">moon</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">positions</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">round</span><span class="p">(</span><span class="n">sun</span><span class="o">.</span><span class="n">longitude_deg</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="nb">round</span><span class="p">(</span><span class="n">moon</span><span class="o">.</span><span class="n">longitude_deg</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="go">(114.2565, 337.8942)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">placements</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">placements</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">placements</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sign</span><span class="p">,</span> <span class="n">placements</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">house</span><span class="p">)</span>
+<span class="go">(&lt;Sign.CANCER: 'cancer'&gt;, 12)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">placements</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">sign</span><span class="p">,</span> <span class="n">placements</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">house</span><span class="p">)</span>
+<span class="go">(&lt;Sign.PISCES: 'pisces'&gt;, 9)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">round</span><span class="p">(</span><span class="n">placements</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sign_degree_deg</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="go">24.2565</span>
+</pre></div>
+</div>
+</section>
+<section id="keep-the-models-and-the-conventions">
+<h2>Keep the models and the conventions<a class="headerlink" href="#keep-the-models-and-the-conventions" title="Link to this heading">¶</a></h2>
+<p>The requested configuration and the effective configuration are separate
+values. The adapter fixes the ΔT model; it is not a caller request, and the
+result names it anyway.</p>
+<p>The result also keeps the actual input in <code class="docutils literal notranslate"><span class="pre">chart.resolved</span></code> and the astrology
+package version in <code class="docutils literal notranslate"><span class="pre">chart.provenance.astrology_version</span></code>. See the <a class="reference internal" href="records.html"><span class="std std-doc">record guide</span></a>
+for storage, restoration, replay and bilingual text output.</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">chart</span><span class="o">.</span><span class="n">effective</span><span class="o">.</span><span class="n">delta_t_model</span>
+<span class="go">'algo5'</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">chart</span><span class="o">.</span><span class="n">effective</span><span class="o">.</span><span class="n">evaluation</span>
+<span class="go">'fixed_fourteen_object_joint_snapshot'</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">chart</span><span class="o">.</span><span class="n">provenance</span><span class="o">.</span><span class="n">celestial_version</span>
+<span class="go">'0.8.0'</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">chart</span><span class="o">.</span><span class="n">provenance</span><span class="o">.</span><span class="n">position_frame</span>
+<span class="go">'apparent_geocentric_true_ecliptic_of_date'</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">chart</span><span class="o">.</span><span class="n">provenance</span><span class="o">.</span><span class="n">ut1_derivation</span>
+<span class="go">'delta_t_model_from_civil_utc'</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">position_frame</span></code> states that the values are apparent geocentric positions on the
+true ecliptic and equinox of date. <code class="docutils literal notranslate"><span class="pre">ut1_derivation</span></code> states that UT1 is derived
+from civil UTC through the ΔT model, not observed as DUT1. The lunar nodes are
+referred to the same true equinox, so they already carry the nutation in
+longitude. <code class="docutils literal notranslate"><span class="pre">ChartTimes</span></code> records the UT1-based Julian Day and the TT-based
+Julian Ephemeris Day of the instant.</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">chart</span><span class="o">.</span><span class="n">times</span><span class="o">.</span><span class="n">jde_tt</span> <span class="o">&gt;</span> <span class="n">chart</span><span class="o">.</span><span class="n">times</span><span class="o">.</span><span class="n">jd_ut1</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>Positions do not depend on the location; the house geometry does.</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">elsewhere</span> <span class="o">=</span> <span class="n">natal_chart</span><span class="p">(</span>
+<span class="gp">... </span>  <span class="n">prepare_natal_input</span><span class="p">(</span><span class="n">BirthRecord</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">date</span><span class="p">(</span><span class="mi">2003</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">17</span><span class="p">),</span> <span class="n">time</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">37</span><span class="p">,</span> <span class="mi">13</span><span class="p">),</span> <span class="n">FixedOffset</span><span class="p">(</span><span class="n">timedelta</span><span class="p">(</span><span class="mi">0</span><span class="p">)),</span>
+<span class="gp">... </span>    <span class="n">Location</span><span class="p">(</span><span class="o">-</span><span class="mf">33.87</span><span class="p">,</span> <span class="mf">151.21</span><span class="p">),</span> <span class="n">TimePrecision</span><span class="o">.</span><span class="n">SECOND</span><span class="p">,</span> <span class="p">{</span><span class="s2">"record"</span><span class="p">:</span> <span class="s2">"synthetic"</span><span class="p">},</span>
+<span class="gp">... </span>  <span class="p">)),</span>
+<span class="gp">... </span>  <span class="n">request</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">elsewhere</span><span class="o">.</span><span class="n">positions</span> <span class="o">==</span> <span class="n">chart</span><span class="o">.</span><span class="n">positions</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">elsewhere</span><span class="o">.</span><span class="n">houses</span> <span class="o">==</span> <span class="n">chart</span><span class="o">.</span><span class="n">houses</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</section>
+<section id="read-the-house-system-as-it-is">
+<h2>Read the house system as it is<a class="headerlink" href="#read-the-house-system-as-it-is" title="Link to this heading">¶</a></h2>
+<p>Whole Sign, Equal and Placidus are different geometries, not different labels
+for one result. Under Whole Sign the Ascendant is not the first cusp, and the
+Midheaven is not the tenth cusp; the chart keeps the axes and the cusps apart.</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">whole</span> <span class="o">=</span> <span class="n">natal_chart</span><span class="p">(</span>
+<span class="gp">... </span>  <span class="n">resolved</span><span class="p">,</span> <span class="n">ChartConfig</span><span class="p">(</span><span class="n">HouseSystem</span><span class="o">.</span><span class="n">WHOLE_SIGN</span><span class="p">,</span> <span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">SUN</span><span class="p">,),</span> <span class="p">())</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">whole</span><span class="o">.</span><span class="n">houses</span><span class="o">.</span><span class="n">cusps_deg</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">120.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">round</span><span class="p">(</span><span class="n">whole</span><span class="o">.</span><span class="n">houses</span><span class="o">.</span><span class="n">ascendant_deg</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="go">127.7431</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">whole</span><span class="o">.</span><span class="n">houses</span><span class="o">.</span><span class="n">ascendant_deg</span> <span class="o">!=</span> <span class="n">whole</span><span class="o">.</span><span class="n">houses</span><span class="o">.</span><span class="n">cusps_deg</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">astrology</span><span class="w"> </span><span class="kn">import</span> <span class="n">house_of</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">house_of</span><span class="p">(</span><span class="n">whole</span><span class="o">.</span><span class="n">houses</span><span class="o">.</span><span class="n">ascendant_deg</span><span class="p">,</span> <span class="n">whole</span><span class="o">.</span><span class="n">houses</span><span class="o">.</span><span class="n">cusps_deg</span><span class="p">)</span>
+<span class="go">1</span>
+</pre></div>
+</div>
+<p>A house interval is half-open: a longitude exactly on a cusp belongs to the
+house that starts there. <code class="docutils literal notranslate"><span class="pre">house_of</span></code> works on any supplied cusp table and never
+consults the Ascendant.</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">astrology</span><span class="w"> </span><span class="kn">import</span> <span class="n">house_of</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">house_of</span><span class="p">(</span><span class="mf">120.0</span><span class="p">,</span> <span class="n">whole</span><span class="o">.</span><span class="n">houses</span><span class="o">.</span><span class="n">cusps_deg</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">house_of</span><span class="p">(</span><span class="mf">150.0</span><span class="p">,</span> <span class="n">whole</span><span class="o">.</span><span class="n">houses</span><span class="o">.</span><span class="n">cusps_deg</span><span class="p">)</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">house_of</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">whole</span><span class="o">.</span><span class="n">houses</span><span class="o">.</span><span class="n">cusps_deg</span><span class="p">)</span>
+<span class="go">9</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">house_of</span><span class="p">(</span><span class="mf">359.999999</span><span class="p">,</span> <span class="n">whole</span><span class="o">.</span><span class="n">houses</span><span class="o">.</span><span class="n">cusps_deg</span><span class="p">)</span>
+<span class="go">8</span>
+</pre></div>
+</div>
+</section>
+<section id="read-a-sign-from-a-longitude">
+<h2>Read a sign from a longitude<a class="headerlink" href="#read-a-sign-from-a-longitude" title="Link to this heading">¶</a></h2>
+<p>Sign sectors are half-open: exactly 30 degrees is Taurus, exactly 0 degrees is
+Aries. The degree within the sign is unrounded, and the display rule is
+truncation, so a displayed value never shows the next sign.</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">astrology</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sign</span><span class="p">,</span> <span class="n">sign_degree</span><span class="p">,</span> <span class="n">sign_of</span><span class="p">,</span> <span class="n">truncate_display</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sign_of</span><span class="p">(</span><span class="mf">0.0</span><span class="p">),</span> <span class="n">sign_of</span><span class="p">(</span><span class="mf">30.0</span><span class="p">)</span>
+<span class="go">(&lt;Sign.ARIES: 'aries'&gt;, &lt;Sign.TAURUS: 'taurus'&gt;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sign_degree</span><span class="p">(</span><span class="mf">45.0</span><span class="p">)</span>
+<span class="go">15.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">truncate_display</span><span class="p">(</span><span class="mf">29.9999999</span><span class="p">)</span>
+<span class="go">29.99972222222222</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sign_of</span><span class="p">(</span><span class="n">truncate_display</span><span class="p">(</span><span class="mf">29.9999999</span><span class="p">))</span> <span class="ow">is</span> <span class="n">sign_of</span><span class="p">(</span><span class="mf">29.9999999</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</section>
+<section id="fail-explicitly">
+<h2>Fail explicitly<a class="headerlink" href="#fail-explicitly" title="Link to this heading">¶</a></h2>
+<p>The adapter rejects input it can judge before the astronomy library is asked,
+and reports an upstream failure without inventing a substitute. Nothing is
+returned partially, and the requested house system is never replaced.</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">astrology</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChartDomainError</span><span class="p">,</span> <span class="n">MissingBirthDataError</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">polar</span> <span class="o">=</span> <span class="n">BirthRecord</span><span class="p">(</span>
+<span class="gp">... </span>  <span class="n">date</span><span class="p">(</span><span class="mi">2003</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">17</span><span class="p">),</span> <span class="n">time</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">FixedOffset</span><span class="p">(</span><span class="n">timedelta</span><span class="p">(</span><span class="mi">0</span><span class="p">)),</span>
+<span class="gp">... </span>  <span class="n">Location</span><span class="p">(</span><span class="mf">90.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span> <span class="n">TimePrecision</span><span class="o">.</span><span class="n">SECOND</span><span class="p">,</span> <span class="p">{</span><span class="s2">"record"</span><span class="p">:</span> <span class="s2">"synthetic"</span><span class="p">},</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
+<span class="gp">... </span>  <span class="n">natal_chart</span><span class="p">(</span><span class="n">prepare_natal_input</span><span class="p">(</span><span class="n">polar</span><span class="p">),</span> <span class="n">request</span><span class="p">)</span>
+<span class="gp">... </span><span class="k">except</span> <span class="n">ChartDomainError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+<span class="gp">... </span>  <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">error</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">error</span><span class="o">.</span><span class="n">house_system</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+<span class="go">('ChartDomainError', 'placidus')</span>
+</pre></div>
+</div>
+<p>A missing location is missing information, not a domain error, and is reported
+as such.</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">without_location</span> <span class="o">=</span> <span class="n">BirthRecord</span><span class="p">(</span>
+<span class="gp">... </span>  <span class="n">date</span><span class="p">(</span><span class="mi">2003</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">17</span><span class="p">),</span> <span class="n">time</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">37</span><span class="p">,</span> <span class="mi">13</span><span class="p">),</span> <span class="n">FixedOffset</span><span class="p">(</span><span class="n">timedelta</span><span class="p">(</span><span class="mi">0</span><span class="p">)),</span> <span class="kc">None</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">TimePrecision</span><span class="o">.</span><span class="n">SECOND</span><span class="p">,</span> <span class="p">{</span><span class="s2">"record"</span><span class="p">:</span> <span class="s2">"synthetic"</span><span class="p">},</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">astrology</span><span class="w"> </span><span class="kn">import</span> <span class="n">resolve_birth_time</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
+<span class="gp">... </span>  <span class="n">natal_chart</span><span class="p">(</span><span class="n">resolve_birth_time</span><span class="p">(</span><span class="n">without_location</span><span class="p">),</span> <span class="n">request</span><span class="p">)</span>
+<span class="gp">... </span><span class="k">except</span> <span class="n">MissingBirthDataError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+<span class="gp">... </span>  <span class="nb">type</span><span class="p">(</span><span class="n">error</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span>
+<span class="go">'MissingBirthDataError'</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Situation</p></th>
+<th class="head"><p>Reported as</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>No location on the record</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">MissingBirthDataError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Latitude at a pole</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ChartDomainError</span></code>, no upstream detail</p></td>
+</tr>
+<tr class="row-even"><td><p>Civil year 2100 or later</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ChartDomainError</span></code>, no upstream detail</p></td>
+</tr>
+<tr class="row-odd"><td><p>Instant outside the supported ephemeris range</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ChartDomainError</span></code> with the upstream operation</p></td>
+</tr>
+<tr class="row-even"><td><p>Requested geometry undefined at this latitude</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ChartDomainError</span></code> with the requested house system</p></td>
+</tr>
+</tbody>
+</table>
+<p>The classification never depends on reading the upstream message. A failure
+raised before the library is called carries no upstream detail; a failure
+raised by the library carries the operation and the recording status.</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">high</span> <span class="o">=</span> <span class="n">prepare_natal_input</span><span class="p">(</span><span class="n">BirthRecord</span><span class="p">(</span>
+<span class="gp">... </span>  <span class="n">date</span><span class="p">(</span><span class="mi">1990</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">21</span><span class="p">),</span> <span class="n">time</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">FixedOffset</span><span class="p">(</span><span class="n">timedelta</span><span class="p">(</span><span class="mi">0</span><span class="p">)),</span>
+<span class="gp">... </span>  <span class="n">Location</span><span class="p">(</span><span class="mf">69.65</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span> <span class="n">TimePrecision</span><span class="o">.</span><span class="n">SECOND</span><span class="p">,</span> <span class="p">{</span><span class="s2">"record"</span><span class="p">:</span> <span class="s2">"synthetic"</span><span class="p">},</span>
+<span class="gp">... </span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
+<span class="gp">... </span>  <span class="n">natal_chart</span><span class="p">(</span><span class="n">high</span><span class="p">,</span> <span class="n">ChartConfig</span><span class="p">(</span><span class="n">HouseSystem</span><span class="o">.</span><span class="n">PLACIDUS</span><span class="p">,</span> <span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">SUN</span><span class="p">,),</span> <span class="p">()))</span>
+<span class="gp">... </span><span class="k">except</span> <span class="n">ChartDomainError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+<span class="gp">... </span>  <span class="p">(</span><span class="n">error</span><span class="o">.</span><span class="n">house_system</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">error</span><span class="o">.</span><span class="n">operation</span><span class="p">,</span> <span class="n">error</span><span class="o">.</span><span class="n">recorded</span><span class="p">)</span>
+<span class="go">('placidus', 'chart_snapshot', True)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">natal_chart</span><span class="p">(</span><span class="n">high</span><span class="p">,</span> <span class="n">ChartConfig</span><span class="p">(</span><span class="n">HouseSystem</span><span class="o">.</span><span class="n">EQUAL</span><span class="p">,</span> <span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">SUN</span><span class="p">,),</span> <span class="p">()))</span><span class="o">.</span><span class="n">houses</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">value</span>
+<span class="go">'equal'</span>
+</pre></div>
+</div>
+</section>
+<section id="select-objects-without-widening-the-domain">
+<h2>Select objects without widening the domain<a class="headerlink" href="#select-objects-without-widening-the-domain" title="Link to this heading">¶</a></h2>
+<p>The astronomy library evaluates the fourteen-object snapshot and the house
+geometry together. Selecting fewer objects filters that output; it does not
+narrow the evaluated domain, and the result says so.</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">one</span> <span class="o">=</span> <span class="n">natal_chart</span><span class="p">(</span><span class="n">resolved</span><span class="p">,</span> <span class="n">ChartConfig</span><span class="p">(</span><span class="n">HouseSystem</span><span class="o">.</span><span class="n">WHOLE_SIGN</span><span class="p">,</span> <span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">SUN</span><span class="p">,),</span> <span class="p">()))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">one</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">one</span><span class="o">.</span><span class="n">effective</span><span class="o">.</span><span class="n">evaluation</span>
+<span class="go">'fixed_fourteen_object_joint_snapshot'</span>
+</pre></div>
+</div>
+</section>
+<section id="check-the-result-against-an-independent-reference">
+<h2>Check the result against an independent reference<a class="headerlink" href="#check-the-result-against-an-independent-reference" title="Link to this heading">¶</a></h2>
+<p>The reference cases in <code class="docutils literal notranslate"><span class="pre">tests/reference/natal_reference.json</span></code> compare two
+instants, one per hemisphere, with JPL Horizons. Under matched conventions the
+checks require agreement within 3 arcseconds for the Sun and the planets, 15 for
+the Moon, 1 arcsecond in latitude (3 for the Moon) and 0.001 degrees for the
+axes. The Placidus cusps 2, 3, 11 and 12 are held to the same 0.001 degrees
+against the Placidus definition, evaluated at the Horizons sidereal time. The
+node check reimplements the Meeus chapter 47 formulas that the library also
+uses, and the leap-second relation <code class="docutils literal notranslate"><span class="pre">JDE(TT)</span> <span class="pre">-</span> <span class="pre">JD(UTC)</span></code> is exact. The
+<a class="reference internal" href="contributing.html#correctness"><span class="std std-ref">contributing guide</span></a> records what each reference
+can and cannot detect.</p>
+<p>Separate complete-chart cases compare against Swiss states, rates and all twelve
+cusps, with independent derived placements/aspects. Their conventions, tolerances
+and limits are in the <a class="reference internal" href="records.html#verification-and-limits"><span class="std std-ref">record guide</span></a>.</p>
+</section>
+<section id="limits">
+<h2>Limits<a class="headerlink" href="#limits" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Requested aspects are judged among the participating objects; the
+<a class="reference internal" href="aspects.html"><span class="std std-doc">aspect guide</span></a> explains the rules and their limits.</p></li>
+<li><p>The Horizons fixture itself has no external cusp values; its checks against the
+Placidus definition can share a misreading with the library. The separate Swiss
+fixture checks the complete geometry but has its own time-model differences.</p></li>
+<li><p>The astronomy library supports civil years 1885 to 2099 and, for UTC input,
+instants from 1972-01-01; the ephemeris range is narrower than the civil
+range, and an instant outside it fails explicitly.</p></li>
+<li><p>Installs need a platform with a celestial-calendar wheel; see
+<a class="reference internal" href="contributing.html#run-the-checks"><span class="std std-ref">contributing</span></a>.</p></li>
+</ul>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">celestial-astrology</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../README.html">celestial-astrology</a></li>
+<li class="toctree-l2"><a class="reference internal" href="birth.html">Birth records and modern time resolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html">Requested chart configuration</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Natal charts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aspects.html">Aspects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="records.html">Save, restore, replay and inspect a chart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference.html">Public API reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html">Repository structure and calculation boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="knowledge.html">Knowledge organization and bilingual documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="catalog.html">Knowledge catalog reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html">Contributing</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../zh-CN/index.html">文档入口</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Documentation</a><ul>
+      <li>Previous: <a href="configuration.html" title="previous chapter">Requested chart configuration</a></li>
+      <li>Next: <a href="aspects.html" title="next chapter">Aspects</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 9.1.0</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../../_sources/docs/en/chart.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

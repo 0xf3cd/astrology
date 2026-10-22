@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>参与开发 &#8212; celestial-astrology 0.1.0 (development / 开发版)</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
+    <script src="../../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/zh-CN/contributing.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="prev" title="知识目录参考" href="catalog.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="id1">
+<h1>参与开发<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h1>
+<p><a class="reference internal" href="../en/contributing.html"><span class="std std-doc">English</span></a> · <a class="reference internal" href="index.html"><span class="std std-doc">文档入口</span></a></p>
+<p>先读相关 issue 和<a class="reference internal" href="architecture.html"><span class="std std-doc">结构设计</span></a>。issue 定义功能范围与验收案例，
+每次改动应能作为一个行为变化讲清楚、审清楚。</p>
+<p>PR、issue、评论与审阅回复使用英文，标题也用英文。文档以英文为主，并维护对应中文页面。</p>
+<section id="id2">
+<h2>运行检查<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<p>安装 <a class="reference external" href="https://docs.astral.sh/uv/getting-started/installation/">uv</a>，在仓库根目录运行：</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>sync<span class="w"> </span>--locked<span class="w"> </span>--python<span class="w"> </span><span class="m">3</span>.14
+uv<span class="w"> </span>run<span class="w"> </span>--locked<span class="w"> </span>python<span class="w"> </span>tools/check.py
+</pre></div>
+</div>
+<p>支持 Python 3.11–3.14，下限与 celestial-calendar 0.8.0 一致；该库是本包的硬依赖。
+CI 在 Linux 3.11／3.14 和 macOS／Windows 3.14 上运行同一命令。
+本地验证下限时使用 <code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">sync</span> <span class="pre">--locked</span> <span class="pre">--python</span> <span class="pre">3.11</span></code>。
+开发检查使用当前补丁版。检查中的 sdist 安全解压要求 Python 3.11.4 或更高版本；
+安装后库的次版本支持范围仍为 3.11–3.14。</p>
+<p>天文依赖只发布 Linux x86_64 与 aarch64、macOS 14+ arm64、Windows amd64 的轮子，没有源码分发包。
+因此本包在其他平台无法安装，浏览知识目录也需要同样的安装。</p>
+<p>该命令检查 Ruff lint／两空格格式、严格 mypy、普通与优化模式下的 pytest、文档对页／本地链接、
+从头生成的严格 HTML／doctest 构建及带声明运行依赖的隔离 wheel 安装。</p>
+<p>分发检查先运行 <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">build</span> <span class="pre">--sdist</span></code> 并解压归档，再在解压目录运行 <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">build</span> <span class="pre">--wheel</span></code>。
+严格 HTML／doctest 构建也在该目录运行，导入其中的包源码。随后检查 API／知识目录页面、
+生成的搜索索引及查询代码，以及 doctest 结果。</p>
+<p>安装后的消费者程序在仓外验证出生、时区来源与配置。
+完整盘、恢复、重算及文本检查见<a class="reference internal" href="records.html#id5"><span class="std std-ref">记录指南</span></a>。
+另有仅查知识的消费者，执行列举、名称查询、筛选及引用解析，不初始化时间或原生库。
+两者均以隔离导入运行普通与优化模式；wheel 和 sdist 检查要求实际包含语料资源。</p>
+<p>临时 HTML、doctest 报告、分发包和消费者环境优先使用 <code class="docutils literal notranslate"><span class="pre">SCRATCH</span></code>，否则使用系统临时目录，
+退出时删除。构建元数据和工具缓存可能保留在仓内已忽略的目录中。
+严格文档构建可能从 <code class="docutils literal notranslate"><span class="pre">docs.python.org</span></code> 获取 Python intersphinx 清单；除安装构建依赖外，还需允许联网。</p>
+<p>CI 安装 uv 0.12.5，按平台归档使用其<a class="reference external" href="https://github.com/astral-sh/uv/releases/tag/0.12.5">上游发布</a>
+的 SHA-256 摘要。安装步骤使用新的工具缓存目录，避免 setup-uv 命中缓存后跳过归档校验。</p>
+<p>uv、setup-uv 或 runner 平台变化时，在临时分支复验反例：把矩阵中每个 <code class="docutils literal notranslate"><span class="pre">uv-checksum</span></code>
+改为带引号的 64 个零字符串并推送。每个 setup-uv 步骤都应以摘要不匹配报错，后续 uv 命令应被跳过。
+无关的下载或网络错误不能作为通过依据。不要合并该分支。</p>
+<p>工具版本由 <code class="docutils literal notranslate"><span class="pre">uv.lock</span></code> 锁定：Python 3.11 使用 Sphinx 8.2.3，较新 Python 使用 Sphinx 9.1.0。
+覆盖率报告用于定位遗漏，但不能认证天文数值，那由参考案例负责。
+测试覆盖出生／时刻、命盘／配置、记录与文本合同，以及开发检查；领域测试随功能加入。</p>
+<p>本地格式化运行 <code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">run</span> <span class="pre">ruff</span> <span class="pre">format</span> <span class="pre">.</span></code>。任一命令失败即停止，修复原因后重跑。
+依赖变更须更新锁文件并通过两个 Python 端点；忽略规则或警告时应限制范围并说明原因。</p>
+<p>若要保留 HTML 供检查，可构建到已忽略的 <code class="docutils literal notranslate"><span class="pre">build/</span></code> 目录：</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>sphinx<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-E<span class="w"> </span>-a<span class="w"> </span>-n<span class="w"> </span>-W<span class="w"> </span>-b<span class="w"> </span>html<span class="w"> </span>-c<span class="w"> </span>docs<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-d<span class="w"> </span>build/docs-doctrees<span class="w"> </span>.<span class="w"> </span>build/docs
+</pre></div>
+</div>
+<p>打开 <code class="docutils literal notranslate"><span class="pre">build/docs/index.html</span></code>，可进入两种语言。共用索引保留英文词干处理，
+Python 与 JavaScript 使用对应的中文相邻双字切分。限制见<a class="reference internal" href="knowledge.html#id4"><span class="std std-ref">知识指南</span></a>。
+检查核实际生成的搜索索引、输出的分词及词干接口、页面语言与对页导航、完整目录锚点及当前译文。
+构建成功不能代替这些检查。独立核验可以执行生成的 JavaScript 查询及索引代码；
+Python 分词单测不能证明浏览器行为。</p>
+<p>Sphinx 只发现根目录的两个 README 和 <code class="docutils literal notranslate"><span class="pre">docs/</span></code> 下的源文档。虚拟环境应放在 <code class="docutils literal notranslate"><span class="pre">docs/</span></code> 之外：
+该目录内任意位置的源文档都是文档输入，与它同级的目录则不是。上述源文档中的警告仍会使严格构建失败。</p>
+<p>按上面的 <code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">sync</span></code> 从本仓安装开发包，分发名／版本为 <code class="docutils literal notranslate"><span class="pre">celestial-astrology</span></code>／<code class="docutils literal notranslate"><span class="pre">0.1.0</span></code>，
+Python 导入名仍为 <code class="docutils literal notranslate"><span class="pre">astrology</span></code>。此候选尚未发布到 PyPI；PyPI 的 <code class="docutils literal notranslate"><span class="pre">astrology</span></code> 是另一个无关项目，
+不是本库。可检查已安装的身份：</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">importlib.metadata</span><span class="w"> </span><span class="kn">import</span> <span class="n">version</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">version</span><span class="p">(</span><span class="s2">"celestial-astrology"</span><span class="p">)</span>
+<span class="go">'0.1.0'</span>
+</pre></div>
+</div>
+<p>检查会在隔离的 wheel 安装环境中执行两份 README，比较文档中的输出，检查 wheel 实际保存的
+Markdown 链接，并在构建后的站点中解析两种语言的路径。还会在一次性安装环境中分别隐藏两个
+分发包的元数据，确认恢复结果不变、重算抛出 <code class="docutils literal notranslate"><span class="pre">ChartReplayError</span></code>，并在缺少本项目元数据时
+确认直接计算抛出 <code class="docutils literal notranslate"><span class="pre">PackageNotFoundError</span></code>。普通／优化模式都执行，随后恢复元数据。</p>
+<p>手动发布 Pages 时，从干净且已提交的源码构建，将 <code class="docutils literal notranslate"><span class="pre">ASTROLOGY_DOCS_SOURCE_SHA</span></code> 设为完整的小写提交号。
+根页据此生成源码归档链接和安装命令；普通本地构建则明确没有固定版本。
+doctrees、缓存及其他构建控制文件不进入站点成品。检查所有生成的源文档、下载文件和静态资源后，
+再手动更新带有 <code class="docutils literal notranslate"><span class="pre">.nojekyll</span></code> 的独立 <code class="docutils literal notranslate"><span class="pre">gh-pages</span></code> 分支。这是手动更新站点，不是自动发布源码或发行包。
+实际验收还须检查已部署的根页、每条 README URL 和中英文浏览器搜索，不能只看本地 HTML 构建成功。
+快照安装和 Python intersphinx 索引需要联网。</p>
+</section>
+<section id="id3">
+<h2>设计<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
+<p>输入、配置、规则和结果默认采用不可变值。冻结 dataclass 仍不能冻结内部的列表或字典；
+使用不可变成员，或在边界复制并隔离可变输入。调用方在构造后改动原始输入，不应改变已存命盘。</p>
+<p>优先使用参数和返回值明确的普通函数。文件读取、原生库初始化、网络调用与缓存由所属边界显式负责。
+导入包或查知识不应触发排盘。</p>
+<p>表格形规则用数据表达，计算用函数表达。定义归领域模块，入口负责组合。
+有真实调用方共用一个合同再提取抽象，潜在的未来后端不算调用方。
+含义尽量进入名字与类型，再由注释补充理由。</p>
+<p>配置必须影响它所描述的计算。拒绝不支持的选择，保留请求和实际生效配置。
+避免隐式全局设置、静默替代，以及返回类型依赖隐藏状态的工厂。</p>
+</section>
+<section id="id4">
+<h2>正确性<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h2>
+<p>除代表值外，还要测试领域边界：非有限数、时间歧义、坐标回绕、精确端点、缺失信息与不支持的组合。
+公开输入校验在 <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-O</span></code> 下也必须有效。</p>
+<p>数值夹具记录来源、模型／版本、时标、坐标口径、配置、单位和容差。
+往返测试检验保真，重新计算检验执行，独立来源检验一致性。共用公式或复制的数据集
+可能让多份检查在同一错误上相互吻合；说明参考案例为什么能发现要测的缺陷。</p>
+<p>示例使用合成数据或允许转载的来源。天文数值的验证与命盘解读的主张分别处理。</p>
+<p><code class="docutils literal notranslate"><span class="pre">tests/reference/natal_reference.json</span></code> 中的本命盘案例覆盖南北半球各一个时刻，
+与 JPL Horizons 及定义级检查比对。夹具记录查询 URL、Horizons 为每个天体及地心给出的
+星历核（太阳、月亮、水星与金星用 DE441，其余天体用各自的核）、取数时间及所用口径。</p>
+<p>若要重新取回两组 Horizons 数据而不改动已提交的夹具：</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>--locked<span class="w"> </span>python<span class="w"> </span>tools/fetch_reference.py<span class="w"> </span>--output<span class="w"> </span>build/natal_reference.json
+</pre></div>
+</div>
+<p>取数需要联网，仅依赖 Python 标准库。必须指定输出路径；工具不读取本地参考或审阅文件。
+输出包含查询 URL、来源星历核、计算口径、取数时间和值，随后打印该文件的 SHA-256。
+有意替换版本化夹具之前，先检查数值和来源信息的变化。离线测试使用受控响应，与真实联网取数分开。</p>
+<p>天体容差取自上游模型对 Horizons 的自身误差，而不是这两个时刻。太阳与行星在
+2000—2002 年 24 个时刻的经度一致到约 0.8 角秒，在 2020 年夹具时刻为 1.3；
+截断的月历模型在 2000—2030 年 60 个时刻的经度一致到 10 角秒、黄纬到 2.4。
+这些采样是临时测量，没有留在仓库里。容差为：太阳与行星 3 角秒，月亮 15 角秒，
+黄纬 1 角秒，月亮黄纬 3 角秒，交点 1 角秒。四轴与 Placidus 宫头用 0.001 度（3.6 角秒）：
+两个时刻在此最多相差 0.91 角秒，这是本库模型 UT1 与 Horizons 观测 UT1 之差。</p>
+<p>各条参考检出的缺陷不同。缺陷能否被抓到，取决于容差与库本来就和参考相差多少（四轴至多 0.91 角秒，
+月亮经度 3.4），所以略低于容差的偏移也可能被抓到。下面各例都按计入这个偏差来判：</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>参考</p></th>
+<th class="head"><p>能检出</p></th>
+<th class="head"><p>检不出</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Horizons 黄经</p></td>
+<td><p>星历错误或天体映射错误。用 UTC 代 TT（差 64—69 秒）使月亮偏 35—42 角秒、水星偏 3—5。</p></td>
+<td><p>计入该偏差后仍在容差内的偏移，包括只破坏太阳的路径（偏 2.6—2.8 角秒）。</p></td>
+</tr>
+<tr class="row-odd"><td><p>精确的闰秒关系</p></td>
+<td><p>把 UTC 或 UT1 当作 TT：报告的 JDE(TT) 偏 0.2—0.3 秒。</p></td>
+<td><p>把 UTC 当 UT1 的自转路径；报告的 JDE(TT) 仍然精确。</p></td>
+</tr>
+<tr class="row-even"><td><p>Horizons 恒星时，四轴</p></td>
+<td><p>用平恒星时代替真恒星时（偏 0.002—0.005 度）。把 UT1 取作 UTC：北例偏 5.0 角秒，南例 3.7，南例只是刚过 3.6 的阈值。北例用平黄赤交角代真黄赤交角（偏 5.7）。</p></td>
+<td><p>南例用平黄赤交角代真黄赤交角（偏不到 1 角秒）。</p></td>
+</tr>
+<tr class="row-odd"><td><p>Horizons 恒星时，Placidus 第 2、3、11、12 宫头</p></td>
+<td><p>宫头偏离 Placidus 时间分割超过约 0.0015 度，例如换成别的宫制。</p></td>
+<td><p>与检查共有的对 Placidus 定义的误读。本夹具没有外部宫头值；第 5、6、8、9 宫头只作为精确对冲核对。</p></td>
+</tr>
+<tr class="row-even"><td><p>Meeus 第 47 章交点</p></td>
+<td><p>交点定义、方向错误或漏掉章动项。</p></td>
+<td><p>共用公式里的错误，以及 TT／UT 混用（交点只偏不到 0.4 角秒）。</p></td>
+</tr>
+</tbody>
+</table>
+<p>基于 Horizons 和手算的相位检查分三部分。<code class="docutils literal notranslate"><span class="pre">tests/test_aspects.py</span></code> 用手算案例，不需要天文计算。用相隔一小时的黄经差除以时间，
+核对速率的符号和单位，因为入相／离相状态依赖这些速率。参考测试按 Astrodienst 为 Hellenistic 绘图风格
+公布的容许度配置本库，把求出的相位集合与由 Horizons 黄经推出的集合比较。有一对对象靠近限度时，它们能检出
+错误的容许度、合成规则或角度；也能检出参与相位的月交点。检不出小于 0.4 度余量的黄经误差；两个时刻
+里没有六分相和对分相，这两个角度靠手算案例核对。运动状态没有与外部结果比对：这里 Horizons 不提供
+速率，该风格页公布的是参数，不是某张盘的相位表。</p>
+<p>另设的 Swiss 完整盘夹具增加独立速率及全部宫头，还对四个合成时刻另写算术推导归属、
+相位和运动状态，五种相位均有出现。各案例容差和来源限度见<a class="reference internal" href="records.html#id5"><span class="std std-ref">记录指南</span></a>。
+项目存储盘另测重算，不把它当外部证据。</p>
+</section>
+<section id="id5">
+<h2>知识与文档<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h2>
+<p>遵循<a class="reference internal" href="knowledge.html"><span class="std std-doc">知识设计</span></a>，解释文字链接稳定的概念、规则与来源标识。
+保留原文并标明译文；来源已核实，不能证明某张盘满足条目前提。</p>
+<p>行为变化时同步更新两种语言。公开 docstring 的概述和合同保留双语；标识、签名、单位、
+默认值只有一份来源。运行例子并检查生成页面。自动检查能发现缺少译文文件，但不能证明译文语义相同。
+目录检查还拒绝旧译修订、记录说明缺失、未知引用及重复标识。两种语言均有可执行例子；
+来源及翻译审阅检查前提与限度是否保真。</p>
+</section>
+<section id="id6">
+<h2>审阅依据<a class="headerlink" href="#id6" title="Link to this heading">¶</a></h2>
+<p>使用 AI 编写的贡献仍由贡献者负责。在 PR 中说明对应 issue、行为变化、实际运行的检查和未解决问题，
+区分已经执行的验证与建议以后运行的检查。</p>
+<p>审阅检查来源是否忠实、假设是否成立、对象修改与共享、失败行为、抽象是否多余及翻译语义。
+lint 通过或覆盖率很高不能回答这些问题。修改检查程序时，同时提供应通过的输入与应拒绝的缺陷。</p>
+<p>合并和发布需要维护者批准。CI 负责报告检查结果；若要自动阻止未通过检查的合并，
+还需在仓库规则中将它们设为必需检查。</p>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">celestial-astrology</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../en/index.html">Documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">文档入口</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../README.zh-CN.html">celestial-astrology</a></li>
+<li class="toctree-l2"><a class="reference internal" href="birth.html">出生记录与现代时刻解析</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html">排盘请求配置</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chart.html">本命盘</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aspects.html">相位</a></li>
+<li class="toctree-l2"><a class="reference internal" href="records.html">保存、恢复、重算和查看命盘</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference.html">公开 API 参考</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html">仓库结构与计算边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="knowledge.html">知识组织与双语文档</a></li>
+<li class="toctree-l2"><a class="reference internal" href="catalog.html">知识目录参考</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">参与开发</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">文档入口</a><ul>
+      <li>Previous: <a href="catalog.html" title="previous chapter">知识目录参考</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 9.1.0</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../../_sources/docs/zh-CN/contributing.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

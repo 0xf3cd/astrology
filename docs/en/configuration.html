@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Requested chart configuration &#8212; celestial-astrology 0.1.0 (development / 开发版)</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
+    <script src="../../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/en/configuration.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Natal charts" href="chart.html" />
+    <link rel="prev" title="Birth records and modern time resolution" href="birth.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="requested-chart-configuration">
+<h1>Requested chart configuration<a class="headerlink" href="#requested-chart-configuration" title="Link to this heading">¶</a></h1>
+<p><a class="reference internal" href="../zh-CN/configuration.html"><span class="std std-doc">简体中文</span></a> · <a class="reference internal" href="index.html"><span class="std std-doc">Documentation</span></a> · <a class="reference internal" href="reference.html"><span class="std std-doc">API reference</span></a></p>
+<p><code class="docutils literal notranslate"><span class="pre">ChartConfig</span></code> is an immutable request, not a calculated chart or resolved
+astronomy metadata. The only admitted modes are <code class="docutils literal notranslate"><span class="pre">tropical</span></code> and <code class="docutils literal notranslate"><span class="pre">geocentric</span></code>.
+House system, object selection, and aspect rules must be supplied explicitly.
+An empty aspect sequence requests no aspect rules; object selection cannot be
+empty. There is no default house system or orb.</p>
+<section id="preserve-the-selected-identities">
+<h2>Preserve the selected identities<a class="headerlink" href="#preserve-the-selected-identities" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">HouseSystem</span></code> admits Whole Sign, Equal, and Placidus. This layer preserves the
+selection; it neither calculates geometry nor substitutes a different system.
+The <a class="reference internal" href="chart.html"><span class="std std-doc">chart guide</span></a> reports unavailable requested geometry explicitly.</p>
+<p><code class="docutils literal notranslate"><span class="pre">Body</span></code> identifies the ten physical bodies from Sun and Moon through Pluto.
+<code class="docutils literal notranslate"><span class="pre">LunarNode</span></code> identifies mathematical ascending/descending nodes with either the
+mean or Meeus five-term true definition. The definition is part of each node’s
+identity, not an accuracy flag or an interchangeable model. Both definitions
+may be selected explicitly in one request.</p>
+<p>These are requested identities; the <a class="reference internal" href="chart.html"><span class="std std-doc">chart adapter</span></a> binds them to the
+astronomical definitions and models. No node formula is implemented in this
+layer.</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">astrology</span><span class="w"> </span><span class="kn">import</span> <span class="n">Body</span><span class="p">,</span> <span class="n">ChartConfig</span><span class="p">,</span> <span class="n">HouseSystem</span><span class="p">,</span> <span class="n">LunarNode</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">objects</span> <span class="o">=</span> <span class="p">[</span><span class="n">Body</span><span class="o">.</span><span class="n">SUN</span><span class="p">,</span> <span class="n">Body</span><span class="o">.</span><span class="n">MOON</span><span class="p">,</span> <span class="n">LunarNode</span><span class="o">.</span><span class="n">MEAN_ASCENDING</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">request</span> <span class="o">=</span> <span class="n">ChartConfig</span><span class="p">(</span><span class="n">HouseSystem</span><span class="o">.</span><span class="n">WHOLE_SIGN</span><span class="p">,</span> <span class="n">objects</span><span class="p">,</span> <span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">objects</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">tuple</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">objects</span><span class="p">)</span>
+<span class="go">('sun', 'moon', 'mean_ascending_node')</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">request</span><span class="o">.</span><span class="n">house_system</span><span class="o">.</span><span class="n">value</span>
+<span class="go">'whole_sign'</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">LunarNode</span><span class="o">.</span><span class="n">MEAN_ASCENDING</span><span class="o">.</span><span class="n">definition</span><span class="o">.</span><span class="n">value</span>
+<span class="go">'mean'</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">LunarNode</span><span class="o">.</span><span class="n">MEEUS_FIVE_TERM_TRUE_ASCENDING</span><span class="o">.</span><span class="n">definition</span><span class="o">.</span><span class="n">value</span>
+<span class="go">'meeus_five_term_true'</span>
+</pre></div>
+</div>
+<p>Object and rule sequences are copied into tuples, preserving order. Source lists
+can change without changing the request. Duplicate objects or duplicate aspect
+identities are rejected rather than silently merged. Enum value strings such as
+<code class="docutils literal notranslate"><span class="pre">&quot;sun&quot;</span></code> are not enum instances and are not implicitly converted.</p>
+</section>
+<section id="request-aspects">
+<h2>Request aspects<a class="headerlink" href="#request-aspects" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">MajorAspect</span></code> names conjunction, sextile, square, trine, and opposition.
+<code class="docutils literal notranslate"><span class="pre">AspectRule</span></code> carries a caller-supplied finite nonnegative <code class="docutils literal notranslate"><span class="pre">orb_degrees</span></code> value in
+degrees. This layer stores the request. It does not calculate aspects or choose a
+tradition’s orb policy; the <a class="reference internal" href="aspects.html"><span class="std std-doc">aspect guide</span></a> explains how the request is
+judged.</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">astrology</span><span class="w"> </span><span class="kn">import</span> <span class="n">AspectRule</span><span class="p">,</span> <span class="n">MajorAspect</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rules</span> <span class="o">=</span> <span class="p">[</span><span class="n">AspectRule</span><span class="p">(</span><span class="n">MajorAspect</span><span class="o">.</span><span class="n">CONJUNCTION</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">request</span> <span class="o">=</span> <span class="n">ChartConfig</span><span class="p">(</span><span class="n">HouseSystem</span><span class="o">.</span><span class="n">PLACIDUS</span><span class="p">,</span> <span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">SUN</span><span class="p">,</span> <span class="n">Body</span><span class="o">.</span><span class="n">MOON</span><span class="p">),</span> <span class="n">rules</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rules</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">aspects</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">aspect</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">aspects</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">orb_degrees</span><span class="p">)</span>
+<span class="go">('conjunction', 0.0)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">zodiac</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">center</span><span class="p">)</span>
+<span class="go">('tropical', 'geocentric')</span>
+</pre></div>
+</div>
+<p>The zero orb above is an explicit synthetic request value, not a library default
+or recommendation.</p>
+</section>
+<section id="give-an-object-its-own-orb-and-choose-who-takes-part">
+<h2>Give an object its own orb, and choose who takes part<a class="headerlink" href="#give-an-object-its-own-orb-and-choose-who-takes-part" title="Link to this heading">¶</a></h2>
+<p>Use <code class="docutils literal notranslate"><span class="pre">ObjectOrb</span></code> to set an object’s orb separately; other objects use the rule’s
+<code class="docutils literal notranslate"><span class="pre">orb_degrees</span></code>. If any rule uses <code class="docutils literal notranslate"><span class="pre">ObjectOrb</span></code>, you must choose <code class="docutils literal notranslate"><span class="pre">orb_combination</span></code> to
+combine the pair’s orbs into one limit. Otherwise, leave <code class="docutils literal notranslate"><span class="pre">orb_combination</span></code> out.
+<code class="docutils literal notranslate"><span class="pre">aspect_objects</span></code> selects the objects to include in aspects and must be a subset
+of <code class="docutils literal notranslate"><span class="pre">objects</span></code>. If omitted, all requested objects take part. You can set a separate
+orb only for an object that takes part.</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">astrology</span><span class="w"> </span><span class="kn">import</span> <span class="n">LunarNode</span><span class="p">,</span> <span class="n">ObjectOrb</span><span class="p">,</span> <span class="n">OrbCombination</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rules</span> <span class="o">=</span> <span class="p">[</span><span class="n">AspectRule</span><span class="p">(</span><span class="n">MajorAspect</span><span class="o">.</span><span class="n">TRINE</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="p">[</span><span class="n">ObjectOrb</span><span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">MOON</span><span class="p">,</span> <span class="mi">13</span><span class="p">)])]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">objects</span> <span class="o">=</span> <span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">SUN</span><span class="p">,</span> <span class="n">Body</span><span class="o">.</span><span class="n">MOON</span><span class="p">,</span> <span class="n">LunarNode</span><span class="o">.</span><span class="n">MEAN_ASCENDING</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">request</span> <span class="o">=</span> <span class="n">ChartConfig</span><span class="p">(</span>
+<span class="gp">... </span>  <span class="n">HouseSystem</span><span class="o">.</span><span class="n">PLACIDUS</span><span class="p">,</span> <span class="n">objects</span><span class="p">,</span> <span class="n">rules</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">aspect_objects</span><span class="o">=</span><span class="p">[</span><span class="n">Body</span><span class="o">.</span><span class="n">SUN</span><span class="p">,</span> <span class="n">Body</span><span class="o">.</span><span class="n">MOON</span><span class="p">],</span>
+<span class="gp">... </span>  <span class="n">orb_combination</span><span class="o">=</span><span class="n">OrbCombination</span><span class="o">.</span><span class="n">EITHER_WITHIN_OWN_ORB</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">value</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">aspect_objects</span><span class="p">]</span>
+<span class="go">['sun', 'moon']</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">request</span><span class="o">.</span><span class="n">orb_combination</span><span class="o">.</span><span class="n">value</span>
+<span class="go">'either_within_own_orb'</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ChartConfig</span><span class="p">(</span><span class="n">HouseSystem</span><span class="o">.</span><span class="n">PLACIDUS</span><span class="p">,</span> <span class="n">objects</span><span class="p">,</span> <span class="n">rules</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">ValueError</span>: <span class="n">orb_combination is required when aspect rules have object orbs</span>
+</pre></div>
+</div>
+<p>NaN, infinity, negative orbs, booleans, unsupported modes, and inconsistent
+selections fail under normal Python and <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-O</span></code>.</p>
+<p>The defining enums and API contracts are generated in the <a class="reference internal" href="reference.html"><span class="std std-doc">reference</span></a>.
+Actual astronomy models, versions, time scales, and effective calculation
+settings belong to the chart result; they are not invented here to complete a
+metadata record. The <a class="reference internal" href="chart.html"><span class="std std-doc">chart guide</span></a> shows how a request becomes that
+result, and the <a class="reference internal" href="knowledge.html"><span class="std std-doc">knowledge guide</span></a> covers queries that need no
+chart at all.</p>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">celestial-astrology</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../README.html">celestial-astrology</a></li>
+<li class="toctree-l2"><a class="reference internal" href="birth.html">Birth records and modern time resolution</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Requested chart configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chart.html">Natal charts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aspects.html">Aspects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="records.html">Save, restore, replay and inspect a chart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference.html">Public API reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html">Repository structure and calculation boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="knowledge.html">Knowledge organization and bilingual documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="catalog.html">Knowledge catalog reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html">Contributing</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../zh-CN/index.html">文档入口</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Documentation</a><ul>
+      <li>Previous: <a href="birth.html" title="previous chapter">Birth records and modern time resolution</a></li>
+      <li>Next: <a href="chart.html" title="next chapter">Natal charts</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 9.1.0</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../../_sources/docs/en/configuration.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

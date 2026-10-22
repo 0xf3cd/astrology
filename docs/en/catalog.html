@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Knowledge catalog reference &#8212; celestial-astrology 0.1.0 (development / 开发版)</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
+    <script src="../../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/en/catalog.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Contributing" href="contributing.html" />
+    <link rel="prev" title="Knowledge organization and bilingual documentation" href="knowledge.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="knowledge-catalog-reference">
+<h1>Knowledge catalog reference<a class="headerlink" href="#knowledge-catalog-reference" title="Link to this heading">¶</a></h1>
+<p><a class="reference internal" href="../zh-CN/catalog.html"><span class="std std-doc">简体中文</span></a> · <a class="reference internal" href="knowledge.html"><span class="std std-doc">Guide</span></a> · <a class="reference internal" href="reference.html"><span class="std std-doc">API</span></a></p>
+<p>This development catalog is generated at documentation build time from the packaged
+records. All admitted concepts, variants, editions and entries appear below.
+Configuration links identify implemented <strong>request values</strong>, not astronomical
+algorithms. The historical variant has no executable implementation.</p>
+<p>The <a class="reference internal" href="knowledge.html"><span class="std std-doc">knowledge guide</span></a> explains queries, source scope, translation
+revisions and search limits. Original excerpts, project translations and authored
+statements are labeled separately. Retrieval never establishes chart applicability.
+The guide explains the <a class="reference internal" href="knowledge.html#status-has-several-dimensions"><span class="std std-ref">source, prerequisite, output and chart states</span></a>
+and <a class="reference internal" href="knowledge.html#translation-revisions-and-search"><span class="std std-ref">translation revisions</span></a> shown below.</p>
+<p><code class="docutils literal notranslate"><span class="pre">code=0.1.0</span></code> · <code class="docutils literal notranslate"><span class="pre">corpus=2026.10.21.1</span></code></p>
+<section id="body-sun-sun">
+<span id="catalog-en-body-sun"></span><h2>body.sun · Sun<a class="headerlink" href="#body-sun-sun" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=body</span></code></p>
+<p>Physical-body request for the Sun. The chart adapter calculates its apparent geocentric position; this catalog computes none.</p>
+<p>English names / 英文名称：Sun, Sol</p>
+<p>Chinese names / 中文名称：太阳、日轮、日</p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.Body.SUN</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">sun</span></code></p>
+</section>
+<section id="body-moon-moon">
+<span id="catalog-en-body-moon"></span><h2>body.moon · Moon<a class="headerlink" href="#body-moon-moon" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=body</span></code></p>
+<p>Physical-body request for the Moon, distinct from lunar nodes. The chart adapter calculates its apparent geocentric position.</p>
+<p>English names / 英文名称：Moon, Luna</p>
+<p>Chinese names / 中文名称：月亮、太阴、月</p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.Body.MOON</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">moon</span></code></p>
+</section>
+<section id="body-mercury-mercury">
+<span id="catalog-en-body-mercury"></span><h2>body.mercury · Mercury<a class="headerlink" href="#body-mercury-mercury" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=body</span></code></p>
+<p>Physical-body request for Mercury. The chart adapter calculates its apparent geocentric position; this catalog computes none.</p>
+<p>English names / 英文名称：Mercury</p>
+<p>Chinese names / 中文名称：水星</p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.Body.MERCURY</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">mercury</span></code></p>
+</section>
+<section id="body-venus-venus">
+<span id="catalog-en-body-venus"></span><h2>body.venus · Venus<a class="headerlink" href="#body-venus-venus" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=body</span></code></p>
+<p>Physical-body request for Venus. The chart adapter calculates its apparent geocentric position; this catalog computes none.</p>
+<p>English names / 英文名称：Venus</p>
+<p>Chinese names / 中文名称：金星</p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.Body.VENUS</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">venus</span></code></p>
+</section>
+<section id="body-mars-mars">
+<span id="catalog-en-body-mars"></span><h2>body.mars · Mars<a class="headerlink" href="#body-mars-mars" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=body</span></code></p>
+<p>Physical-body request for Mars. The chart adapter calculates its apparent geocentric position; this catalog computes none.</p>
+<p>English names / 英文名称：Mars</p>
+<p>Chinese names / 中文名称：火星</p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.Body.MARS</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">mars</span></code></p>
+</section>
+<section id="body-jupiter-jupiter">
+<span id="catalog-en-body-jupiter"></span><h2>body.jupiter · Jupiter<a class="headerlink" href="#body-jupiter-jupiter" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=body</span></code></p>
+<p>Physical-body request for Jupiter. The chart adapter calculates its apparent geocentric position; this catalog computes none.</p>
+<p>English names / 英文名称：Jupiter</p>
+<p>Chinese names / 中文名称：木星</p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.Body.JUPITER</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">jupiter</span></code></p>
+</section>
+<section id="body-saturn-saturn">
+<span id="catalog-en-body-saturn"></span><h2>body.saturn · Saturn<a class="headerlink" href="#body-saturn-saturn" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=body</span></code></p>
+<p>Physical-body request for Saturn. The chart adapter calculates its apparent geocentric position; this catalog computes none.</p>
+<p>English names / 英文名称：Saturn</p>
+<p>Chinese names / 中文名称：土星</p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.Body.SATURN</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">saturn</span></code></p>
+</section>
+<section id="body-uranus-uranus">
+<span id="catalog-en-body-uranus"></span><h2>body.uranus · Uranus<a class="headerlink" href="#body-uranus-uranus" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=body</span></code></p>
+<p>Physical-body request for Uranus. The chart adapter calculates its apparent geocentric position; this catalog computes none.</p>
+<p>English names / 英文名称：Uranus</p>
+<p>Chinese names / 中文名称：天王星</p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.Body.URANUS</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">uranus</span></code></p>
+</section>
+<section id="body-neptune-neptune">
+<span id="catalog-en-body-neptune"></span><h2>body.neptune · Neptune<a class="headerlink" href="#body-neptune-neptune" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=body</span></code></p>
+<p>Physical-body request for Neptune. The chart adapter calculates its apparent geocentric position; this catalog computes none.</p>
+<p>English names / 英文名称：Neptune</p>
+<p>Chinese names / 中文名称：海王星</p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.Body.NEPTUNE</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">neptune</span></code></p>
+</section>
+<section id="body-pluto-pluto">
+<span id="catalog-en-body-pluto"></span><h2>body.pluto · Pluto<a class="headerlink" href="#body-pluto-pluto" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=body</span></code></p>
+<p>Physical-body request for Pluto. The chart adapter calculates its apparent geocentric position; this catalog computes none.</p>
+<p>English names / 英文名称：Pluto</p>
+<p>Chinese names / 中文名称：冥王星</p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.Body.PLUTO</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">pluto</span></code></p>
+</section>
+<section id="sign-aries-aries">
+<span id="catalog-en-sign-aries"></span><h2>sign.aries · Aries<a class="headerlink" href="#sign-aries-aries" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=sign</span></code></p>
+<p>Sign vocabulary, not a constellation. Tropical longitude classification is executable in the chart implementation; the 30-degree sector boundaries are a project convention.</p>
+<p>English names / 英文名称：Aries</p>
+<p>Chinese names / 中文名称：白羊座、牡羊座</p>
+<p>Related / 关联：<a class="reference internal" href="#catalog-en-sign-libra"><span class="std std-ref">sign.libra</span></a></p>
+</section>
+<section id="sign-taurus-taurus">
+<span id="catalog-en-sign-taurus"></span><h2>sign.taurus · Taurus<a class="headerlink" href="#sign-taurus-taurus" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=sign</span></code></p>
+<p>Sign vocabulary. Tropical longitude classification is executable in the chart implementation; the 30-degree sector boundaries are a project convention.</p>
+<p>English names / 英文名称：Taurus</p>
+<p>Chinese names / 中文名称：金牛座</p>
+</section>
+<section id="sign-gemini-gemini">
+<span id="catalog-en-sign-gemini"></span><h2>sign.gemini · Gemini<a class="headerlink" href="#sign-gemini-gemini" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=sign</span></code></p>
+<p>Sign vocabulary. Tropical longitude classification is executable in the chart implementation; the 30-degree sector boundaries are a project convention.</p>
+<p>English names / 英文名称：Gemini</p>
+<p>Chinese names / 中文名称：双子座</p>
+</section>
+<section id="sign-cancer-cancer">
+<span id="catalog-en-sign-cancer"></span><h2>sign.cancer · Cancer<a class="headerlink" href="#sign-cancer-cancer" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=sign</span></code></p>
+<p>Sign vocabulary. Tropical longitude classification is executable in the chart implementation; the 30-degree sector boundaries are a project convention.</p>
+<p>English names / 英文名称：Cancer</p>
+<p>Chinese names / 中文名称：巨蟹座</p>
+</section>
+<section id="sign-leo-leo">
+<span id="catalog-en-sign-leo"></span><h2>sign.leo · Leo<a class="headerlink" href="#sign-leo-leo" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=sign</span></code></p>
+<p>Sign vocabulary. Tropical longitude classification is executable in the chart implementation; the 30-degree sector boundaries are a project convention.</p>
+<p>English names / 英文名称：Leo</p>
+<p>Chinese names / 中文名称：狮子座</p>
+</section>
+<section id="sign-virgo-virgo">
+<span id="catalog-en-sign-virgo"></span><h2>sign.virgo · Virgo<a class="headerlink" href="#sign-virgo-virgo" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=sign</span></code></p>
+<p>Sign vocabulary. Tropical longitude classification is executable in the chart implementation; the 30-degree sector boundaries are a project convention.</p>
+<p>English names / 英文名称：Virgo</p>
+<p>Chinese names / 中文名称：处女座</p>
+</section>
+<section id="sign-libra-libra">
+<span id="catalog-en-sign-libra"></span><h2>sign.libra · Libra<a class="headerlink" href="#sign-libra-libra" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=sign</span></code></p>
+<p>Sign vocabulary. Tropical longitude classification is executable in the chart implementation; the 30-degree sector boundaries are a project convention.</p>
+<p>English names / 英文名称：Libra</p>
+<p>Chinese names / 中文名称：天秤座、天平座</p>
+<p>Related / 关联：<a class="reference internal" href="#catalog-en-sign-aries"><span class="std std-ref">sign.aries</span></a></p>
+</section>
+<section id="sign-scorpio-scorpio">
+<span id="catalog-en-sign-scorpio"></span><h2>sign.scorpio · Scorpio<a class="headerlink" href="#sign-scorpio-scorpio" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=sign</span></code></p>
+<p>Sign vocabulary. Tropical longitude classification is executable in the chart implementation; the 30-degree sector boundaries are a project convention.</p>
+<p>English names / 英文名称：Scorpio</p>
+<p>Chinese names / 中文名称：天蝎座</p>
+</section>
+<section id="sign-sagittarius-sagittarius">
+<span id="catalog-en-sign-sagittarius"></span><h2>sign.sagittarius · Sagittarius<a class="headerlink" href="#sign-sagittarius-sagittarius" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=sign</span></code></p>
+<p>Sign vocabulary. Tropical longitude classification is executable in the chart implementation; the 30-degree sector boundaries are a project convention.</p>
+<p>English names / 英文名称：Sagittarius</p>
+<p>Chinese names / 中文名称：射手座、人马座</p>
+</section>
+<section id="sign-capricorn-capricorn">
+<span id="catalog-en-sign-capricorn"></span><h2>sign.capricorn · Capricorn<a class="headerlink" href="#sign-capricorn-capricorn" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=sign</span></code></p>
+<p>Sign vocabulary. Tropical longitude classification is executable in the chart implementation; the 30-degree sector boundaries are a project convention.</p>
+<p>English names / 英文名称：Capricorn</p>
+<p>Chinese names / 中文名称：摩羯座</p>
+</section>
+<section id="sign-aquarius-aquarius">
+<span id="catalog-en-sign-aquarius"></span><h2>sign.aquarius · Aquarius<a class="headerlink" href="#sign-aquarius-aquarius" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=sign</span></code></p>
+<p>Sign vocabulary. Tropical longitude classification is executable in the chart implementation; the 30-degree sector boundaries are a project convention.</p>
+<p>English names / 英文名称：Aquarius</p>
+<p>Chinese names / 中文名称：水瓶座、宝瓶座</p>
+</section>
+<section id="sign-pisces-pisces">
+<span id="catalog-en-sign-pisces"></span><h2>sign.pisces · Pisces<a class="headerlink" href="#sign-pisces-pisces" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=sign</span></code></p>
+<p>Sign vocabulary. Tropical longitude classification is executable in the chart implementation; the 30-degree sector boundaries are a project convention.</p>
+<p>English names / 英文名称：Pisces</p>
+<p>Chinese names / 中文名称：双鱼座</p>
+</section>
+<section id="house-whole-sign-whole-sign">
+<span id="catalog-en-house-whole-sign"></span><h2>house.whole_sign · Whole Sign<a class="headerlink" href="#house-whole-sign-whole-sign" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=house_system</span></code></p>
+<p>Whole Sign house-system request. The chart adapter calculates its cusps and placement; the Ascendant need not coincide with the first cusp.</p>
+<p>English names / 英文名称：Whole Sign, whole sign houses</p>
+<p>Chinese names / 中文名称：整宫制、整宫</p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.HouseSystem.WHOLE_SIGN</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">whole_sign</span></code></p>
+</section>
+<section id="house-equal-equal">
+<span id="catalog-en-house-equal"></span><h2>house.equal · Equal<a class="headerlink" href="#house-equal-equal" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=house_system</span></code></p>
+<p>Equal house-system request. The chart adapter calculates its cusps and placement.</p>
+<p>English names / 英文名称：Equal, equal houses</p>
+<p>Chinese names / 中文名称：等宫制</p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.HouseSystem.EQUAL</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">equal</span></code></p>
+</section>
+<section id="house-placidus-placidus">
+<span id="catalog-en-house-placidus"></span><h2>house.placidus · Placidus<a class="headerlink" href="#house-placidus-placidus" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=house_system</span></code></p>
+<p>Placidus house-system request. The chart adapter calculates its cusps and placement; unavailable geometry is reported and never replaced by another system.</p>
+<p>English names / 英文名称：Placidus, placidus houses</p>
+<p>Chinese names / 中文名称：普拉西德制、普拉西度制</p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.HouseSystem.PLACIDUS</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">placidus</span></code></p>
+</section>
+<section id="node-definition-mean-mean-lunar-node">
+<span id="catalog-en-node-definition-mean"></span><h2>node_definition.mean · Mean lunar node<a class="headerlink" href="#node-definition-mean-mean-lunar-node" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=node_definition</span></code></p>
+<p>Project mean-node definition identifier. The chart adapter binds it to the astronomy library’s mean node; the printed Meeus formula has not been checked against the source text.</p>
+<p>English names / 英文名称：Mean lunar node, mean node</p>
+<p>Chinese names / 中文名称：平均月交点、平均交点</p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.NodeDefinition.MEAN</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">mean</span></code></p>
+</section>
+<section id="node-definition-meeus-five-term-true-meeus-five-term-true-lunar-node">
+<span id="catalog-en-node-definition-meeus-five-term-true"></span><h2>node_definition.meeus_five_term_true · Meeus five-term true lunar node<a class="headerlink" href="#node-definition-meeus-five-term-true-meeus-five-term-true-lunar-node" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=node_definition</span></code></p>
+<p>Project definition identifier MEEUS_FIVE_TERM_TRUE. The chart adapter binds it to the astronomy library’s true node. The identification with the five-term series is this project’s, checked against the same Meeus formulas; the library does not name the series. No residual bound or equivalence to an osculating node is established here.</p>
+<p>English names / 英文名称：Meeus five-term true lunar node, meeus five-term node</p>
+<p>Chinese names / 中文名称：Meeus 五项真月交点、五项真交点</p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.NodeDefinition.MEEUS_FIVE_TERM_TRUE</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">meeus_five_term_true</span></code></p>
+</section>
+<section id="node-mean-ascending-mean-ascending-lunar-node">
+<span id="catalog-en-node-mean-ascending"></span><h2>node.mean_ascending · Mean ascending lunar node<a class="headerlink" href="#node-mean-ascending-mean-ascending-lunar-node" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=lunar_node</span></code></p>
+<p>Mathematical ascending-node identity using the named MEAN definition, not a physical body.</p>
+<p>English names / 英文名称：Mean ascending lunar node, mean north node</p>
+<p>Chinese names / 中文名称：平均升交点、平均北交点</p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.LunarNode.MEAN_ASCENDING</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">mean_ascending_node</span></code></p>
+<p>Related / 关联：<a class="reference internal" href="#catalog-en-node-definition-mean"><span class="std std-ref">node_definition.mean</span></a></p>
+</section>
+<section id="node-mean-descending-mean-descending-lunar-node">
+<span id="catalog-en-node-mean-descending"></span><h2>node.mean_descending · Mean descending lunar node<a class="headerlink" href="#node-mean-descending-mean-descending-lunar-node" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=lunar_node</span></code></p>
+<p>Mathematical descending-node identity using the named MEAN definition, not a physical body.</p>
+<p>English names / 英文名称：Mean descending lunar node, mean south node</p>
+<p>Chinese names / 中文名称：平均降交点、平均南交点</p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.LunarNode.MEAN_DESCENDING</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">mean_descending_node</span></code></p>
+<p>Related / 关联：<a class="reference internal" href="#catalog-en-node-definition-mean"><span class="std std-ref">node_definition.mean</span></a></p>
+</section>
+<section id="node-meeus-five-term-true-ascending-meeus-five-term-true-ascending-node">
+<span id="catalog-en-node-meeus-five-term-true-ascending"></span><h2>node.meeus_five_term_true_ascending · Meeus five-term true ascending node<a class="headerlink" href="#node-meeus-five-term-true-ascending-meeus-five-term-true-ascending-node" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=lunar_node</span></code></p>
+<p>Mathematical ascending-node identity using MEEUS_FIVE_TERM_TRUE, not a physical body.</p>
+<p>English names / 英文名称：Meeus five-term true ascending node</p>
+<p>Chinese names / 中文名称：Meeus 五项真升交点</p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.LunarNode.MEEUS_FIVE_TERM_TRUE_ASCENDING</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">meeus_five_term_true_ascending_node</span></code></p>
+<p>Related / 关联：<a class="reference internal" href="#catalog-en-node-definition-meeus-five-term-true"><span class="std std-ref">node_definition.meeus_five_term_true</span></a></p>
+</section>
+<section id="node-meeus-five-term-true-descending-meeus-five-term-true-descending-node">
+<span id="catalog-en-node-meeus-five-term-true-descending"></span><h2>node.meeus_five_term_true_descending · Meeus five-term true descending node<a class="headerlink" href="#node-meeus-five-term-true-descending-meeus-five-term-true-descending-node" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=lunar_node</span></code></p>
+<p>Mathematical descending-node identity using MEEUS_FIVE_TERM_TRUE, not a physical body.</p>
+<p>English names / 英文名称：Meeus five-term true descending node</p>
+<p>Chinese names / 中文名称：Meeus 五项真降交点</p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.LunarNode.MEEUS_FIVE_TERM_TRUE_DESCENDING</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">meeus_five_term_true_descending_node</span></code></p>
+<p>Related / 关联：<a class="reference internal" href="#catalog-en-node-definition-meeus-five-term-true"><span class="std std-ref">node_definition.meeus_five_term_true</span></a></p>
+</section>
+<section id="aspect-conjunction-conjunction">
+<span id="catalog-en-aspect-conjunction"></span><h2>aspect.conjunction · Conjunction<a class="headerlink" href="#aspect-conjunction-conjunction" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=aspect</span></code></p>
+<p>Conjunction request identity. Exact angle 0 degrees; the chart implementation judges it from ecliptic longitudes and an explicit orb.</p>
+<p>English names / 英文名称：Conjunction</p>
+<p>Chinese names / 中文名称：合相、合相位</p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.MajorAspect.CONJUNCTION</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">conjunction</span></code></p>
+<p>Exact angle / 精确角度：0°</p>
+</section>
+<section id="aspect-sextile-sextile">
+<span id="catalog-en-aspect-sextile"></span><h2>aspect.sextile · Sextile<a class="headerlink" href="#aspect-sextile-sextile" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=aspect</span></code></p>
+<p>Sextile request identity. Exact angle 60 degrees; the chart implementation judges it from ecliptic longitudes and an explicit orb.</p>
+<p>English names / 英文名称：Sextile</p>
+<p>Chinese names / 中文名称：六分相</p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.MajorAspect.SEXTILE</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">sextile</span></code></p>
+<p>Exact angle / 精确角度：60°</p>
+</section>
+<section id="aspect-square-square">
+<span id="catalog-en-aspect-square"></span><h2>aspect.square · Square<a class="headerlink" href="#aspect-square-square" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=aspect</span></code></p>
+<p>Square request identity. Exact angle 90 degrees; the chart implementation judges it from ecliptic longitudes and an explicit orb.</p>
+<p>English names / 英文名称：Square</p>
+<p>Chinese names / 中文名称：四分相、刑相</p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.MajorAspect.SQUARE</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">square</span></code></p>
+<p>Exact angle / 精确角度：90°</p>
+</section>
+<section id="aspect-trine-trine">
+<span id="catalog-en-aspect-trine"></span><h2>aspect.trine · Trine<a class="headerlink" href="#aspect-trine-trine" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=aspect</span></code></p>
+<p>Trine request identity. Exact angle 120 degrees; the chart implementation judges it from ecliptic longitudes and an explicit orb.</p>
+<p>English names / 英文名称：Trine</p>
+<p>Chinese names / 中文名称：三分相</p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.MajorAspect.TRINE</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">trine</span></code></p>
+<p>Exact angle / 精确角度：120°</p>
+</section>
+<section id="aspect-opposition-opposition">
+<span id="catalog-en-aspect-opposition"></span><h2>aspect.opposition · Opposition<a class="headerlink" href="#aspect-opposition-opposition" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=aspect</span></code></p>
+<p>Opposition request identity. Exact angle 180 degrees; the chart implementation judges it from ecliptic longitudes and an explicit orb.</p>
+<p>English names / 英文名称：Opposition</p>
+<p>Chinese names / 中文名称：对分相、冲相</p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.MajorAspect.OPPOSITION</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">opposition</span></code></p>
+<p>Exact angle / 精确角度：180°</p>
+</section>
+<section id="rule-house-whole-sign-whole-sign">
+<span id="catalog-en-rule-house-whole-sign"></span><h2>rule.house.whole_sign · Whole Sign<a class="headerlink" href="#rule-house-whole-sign-whole-sign" title="Link to this heading">¶</a></h2>
+<p>The chart adapter selects celestial-calendar’s WHOLE_SIGN geometry explicitly, then assigns longitudes to its supplied cusps using rule.project.cusp_ownership. The Ascendant need not coincide with the first cusp.</p>
+<p>Project binding to a named upstream house system, not an independent historical derivation.</p>
+<p>Requires the adapter’s joint computation domain and defined axes. Selecting Whole Sign does not bypass upstream geometry restrictions or provide a fallback.</p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-en-house-whole-sign"><span class="std std-ref">house.whole_sign</span></a></p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.HouseSystem.WHOLE_SIGN</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">whole_sign</span></code></p>
+</section>
+<section id="rule-house-equal-equal">
+<span id="catalog-en-rule-house-equal"></span><h2>rule.house.equal · Equal<a class="headerlink" href="#rule-house-equal-equal" title="Link to this heading">¶</a></h2>
+<p>The chart adapter selects celestial-calendar’s EQUAL geometry explicitly, then assigns longitudes to its supplied cusps using rule.project.cusp_ownership.</p>
+<p>Project binding to a named upstream house system, not an independent historical derivation.</p>
+<p>Requires the adapter’s joint computation domain and defined axes. Equal houses do not replace an unavailable requested system.</p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-en-house-equal"><span class="std std-ref">house.equal</span></a></p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.HouseSystem.EQUAL</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">equal</span></code></p>
+</section>
+<section id="rule-house-placidus-placidus">
+<span id="catalog-en-rule-house-placidus"></span><h2>rule.house.placidus · Placidus<a class="headerlink" href="#rule-house-placidus-placidus" title="Link to this heading">¶</a></h2>
+<p>The chart adapter selects celestial-calendar’s PLACIDUS geometry explicitly, then assigns longitudes to its supplied cusps using rule.project.cusp_ownership. An unavailable geometry fails the chart request.</p>
+<p>Project binding to a named upstream house system, not an independent historical derivation.</p>
+<p>Requires the adapter’s joint computation domain and a defined Placidus geometry. Failure returns neither a partial chart nor another house system.</p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-en-house-placidus"><span class="std std-ref">house.placidus</span></a></p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.HouseSystem.PLACIDUS</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">placidus</span></code></p>
+</section>
+<section id="rule-node-definition-mean-mean-lunar-node">
+<span id="catalog-en-rule-node-definition-mean"></span><h2>rule.node_definition.mean · Mean lunar node<a class="headerlink" href="#rule-node-definition-mean-mean-lunar-node" title="Link to this heading">¶</a></h2>
+<p>The adapter maps the MEAN node definition to the upstream mean ascending and descending targets. The direction stays on each LunarNode identity; the five-term correction is not selected for this definition.</p>
+<p>Project definition binding, not an accuracy setting.</p>
+<p>The project test calculates a mean-node value from its reference formula, adds nutation and compares it with the upstream result. It does not verify the printed Meeus text, establish an error bound or make this interchangeable with a true or osculating node.</p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-en-node-definition-mean"><span class="std std-ref">node_definition.mean</span></a></p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.NodeDefinition.MEAN</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">mean</span></code></p>
+</section>
+<section id="rule-node-definition-meeus-five-term-true-meeus-five-term-true-lunar-node">
+<span id="catalog-en-rule-node-definition-meeus-five-term-true"></span><h2>rule.node_definition.meeus_five_term_true · Meeus five-term true lunar node<a class="headerlink" href="#rule-node-definition-meeus-five-term-true-meeus-five-term-true-lunar-node" title="Link to this heading">¶</a></h2>
+<p>The adapter maps MEEUS_FIVE_TERM_TRUE to the upstream true ascending and descending targets. The project identifies the series by comparing the result with the mean node plus five sine corrections and nutation; the upstream target name itself does not specify that series.</p>
+<p>Project definition binding, not an accuracy setting.</p>
+<p>This is an implementation comparison, not independent astronomical corroboration. The printed Meeus text, an error bound and equivalence to an osculating node remain unverified.</p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-en-node-definition-meeus-five-term-true"><span class="std std-ref">node_definition.meeus_five_term_true</span></a></p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.NodeDefinition.MEEUS_FIVE_TERM_TRUE</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">meeus_five_term_true</span></code></p>
+</section>
+<section id="rule-aspect-conjunction-conjunction">
+<span id="catalog-en-rule-aspect-conjunction"></span><h2>rule.aspect.conjunction · Conjunction<a class="headerlink" href="#rule-aspect-conjunction-conjunction" title="Link to this heading">¶</a></h2>
+<p>Conjunction uses the exact angle defined by astrology.aspects.aspect_angle for MajorAspect.CONJUNCTION. Its single oriented branch is tested by rule.project.aspect_deviation.</p>
+<p>Project longitude-aspect classification; no traditional orb is prescribed.</p>
+<p>Requires an explicit caller-supplied orb. Per-object orbs require a selected combination rule. This angle rule supplies no motion, strength or interpretation by itself.</p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-en-aspect-conjunction"><span class="std std-ref">aspect.conjunction</span></a></p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.MajorAspect.CONJUNCTION</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">conjunction</span></code></p>
+<p>Exact angle / 精确角度：0°</p>
+</section>
+<section id="rule-aspect-sextile-sextile">
+<span id="catalog-en-rule-aspect-sextile"></span><h2>rule.aspect.sextile · Sextile<a class="headerlink" href="#rule-aspect-sextile-sextile" title="Link to this heading">¶</a></h2>
+<p>Sextile uses the exact angle defined by astrology.aspects.aspect_angle for MajorAspect.SEXTILE. Both oriented branches are tested by rule.project.aspect_deviation.</p>
+<p>Project longitude-aspect classification; no traditional orb is prescribed.</p>
+<p>Requires an explicit caller-supplied orb. Per-object orbs require a selected combination rule. This angle rule supplies no motion, strength or interpretation by itself.</p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-en-aspect-sextile"><span class="std std-ref">aspect.sextile</span></a></p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.MajorAspect.SEXTILE</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">sextile</span></code></p>
+<p>Exact angle / 精确角度：60°</p>
+</section>
+<section id="rule-aspect-square-square">
+<span id="catalog-en-rule-aspect-square"></span><h2>rule.aspect.square · Square<a class="headerlink" href="#rule-aspect-square-square" title="Link to this heading">¶</a></h2>
+<p>Square uses the exact angle defined by astrology.aspects.aspect_angle for MajorAspect.SQUARE. Both oriented branches are tested by rule.project.aspect_deviation.</p>
+<p>Project longitude-aspect classification; no traditional orb is prescribed.</p>
+<p>Requires an explicit caller-supplied orb. Per-object orbs require a selected combination rule. This angle rule supplies no motion, strength or interpretation by itself.</p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-en-aspect-square"><span class="std std-ref">aspect.square</span></a></p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.MajorAspect.SQUARE</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">square</span></code></p>
+<p>Exact angle / 精确角度：90°</p>
+</section>
+<section id="rule-aspect-trine-trine">
+<span id="catalog-en-rule-aspect-trine"></span><h2>rule.aspect.trine · Trine<a class="headerlink" href="#rule-aspect-trine-trine" title="Link to this heading">¶</a></h2>
+<p>Trine uses the exact angle defined by astrology.aspects.aspect_angle for MajorAspect.TRINE. Both oriented branches are tested by rule.project.aspect_deviation.</p>
+<p>Project longitude-aspect classification; no traditional orb is prescribed.</p>
+<p>Requires an explicit caller-supplied orb. Per-object orbs require a selected combination rule. This angle rule supplies no motion, strength or interpretation by itself.</p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-en-aspect-trine"><span class="std std-ref">aspect.trine</span></a></p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.MajorAspect.TRINE</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">trine</span></code></p>
+<p>Exact angle / 精确角度：120°</p>
+</section>
+<section id="rule-aspect-opposition-opposition">
+<span id="catalog-en-rule-aspect-opposition"></span><h2>rule.aspect.opposition · Opposition<a class="headerlink" href="#rule-aspect-opposition-opposition" title="Link to this heading">¶</a></h2>
+<p>Opposition uses the exact angle defined by astrology.aspects.aspect_angle for MajorAspect.OPPOSITION. Its single oriented branch is tested by rule.project.aspect_deviation.</p>
+<p>Project longitude-aspect classification; no traditional orb is prescribed.</p>
+<p>Requires an explicit caller-supplied orb. Per-object orbs require a selected combination rule. This angle rule supplies no motion, strength or interpretation by itself.</p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-en-aspect-opposition"><span class="std std-ref">aspect.opposition</span></a></p>
+<p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.MajorAspect.OPPOSITION</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">opposition</span></code></p>
+<p>Exact angle / 精确角度：180°</p>
+</section>
+<section id="rule-project-tropical-sign-sectors-tropical-sign-sectors">
+<span id="catalog-en-rule-project-tropical-sign-sectors"></span><h2>rule.project.tropical_sign_sectors · Tropical sign sectors<a class="headerlink" href="#rule-project-tropical-sign-sectors-tropical-sign-sectors" title="Link to this heading">¶</a></h2>
+<p>The tropical zodiac divides ecliptic longitude into twelve half-open 30-degree sectors; a longitude exactly on a sector boundary belongs to the higher sign.</p>
+<p>Project convention for the tropical zodiac; it is not a claim about the constellations or about historical sign division.</p>
+<p>Applies to tropical longitudes only. The sidereal zodiac and the historical groupings in this catalog are not implemented.</p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-en-sign-aries"><span class="std std-ref">sign.aries</span></a>, <a class="reference internal" href="#catalog-en-sign-taurus"><span class="std std-ref">sign.taurus</span></a>, <a class="reference internal" href="#catalog-en-sign-gemini"><span class="std std-ref">sign.gemini</span></a>, <a class="reference internal" href="#catalog-en-sign-cancer"><span class="std std-ref">sign.cancer</span></a>, <a class="reference internal" href="#catalog-en-sign-leo"><span class="std std-ref">sign.leo</span></a>, <a class="reference internal" href="#catalog-en-sign-virgo"><span class="std std-ref">sign.virgo</span></a>, <a class="reference internal" href="#catalog-en-sign-libra"><span class="std std-ref">sign.libra</span></a>, <a class="reference internal" href="#catalog-en-sign-scorpio"><span class="std std-ref">sign.scorpio</span></a>, <a class="reference internal" href="#catalog-en-sign-sagittarius"><span class="std std-ref">sign.sagittarius</span></a>, <a class="reference internal" href="#catalog-en-sign-capricorn"><span class="std std-ref">sign.capricorn</span></a>, <a class="reference internal" href="#catalog-en-sign-aquarius"><span class="std std-ref">sign.aquarius</span></a>, <a class="reference internal" href="#catalog-en-sign-pisces"><span class="std std-ref">sign.pisces</span></a></p>
+</section>
+<section id="rule-project-cusp-ownership-cusp-ownership-and-wrap">
+<span id="catalog-en-rule-project-cusp-ownership"></span><h2>rule.project.cusp_ownership · Cusp ownership and wrap<a class="headerlink" href="#rule-project-cusp-ownership-cusp-ownership-and-wrap" title="Link to this heading">¶</a></h2>
+<p>House membership uses half-open intervals [cusp, next cusp): a longitude exactly on a cusp belongs to the house that starts there, and membership wraps across 0/360 degrees.</p>
+<p>Project convention for two-dimensional house placement; the house systems themselves are named requests.</p>
+<p>Uses the supplied cusp geometry only. Whether an axis coincides with a cusp is a property of the requested house system.</p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-en-house-whole-sign"><span class="std std-ref">house.whole_sign</span></a>, <a class="reference internal" href="#catalog-en-house-equal"><span class="std std-ref">house.equal</span></a>, <a class="reference internal" href="#catalog-en-house-placidus"><span class="std std-ref">house.placidus</span></a></p>
+</section>
+<section id="rule-ptolemy-ashmand-equinoctial-signs-equinoctial-signs-in-ashmand-s-ptolemy">
+<span id="catalog-en-rule-ptolemy-ashmand-equinoctial-signs"></span><h2>rule.ptolemy_ashmand.equinoctial_signs · Equinoctial signs in Ashmand’s Ptolemy<a class="headerlink" href="#rule-ptolemy-ashmand-equinoctial-signs-equinoctial-signs-in-ashmand-s-ptolemy" title="Link to this heading">¶</a></h2>
+<p>This edition calls Aries and Libra equinoctial signs, with the rationale preserved in the cited sentence.</p>
+<p>Ptolemy through the paraphrase attributed to Proclus, Ashmand’s 1822 English translation; single-source historical record.</p>
+<p>Non-executable. The historical equal-day/night explanation is not a guarantee about observed daylight. It defines neither modern sign classification nor a house system or a chart interpretation.</p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-en-sign-aries"><span class="std std-ref">sign.aries</span></a>, <a class="reference internal" href="#catalog-en-sign-libra"><span class="std std-ref">sign.libra</span></a></p>
+</section>
+<section id="rule-project-aspect-deviation-aspect-deviation-and-branch">
+<span id="catalog-en-rule-project-aspect-deviation"></span><h2>rule.project.aspect_deviation · Aspect deviation and branch<a class="headerlink" href="#rule-project-aspect-deviation-aspect-deviation-and-branch" title="Link to this heading">¶</a></h2>
+<p>The oriented separation runs from the first object to the second, in (-180, 180] degrees of ecliptic longitude. An aspect with exact angle theta holds when the separation differs from a branch by at most the limit, the limit included. The branches are minus and plus theta for a sextile, square or trine, and the single angle 0 or 180 for a conjunction or opposition. Every holding branch is reported, in the order of the objects, then the aspect angle, then the minus branch before the plus branch.</p>
+<p>Project convention; it is not attributed to a tradition.</p>
+<p>Ecliptic longitude only. Latitude, declination, minor aspects, whole-sign aspects and aspects to axes are not evaluated.</p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-en-aspect-conjunction"><span class="std std-ref">aspect.conjunction</span></a>, <a class="reference internal" href="#catalog-en-aspect-sextile"><span class="std std-ref">aspect.sextile</span></a>, <a class="reference internal" href="#catalog-en-aspect-square"><span class="std std-ref">aspect.square</span></a>, <a class="reference internal" href="#catalog-en-aspect-trine"><span class="std std-ref">aspect.trine</span></a>, <a class="reference internal" href="#catalog-en-aspect-opposition"><span class="std std-ref">aspect.opposition</span></a></p>
+</section>
+<section id="rule-project-aspect-motion-applying-and-separating-status">
+<span id="catalog-en-rule-project-aspect-motion"></span><h2>rule.project.aspect_motion · Applying and separating status<a class="headerlink" href="#rule-project-aspect-motion-applying-and-separating-status" title="Link to this heading">¶</a></h2>
+<p>The relative longitude rate is the second object’s rate minus the first’s. Away from a deviation of 180 degrees, opposite signs of the relative rate and deviation mean applying; matching signs mean separating. Zero deviation is exact. Zero relative rate with nonzero deviation is stationary: the objects have no relative motion, but either planet may still be changing longitude. A missing rate is indeterminate. At a deviation of 180 degrees with nonzero relative motion, the absolute wrapped deviation has no two-sided derivative and the status is indeterminate. Floats are compared directly, without a tolerance.</p>
+<p>Project definition; no tradition is claimed.</p>
+<p>Describes this instant only. It does not predict whether an aspect will become exact; either object may change direction before that happens.</p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-en-aspect-conjunction"><span class="std std-ref">aspect.conjunction</span></a>, <a class="reference internal" href="#catalog-en-aspect-sextile"><span class="std std-ref">aspect.sextile</span></a>, <a class="reference internal" href="#catalog-en-aspect-square"><span class="std std-ref">aspect.square</span></a>, <a class="reference internal" href="#catalog-en-aspect-trine"><span class="std std-ref">aspect.trine</span></a>, <a class="reference internal" href="#catalog-en-aspect-opposition"><span class="std std-ref">aspect.opposition</span></a></p>
+</section>
+<section id="rule-project-aspect-participation-objects-that-take-part-in-aspects">
+<span id="catalog-en-rule-project-aspect-participation"></span><h2>rule.project.aspect_participation · Objects that take part in aspects<a class="headerlink" href="#rule-project-aspect-participation-objects-that-take-part-in-aspects" title="Link to this heading">¶</a></h2>
+<p>Aspects are judged among the requested objects, or among a chosen subset of them. Two lunar nodes never form an aspect with each other: the four node identities are one pair of nodes under two definitions and two directions. A node may form an aspect with a body. Axes are not objects of a chart request and take no part.</p>
+<p>Project convention; it is not attributed to a tradition.</p>
+<p>The exclusion of aspects between nodes is a project convention. A convention that draws no aspects for a node at all is expressed by leaving the node out of the chosen subset.</p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-en-aspect-conjunction"><span class="std std-ref">aspect.conjunction</span></a>, <a class="reference internal" href="#catalog-en-aspect-sextile"><span class="std std-ref">aspect.sextile</span></a>, <a class="reference internal" href="#catalog-en-aspect-square"><span class="std std-ref">aspect.square</span></a>, <a class="reference internal" href="#catalog-en-aspect-trine"><span class="std std-ref">aspect.trine</span></a>, <a class="reference internal" href="#catalog-en-aspect-opposition"><span class="std std-ref">aspect.opposition</span></a></p>
+</section>
+<section id="rule-project-orb-either-within-own-orb-either-object-s-own-orb">
+<span id="catalog-en-rule-project-orb-either-within-own-orb"></span><h2>rule.project.orb_either_within_own_orb · Either object’s own orb<a class="headerlink" href="#rule-project-orb-either-within-own-orb-either-object-s-own-orb" title="Link to this heading">¶</a></h2>
+<p>Each object uses its separately assigned orb, or the aspect rule’s orb if none is assigned. The deviation must be within at least one object’s orb, so the limit is the larger of the two orbs.</p>
+<p>Project definition; no tradition is claimed.</p>
+<p>Needed exactly when an aspect rule gives per-object orbs. The catalog supplies no default orb.</p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-en-aspect-conjunction"><span class="std std-ref">aspect.conjunction</span></a>, <a class="reference internal" href="#catalog-en-aspect-sextile"><span class="std std-ref">aspect.sextile</span></a>, <a class="reference internal" href="#catalog-en-aspect-square"><span class="std std-ref">aspect.square</span></a>, <a class="reference internal" href="#catalog-en-aspect-trine"><span class="std std-ref">aspect.trine</span></a>, <a class="reference internal" href="#catalog-en-aspect-opposition"><span class="std std-ref">aspect.opposition</span></a></p>
+</section>
+<section id="rule-project-orb-both-within-own-orb-both-objects-own-orbs">
+<span id="catalog-en-rule-project-orb-both-within-own-orb"></span><h2>rule.project.orb_both_within_own_orb · Both objects’ own orbs<a class="headerlink" href="#rule-project-orb-both-within-own-orb-both-objects-own-orbs" title="Link to this heading">¶</a></h2>
+<p>Each object uses its separately assigned orb, or the aspect rule’s orb if none is assigned. The deviation must be within both objects’ orbs, so the limit is the smaller of the two orbs.</p>
+<p>Project definition; no tradition is claimed.</p>
+<p>Needed exactly when an aspect rule gives per-object orbs. The catalog supplies no default orb.</p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-en-aspect-conjunction"><span class="std std-ref">aspect.conjunction</span></a>, <a class="reference internal" href="#catalog-en-aspect-sextile"><span class="std std-ref">aspect.sextile</span></a>, <a class="reference internal" href="#catalog-en-aspect-square"><span class="std std-ref">aspect.square</span></a>, <a class="reference internal" href="#catalog-en-aspect-trine"><span class="std std-ref">aspect.trine</span></a>, <a class="reference internal" href="#catalog-en-aspect-opposition"><span class="std std-ref">aspect.opposition</span></a></p>
+</section>
+<section id="rule-project-orb-mean-of-orbs-mean-of-the-two-orbs">
+<span id="catalog-en-rule-project-orb-mean-of-orbs"></span><h2>rule.project.orb_mean_of_orbs · Mean of the two orbs<a class="headerlink" href="#rule-project-orb-mean-of-orbs-mean-of-the-two-orbs" title="Link to this heading">¶</a></h2>
+<p>Each object uses its separately assigned orb, or the aspect rule’s orb if none is assigned. The deviation must be within the mean of the two orbs.</p>
+<p>Project definition; no tradition is claimed.</p>
+<p>Needed exactly when an aspect rule gives per-object orbs. The catalog supplies no default orb.</p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-en-aspect-conjunction"><span class="std std-ref">aspect.conjunction</span></a>, <a class="reference internal" href="#catalog-en-aspect-sextile"><span class="std std-ref">aspect.sextile</span></a>, <a class="reference internal" href="#catalog-en-aspect-square"><span class="std std-ref">aspect.square</span></a>, <a class="reference internal" href="#catalog-en-aspect-trine"><span class="std std-ref">aspect.trine</span></a>, <a class="reference internal" href="#catalog-en-aspect-opposition"><span class="std std-ref">aspect.opposition</span></a></p>
+</section>
+<section id="source-astrology-chart-fc845fa-astrology-chart-implementation">
+<span id="catalog-en-source-astrology-chart-fc845fa"></span><h2>source.astrology.chart.fc845fa · astrology chart implementation<a class="headerlink" href="#source-astrology-chart-fc845fa-astrology-chart-implementation" title="Link to this heading">¶</a></h2>
+<p>astrology contributors. Development package 0.0.0; src/astrology/ and tests/test_reference.py at fc845fa1aa786f7e1eda7b4d901e70e9a505add5. <code class="docutils literal notranslate"><span class="pre">language=en</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">source_verification=verified</span></code></p>
+<p><a class="reference external" href="https://github.com/0xf3cd/astrology/tree/fc845fa1aa786f7e1eda7b4d901e70e9a505add5"><code class="docutils literal notranslate"><span class="pre">https://github.com/0xf3cd/astrology/tree/fc845fa1aa786f7e1eda7b4d901e70e9a505add5</span></code></a></p>
+<p>Project-authored adapter, sign sectors, supplied-cusp placement, aspect classification and node comparison tests. These are not independent astronomical or traditional corroboration.</p>
+<p>Project-authored text under the repository MIT license.</p>
+<p>Supports the executable sign, placement, adapter and aspect rules at this fixed commit, plus the existence of its node comparison test. It does not verify printed Meeus formulas, error bounds, historical definitions or interpretations.</p>
+</section>
+<section id="source-astrology-config-fa2e985-astrology-configuration-contracts">
+<span id="catalog-en-source-astrology-config-fa2e985"></span><h2>source.astrology.config.fa2e985 · astrology configuration contracts<a class="headerlink" href="#source-astrology-config-fa2e985-astrology-configuration-contracts" title="Link to this heading">¶</a></h2>
+<p>astrology contributors. Development package 0.0.0; config.py at fa2e985c964dab653a6aa0f5771062ad9fd956dc. <code class="docutils literal notranslate"><span class="pre">language=en</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">source_verification=verified</span></code></p>
+<p><a class="reference external" href="https://github.com/0xf3cd/astrology/blob/fa2e985c964dab653a6aa0f5771062ad9fd956dc/src/astrology/config.py"><code class="docutils literal notranslate"><span class="pre">https://github.com/0xf3cd/astrology/blob/fa2e985c964dab653a6aa0f5771062ad9fd956dc/src/astrology/config.py</span></code></a></p>
+<p>Project-authored request identifiers and bilingual contracts; not independent astronomical or traditional corroboration.</p>
+<p>Project-authored text under the repository MIT license.</p>
+<p>Supports existing configuration identities and validation contracts only, not the chart calculation, which is implemented elsewhere, and not historical definitions.</p>
+</section>
+<section id="source-ptolemy-ashmand1822-ptolemy-s-tetrabiblos-or-quadripartite">
+<span id="catalog-en-source-ptolemy-ashmand1822"></span><h2>source.ptolemy.ashmand1822 · Ptolemy’s Tetrabiblos, or Quadripartite<a class="headerlink" href="#source-ptolemy-ashmand1822-ptolemy-s-tetrabiblos-or-quadripartite" title="Link to this heading">¶</a></h2>
+<p>Ptolemy; paraphrase attributed to Proclus; English translator J. M. Ashmand. Davis and Dickson, London, 1822. <code class="docutils literal notranslate"><span class="pre">language=en</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">source_verification=verified</span></code></p>
+<p><a class="reference external" href="https://commons.wikimedia.org/w/index.php?title=File:Ptolemy%27s_Tetrabiblos_or_Quadripartite_(1822).pdf&amp;oldid=1078168290"><code class="docutils literal notranslate"><span class="pre">https://commons.wikimedia.org/w/index.php?title=File:Ptolemy%27s_Tetrabiblos_or_Quadripartite_(1822).pdf&amp;oldid=1078168290</span></code></a></p>
+<p>Direct transcription of printed pp. 34–35 (PDF pages 72–73), Google Books scan hosted on Wikimedia Commons. Download SHA-256: 8ab3073b2200ba85b3dd812acc0b2edd2d2757f196cc641de42e9a46293189cb. Line wraps, split-word hyphenation and punctuation spacing normalized; wording retained. Plain-text transcription does not encode typographic emphasis. Not the 1900 reprint or a modern web transcription. Edition corroboration: https://wdl.warburg.sas.ac.uk/object-wdl-awa-aaan . Mirrors/catalogs are not independent rule authors.</p>
+<p>Underlying 1822 text: Commons file revision 1078168290 records public-domain status in its country of origin, life-plus-70-or-shorter jurisdictions and the USA (template PD-old-70-1923, with a displayed Public Domain Mark 1.0 notice). No worldwide rights guarantee. Only a short manually transcribed passage is included; scan images, watermarks and site prose are not redistributed. Project Chinese translation and authored explanations are MIT.</p>
+<p>One historical sign-grouping statement in Book I, chapter XIV, not an empirical claim, independent multi-source consensus or applicable chart conclusion.</p>
+</section>
+<section id="entry-body-requests-statement">
+<span id="catalog-en-entry-body-requests"></span><h2>entry.body_requests · Statement / 陈述<a class="headerlink" href="#entry-body-requests-statement" title="Link to this heading">¶</a></h2>
+<p>Body provides physical-object request identifiers; mathematical lunar nodes are separate identities.</p>
+<p><code class="docutils literal notranslate"><span class="pre">prerequisites=complete</span></code> · <code class="docutils literal notranslate"><span class="pre">output=reference_only</span></code> · <code class="docutils literal notranslate"><span class="pre">chart=not_assessed</span></code></p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-en-body-sun"><span class="std std-ref">body.sun</span></a>, <a class="reference internal" href="#catalog-en-body-moon"><span class="std std-ref">body.moon</span></a>, <a class="reference internal" href="#catalog-en-body-mercury"><span class="std std-ref">body.mercury</span></a>, <a class="reference internal" href="#catalog-en-body-venus"><span class="std std-ref">body.venus</span></a>, <a class="reference internal" href="#catalog-en-body-mars"><span class="std std-ref">body.mars</span></a>, <a class="reference internal" href="#catalog-en-body-jupiter"><span class="std std-ref">body.jupiter</span></a>, <a class="reference internal" href="#catalog-en-body-saturn"><span class="std std-ref">body.saturn</span></a>, <a class="reference internal" href="#catalog-en-body-uranus"><span class="std std-ref">body.uranus</span></a>, <a class="reference internal" href="#catalog-en-body-neptune"><span class="std std-ref">body.neptune</span></a>, <a class="reference internal" href="#catalog-en-body-pluto"><span class="std std-ref">body.pluto</span></a></p>
+<p>Variants / 变体：</p>
+<p>Prerequisites / 前提：</p>
+<p>No prerequisites recorded / 未记录前提</p>
+<p>Exceptions / 例外：A mathematical node must not be passed as a Body.</p>
+<p>Limits / 限度：These are request identities. The chart adapter calculates the positions; this entry states no position and no classification table.</p>
+<p><a class="reference internal" href="#catalog-en-source-astrology-config-fa2e985"><span class="std std-ref">source.astrology.config.fa2e985</span></a>: astrology 0.0.0 / config.Body and config.LunarNode at the recorded commit</p>
+<p><a class="reference internal" href="#catalog-en-source-astrology-chart-fc845fa"><span class="std std-ref">source.astrology.chart.fc845fa</span></a>: astrology 0.0.0 / src/astrology/celestial.py and src/astrology/chart.py at the recorded commit</p>
+</section>
+<section id="entry-house-requests-statement">
+<span id="catalog-en-entry-house-requests"></span><h2>entry.house_requests · Statement / 陈述<a class="headerlink" href="#entry-house-requests-statement" title="Link to this heading">¶</a></h2>
+<p>HouseSystem identifies explicit Whole Sign, Equal or Placidus requests. A failed request is not silently replaced.</p>
+<p><code class="docutils literal notranslate"><span class="pre">prerequisites=complete</span></code> · <code class="docutils literal notranslate"><span class="pre">output=reference_only</span></code> · <code class="docutils literal notranslate"><span class="pre">chart=not_assessed</span></code></p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-en-house-whole-sign"><span class="std std-ref">house.whole_sign</span></a>, <a class="reference internal" href="#catalog-en-house-equal"><span class="std std-ref">house.equal</span></a>, <a class="reference internal" href="#catalog-en-house-placidus"><span class="std std-ref">house.placidus</span></a></p>
+<p>Variants / 变体：<a class="reference internal" href="#catalog-en-rule-house-whole-sign"><span class="std std-ref">rule.house.whole_sign</span></a>, <a class="reference internal" href="#catalog-en-rule-house-equal"><span class="std std-ref">rule.house.equal</span></a>, <a class="reference internal" href="#catalog-en-rule-house-placidus"><span class="std std-ref">rule.house.placidus</span></a>, <a class="reference internal" href="#catalog-en-rule-project-cusp-ownership"><span class="std std-ref">rule.project.cusp_ownership</span></a></p>
+<p>Prerequisites / 前提：</p>
+<ul class="simple">
+<li><p>The caller chooses a HouseSystem member.</p></li>
+</ul>
+<p>Exceptions / 例外：The request contract does not supply house geometry; the chart adapter does.</p>
+<p>Limits / 限度：This entry does not establish a house algorithm or an applicability domain; the chart adapter and its domain checks do. There is no default house system.</p>
+<p><a class="reference internal" href="#catalog-en-source-astrology-config-fa2e985"><span class="std std-ref">source.astrology.config.fa2e985</span></a>: astrology 0.0.0 / config.HouseSystem and config.ChartConfig at the recorded commit</p>
+<p><a class="reference internal" href="#catalog-en-source-astrology-chart-fc845fa"><span class="std std-ref">source.astrology.chart.fc845fa</span></a>: astrology 0.0.0 / src/astrology/houses.py at the recorded commit</p>
+</section>
+<section id="entry-node-definitions-statement">
+<span id="catalog-en-entry-node-definitions"></span><h2>entry.node_definitions · Statement / 陈述<a class="headerlink" href="#entry-node-definitions-statement" title="Link to this heading">¶</a></h2>
+<p>MEAN and MEEUS_FIVE_TERM_TRUE are distinct named project definition identifiers, not accuracy settings.</p>
+<p><code class="docutils literal notranslate"><span class="pre">prerequisites=unresolved</span></code> · <code class="docutils literal notranslate"><span class="pre">output=reference_only</span></code> · <code class="docutils literal notranslate"><span class="pre">chart=not_assessed</span></code></p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-en-node-definition-mean"><span class="std std-ref">node_definition.mean</span></a>, <a class="reference internal" href="#catalog-en-node-definition-meeus-five-term-true"><span class="std std-ref">node_definition.meeus_five_term_true</span></a></p>
+<p>Variants / 变体：<a class="reference internal" href="#catalog-en-rule-node-definition-mean"><span class="std std-ref">rule.node_definition.mean</span></a>, <a class="reference internal" href="#catalog-en-rule-node-definition-meeus-five-term-true"><span class="std std-ref">rule.node_definition.meeus_five_term_true</span></a></p>
+<p>Prerequisites / 前提：</p>
+<ul class="simple">
+<li><p>Astronomical computation requires the chart adapter and its named model; this catalog does not provide it.</p></li>
+</ul>
+<p>Exceptions / 例外：Neither definition is silently substituted for another.</p>
+<p>Limits / 限度：No Meeus book equation, error bound or equivalence to an osculating node has been verified here.</p>
+<p><a class="reference internal" href="#catalog-en-source-astrology-config-fa2e985"><span class="std std-ref">source.astrology.config.fa2e985</span></a>: astrology 0.0.0 / config.NodeDefinition at the recorded commit</p>
+<p><a class="reference internal" href="#catalog-en-source-astrology-chart-fc845fa"><span class="std std-ref">source.astrology.chart.fc845fa</span></a>: astrology 0.0.0 / src/astrology/celestial.py (_NODE_TARGETS); tests/test_reference.py (_meeus_nodes, _nodes_agree, test_the_lunar_nodes_agree_with_the_meeus_definition) at fc845fa1aa786f7e1eda7b4d901e70e9a505add5</p>
+</section>
+<section id="entry-node-directions-statement">
+<span id="catalog-en-entry-node-directions"></span><h2>entry.node_directions · Statement / 陈述<a class="headerlink" href="#entry-node-directions-statement" title="Link to this heading">¶</a></h2>
+<p>LunarNode identities retain both their named definition and ascending/descending direction.</p>
+<p><code class="docutils literal notranslate"><span class="pre">prerequisites=complete</span></code> · <code class="docutils literal notranslate"><span class="pre">output=reference_only</span></code> · <code class="docutils literal notranslate"><span class="pre">chart=not_assessed</span></code></p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-en-node-mean-ascending"><span class="std std-ref">node.mean_ascending</span></a>, <a class="reference internal" href="#catalog-en-node-mean-descending"><span class="std std-ref">node.mean_descending</span></a>, <a class="reference internal" href="#catalog-en-node-meeus-five-term-true-ascending"><span class="std std-ref">node.meeus_five_term_true_ascending</span></a>, <a class="reference internal" href="#catalog-en-node-meeus-five-term-true-descending"><span class="std std-ref">node.meeus_five_term_true_descending</span></a></p>
+<p>Variants / 变体：</p>
+<p>Prerequisites / 前提：</p>
+<p>No prerequisites recorded / 未记录前提</p>
+<p>Exceptions / 例外：Physical-body identities do not carry a node definition.</p>
+<p>Limits / 限度：Naming a direction does not define the node’s motion; the chart adapter calculates the node and its longitude rate.</p>
+<p><a class="reference internal" href="#catalog-en-source-astrology-config-fa2e985"><span class="std std-ref">source.astrology.config.fa2e985</span></a>: astrology 0.0.0 / config.LunarNode.definition at the recorded commit</p>
+</section>
+<section id="entry-aspect-requests-statement">
+<span id="catalog-en-entry-aspect-requests"></span><h2>entry.aspect_requests · Statement / 陈述<a class="headerlink" href="#entry-aspect-requests-statement" title="Link to this heading">¶</a></h2>
+<p>MajorAspect provides five admitted identities; AspectRule requires a caller-supplied finite nonnegative orb in degrees.</p>
+<p><code class="docutils literal notranslate"><span class="pre">prerequisites=complete</span></code> · <code class="docutils literal notranslate"><span class="pre">output=reference_only</span></code> · <code class="docutils literal notranslate"><span class="pre">chart=not_assessed</span></code></p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-en-aspect-conjunction"><span class="std std-ref">aspect.conjunction</span></a>, <a class="reference internal" href="#catalog-en-aspect-sextile"><span class="std std-ref">aspect.sextile</span></a>, <a class="reference internal" href="#catalog-en-aspect-square"><span class="std std-ref">aspect.square</span></a>, <a class="reference internal" href="#catalog-en-aspect-trine"><span class="std std-ref">aspect.trine</span></a>, <a class="reference internal" href="#catalog-en-aspect-opposition"><span class="std std-ref">aspect.opposition</span></a></p>
+<p>Variants / 变体：<a class="reference internal" href="#catalog-en-rule-aspect-conjunction"><span class="std std-ref">rule.aspect.conjunction</span></a>, <a class="reference internal" href="#catalog-en-rule-aspect-sextile"><span class="std std-ref">rule.aspect.sextile</span></a>, <a class="reference internal" href="#catalog-en-rule-aspect-square"><span class="std std-ref">rule.aspect.square</span></a>, <a class="reference internal" href="#catalog-en-rule-aspect-trine"><span class="std std-ref">rule.aspect.trine</span></a>, <a class="reference internal" href="#catalog-en-rule-aspect-opposition"><span class="std std-ref">rule.aspect.opposition</span></a></p>
+<p>Prerequisites / 前提：</p>
+<ul class="simple">
+<li><p>A requested aspect requires an explicit orb.</p></li>
+</ul>
+<p>Exceptions / 例外：An empty aspect request sequence is allowed by ChartConfig.</p>
+<p>Limits / 限度：This entry names the requests only; the evaluation is in entry.aspect_evaluation. No orb default or interpretation is supplied.</p>
+<p><a class="reference internal" href="#catalog-en-source-astrology-config-fa2e985"><span class="std std-ref">source.astrology.config.fa2e985</span></a>: astrology 0.0.0 / config.MajorAspect and config.AspectRule at the recorded commit</p>
+</section>
+<section id="entry-aspect-evaluation-statement">
+<span id="catalog-en-entry-aspect-evaluation"></span><h2>entry.aspect_evaluation · Statement / 陈述<a class="headerlink" href="#entry-aspect-evaluation-statement" title="Link to this heading">¶</a></h2>
+<p>Major aspects are judged from ecliptic longitudes and an explicit orb, with the oriented branch and a local applying or separating status kept in the result.</p>
+<p><code class="docutils literal notranslate"><span class="pre">prerequisites=complete</span></code> · <code class="docutils literal notranslate"><span class="pre">output=reference_only</span></code> · <code class="docutils literal notranslate"><span class="pre">chart=not_assessed</span></code></p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-en-aspect-conjunction"><span class="std std-ref">aspect.conjunction</span></a>, <a class="reference internal" href="#catalog-en-aspect-sextile"><span class="std std-ref">aspect.sextile</span></a>, <a class="reference internal" href="#catalog-en-aspect-square"><span class="std std-ref">aspect.square</span></a>, <a class="reference internal" href="#catalog-en-aspect-trine"><span class="std std-ref">aspect.trine</span></a>, <a class="reference internal" href="#catalog-en-aspect-opposition"><span class="std std-ref">aspect.opposition</span></a></p>
+<p>Variants / 变体：<a class="reference internal" href="#catalog-en-rule-project-aspect-deviation"><span class="std std-ref">rule.project.aspect_deviation</span></a>, <a class="reference internal" href="#catalog-en-rule-project-aspect-motion"><span class="std std-ref">rule.project.aspect_motion</span></a>, <a class="reference internal" href="#catalog-en-rule-project-aspect-participation"><span class="std std-ref">rule.project.aspect_participation</span></a>, <a class="reference internal" href="#catalog-en-rule-project-orb-either-within-own-orb"><span class="std std-ref">rule.project.orb_either_within_own_orb</span></a>, <a class="reference internal" href="#catalog-en-rule-project-orb-both-within-own-orb"><span class="std std-ref">rule.project.orb_both_within_own_orb</span></a>, <a class="reference internal" href="#catalog-en-rule-project-orb-mean-of-orbs"><span class="std std-ref">rule.project.orb_mean_of_orbs</span></a></p>
+<p>Prerequisites / 前提：</p>
+<ul class="simple">
+<li><p>The caller supplies every orb; this entry gives none.</p></li>
+<li><p>Per-object orbs need a chosen combination rule.</p></li>
+</ul>
+<p>Exceptions / 例外：Two lunar nodes never form an aspect with each other.</p>
+<p>Limits / 限度：This entry is a project definition, not an independent corroboration or a traditional rule. It supplies no default orb, strength or interpretation, and a retrieval never assesses a chart.</p>
+<p><a class="reference internal" href="#catalog-en-source-astrology-chart-fc845fa"><span class="std std-ref">source.astrology.chart.fc845fa</span></a>: astrology 0.0.0 / src/astrology/aspects.py at the recorded commit</p>
+</section>
+<section id="entry-sign-vocabulary-statement">
+<span id="catalog-en-entry-sign-vocabulary"></span><h2>entry.sign_vocabulary · Statement / 陈述<a class="headerlink" href="#entry-sign-vocabulary-statement" title="Link to this heading">¶</a></h2>
+<p>Aries and Libra appear in the cited historical equinoctial-sign grouping; this catalog keeps sign names separate from calculation.</p>
+<p><code class="docutils literal notranslate"><span class="pre">prerequisites=complete</span></code> · <code class="docutils literal notranslate"><span class="pre">output=reference_only</span></code> · <code class="docutils literal notranslate"><span class="pre">chart=not_assessed</span></code></p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-en-sign-aries"><span class="std std-ref">sign.aries</span></a>, <a class="reference internal" href="#catalog-en-sign-libra"><span class="std std-ref">sign.libra</span></a></p>
+<p>Variants / 变体：<a class="reference internal" href="#catalog-en-rule-ptolemy-ashmand-equinoctial-signs"><span class="std std-ref">rule.ptolemy_ashmand.equinoctial_signs</span></a>, <a class="reference internal" href="#catalog-en-rule-project-tropical-sign-sectors"><span class="std std-ref">rule.project.tropical_sign_sectors</span></a></p>
+<p>Prerequisites / 前提：</p>
+<p>No prerequisites recorded / 未记录前提</p>
+<p>Exceptions / 例外：The source is a named historical edition, not a universal definition across traditions.</p>
+<p>Limits / 限度：The remaining sign names are vocabulary only; the 30-degree sector boundaries and the executable classification are a project convention in the chart implementation, not a claim from the cited edition.</p>
+<p><a class="reference internal" href="#catalog-en-source-ptolemy-ashmand1822"><span class="std std-ref">source.ptolemy.ashmand1822</span></a>: Book I, chapter XIV, printed pp. 34–35; PDF pages 72–73</p>
+<p><a class="reference internal" href="#catalog-en-source-astrology-chart-fc845fa"><span class="std std-ref">source.astrology.chart.fc845fa</span></a>: astrology 0.0.0 / src/astrology/zodiac.py at the recorded commit</p>
+</section>
+<section id="entry-equinoctial-example-statement">
+<span id="catalog-en-entry-equinoctial-example"></span><h2>entry.equinoctial_example · Statement / 陈述<a class="headerlink" href="#entry-equinoctial-example-statement" title="Link to this heading">¶</a></h2>
+<p>The cited edition groups Aries and Libra as equinoctial signs. Inspecting this passage does not show that a particular chart satisfies any condition.</p>
+<p><code class="docutils literal notranslate"><span class="pre">prerequisites=unresolved</span></code> · <code class="docutils literal notranslate"><span class="pre">output=reference_only</span></code> · <code class="docutils literal notranslate"><span class="pre">chart=not_assessed</span></code></p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-en-sign-aries"><span class="std std-ref">sign.aries</span></a>, <a class="reference internal" href="#catalog-en-sign-libra"><span class="std std-ref">sign.libra</span></a></p>
+<p>Variants / 变体：<a class="reference internal" href="#catalog-en-rule-ptolemy-ashmand-equinoctial-signs"><span class="std std-ref">rule.ptolemy_ashmand.equinoctial_signs</span></a></p>
+<p>Prerequisites / 前提：</p>
+<ul class="simple">
+<li><p>A chart-level use would need an explicit zodiac convention, computed position and a separately specified use of this historical grouping; these are not evaluated here.</p></li>
+</ul>
+<p>Exceptions / 例外：The historical rationale about equal day and night is preserved, not endorsed as an observed daylight guarantee.</p>
+<p>Limits / 限度：Single-source, reference-only, non-executable example. Missing prerequisites remain unresolved; computing one condition cannot turn retrieval into full applicability.</p>
+<p><a class="reference internal" href="#catalog-en-source-ptolemy-ashmand1822"><span class="std std-ref">source.ptolemy.ashmand1822</span></a>: Book I, chapter XIV, printed pp. 34–35; PDF pages 72–73; complete equinoctial-sign sentence</p>
+<p>Original excerpt (English) / 原文引述（英文）：</p>
+<blockquote>
+<div><p>There are also two equinoctial signs: Aries, the first after the vernal equinox; and Libra, the first after the autumnal equinox: they are so called, because the Sun, when in the first point of either, makes the day and night equal.</p>
+</div></blockquote>
+<p>Chinese translation / 中文译文: <code class="docutils literal notranslate"><span class="pre">current</span></code>, revision=1; astrology contributors (project Chinese translation of Ashmand’s English)</p>
+<blockquote>
+<div><p>分点星座也有两个：白羊座，春分之后的第一个；天秤座，秋分之后的第一个。它们如此命名，是因为太阳位于二者任一的起点时，使昼与夜等长。</p>
+</div></blockquote>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">celestial-astrology</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../README.html">celestial-astrology</a></li>
+<li class="toctree-l2"><a class="reference internal" href="birth.html">Birth records and modern time resolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html">Requested chart configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chart.html">Natal charts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aspects.html">Aspects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="records.html">Save, restore, replay and inspect a chart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference.html">Public API reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html">Repository structure and calculation boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="knowledge.html">Knowledge organization and bilingual documentation</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Knowledge catalog reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html">Contributing</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../zh-CN/index.html">文档入口</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Documentation</a><ul>
+      <li>Previous: <a href="knowledge.html" title="previous chapter">Knowledge organization and bilingual documentation</a></li>
+      <li>Next: <a href="contributing.html" title="next chapter">Contributing</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 9.1.0</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../../_sources/docs/en/catalog.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
