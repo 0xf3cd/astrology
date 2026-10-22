@@ -167,7 +167,7 @@ jobs:
           [[ -f "$DIST_DIR/packages/$SDIST_NAME" && ! -L "$DIST_DIR/packages/$SDIST_NAME" ]]
           [[ -f "$DIST_DIR/packages/$WHEEL_NAME" && ! -L "$DIST_DIR/packages/$WHEEL_NAME" ]]
           printf '%s  %s\n' "$SDIST_SHA256" "$DIST_DIR/packages/$SDIST_NAME" \
-            "$WHEEL_SHA256" "$DIST_DIR/packages/$WHEEL_NAME" | sha256sum --check --strict
+            "$WHEEL_SHA256" "$DIST_DIR/packages/$WHEEL_NAME" | sha256sum -c
       - uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # v1.14.3
         with:
           repository-url: https://upload.pypi.org/legacy/

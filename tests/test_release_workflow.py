@@ -85,7 +85,7 @@ def _contract(workflow: dict[str, Any]) -> None:
   assert build["outputs"]["artifact_id"] == "${{ steps.upload.outputs.artifact-id }}"
   assert len(publish["steps"]) == 3
   assert publish["steps"][0]["uses"].startswith("actions/download-artifact@")
-  assert "sha256sum --check --strict" in publish["steps"][1]["run"]
+  assert "sha256sum -c" in publish["steps"][1]["run"]
   publisher = publish["steps"][-1]
   assert publisher["uses"] == "pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086"
   assert publisher["with"] == {
@@ -156,7 +156,20 @@ def test_workflow_contract_rejects_representative_defects(defect: str) -> None:
     _contract(workflow)
 
 
-@pytest.mark.parametrize("defect", ["none", "digest", "bytes", "extra", "filename", "version"])
+@pytest.mark.parametrize(
+  "defect",
+  [
+    "none",
+    "digest",
+    "digest-shape",
+    "digest-uppercase",
+    "bytes",
+    "extra",
+    "filename",
+    "filename-newline",
+    "version",
+  ],
+)
 def test_actual_publication_byte_guard(tmp_path: Path, defect: str) -> None:
   bash = shutil.which("bash")
   if bash is None:
@@ -175,17 +188,27 @@ def test_actual_publication_byte_guard(tmp_path: Path, defect: str) -> None:
     "SDIST_SHA256": hashlib.sha256((packages / sdist).read_bytes()).hexdigest(),
     "WHEEL_SHA256": hashlib.sha256((packages / wheel).read_bytes()).hexdigest(),
   }
+  guard = _workflow()["jobs"]["publish-pypi"]["steps"][1]["run"]
+  baseline = subprocess.run(
+    (bash, "-c", guard), cwd=tmp_path, env=environment, capture_output=True, timeout=15
+  )
+  assert baseline.returncode == 0, baseline.stderr.decode(errors="replace")
   if defect == "digest":
     environment["WHEEL_SHA256"] = "0" * 64
+  elif defect == "digest-shape":
+    environment["WHEEL_SHA256"] += "\nmalformed"
+  elif defect == "digest-uppercase":
+    environment["WHEEL_SHA256"] = "A" * 64
   elif defect == "bytes":
     (packages / wheel).write_bytes(b"different download")
   elif defect == "extra":
     (packages / "unexpected.whl").touch()
   elif defect == "filename":
     environment["SDIST_NAME"] = "../unexpected.tar.gz"
+  elif defect == "filename-newline":
+    environment["WHEEL_NAME"] += "\nmalformed"
   elif defect == "version":
     environment["RELEASE_VERSION"] = "0.1.0\nunsafe"
-  guard = _workflow()["jobs"]["publish-pypi"]["steps"][1]["run"]
   result = subprocess.run(
     (bash, "-c", guard), cwd=tmp_path, env=environment, capture_output=True, timeout=15
   )
