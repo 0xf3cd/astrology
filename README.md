@@ -2,11 +2,11 @@
 
 [English](https://0xf3cd.github.io/astrology/README.html) | [简体中文](https://0xf3cd.github.io/astrology/README.zh-CN.html)
 
-A Python library in development for reproducible Western astrology charts. It uses
+A Python library for reproducible Western astrology charts and knowledge queries. It uses
 [celestial-calendar](https://github.com/0xf3cd/celestial-calendar) for astronomy and
 keeps astrological rules, their sources, and their variants in this repository.
 
-The development package provides immutable [birth records and modern time
+The package provides immutable [birth records and modern time
 resolution](https://0xf3cd.github.io/astrology/docs/en/birth.html), [requested chart configuration](https://0xf3cd.github.io/astrology/docs/en/configuration.html),
 [tropical natal chart calculation](https://0xf3cd.github.io/astrology/docs/en/chart.html), [chart records and text output](https://0xf3cd.github.io/astrology/docs/en/records.html), an independent
 [knowledge catalog](https://0xf3cd.github.io/astrology/docs/en/knowledge.html), quality checks, and bilingual
@@ -20,13 +20,34 @@ wheels for Linux x86_64 and aarch64, macOS 14+ arm64 and Windows amd64, and no s
 distribution. On any other platform this package cannot be installed, and
 knowledge browsing is not available either.
 
-## Install from source
+## Install a release
 
 `celestial-astrology` is the distribution name; the Python import is `astrology`.
-This checkout prepares version `0.1.0`, which is not yet published on PyPI.
 Do not install the unrelated PyPI project named `astrology`.
 
-Use **Python 3.11–3.14** on one of the platforms listed above. For the exact source
+Use **Python 3.11–3.14** on one of the platforms listed above.
+
+Linux/macOS (replace `python3.14` with your supported Python version):
+
+```sh
+python3.14 -m venv .venv
+.venv/bin/python -m pip install "celestial-astrology==0.1.0"
+```
+
+Windows PowerShell:
+
+```powershell
+py -3.14 -m venv .venv
+.venv\Scripts\python.exe -m pip install "celestial-astrology==0.1.0"
+```
+
+Runtime dependencies remain exactly pinned to `celestial-calendar==0.8.0` and
+`tzdata==2026.5`. This can conflict with applications requiring another version.
+See the [release notes](https://0xf3cd.github.io/astrology/docs/en/releases.html).
+
+## Install from source
+
+For the exact source
 revision used by the documentation, use the snapshot command on the
 [documentation home](https://0xf3cd.github.io/astrology/). To install your downloaded
 or cloned source checkout instead, run these commands from its root. Installation
@@ -46,8 +67,7 @@ py -3.14 -m venv .venv
 .venv\Scripts\python.exe -m pip install .
 ```
 
-These are source-install instructions, not a claim that the candidate can be
-installed from the package index. Development checks use `uv sync --locked` as
+These commands install your source checkout. Development checks use `uv sync --locked` as
 described in the contribution guide.
 
 ## First chart

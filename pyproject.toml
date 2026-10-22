@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "celestial-astrology"
 version = "0.1.0"
-description = "Western astrology charts and sourced knowledge (in development)"
+description = "Reproducible Western astrology charts and sourced knowledge"
 readme = "README.md"
 requires-python = ">=3.11,<3.15"
 license = "MIT"
@@ -25,9 +25,11 @@ dev = [
   "myst-parser==5.1.0",
   "pytest==9.1.1",
   "pytest-cov==7.1.0",
+  "pyyaml==6.0.3",
   "ruff==0.17.1",
   "sphinx==8.2.3; python_version < '3.12'",
   "sphinx==9.1.0; python_version >= '3.12'",
+  "types-pyyaml==6.0.12.20260906",
 ]
 
 [tool.setuptools.packages.find]

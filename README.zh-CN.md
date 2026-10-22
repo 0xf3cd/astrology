@@ -2,11 +2,11 @@
 
 [English](https://0xf3cd.github.io/astrology/README.html) | [简体中文](https://0xf3cd.github.io/astrology/README.zh-CN.html)
 
-开发中的 Python 西方占星排盘与知识库。天文计算由
+用于可复现西方占星排盘与知识查询的 Python 库。天文计算由
 [celestial-calendar](https://github.com/0xf3cd/celestial-calendar) 提供；本仓记录占星规则、
 出处和流派变体，并组织可复现的星盘结果。
 
-开发包提供不可变的[出生记录与现代时刻解析](https://0xf3cd.github.io/astrology/docs/zh-CN/birth.html)、
+本包提供不可变的[出生记录与现代时刻解析](https://0xf3cd.github.io/astrology/docs/zh-CN/birth.html)、
 [排盘请求配置](https://0xf3cd.github.io/astrology/docs/zh-CN/configuration.html)、[热带本命盘计算](https://0xf3cd.github.io/astrology/docs/zh-CN/chart.html)、
 [命盘记录与文本输出](https://0xf3cd.github.io/astrology/docs/zh-CN/records.html)、独立[知识目录](https://0xf3cd.github.io/astrology/docs/zh-CN/knowledge.html)、质量检查和双语 [API 文档](https://0xf3cd.github.io/astrology/docs/zh-CN/reference.html)。
 天文库只在请求排盘或重算时导入，导入本包或查询知识都不会初始化它。
@@ -16,12 +16,32 @@
 macOS 14+ arm64、Windows amd64 的轮子，没有源码分发包。其他平台无法安装本包，
 连知识浏览也不可用。
 
-## 从源码安装
+## 安装发行版
 
 分发包名是 `celestial-astrology`，Python 导入名仍是 `astrology`。
-当前源码准备版本 `0.1.0`，尚未发布到 PyPI；请勿安装 PyPI 上另一个无关的 `astrology` 项目。
+请勿安装 PyPI 上另一个无关的 `astrology` 项目。
 
 请在上述支持的平台使用 **Python 3.11–3.14**。
+
+Linux/macOS（可把 `python3.14` 换成其他受支持的 Python 版本）：
+
+```sh
+python3.14 -m venv .venv
+.venv/bin/python -m pip install "celestial-astrology==0.1.0"
+```
+
+Windows PowerShell：
+
+```powershell
+py -3.14 -m venv .venv
+.venv\Scripts\python.exe -m pip install "celestial-astrology==0.1.0"
+```
+
+运行依赖仍精确固定为 `celestial-calendar==0.8.0` 和 `tzdata==2026.5`，
+可能与要求其他版本的应用发生依赖冲突。详见[发行说明](https://0xf3cd.github.io/astrology/docs/zh-CN/releases.html)。
+
+## 从源码安装
+
 若要安装文档对应的固定源码版本，使用[文档首页](https://0xf3cd.github.io/astrology/)标明提交号的快照安装命令。
 若已下载或克隆所需源码，则在其根目录运行以下命令。安装需要联网下载构建依赖和精确钉版的运行依赖。
 
@@ -39,7 +59,7 @@ py -3.14 -m venv .venv
 .venv\Scripts\python.exe -m pip install .
 ```
 
-这些命令从源码安装，不表示候选包已可从包索引安装。
+这些命令安装本地源码。
 开发检查使用 `uv sync --locked`，详见参与开发指南。
 
 ## 第一张命盘

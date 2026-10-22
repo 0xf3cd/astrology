@@ -73,7 +73,7 @@ Sphinx 只发现根目录的两个 README 和 `docs/` 下的源文档。虚拟�
 该目录内任意位置的源文档都是文档输入，与它同级的目录则不是。上述源文档中的警告仍会使严格构建失败。
 
 按上面的 `uv sync` 从本仓安装开发包，分发名／版本为 `celestial-astrology`／`0.1.0`，
-Python 导入名仍为 `astrology`。此候选尚未发布到 PyPI；PyPI 的 `astrology` 是另一个无关项目，
+Python 导入名仍为 `astrology`。PyPI 的 `astrology` 是另一个无关项目，
 不是本库。可检查已安装的身份：
 
 ```{doctest}
