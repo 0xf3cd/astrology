@@ -157,15 +157,15 @@ jobs:
           WHEEL_SHA256: ${{ needs.build.outputs.wheel_sha256 }}
         run: |
           set -euo pipefail
-          [[ "$RELEASE_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
-          [[ "$SDIST_NAME" == "celestial_astrology-${RELEASE_VERSION}.tar.gz" ]]
-          [[ "$WHEEL_NAME" == "celestial_astrology-${RELEASE_VERSION}-py3-none-any.whl" ]]
-          [[ "$SDIST_SHA256" =~ ^[0-9a-f]{64}$ && "$WHEEL_SHA256" =~ ^[0-9a-f]{64}$ ]]
-          [[ -d "$DIST_DIR" && ! -L "$DIST_DIR" ]]
-          [[ -d "$DIST_DIR/packages" && ! -L "$DIST_DIR/packages" ]]
-          [[ $(find "$DIST_DIR/packages" -mindepth 1 -maxdepth 1 | wc -l) -eq 2 ]]
-          [[ -f "$DIST_DIR/packages/$SDIST_NAME" && ! -L "$DIST_DIR/packages/$SDIST_NAME" ]]
-          [[ -f "$DIST_DIR/packages/$WHEEL_NAME" && ! -L "$DIST_DIR/packages/$WHEEL_NAME" ]]
+          [[ "$RELEASE_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || exit 1
+          [[ "$SDIST_NAME" == "celestial_astrology-${RELEASE_VERSION}.tar.gz" ]] || exit 1
+          [[ "$WHEEL_NAME" == "celestial_astrology-${RELEASE_VERSION}-py3-none-any.whl" ]] || exit 1
+          [[ "$SDIST_SHA256" =~ ^[0-9a-f]{64}$ && "$WHEEL_SHA256" =~ ^[0-9a-f]{64}$ ]] || exit 1
+          [[ -d "$DIST_DIR" && ! -L "$DIST_DIR" ]] || exit 1
+          [[ -d "$DIST_DIR/packages" && ! -L "$DIST_DIR/packages" ]] || exit 1
+          [[ $(find "$DIST_DIR/packages" -mindepth 1 -maxdepth 1 | wc -l) -eq 2 ]] || exit 1
+          [[ -f "$DIST_DIR/packages/$SDIST_NAME" && ! -L "$DIST_DIR/packages/$SDIST_NAME" ]] || exit 1
+          [[ -f "$DIST_DIR/packages/$WHEEL_NAME" && ! -L "$DIST_DIR/packages/$WHEEL_NAME" ]] || exit 1
           printf '%s  %s\n' "$SDIST_SHA256" "$DIST_DIR/packages/$SDIST_NAME" \
             "$WHEEL_SHA256" "$DIST_DIR/packages/$WHEEL_NAME" | sha256sum -c -
       - uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # v1.14.3

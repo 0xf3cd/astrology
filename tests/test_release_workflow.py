@@ -175,7 +175,8 @@ def test_workflow_contract_rejects_representative_defects(defect: str) -> None:
     "version",
   ],
 )
-def test_actual_publication_byte_guard(tmp_path: Path, defect: str) -> None:
+@pytest.mark.parametrize("errexit", [True, False])
+def test_actual_publication_byte_guard(tmp_path: Path, defect: str, errexit: bool) -> None:
   bash = shutil.which("bash")
   if bash is None:
     pytest.skip("The publication guard requires Bash, as does its Ubuntu job")
@@ -194,6 +195,8 @@ def test_actual_publication_byte_guard(tmp_path: Path, defect: str) -> None:
     "WHEEL_SHA256": hashlib.sha256((packages / wheel).read_bytes()).hexdigest(),
   }
   guard = _workflow()["jobs"]["publish-pypi"]["steps"][1]["run"]
+  if not errexit:
+    guard = guard.replace("set -euo pipefail", "set -uo pipefail")
   baseline = subprocess.run(
     (bash, "-c", guard), cwd=tmp_path, env=environment, capture_output=True, timeout=15
   )
