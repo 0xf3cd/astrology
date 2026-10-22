@@ -85,7 +85,7 @@ def _contract(workflow: dict[str, Any]) -> None:
   assert build["outputs"]["artifact_id"] == "${{ steps.upload.outputs.artifact-id }}"
   assert len(publish["steps"]) == 3
   assert publish["steps"][0]["uses"].startswith("actions/download-artifact@")
-  assert "sha256sum -c" in publish["steps"][1]["run"]
+  assert "| sha256sum -c -\n" in publish["steps"][1]["run"]
   publisher = publish["steps"][-1]
   assert publisher["uses"] == "pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086"
   assert publisher["with"] == {
@@ -117,6 +117,7 @@ def test_release_workflow_has_the_restricted_artifact_chain() -> None:
     "skip-existing",
     "attestations",
     "tolerate-failure",
+    "implicit-stdin",
   ],
 )
 def test_workflow_contract_rejects_representative_defects(defect: str) -> None:
@@ -150,6 +151,10 @@ def test_workflow_contract_rejects_representative_defects(defect: str) -> None:
     consume["strategy"]["matrix"]["include"].pop()
   elif defect in ("skip-existing", "attestations"):
     publish["steps"][-1]["with"][defect] = "true" if defect == "skip-existing" else "false"
+  elif defect == "implicit-stdin":
+    publish["steps"][1]["run"] = publish["steps"][1]["run"].replace(
+      "sha256sum -c -", "sha256sum -c"
+    )
   else:
     consume["continue-on-error"] = "true"
   with pytest.raises((AssertionError, KeyError)):
@@ -193,6 +198,10 @@ def test_actual_publication_byte_guard(tmp_path: Path, defect: str) -> None:
     (bash, "-c", guard), cwd=tmp_path, env=environment, capture_output=True, timeout=15
   )
   assert baseline.returncode == 0, baseline.stderr.decode(errors="replace")
+  assert baseline.stdout.decode().splitlines() == [
+    f"dist/packages/{sdist}: OK",
+    f"dist/packages/{wheel}: OK",
+  ]
   if defect == "digest":
     environment["WHEEL_SHA256"] = "0" * 64
   elif defect == "digest-shape":
