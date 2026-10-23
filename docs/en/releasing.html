@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Release procedure &#8212; celestial-astrology 0.1.0 documentation / 文档</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
+    <script src="../../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/en/releasing.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Contributing" href="contributing.html" />
+    <link rel="prev" title="Release notes" href="releases.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="release-procedure">
+<h1>Release procedure<a class="headerlink" href="#release-procedure" title="Link to this heading">¶</a></h1>
+<p><a class="reference internal" href="../zh-CN/releasing.html"><span class="std std-doc">简体中文</span></a> · <a class="reference internal" href="releases.html"><span class="std std-doc">Release notes</span></a> · <a class="reference internal" href="contributing.html"><span class="std std-doc">Contributing</span></a></p>
+<p>The <code class="docutils literal notranslate"><span class="pre">Release</span></code> workflow builds one sdist and a wheel from that sdist, retains their
+member inventory and SHA-256 values, and tests the same wheel in seven isolated
+installation consumers. A manual main-branch run may upload those files only after
+the build and every consumer succeed. Pull-request runs validate build/consumption
+and cannot publish. Tags and ordinary main pushes do not trigger this workflow.</p>
+<section id="configure-the-publication-boundary-first">
+<h2>Configure the publication boundary first<a class="headerlink" href="#configure-the-publication-boundary-first" title="Link to this heading">¶</a></h2>
+<p>Before the first PR validation or publisher registration, configure the GitHub
+<code class="docutils literal notranslate"><span class="pre">pypi</span></code> environment:</p>
+<ul class="simple">
+<li><p>Use selected deployment branches/tags with exactly one <strong>branch</strong> rule, <code class="docutils literal notranslate"><span class="pre">main</span></code>.
+Do not allow PR merge refs, tags or unrestricted deployments. Read back both
+the environment policy and its branch-policy list; a workflow <code class="docutils literal notranslate"><span class="pre">if</span></code> alone does
+not protect against a PR that changes the workflow.</p></li>
+<li><p>Require maintainer approval before the publication job starts. Do not bypass
+that approval or deployment restrictions as an administrator.</p></li>
+<li><p>Leave existing main-branch protection and the separate Pages environment intact.</p></li>
+</ul>
+<p>Register a PyPI <a class="reference external" href="https://docs.pypi.org/trusted-publishers/creating-a-project-through-oidc/">pending Trusted Publisher</a>
+for project <code class="docutils literal notranslate"><span class="pre">celestial-astrology</span></code>, owner <code class="docutils literal notranslate"><span class="pre">0xf3cd</span></code>, repository <code class="docutils literal notranslate"><span class="pre">astrology</span></code>, workflow
+<code class="docutils literal notranslate"><span class="pre">release.yml</span></code>, environment <code class="docutils literal notranslate"><span class="pre">pypi</span></code>. A pending publisher does not reserve the name.
+For an existing project, use its <a class="reference external" href="https://docs.pypi.org/trusted-publishers/adding-a-publisher/">publisher settings</a>.
+No long-lived upload password is supplied. A missing publisher or denied environment
+is a blocker; do not switch to a token or weaken protection to continue.</p>
+</section>
+<section id="prepare-and-inspect-the-candidate">
+<h2>Prepare and inspect the candidate<a class="headerlink" href="#prepare-and-inspect-the-candidate" title="Link to this heading">¶</a></h2>
+<ol class="arabic simple">
+<li><p>Review the source, matching bilingual notes and the seven acceptance items in
+the release tracker. Keep dependency policy, historical provenance and
+restore/recompute compatibility explicit.</p></li>
+<li><p>Run locked complete checks locally and the PR quality/installation workflows.
+The existing quality matrix is Linux 3.11/3.14 and macOS/Windows 3.14. The seven
+retained-wheel consumers are Linux x86_64 3.11/3.12/3.13/3.14, Linux ARM64 3.14,
+macOS ARM64 3.14 and Windows amd64 3.14. These are distinct check sets, not every
+supported Python/platform combination.</p></li>
+<li><p>Inspect the actual sdist/wheel members and metadata. The manifest records source
+commit, corpus version, Python/dependency requirements, the two artifact digests
+and every archived file’s path/size/digest. Unexpected members, changed source bytes or
+changed runtime requirements fail inspection.</p></li>
+<li><p>Verify representative rejection cases for the new release checks. Every new
+uv step pins uv 0.12.5, its named archive SHA-256, and a fresh tool cache. On an
+unmerged probe branch, wrong archive digests must fail before uv runs, including
+the ARM consumer. A network failure is not that evidence.</p></li>
+</ol>
+<p>To retain the distributions from a local complete check, use a new output directory:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>sync<span class="w"> </span>--locked<span class="w"> </span>--python<span class="w"> </span><span class="m">3</span>.14
+uv<span class="w"> </span>run<span class="w"> </span>--locked<span class="w"> </span>python<span class="w"> </span>tools/check.py<span class="w"> </span>--artifacts-dir<span class="w"> </span>dist/packages
+</pre></div>
+</div>
+<p>The destination must not already exist. This retains the files that passed the
+complete distribution check; it does not upload them or establish a release.
+The workflow’s <code class="docutils literal notranslate"><span class="pre">tools/release.py</span> <span class="pre">prepare</span></code> checks the unchanged source and writes
+<code class="docutils literal notranslate"><span class="pre">dist/manifest.json</span></code> plus separate build-job digest outputs. No second distribution
+wheel is built by preparation or consumption.</p>
+</section>
+<section id="authorize-and-run-publication">
+<h2>Authorize and run publication<a class="headerlink" href="#authorize-and-run-publication" title="Link to this heading">¶</a></h2>
+<p>After the candidate is accepted and merged, obtain publication authorization for
+its version and full main commit SHA. In Actions, choose <code class="docutils literal notranslate"><span class="pre">Release</span></code>, <code class="docutils literal notranslate"><span class="pre">Run</span> <span class="pre">workflow</span></code>,
+branch <code class="docutils literal notranslate"><span class="pre">main</span></code>, and enter that exact <code class="docutils literal notranslate"><span class="pre">version</span></code> and <code class="docutils literal notranslate"><span class="pre">sha</span></code>. The build rejects a source
+that differs from the requested/current remote main. Do not substitute a moving
+branch name for the SHA.</p>
+<p>The artifact is downloaded by the exact ID returned by this run’s build job, not
+by a reusable name or another run. Each consumer compares wheel/sdist digests with
+separate build-job outputs, checks the manifest against source, and installs only
+the retained wheel outside the checkout. Its expected source chart is computed on
+that same runner. Normal/optimized knowledge, chart, metadata-failure and README
+checks must pass without rebuilding the publication wheel.</p>
+<p>Inspect those results and <code class="docutils literal notranslate"><span class="pre">manifest.json</span></code> before approving the <code class="docutils literal notranslate"><span class="pre">pypi</span></code> deployment.
+Only the Linux publication job has <code class="docutils literal notranslate"><span class="pre">id-token:</span> <span class="pre">write</span></code>; it needs both the build and
+the entire consumer matrix. It rechecks the exact two package filenames and
+SHA-256 values, then calls the commit-pinned PyPI action with attestations enabled
+and <code class="docutils literal notranslate"><span class="pre">skip-existing:</span> <span class="pre">false</span></code>. It runs no repository build code with that permission.</p>
+</section>
+<section id="verify-and-record-the-published-result">
+<h2>Verify and record the published result<a class="headerlink" href="#verify-and-record-the-published-result" title="Link to this heading">¶</a></h2>
+<p>Download both distribution files from PyPI and compare their bytes with the saved
+manifest’s SHA-256 values. Use the README’s package-index installation command in
+a fresh supported environment, then execute its chart and knowledge examples.
+A successful source-snapshot installation is not this index-install check.</p>
+<p>Create <code class="docutils literal notranslate"><span class="pre">v0.1.0</span></code> at the accepted source SHA and a GitHub Release only under the
+publication authorization. Attach the verified wheel, sdist and manifest. GitHub’s
+automatic source ZIP/tar archives are git snapshots, not the published sdist.
+Record actual workflow results, artifact identity, downloaded digests, installation
+results and remaining limits in the release. Refresh the manually maintained
+bilingual Pages site from that accepted source and verify the affected live pages.</p>
+<p>If upload succeeds but tag/Release/site work fails, retain the successful upload
+and report the partial state. Finish the missing delivery from the verified files;
+do not rebuild or upload replacements under the same version. A duplicate-file
+failure is not permission to enable <code class="docutils literal notranslate"><span class="pre">skip-existing</span></code>. Content changes require a
+new reviewed release version.</p>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">celestial-astrology</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../README.html">celestial-astrology</a></li>
+<li class="toctree-l2"><a class="reference internal" href="birth.html">Birth records and modern time resolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html">Requested chart configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chart.html">Natal charts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aspects.html">Aspects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="records.html">Save, restore, replay and inspect a chart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference.html">Public API reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html">Repository structure and calculation boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="knowledge.html">Knowledge organization and bilingual documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="catalog.html">Knowledge catalog reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="releases.html">Release notes</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Release procedure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html">Contributing</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../zh-CN/index.html">文档入口</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Documentation</a><ul>
+      <li>Previous: <a href="releases.html" title="previous chapter">Release notes</a></li>
+      <li>Next: <a href="contributing.html" title="next chapter">Contributing</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 9.1.0</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../../_sources/docs/en/releasing.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

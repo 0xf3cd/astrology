@@ -2,7 +2,7 @@
 
 [简体中文](../zh-CN/reference.md) · [Documentation](index.md)
 
-These development APIs are rendered from their defining modules. Public summaries
+These APIs are rendered from their defining modules. Public summaries
 and contracts are bilingual; both language views use the same definitions.
 See [birth inputs](birth.md), [requested configuration](configuration.md),
 [charts](chart.md), [aspects](aspects.md) and [chart records](records.md) for executed examples. The

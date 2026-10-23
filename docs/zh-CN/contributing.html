@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>参与开发 &#8212; celestial-astrology 0.1.0 (development / 开发版)</title>
+    <title>参与开发 &#8212; celestial-astrology 0.1.0 documentation / 文档</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
@@ -15,7 +15,7 @@
     <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/zh-CN/contributing.html" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="prev" title="知识目录参考" href="catalog.html" />
+    <link rel="prev" title="发行流程" href="releasing.html" />
    
   <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
   
@@ -89,7 +89,7 @@ Python 分词单测不能证明浏览器行为。</p>
 <p>Sphinx 只发现根目录的两个 README 和 <code class="docutils literal notranslate"><span class="pre">docs/</span></code> 下的源文档。虚拟环境应放在 <code class="docutils literal notranslate"><span class="pre">docs/</span></code> 之外：
 该目录内任意位置的源文档都是文档输入，与它同级的目录则不是。上述源文档中的警告仍会使严格构建失败。</p>
 <p>按上面的 <code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">sync</span></code> 从本仓安装开发包，分发名／版本为 <code class="docutils literal notranslate"><span class="pre">celestial-astrology</span></code>／<code class="docutils literal notranslate"><span class="pre">0.1.0</span></code>，
-Python 导入名仍为 <code class="docutils literal notranslate"><span class="pre">astrology</span></code>。此候选尚未发布到 PyPI；PyPI 的 <code class="docutils literal notranslate"><span class="pre">astrology</span></code> 是另一个无关项目，
+Python 导入名仍为 <code class="docutils literal notranslate"><span class="pre">astrology</span></code>。PyPI 的 <code class="docutils literal notranslate"><span class="pre">astrology</span></code> 是另一个无关项目，
 不是本库。可检查已安装的身份：</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">importlib.metadata</span><span class="w"> </span><span class="kn">import</span> <span class="n">version</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">version</span><span class="p">(</span><span class="s2">"celestial-astrology"</span><span class="p">)</span>
@@ -200,8 +200,30 @@ doctrees、缓存及其他构建控制文件不进入站点成品。检查所有
 区分已经执行的验证与建议以后运行的检查。</p>
 <p>审阅检查来源是否忠实、假设是否成立、对象修改与共享、失败行为、抽象是否多余及翻译语义。
 lint 通过或覆盖率很高不能回答这些问题。修改检查程序时，同时提供应通过的输入与应拒绝的缺陷。</p>
-<p>合并和发布需要维护者批准。CI 负责报告检查结果；若要自动阻止未通过检查的合并，
-还需在仓库规则中将它们设为必需检查。</p>
+</section>
+<section id="id7">
+<h2>合并规则<a class="headerlink" href="#id7" title="Link to this heading">¶</a></h2>
+<p>修改 <code class="docutils literal notranslate"><span class="pre">main</span></code> 必须通过 PR，并满足以下四项必需检查：</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">quality</span> <span class="pre">(ubuntu-latest,</span> <span class="pre">3.11)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">quality</span> <span class="pre">(ubuntu-latest,</span> <span class="pre">3.14)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">quality</span> <span class="pre">(macos-latest,</span> <span class="pre">3.14)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">quality</span> <span class="pre">(windows-latest,</span> <span class="pre">3.14)</span></code></p></li>
+</ul>
+<p>必需检查采用严格模式，还要求分支包含 <code class="docutils literal notranslate"><span class="pre">main</span></code> 的最新内容。仓库配置的必需批准数为零，
+但这不授权自动化 agent 自行合并；合并和发布仍须维护者批准。</p>
+<p>分支保护也适用于管理员。当前未配置合并时的绕过权限，禁止强制推送或删除 <code class="docutils literal notranslate"><span class="pre">main</span></code>。
+修改这些设置属于独立的管理操作，须另获维护者授权。
+仓库只允许 squash 合并，提交标题和正文取自 PR 标题和正文。</p>
+<p>安全核验保护行为时，使用绝不合并的临时非草稿 PR，在同一 PR 上依次观察
+必需检查成功、仅对探针分支生效的故意失败、恢复成功。
+记录受测版本、检查的准确名称和结果、当前 <code class="docutils literal notranslate"><span class="pre">main</span></code> 版本、生效的分支保护规则及
+REST／GraphQL 合并状态，并排除冲突、落后主干或阻塞性审阅等其他原因。
+仅有配置不变，不能证明实际执行行为。</p>
+<p><code class="docutils literal notranslate"><span class="pre">mergeable</span></code> 描述有无冲突，不表示允许合并。上述故意失败发生时，服务端计算的 <code class="docutils literal notranslate"><span class="pre">BLOCKED</span></code>
+状态与实际合并请求被拒绝是两种证据。不要尝试合并故意失败的探针，或为得到预期结果而
+放宽保护。有歧义的结果仍是未完成的证据；本仓合并规则的实际核验由
+<a class="reference external" href="https://github.com/0xf3cd/astrology/issues/15">#15</a> 追踪。</p>
 </section>
 </section>
 
@@ -244,6 +266,8 @@ lint 通过或覆盖率很高不能回答这些问题。修改检查程序时，
 <li class="toctree-l2"><a class="reference internal" href="architecture.html">仓库结构与计算边界</a></li>
 <li class="toctree-l2"><a class="reference internal" href="knowledge.html">知识组织与双语文档</a></li>
 <li class="toctree-l2"><a class="reference internal" href="catalog.html">知识目录参考</a></li>
+<li class="toctree-l2"><a class="reference internal" href="releases.html">发行说明</a></li>
+<li class="toctree-l2"><a class="reference internal" href="releasing.html">发行流程</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">参与开发</a></li>
 </ul>
 </li>
@@ -254,7 +278,7 @@ lint 通过或覆盖率很高不能回答这些问题。修改检查程序时，
 <ul>
   <li><a href="../index.html">Documentation overview</a><ul>
   <li><a href="index.html">文档入口</a><ul>
-      <li>Previous: <a href="catalog.html" title="previous chapter">知识目录参考</a></li>
+      <li>Previous: <a href="releasing.html" title="previous chapter">发行流程</a></li>
   </ul></li>
   </ul></li>
 </ul>

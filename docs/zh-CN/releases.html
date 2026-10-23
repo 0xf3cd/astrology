@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>发行说明 &#8212; celestial-astrology 0.1.0 documentation / 文档</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
+    <script src="../../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/zh-CN/releases.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="发行流程" href="releasing.html" />
+    <link rel="prev" title="知识目录参考" href="catalog.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="id1">
+<h1>发行说明<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h1>
+<p><a class="reference internal" href="../en/releases.html"><span class="std std-doc">English</span></a> · <a class="reference internal" href="index.html"><span class="std std-doc">文档</span></a> · <a class="reference internal" href="releasing.html"><span class="std std-doc">发行流程</span></a></p>
+<section id="id2">
+<h2>0.1.0<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<p>首版提供现代热带黄道、地心本命盘，以及可独立浏览的中英文知识目录。
+安装分发包 <code class="docutils literal notranslate"><span class="pre">celestial-astrology</span></code>，Python 导入名仍是 <code class="docutils literal notranslate"><span class="pre">astrology</span></code>。</p>
+<section id="api">
+<h3>交付的 API<a class="headerlink" href="#api" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>不可变的原始出生记录、显式时区解释及最终计算时刻。未知时间或地点保留为缺失；
+本命盘准备会拒绝不完整输入，不补正午或推测地点。</p></li>
+<li><p>太阳、月亮、行星位置、明确命名的月交点定义、四轴，以及 Whole Sign、Equal、Placidus 宫制。
+请求的几何无定义时抛出 <code class="docutils literal notranslate"><span class="pre">ChartDomainError</span></code>，不改用另一宫制。</p></li>
+<li><p>热带星座、只按黄经判定的落宫，以及带明确容许度规则和局部入相／离相状态的五大相位。
+该状态描述计算瞬间的运动，不预测之后是否形成精确相位。</p></li>
+<li><p>带版本的命盘记录、恢复、显式重算及中英文文本输出。存储结果分别保留天文原值、
+请求／实际配置与计算来源。</p></li>
+<li><p>不排盘、不初始化原生天文库的概念、具名规则变体、别名和引用查询。
+来源核验、前提状态、展示资格与命盘适用性分别记录；原引文、译文及本项目撰写的说明各自注明出处。</p></li>
+</ul>
+<p><a class="reference internal" href="chart.html"><span class="std std-doc">排盘</span></a>、<a class="reference internal" href="aspects.html"><span class="std std-doc">相位</span></a>、<a class="reference internal" href="records.html"><span class="std std-doc">记录</span></a>及<a class="reference internal" href="knowledge.html"><span class="std std-doc">知识</span></a>指南定义本项目采用的约定和收录的语料范围。</p>
+</section>
+<section id="id3">
+<h3>安装与兼容<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h3>
+<p>支持 Python 3.11–3.14。运行依赖精确固定为 <code class="docutils literal notranslate"><span class="pre">celestial-calendar==0.8.0</span></code> 和 <code class="docutils literal notranslate"><span class="pre">tzdata==2026.5</span></code>。
+这保留了选定的模型和时区数据，但可能无法与要求其他版本的应用共同安装。
+本版不升级到 celestial 0.9，也不放宽依赖范围。</p>
+<p>安装需要兼容的上游天文轮子：具有对应 manylinux 支持的 Linux x86_64 或 aarch64、
+macOS 14+ arm64，或 Windows amd64。天文依赖没有 sdist。
+astrology wheel 的 <code class="docutils literal notranslate"><span class="pre">any</span></code> 平台标签不取消这项限制；仅查知识也需要同样的安装。</p>
+<p>schema v1 的恢复不加载天文库，原样保留存储值和来源，包括历史 <code class="docutils literal notranslate"><span class="pre">0.0.0</span></code> 记录。
+重算要求已安装的 astrology／celestial 版本及记录中的模型精确匹配。
+能恢复历史记录，不表示能在 <code class="docutils literal notranslate"><span class="pre">0.1.0</span></code> 下重算；版本或模型不匹配会抛出 <code class="docutils literal notranslate"><span class="pre">ChartReplayError</span></code>。
+详见<a class="reference internal" href="records.html"><span class="std std-doc">记录兼容说明</span></a>。</p>
+</section>
+<section id="id4">
+<h3>验证与限制<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h3>
+<p>完整质量工作流覆盖 Linux Python 3.11／3.14 及 macOS／Windows 3.14。
+发行安装消费者在 Linux x86_64 3.11／3.12／3.13／3.14、Linux ARM64 3.14、
+macOS ARM64 3.14 和 Windows amd64 3.14 上使用同一份保留的 wheel。
+这七项检查安装和消费者行为，不代表对每个受支持的 Python／平台组合都运行了完整质量检查。
+各次运行结果和制品摘要记在发行记录中，不能提前写成这些任务已经通过。</p>
+<p>独立的 JPL Horizons 和 Swiss 参考案例使用明确约定及文档规定的容差。
+<a class="reference internal" href="contributing.html#id4"><span class="std std-ref">正确性指南</span></a>说明其覆盖范围及共享模型的限制。
+恢复往返和同一 runner 上的源码／安装包对拍检查信息是否保留，不能代替外部参考，
+也不承诺跨平台浮点结果逐位一致。</p>
+<p>适配层即使只选择部分对象，也会计算固定的十四对象联合快照。
+实际可计算范围是该快照的星历／时标范围与请求宫几何的交集；天文库支持的民用年份不能直接当作
+更窄的命盘计算范围。详见<a class="reference internal" href="chart.html#id9"><span class="std std-ref">排盘限制</span></a>。
+历史输入研究、恒星黄道、行运／返照、关系盘、额外对象、解读及星盘图形界面不在本版范围内。</p>
+</section>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">celestial-astrology</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../en/index.html">Documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">文档入口</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../README.zh-CN.html">celestial-astrology</a></li>
+<li class="toctree-l2"><a class="reference internal" href="birth.html">出生记录与现代时刻解析</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html">排盘请求配置</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chart.html">本命盘</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aspects.html">相位</a></li>
+<li class="toctree-l2"><a class="reference internal" href="records.html">保存、恢复、重算和查看命盘</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference.html">公开 API 参考</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html">仓库结构与计算边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="knowledge.html">知识组织与双语文档</a></li>
+<li class="toctree-l2"><a class="reference internal" href="catalog.html">知识目录参考</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">发行说明</a></li>
+<li class="toctree-l2"><a class="reference internal" href="releasing.html">发行流程</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html">参与开发</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">文档入口</a><ul>
+      <li>Previous: <a href="catalog.html" title="previous chapter">知识目录参考</a></li>
+      <li>Next: <a href="releasing.html" title="next chapter">发行流程</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 9.1.0</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../../_sources/docs/zh-CN/releases.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

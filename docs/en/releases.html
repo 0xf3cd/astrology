@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Release notes &#8212; celestial-astrology 0.1.0 documentation / 文档</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
+    <script src="../../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/en/releases.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Release procedure" href="releasing.html" />
+    <link rel="prev" title="Knowledge catalog reference" href="catalog.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="release-notes">
+<h1>Release notes<a class="headerlink" href="#release-notes" title="Link to this heading">¶</a></h1>
+<p><a class="reference internal" href="../zh-CN/releases.html"><span class="std std-doc">简体中文</span></a> · <a class="reference internal" href="index.html"><span class="std std-doc">Documentation</span></a> · <a class="reference internal" href="releasing.html"><span class="std std-doc">Release procedure</span></a></p>
+<section id="id1">
+<h2>0.1.0<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
+<p>The first release provides modern tropical, geocentric natal charts and an
+independently browsable English/Chinese knowledge catalog. Install the distribution
+<code class="docutils literal notranslate"><span class="pre">celestial-astrology</span></code>; Python imports remain <code class="docutils literal notranslate"><span class="pre">astrology</span></code>.</p>
+<section id="delivered-api">
+<h3>Delivered API<a class="headerlink" href="#delivered-api" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Immutable original birth records, explicit timezone interpretation, and resolved
+calculation instants. Unknown time or location is preserved as missing; natal
+preparation rejects incomplete inputs rather than supplying noon or a location.</p></li>
+<li><p>Solar, lunar and planetary positions, named lunar-node definitions, axes and
+Whole Sign, Equal or Placidus houses. An undefined requested geometry raises
+<code class="docutils literal notranslate"><span class="pre">ChartDomainError</span></code> without selecting another house system.</p></li>
+<li><p>Tropical signs, longitude-only house placement, and five major aspects with
+explicit orb rules and local applying/separating status. This status describes
+motion at the calculation instant, not a forecast of a later exact aspect.</p></li>
+<li><p>Versioned chart records, restoration, explicit recomputation, and English/Chinese
+text output. Astronomy values, requested/effective settings and provenance remain
+separate in the stored result.</p></li>
+<li><p>Knowledge concepts, named rule variants, aliases and citations without calculating
+a chart or initializing native astronomy. Source verification, prerequisite status,
+output eligibility and chart applicability remain distinct. Quotations,
+translations and project-authored explanations retain their own attribution.</p></li>
+</ul>
+<p>The <a class="reference internal" href="chart.html"><span class="std std-doc">chart</span></a>, <a class="reference internal" href="aspects.html"><span class="std std-doc">aspect</span></a>, <a class="reference internal" href="records.html"><span class="std std-doc">record</span></a> and
+<a class="reference internal" href="knowledge.html"><span class="std std-doc">knowledge</span></a> guides define the admitted conventions and corpus.</p>
+</section>
+<section id="installation-and-compatibility">
+<h3>Installation and compatibility<a class="headerlink" href="#installation-and-compatibility" title="Link to this heading">¶</a></h3>
+<p>Python 3.11–3.14 is supported. Runtime dependencies are exactly
+<code class="docutils literal notranslate"><span class="pre">celestial-calendar==0.8.0</span></code> and <code class="docutils literal notranslate"><span class="pre">tzdata==2026.5</span></code>. Exact pins preserve the selected
+models and timezone data, but can prevent installation beside a consumer that
+requires another version. This release does not upgrade to celestial 0.9 or widen
+the dependency ranges.</p>
+<p>Installation requires a compatible upstream astronomy wheel: Linux x86_64 or
+aarch64 with the corresponding manylinux support, macOS 14+ arm64, or Windows
+amd64. The astronomy dependency has no sdist. The astrology wheel’s <code class="docutils literal notranslate"><span class="pre">any</span></code> platform
+tag does not remove that restriction; knowledge-only use needs the same install.</p>
+<p>Schema v1 restoration preserves stored values and their original provenance,
+including historical <code class="docutils literal notranslate"><span class="pre">0.0.0</span></code> records, without loading astronomy. Recomputation
+requires exact installed astrology/celestial versions and the recorded model.
+Restoring a historical record does not make it recomputable under <code class="docutils literal notranslate"><span class="pre">0.1.0</span></code>; a
+version or model mismatch raises <code class="docutils literal notranslate"><span class="pre">ChartReplayError</span></code>. See <a class="reference internal" href="records.html"><span class="std std-doc">record compatibility</span></a>.</p>
+</section>
+<section id="verification-and-limits">
+<h3>Verification and limits<a class="headerlink" href="#verification-and-limits" title="Link to this heading">¶</a></h3>
+<p>The full quality workflow runs on Linux Python 3.11/3.14 and macOS/Windows 3.14.
+Release installation consumers use the same retained wheel on Linux x86_64
+3.11/3.12/3.13/3.14, Linux ARM64 3.14, macOS ARM64 3.14 and Windows amd64 3.14.
+The latter seven jobs check installation and consumers; they are not full quality
+runs on every supported Python/platform pair. Run-specific results and artifact
+digests belong to the release record, not a prewritten claim that those jobs passed.</p>
+<p>Independent JPL Horizons and Swiss reference cases use named conventions and
+documented tolerances. Their scope and shared-model limits are in the
+<a class="reference internal" href="contributing.html#correctness"><span class="std std-ref">correctness guide</span></a>. Restoration round trips and
+same-runner source/install comparisons check preservation; they do not replace
+those external references or promise cross-platform bitwise floating-point equality.</p>
+<p>The adapter evaluates a fixed joint fourteen-object snapshot, even when a request
+selects fewer objects. Its admitted domain is the intersection of that snapshot’s
+ephemeris/time limits and the requested house geometry. Astronomy civil-year
+support alone does not establish the narrower chart domain. See <a class="reference internal" href="chart.html#limits"><span class="std std-ref">chart limits</span></a>.
+Historical input research, sidereal charts, transits/returns, relationship charts,
+additional objects, interpretation and a chart-wheel UI are outside this release.</p>
+</section>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">celestial-astrology</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../README.html">celestial-astrology</a></li>
+<li class="toctree-l2"><a class="reference internal" href="birth.html">Birth records and modern time resolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html">Requested chart configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chart.html">Natal charts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aspects.html">Aspects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="records.html">Save, restore, replay and inspect a chart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference.html">Public API reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html">Repository structure and calculation boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="knowledge.html">Knowledge organization and bilingual documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="catalog.html">Knowledge catalog reference</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Release notes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="releasing.html">Release procedure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html">Contributing</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../zh-CN/index.html">文档入口</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Documentation</a><ul>
+      <li>Previous: <a href="catalog.html" title="previous chapter">Knowledge catalog reference</a></li>
+      <li>Next: <a href="releasing.html" title="next chapter">Release procedure</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 9.1.0</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../../_sources/docs/en/releases.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

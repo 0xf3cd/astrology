@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>发行流程 &#8212; celestial-astrology 0.1.0 documentation / 文档</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
+    <script src="../../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/zh-CN/releasing.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="参与开发" href="contributing.html" />
+    <link rel="prev" title="发行说明" href="releases.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="id1">
+<h1>发行流程<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h1>
+<p><a class="reference internal" href="../en/releasing.html"><span class="std std-doc">English</span></a> · <a class="reference internal" href="releases.html"><span class="std std-doc">发行说明</span></a> · <a class="reference internal" href="contributing.html"><span class="std std-doc">参与开发</span></a></p>
+<p><code class="docutils literal notranslate"><span class="pre">Release</span></code> 工作流构建一份 sdist，并从该 sdist 构建 wheel，保留成员清单和 SHA-256，
+再让七项隔离安装消费者使用同一份 wheel。只有手动触发的 main 运行，且构建和每项消费者全部成功，
+才可上传这些文件。PR 运行验证构建与消费，不能发布；tag 和普通 main push 不触发本工作流。</p>
+<section id="id2">
+<h2>先配置发布边界<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<p>首次 PR 验证或登记 publisher 前，配置 GitHub 的 <code class="docutils literal notranslate"><span class="pre">pypi</span></code> environment：</p>
+<ul class="simple">
+<li><p>使用指定部署分支／tag 的模式，只保留一条 <strong>branch</strong> 规则 <code class="docutils literal notranslate"><span class="pre">main</span></code>。
+不允许 PR merge ref、tag 或无限制部署。回读 environment 政策及分支规则列表；
+PR 可以修改工作流，因此仅有 workflow <code class="docutils literal notranslate"><span class="pre">if</span></code> 不够。</p></li>
+<li><p>发布 job 启动前须经维护者批准。不要使用管理员权限绕过批准或部署限制。</p></li>
+<li><p>保留既有 main 分支保护及独立的 Pages environment。</p></li>
+</ul>
+<p>在 PyPI 登记 <a class="reference external" href="https://docs.pypi.org/trusted-publishers/creating-a-project-through-oidc/">pending Trusted Publisher</a>，
+项目名 <code class="docutils literal notranslate"><span class="pre">celestial-astrology</span></code>，owner <code class="docutils literal notranslate"><span class="pre">0xf3cd</span></code>，repository <code class="docutils literal notranslate"><span class="pre">astrology</span></code>，workflow <code class="docutils literal notranslate"><span class="pre">release.yml</span></code>，
+environment <code class="docutils literal notranslate"><span class="pre">pypi</span></code>。pending publisher 不保留项目名。已有项目使用其
+<a class="reference external" href="https://docs.pypi.org/trusted-publishers/adding-a-publisher/">publisher 设置</a>。
+不提供长期上传密码；缺少 publisher 或 environment 拒绝访问时应停止，不能改用 token 或放宽保护。</p>
+</section>
+<section id="id3">
+<h2>准备并检查候选<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
+<ol class="arabic simple">
+<li><p>审阅源码、配套双语说明，以及发行追踪单的七项验收。明确依赖政策、历史来源和恢复／重算兼容边界。</p></li>
+<li><p>本地运行锁定依赖的完整检查，并运行 PR 质量／安装工作流。
+既有完整质量矩阵是 Linux 3.11／3.14 及 macOS／Windows 3.14；七项保留 wheel 的消费者是
+Linux x86_64 3.11／3.12／3.13／3.14、Linux ARM64 3.14、macOS ARM64 3.14 和 Windows amd64 3.14。
+两者检查内容不同，并未穷尽所有受支持的 Python／平台组合。</p></li>
+<li><p>检查实际 sdist／wheel 的成员和元数据。清单记录源码提交、语料版本、Python／依赖要求、
+两份制品的摘要，以及每个归档文件的路径、大小和摘要。额外成员、与源码不同的字节或运行依赖变化都会被拒绝。</p></li>
+<li><p>验证新发行检查的代表性反例。每个新 uv 步骤固定 uv 0.12.5、对应归档的 SHA-256 及新的工具缓存目录。
+在不合并的探针分支上，错误摘要必须使步骤在 uv 运行前失败，包括 ARM 消费者。
+网络错误不能作为这项证据。</p></li>
+</ol>
+<p>本地完整检查若需保留分发文件，使用一个尚不存在的输出目录：</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>sync<span class="w"> </span>--locked<span class="w"> </span>--python<span class="w"> </span><span class="m">3</span>.14
+uv<span class="w"> </span>run<span class="w"> </span>--locked<span class="w"> </span>python<span class="w"> </span>tools/check.py<span class="w"> </span>--artifacts-dir<span class="w"> </span>dist/packages
+</pre></div>
+</div>
+<p>目标目录不能已存在。该命令保留通过完整分发检查的文件，不上传，也不据此宣称已发行。
+工作流的 <code class="docutils literal notranslate"><span class="pre">tools/release.py</span> <span class="pre">prepare</span></code> 检查源码未变，写入 <code class="docutils literal notranslate"><span class="pre">dist/manifest.json</span></code>，
+并单独输出构建 job 的摘要。准备和消费都不再构建第二份发行 wheel。</p>
+</section>
+<section id="id4">
+<h2>授权并运行发布<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h2>
+<p>候选验收并合入后，为其版本及完整 main 提交号取得发布授权。
+在 Actions 选择 <code class="docutils literal notranslate"><span class="pre">Release</span></code>、<code class="docutils literal notranslate"><span class="pre">Run</span> <span class="pre">workflow</span></code>，分支选 <code class="docutils literal notranslate"><span class="pre">main</span></code>，填入精确的 <code class="docutils literal notranslate"><span class="pre">version</span></code> 和 <code class="docutils literal notranslate"><span class="pre">sha</span></code>。
+检出源码与请求提交或当前远端 main 不同时会被拒绝；不要用移动的分支名代替 SHA。</p>
+<p>制品按本次构建 job 返回的精确 ID 下载，不按可复用名称或另一次运行查找。
+每个消费者将 wheel／sdist 摘要与独立的构建 job 输出比较，核清单与源码一致，
+然后只在仓外安装保留的 wheel。预期源码命盘由同一 runner 计算。
+普通／优化模式下的知识、命盘、元数据缺失及 README 检查都须通过，不能重建发行 wheel。</p>
+<p>批准 <code class="docutils literal notranslate"><span class="pre">pypi</span></code> 部署前检查这些结果和 <code class="docutils literal notranslate"><span class="pre">manifest.json</span></code>。
+只有 Linux 发布 job 具有 <code class="docutils literal notranslate"><span class="pre">id-token:</span> <span class="pre">write</span></code>，且依赖构建和整个消费者矩阵。
+它再次检查两份分发文件的精确名称和 SHA-256，再调用以提交号固定的 PyPI action，
+启用 attestations，保持 <code class="docutils literal notranslate"><span class="pre">skip-existing:</span> <span class="pre">false</span></code>。它不在该权限下运行本仓构建代码。</p>
+</section>
+<section id="id5">
+<h2>核验并记录发布结果<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h2>
+<p>从 PyPI 下载两份分发文件，将其字节摘要与保存清单中的 SHA-256 比较。
+在新的受支持环境里执行 README 的包索引安装命令，再运行其中的命盘和知识示例。
+源码快照安装成功不能代替包索引安装验收。</p>
+<p>仅按发布授权，在验收的源码 SHA 上创建 <code class="docutils literal notranslate"><span class="pre">v0.1.0</span></code> 和 GitHub Release，附上核验后的 wheel、sdist 和清单。
+GitHub 自动生成的源码 ZIP／tar 是 git 快照，不是已发布的 sdist。
+发行记录写入实际工作流结果、制品身份、下载摘要、安装结果及剩余限制。
+从同一份验收源码手动更新双语 Pages 站点，并检查受影响的线上页面。</p>
+<p>上传成功而 tag／Release／站点步骤失败时，保留成功上传的事实并报告部分完成状态。
+使用核验后的文件完成剩余交付，不重建，也不在同一版本下上传替代品。
+重复文件报错不能成为启用 <code class="docutils literal notranslate"><span class="pre">skip-existing</span></code> 的理由；内容变化需要新的、经过审阅的发行版本。</p>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">celestial-astrology</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../en/index.html">Documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">文档入口</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../README.zh-CN.html">celestial-astrology</a></li>
+<li class="toctree-l2"><a class="reference internal" href="birth.html">出生记录与现代时刻解析</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html">排盘请求配置</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chart.html">本命盘</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aspects.html">相位</a></li>
+<li class="toctree-l2"><a class="reference internal" href="records.html">保存、恢复、重算和查看命盘</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference.html">公开 API 参考</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html">仓库结构与计算边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="knowledge.html">知识组织与双语文档</a></li>
+<li class="toctree-l2"><a class="reference internal" href="catalog.html">知识目录参考</a></li>
+<li class="toctree-l2"><a class="reference internal" href="releases.html">发行说明</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">发行流程</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html">参与开发</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">文档入口</a><ul>
+      <li>Previous: <a href="releases.html" title="previous chapter">发行说明</a></li>
+      <li>Next: <a href="contributing.html" title="next chapter">参与开发</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 9.1.0</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../../_sources/docs/zh-CN/releasing.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
