@@ -2,7 +2,7 @@
 
 [简体中文](../zh-CN/knowledge.md) · [Project](../../README.md) · [Architecture](architecture.md)
 
-The development package provides a chart-independent knowledge catalog. List
+The package provides a chart-independent knowledge catalog. List
 concepts and variants, find bilingual names/aliases, filter entries and sources,
 and inspect citations without birth data or native astronomy. Chart calculation
 is available through the [chart guide](chart.md) and is never needed to browse

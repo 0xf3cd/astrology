@@ -26,13 +26,10 @@ if __package__ in (None, ""):
 import astrology
 from astrology._distribution import DISTRIBUTION_NAME
 from tools.check import (
-  check_missing_metadata,
-  check_readme_examples,
+  check_installed_wheel,
   check_sdist,
   check_wheel,
-  run,
 )
-from tools.installed_check import acceptance_chart
 
 ROOT = Path(__file__).resolve().parents[1]
 NORMALIZED_NAME = DISTRIBUTION_NAME.replace("-", "_")
@@ -133,8 +130,10 @@ def _sdist_members(path: Path, identity: ReleaseIdentity) -> dict[str, bytes]:
     for member in archive.getmembers():
       name = member.name.rstrip("/")
       _safe_name(name)
-      if name in seen or name.split("/", 1)[0] != prefix:
-        raise ValueError("Duplicate member or unexpected sdist root")
+      if name in seen:
+        raise ValueError("Duplicate sdist member")
+      if name.split("/", 1)[0] != prefix:
+        raise ValueError("Unexpected sdist root")
       seen.add(name)
       if member.isdir():
         continue
@@ -363,45 +362,9 @@ def consume(
   with tempfile.TemporaryDirectory(
     prefix="astrology-release-", dir=environment.get("SCRATCH")
   ) as temporary:
-    work = Path(temporary)
-    expected_chart = work / "source-chart.json"
-    expected_chart.write_text(astrology.dumps_chart(acceptance_chart()), encoding="utf-8")
-    consumer = work / "consumer"
-    run(("uv", "venv", "--python", sys.executable, str(consumer)), cwd=work)
-    python = consumer / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
-    run(
-      (
-        "uv",
-        "pip",
-        "install",
-        "--python",
-        str(python),
-        str(directory / "packages" / identity.wheel_name),
-      ),
-      cwd=work,
+    check_installed_wheel(
+      root, directory / "packages" / identity.wheel_name, identity.version, Path(temporary)
     )
-    script = root / "tools/installed_check.py"
-    corpus = astrology.load_catalog().version
-    for mode in ((), ("-O",)):
-      run(
-        (str(python), *mode, "-I", str(script), identity.version, corpus, "--knowledge-only"),
-        cwd=work,
-      )
-      check_readme_examples(root, python, work, mode)
-      run(
-        (
-          str(python),
-          *mode,
-          "-I",
-          str(script),
-          identity.version,
-          corpus,
-          "--expected-chart",
-          str(expected_chart),
-        ),
-        cwd=work,
-      )
-    check_missing_metadata(consumer, python, script, expected_chart)
 
 
 def main() -> None:

@@ -25,9 +25,12 @@ def _workflow() -> dict[str, Any]:
 def _contract(workflow: dict[str, Any]) -> None:
   assert set(workflow["on"]) == {"pull_request", "workflow_dispatch"}
   assert workflow["permissions"] == {}
+  assert workflow["env"]["RELEASE_SHA"] == "${{ inputs.sha || github.sha }}"
   jobs = workflow["jobs"]
   assert set(jobs) == {"build", "consume", "publish-pypi"}
   build, consume, publish = (jobs[key] for key in ("build", "consume", "publish-pypi"))
+  assert build["steps"][0]["with"]["ref"] == "${{ github.sha }}"
+  assert consume["steps"][0]["with"]["ref"] == "${{ needs.build.outputs.source_sha }}"
   for job in (build, consume):
     assert job["permissions"] == {"contents": "read"}
     assert "environment" not in job
@@ -67,6 +70,8 @@ def _contract(workflow: dict[str, Any]) -> None:
           re.fullmatch(r"[0-9a-f]{64}", step["with"]["checksum"])
           or step["with"]["checksum"] == "${{ matrix.uv-checksum }}"
         )
+      if step["uses"].startswith("actions/checkout@"):
+        assert step["with"]["persist-credentials"] == "false"
       if step["uses"].startswith("actions/download-artifact@"):
         assert step["with"]["artifact-ids"] == "${{ needs.build.outputs.artifact_id }}"
         assert step["with"]["digest-mismatch"] == "error"
@@ -82,6 +87,7 @@ def _contract(workflow: dict[str, Any]) -> None:
   upload = build["steps"][-1]
   assert upload["id"] == "upload"
   assert upload["with"]["overwrite"] == "false"
+  assert upload["with"]["if-no-files-found"] == "error"
   assert build["outputs"]["artifact_id"] == "${{ steps.upload.outputs.artifact-id }}"
   assert len(publish["steps"]) == 3
   assert publish["steps"][0]["uses"].startswith("actions/download-artifact@")
@@ -98,6 +104,10 @@ def _contract(workflow: dict[str, Any]) -> None:
 
 def test_release_workflow_has_the_restricted_artifact_chain() -> None:
   _contract(_workflow())
+
+
+def test_checkout_policy_preserves_linux_archive_text_bytes() -> None:
+  assert (ROOT / ".gitattributes").read_text(encoding="utf-8") == "* text=auto eol=lf\n"
 
 
 @pytest.mark.parametrize(
@@ -118,6 +128,11 @@ def test_release_workflow_has_the_restricted_artifact_chain() -> None:
     "attestations",
     "tolerate-failure",
     "implicit-stdin",
+    "build-ref",
+    "consume-ref",
+    "release-sha",
+    "missing-files",
+    "persist-credentials",
   ],
 )
 def test_workflow_contract_rejects_representative_defects(defect: str) -> None:
@@ -155,6 +170,16 @@ def test_workflow_contract_rejects_representative_defects(defect: str) -> None:
     publish["steps"][1]["run"] = publish["steps"][1]["run"].replace(
       "sha256sum -c -", "sha256sum -c"
     )
+  elif defect == "build-ref":
+    build["steps"][0]["with"]["ref"] = "main"
+  elif defect == "consume-ref":
+    consume["steps"][0]["with"]["ref"] = "main"
+  elif defect == "release-sha":
+    workflow["env"]["RELEASE_SHA"] = "${{ github.sha }}"
+  elif defect == "missing-files":
+    build["steps"][-1]["with"]["if-no-files-found"] = "warn"
+  elif defect == "persist-credentials":
+    consume["steps"][0]["with"]["persist-credentials"] = "true"
   else:
     consume["continue-on-error"] = "true"
   with pytest.raises((AssertionError, KeyError)):
@@ -173,6 +198,8 @@ def test_workflow_contract_rejects_representative_defects(defect: str) -> None:
     "filename",
     "filename-newline",
     "version",
+    "wheel-symlink",
+    "packages-symlink",
   ],
 )
 @pytest.mark.parametrize("errexit", [True, False])
@@ -221,6 +248,14 @@ def test_actual_publication_byte_guard(tmp_path: Path, defect: str, errexit: boo
     environment["WHEEL_NAME"] += "\nmalformed"
   elif defect == "version":
     environment["RELEASE_VERSION"] = "0.1.0\nunsafe"
+  elif defect in ("wheel-symlink", "packages-symlink"):
+    path = packages / wheel if defect == "wheel-symlink" else packages
+    outside = tmp_path / "outside"
+    path.rename(outside)
+    try:
+      path.symlink_to(outside, target_is_directory=defect == "packages-symlink")
+    except OSError as exc:
+      pytest.skip(f"Symlinks unavailable: {exc}")
   result = subprocess.run(
     (bash, "-c", guard), cwd=tmp_path, env=environment, capture_output=True, timeout=15
   )

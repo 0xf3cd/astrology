@@ -14,6 +14,7 @@ from zipfile import ZipFile, ZipInfo
 import pytest
 
 import astrology
+from tools import check as checker
 from tools import release
 from tools.check import PACKAGE_FILES, SDIST_FILES
 
@@ -194,6 +195,9 @@ def test_prepare_retains_complete_inventory_and_independent_digests(files: Relea
   assert manifest["distribution"] == "celestial-astrology"
   assert manifest["source_sha"] == SHA
   assert manifest["version"] == "0.1.0"
+  assert manifest["schema_version"] == 1
+  assert manifest["corpus_version"] == astrology.load_catalog().version
+  assert manifest["requires_python"] == ">=3.11,<3.15"
   assert manifest["dependencies"] == ["celestial-calendar==0.8.0", "tzdata==2026.5"]
   for name, variable in (
     (IDENTITY.sdist_name, "SDIST_SHA256"),
@@ -245,6 +249,39 @@ def test_source_change_and_missing_tracked_resource_are_detected(files: ReleaseF
     release.inspect_distributions(files.root, IDENTITY, files.directory)
 
 
+@pytest.mark.parametrize(("field", "value"), [("Name", "other-project"), ("Version", "0.0.9")])
+def test_sdist_generated_metadata_must_match_release_identity(
+  files: ReleaseFiles, field: str, value: str
+) -> None:
+  original = "celestial-astrology" if field == "Name" else "0.1.0"
+  files.sdist_members["PKG-INFO"] = METADATA.replace(
+    f"{field}: {original}\n".encode(), f"{field}: {value}\n".encode()
+  )
+  files.write()
+  with pytest.raises(ValueError, match="different release identity"):
+    release.inspect_distributions(files.root, IDENTITY, files.directory)
+
+
+def test_wheel_must_include_tracked_package_files_beyond_the_required_list(
+  files: ReleaseFiles, monkeypatch: pytest.MonkeyPatch
+) -> None:
+  name = "src/astrology/additional.py"
+  content = b"synthetic additional package source"
+  (files.root / name).write_bytes(content)
+  files.sdist_members[name] = content
+  original = release._git
+  monkeypatch.setattr(
+    release,
+    "_git",
+    lambda root, *args: (
+      original(root, *args) + name + "\0" if args == ("ls-files", "-z") else original(root, *args)
+    ),
+  )
+  files.write()
+  with pytest.raises(ValueError, match=r"missing source members.*astrology/additional\.py"):
+    release.inspect_distributions(files.root, IDENTITY, files.directory)
+
+
 @pytest.mark.parametrize("defect", ["extra-file", "missing-wheel", "missing-directory"])
 def test_package_directory_has_exactly_two_files(files: ReleaseFiles, defect: str) -> None:
   packages = files.directory / "packages"
@@ -261,6 +298,20 @@ def test_package_directory_has_exactly_two_files(files: ReleaseFiles, defect: st
 def test_release_directory_rejects_unexpected_non_package_files(files: ReleaseFiles) -> None:
   (files.directory / "unexpected.txt").touch()
   with pytest.raises(ValueError, match="unexpected entry"):
+    release.inspect_distributions(files.root, IDENTITY, files.directory)
+
+
+def test_release_artifact_symlink_is_rejected_even_when_target_bytes_match(
+  files: ReleaseFiles,
+) -> None:
+  artifact = files.directory / "packages" / IDENTITY.wheel_name
+  outside = files.directory.parent / "retained-wheel"
+  artifact.rename(outside)
+  try:
+    artifact.symlink_to(outside)
+  except OSError as exc:
+    pytest.skip(f"Symlinks unavailable: {exc}")
+  with pytest.raises(ValueError, match="artifacts must be regular files"):
     release.inspect_distributions(files.root, IDENTITY, files.directory)
 
 
@@ -290,8 +341,15 @@ def test_archive_paths_are_canonical_and_relative(name: str) -> None:
     release._safe_name(name)
 
 
-@pytest.mark.parametrize("defect", ["duplicate", "link", "root"])
-def test_sdist_rejects_ambiguous_or_link_members(tmp_path: Path, defect: str) -> None:
+@pytest.mark.parametrize(
+  ("defect", "message"),
+  [
+    ("duplicate", "Duplicate sdist member"),
+    ("link", "regular files"),
+    ("root", "Unexpected sdist root"),
+  ],
+)
+def test_sdist_rejects_ambiguous_or_link_members(tmp_path: Path, defect: str, message: str) -> None:
   path = tmp_path / "source.tar.gz"
   with tarfile.open(path, "w:gz") as archive:
     name = "other-0.1.0/file" if defect == "root" else "celestial_astrology-0.1.0/file"
@@ -302,8 +360,34 @@ def test_sdist_rejects_ambiguous_or_link_members(tmp_path: Path, defect: str) ->
     archive.addfile(member, BytesIO())
     if defect == "duplicate":
       archive.addfile(member, BytesIO())
-  with pytest.raises(ValueError, match=r"Duplicate member|unexpected sdist root|regular files"):
+  with pytest.raises(ValueError, match=message):
     release._sdist_members(path, IDENTITY)
+
+
+def test_wheel_rejects_duplicate_members_with_different_bytes(tmp_path: Path) -> None:
+  path = tmp_path / "wheel.whl"
+  with ZipFile(path, "w") as archive:
+    archive.writestr("astrology/__init__.py", b"first member")
+    with pytest.warns(UserWarning, match="Duplicate name"):
+      archive.writestr("astrology/__init__.py", b"different member")
+  with pytest.raises(ValueError, match="Duplicate wheel member"):
+    release._wheel_members(path)
+
+
+@pytest.mark.parametrize("mode", [0, 0o40755, 0o100644])
+def test_wheel_directory_entries_must_have_directory_or_unspecified_type(
+  tmp_path: Path, mode: int
+) -> None:
+  path = tmp_path / "wheel.whl"
+  with ZipFile(path, "w") as archive:
+    member = ZipInfo("astrology/")
+    member.external_attr = mode << 16
+    archive.writestr(member, b"")
+  if mode == 0o100644:
+    with pytest.raises(ValueError, match="directory has an unsupported file type"):
+      release._wheel_members(path)
+  else:
+    assert release._wheel_members(path) == {}
 
 
 def test_wheel_rejects_link_members(tmp_path: Path) -> None:
@@ -355,14 +439,14 @@ def test_consumer_installs_only_retained_wheel_and_keeps_all_acceptance_modes(
     if "--expected-chart" in command:
       assert Path(command[-1]).read_text() == "runner-local-source-result"
 
-  monkeypatch.setattr(release, "run", capture)
-  monkeypatch.setattr(release, "acceptance_chart", lambda: None)
+  monkeypatch.setattr(checker, "run", capture)
+  monkeypatch.setattr("tools.installed_check.acceptance_chart", lambda: None)
   monkeypatch.setattr(astrology, "dumps_chart", lambda _chart: "runner-local-source-result")
   monkeypatch.setattr(
-    release, "check_readme_examples", lambda root, python, work, mode: readmes.append(mode)
+    checker, "check_readme_examples", lambda root, python, work, mode: readmes.append(mode)
   )
   monkeypatch.setattr(
-    release,
+    checker,
     "check_missing_metadata",
     lambda env, python, script, chart: missing_metadata.append(chart),
   )

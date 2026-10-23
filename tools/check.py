@@ -63,6 +63,7 @@ PACKAGE_FILES = (
 # Build, documentation and test inputs outside the package itself.
 # 不在包内的构建、文档和测试输入。
 SDIST_FILES = (
+  ".gitattributes",
   ".github/workflows/checks.yml",
   ".github/workflows/release.yml",
   "pyproject.toml",
@@ -619,6 +620,43 @@ print(json.dumps(str(paths[0])))
       hidden.rename(metadata)
 
 
+def check_installed_wheel(source: Path, wheel: Path, version: str, directory: Path) -> None:
+  """Check an isolated wheel install in ordinary and optimized modes.
+
+  在隔离环境中安装 wheel，并以普通和优化模式检查。
+  """
+  from tools.installed_check import acceptance_chart
+
+  environment = directory / "consumer"
+  run(("uv", "venv", "--python", sys.executable, str(environment)), cwd=directory)
+  python = environment / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
+  run(("uv", "pip", "install", "--python", str(python), str(wheel)), cwd=directory)
+  corpus_version = load_catalog().version
+  expected_chart = directory / "development-chart.json"
+  expected_chart.write_text(astrology.dumps_chart(acceptance_chart()), encoding="utf-8")
+  script = source / "tools/installed_check.py"
+  for mode in ((), ("-O",)):
+    run(
+      (str(python), *mode, "-I", str(script), version, corpus_version, "--knowledge-only"),
+      cwd=directory,
+    )
+    check_readme_examples(source, python, directory, mode)
+    run(
+      (
+        str(python),
+        *mode,
+        "-I",
+        str(script),
+        version,
+        corpus_version,
+        "--expected-chart",
+        str(expected_chart),
+      ),
+      cwd=directory,
+    )
+  check_missing_metadata(environment, python, script, expected_chart)
+
+
 def check_distribution(directory: Path) -> None:
   """Build the wheel and docs from an extracted sdist, then test an isolated install.
 
@@ -690,43 +728,7 @@ def check_distribution(directory: Path) -> None:
   )
   check_examples((directory / "source-doctest/output.txt").read_text(encoding="utf-8"))
 
-  environment = directory / "consumer"
-  run(("uv", "venv", "--python", sys.executable, str(environment)))
-  python = environment / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
-  run(("uv", "pip", "install", "--python", str(python), str(wheels[0])))
-  corpus_version = load_catalog().version
-  from tools.installed_check import acceptance_chart
-
-  expected_chart = directory / "development-chart.json"
-  expected_chart.write_text(astrology.dumps_chart(acceptance_chart()), encoding="utf-8")
-  for mode in ((), ("-O",)):
-    run(
-      (
-        str(python),
-        *mode,
-        "-I",
-        str(source / "tools/installed_check.py"),
-        metadata["version"],
-        corpus_version,
-        "--knowledge-only",
-      ),
-      cwd=directory,
-    )
-    check_readme_examples(source, python, directory, mode)
-    run(
-      (
-        str(python),
-        *mode,
-        "-I",
-        str(source / "tools/installed_check.py"),
-        metadata["version"],
-        corpus_version,
-        "--expected-chart",
-        str(expected_chart),
-      ),
-      cwd=directory,
-    )
-  check_missing_metadata(environment, python, source / "tools/installed_check.py", expected_chart)
+  check_installed_wheel(source, wheels[0], metadata["version"], directory)
 
 
 def main(*, artifacts_dir: Path | None = None) -> None:

@@ -39,13 +39,13 @@ is a blocker; do not switch to a token or weaken protection to continue.
    macOS ARM64 3.14 and Windows amd64 3.14. These are distinct check sets, not every
    supported Python/platform combination.
 3. Inspect the actual sdist/wheel members and metadata. The manifest records source
-   commit, corpus version, Python/dependency requirements, file digests and every
-   archived file's path/size/digest. Unexpected members, changed source bytes or
+   commit, corpus version, Python/dependency requirements, the two artifact digests
+   and every archived file's path/size/digest. Unexpected members, changed source bytes or
    changed runtime requirements fail inspection.
 4. Verify representative rejection cases for the new release checks. Every new
    uv step pins uv 0.12.5, its named archive SHA-256, and a fresh tool cache. On an
    unmerged probe branch, wrong archive digests must fail before uv runs, including
-   the new ARM runner. A network failure is not that evidence.
+   the ARM consumer. A network failure is not that evidence.
 
 To retain the distributions from a local complete check, use a new output directory:
 
