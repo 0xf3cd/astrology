@@ -243,7 +243,10 @@ def test_wheel_metadata_count(tmp_path: Path, count: int) -> None:
     check_wheel(wheel, "0.0.0")
 
 
-def test_main_keeps_required_validation_stages(monkeypatch: pytest.MonkeyPatch) -> None:
+@pytest.mark.parametrize(("retain", "existing"), [(False, False), (True, False), (True, True)])
+def test_main_keeps_required_validation_stages(
+  monkeypatch: pytest.MonkeyPatch, tmp_path: Path, retain: bool, existing: bool
+) -> None:
   commands: list[tuple[str, ...]] = []
   monkeypatch.setenv("ASTROLOGY_DOCS_SOURCE_SHA", "a" * 40)
 
@@ -268,10 +271,34 @@ def test_main_keeps_required_validation_stages(monkeypatch: pytest.MonkeyPatch) 
     checker, "check_search_html", lambda directory: commands.append(("search_html",))
   )
   monkeypatch.setattr(checker, "check_site_html", site)
-  monkeypatch.setattr(
-    checker, "check_distribution", lambda directory: commands.append(("distribution",))
-  )
-  checker.main()
+
+  def distribution(directory: Path) -> None:
+    commands.append(("distribution",))
+    artifacts = directory / "artifacts"
+    artifacts.mkdir()
+    (artifacts / "source.tar.gz").write_bytes(b"checked source")
+    (artifacts / "package.whl").write_bytes(b"checked wheel")
+
+  monkeypatch.setattr(checker, "check_distribution", distribution)
+  if existing:
+    target = tmp_path / "retained"
+    target.mkdir()
+    (target / "existing").write_bytes(b"preserve existing bytes")
+    with pytest.raises(FileExistsError):
+      checker.main(artifacts_dir=target)
+    assert commands[-1] == ("distribution",)
+    assert {path.name: path.read_bytes() for path in target.iterdir()} == {
+      "existing": b"preserve existing bytes"
+    }
+    return
+  checker.main(artifacts_dir=tmp_path / "retained" if retain else None)
+  if retain:
+    assert {path.name: path.read_bytes() for path in (tmp_path / "retained").iterdir()} == {
+      "source.tar.gz": b"checked source",
+      "package.whl": b"checked wheel",
+    }
+  else:
+    assert not (tmp_path / "retained").exists()
   assert any(command[:3] == (sys.executable, "-m", "pytest") for command in commands)
   assert any(command[:4] == (sys.executable, "-O", "-m", "pytest") for command in commands)
   assert [command[command.index("-b") + 1] for command in commands if "-b" in command] == [

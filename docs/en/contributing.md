@@ -100,7 +100,7 @@ fail the strict build.
 
 Install this development package from the checkout using `uv sync` above. Its
 distribution name/version is `celestial-astrology` / `0.1.0`; the Python import
-remains `astrology`. This candidate has not been published on PyPI. The unrelated
+remains `astrology`. The unrelated
 PyPI project `astrology` is not this library. Confirm the installed identity:
 
 ```{doctest}

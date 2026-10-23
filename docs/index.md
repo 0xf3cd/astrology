@@ -1,6 +1,6 @@
 # astrology
 
-Development documentation / 开发版文档
+Source documentation snapshot / 源码文档快照
 
 ```{toctree}
 :maxdepth: 2

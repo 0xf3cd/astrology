@@ -80,7 +80,7 @@ def site(tmp_path: Path) -> tuple[Path, Path]:
   )
   (root / "LICENSE").touch()
   (output / "index.html").write_text(
-    f"<h1>celestial-astrology 0.1.0</h1><p>开发版文档</p>"
+    f"<h1>celestial-astrology 0.1.0</h1><p>Source documentation snapshot / 源码文档快照</p>"
     '<a href="docs/en/index.html">English</a><a href="docs/zh-CN/index.html">中文</a>'
     f'<a href="{REPOSITORY}/tree/{REVISION}">{REVISION}</a>'
     f"<pre>{REPOSITORY}/archive/{REVISION}.zip</pre><p>安装这一源码快照</p>",
@@ -118,8 +118,9 @@ def test_valid_bilingual_site_and_snapshot(site: tuple[Path, Path]) -> None:
 @pytest.mark.parametrize(
   "old,new,message",
   [
-    ("celestial-astrology 0.1.0", "celestial-astrology 0.0.0", "candidate version"),
-    ("开发版文档", "", "candidate version"),
+    ("celestial-astrology 0.1.0", "celestial-astrology 0.0.0", "version"),
+    ("源码文档快照", "", "source snapshot"),
+    ("Source documentation snapshot", "", "source snapshot"),
     ("docs/zh-CN/index.html", "lost.html", "both languages"),
     (f"/tree/{REVISION}", "/tree/main", "fixed source"),
     (f"/archive/{REVISION}.zip", "/archive/main.zip", "fixed source"),

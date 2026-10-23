@@ -2,8 +2,8 @@
 {% set title = "Documentation / 文档" %}
 {% block body %}
 <h1>{{ project }} {{ release }}</h1>
-<p>Development documentation, not a package release.</p>
-<p lang="zh-CN">开发版文档，不表示发行包已发布。</p>
+<p>Source documentation snapshot.</p>
+<p lang="zh-CN">源码文档快照。</p>
 <ul>
   <li><a href="{{ pathto('docs/en/index') }}">English documentation</a></li>
   <li lang="zh-CN"><a href="{{ pathto('docs/zh-CN/index') }}">简体中文文档</a></li>
@@ -21,8 +21,8 @@
 <p>Windows PowerShell:</p>
 <div class="highlight-powershell notranslate"><div class="highlight"><pre>.venv\Scripts\python.exe -m pip install "{{ source_archive_url }}"</pre></div></div>
 <p>Source / 源码：<a href="{{ source_tree_url }}"><code style="overflow-wrap: anywhere; white-space: normal;">{{ source_revision }}</code></a>.</p>
-<p>This candidate uses a retained source commit. Archive availability is not a promise of permanent hosting.</p>
-<p lang="zh-CN">此候选对应保留的源码提交；不承诺远端归档永久可用。</p>
+<p>This snapshot uses a retained source commit. Archive availability is not a promise of permanent hosting.</p>
+<p lang="zh-CN">此快照对应保留的源码提交；不承诺远端归档永久可用。</p>
 {% else %}
 <p>This local build has no fixed source revision. Follow the README for installation from your checkout.</p>
 <p lang="zh-CN">此本地构建未指定固定源码版本；请按 README 从当前检出的源码安装。</p>

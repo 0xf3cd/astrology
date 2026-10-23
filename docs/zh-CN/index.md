@@ -19,5 +19,7 @@ reference
 architecture
 knowledge
 catalog
+releases
+releasing
 contributing
 ```

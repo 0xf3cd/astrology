@@ -2,7 +2,7 @@
 
 [简体中文](../zh-CN/knowledge.md) · [Project](../../README.md) · [Architecture](architecture.md)
 
-The development package provides a chart-independent knowledge catalog. List
+The package provides a chart-independent knowledge catalog. List
 concepts and variants, find bilingual names/aliases, filter entries and sources,
 and inspect citations without birth data or native astronomy. Chart calculation
 is available through the [chart guide](chart.md) and is never needed to browse
@@ -257,9 +257,8 @@ Related design: [bazi](https://github.com/0xf3cd/bazi).
   than silently replaced with text in another language.
 - Original excerpts remain in their source language. A reader may choose a
   translation without losing access to that original.
-- The generated [catalog](catalog.md) identifies its code and corpus versions and
-  is labeled as development documentation. Checks and semantic review are described
-  in [contributing](contributing.md).
+- The generated [catalog](catalog.md) identifies its code and corpus versions.
+  Checks and semantic review are described in [contributing](contributing.md).
 
 Language labels must not change calculation. Distinct definitions must not be
 collapsed merely because a translation gives them the same display name. Search

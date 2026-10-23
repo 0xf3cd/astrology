@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import argparse
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import tarfile
@@ -61,7 +63,9 @@ PACKAGE_FILES = (
 # Build, documentation and test inputs outside the package itself.
 # 不在包内的构建、文档和测试输入。
 SDIST_FILES = (
+  ".gitattributes",
   ".github/workflows/checks.yml",
+  ".github/workflows/release.yml",
   "pyproject.toml",
   "uv.lock",
   "MANIFEST.in",
@@ -71,6 +75,7 @@ SDIST_FILES = (
   "docs/_templates/site_index.html",
   "tools/check.py",
   "tools/installed_check.py",
+  "tools/release.py",
   "tools/fetch_reference.py",
   "tools/catalog_docs.py",
   "tools/docs_search.py",
@@ -467,8 +472,10 @@ def check_site_html(directory: Path, *, root: Path = ROOT, source_revision: str 
   parser = _CatalogHtml()
   parser.feed(index.read_text(encoding="utf-8"))
   text = " ".join("".join(parser.text).split())
-  if f"{project['name']} {project['version']}" not in text or "开发版文档" not in text:
-    raise ValueError("Site root must identify its candidate version in both languages")
+  if f"{project['name']} {project['version']}" not in text or not all(
+    phrase in text for phrase in ("Source documentation snapshot", "源码文档快照")
+  ):
+    raise ValueError("Site root must identify its version and bilingual source snapshot")
   if not {"docs/en/index.html", "docs/zh-CN/index.html"}.issubset(parser.links):
     raise ValueError("Site root must link both languages")
   if source_revision:
@@ -613,6 +620,43 @@ print(json.dumps(str(paths[0])))
       hidden.rename(metadata)
 
 
+def check_installed_wheel(source: Path, wheel: Path, version: str, directory: Path) -> None:
+  """Check an isolated wheel install in ordinary and optimized modes.
+
+  在隔离环境中安装 wheel，并以普通和优化模式检查。
+  """
+  from tools.installed_check import acceptance_chart
+
+  environment = directory / "consumer"
+  run(("uv", "venv", "--python", sys.executable, str(environment)), cwd=directory)
+  python = environment / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
+  run(("uv", "pip", "install", "--python", str(python), str(wheel)), cwd=directory)
+  corpus_version = load_catalog().version
+  expected_chart = directory / "development-chart.json"
+  expected_chart.write_text(astrology.dumps_chart(acceptance_chart()), encoding="utf-8")
+  script = source / "tools/installed_check.py"
+  for mode in ((), ("-O",)):
+    run(
+      (str(python), *mode, "-I", str(script), version, corpus_version, "--knowledge-only"),
+      cwd=directory,
+    )
+    check_readme_examples(source, python, directory, mode)
+    run(
+      (
+        str(python),
+        *mode,
+        "-I",
+        str(script),
+        version,
+        corpus_version,
+        "--expected-chart",
+        str(expected_chart),
+      ),
+      cwd=directory,
+    )
+  check_missing_metadata(environment, python, script, expected_chart)
+
+
 def check_distribution(directory: Path) -> None:
   """Build the wheel and docs from an extracted sdist, then test an isolated install.
 
@@ -684,46 +728,10 @@ def check_distribution(directory: Path) -> None:
   )
   check_examples((directory / "source-doctest/output.txt").read_text(encoding="utf-8"))
 
-  environment = directory / "consumer"
-  run(("uv", "venv", "--python", sys.executable, str(environment)))
-  python = environment / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
-  run(("uv", "pip", "install", "--python", str(python), str(wheels[0])))
-  corpus_version = load_catalog().version
-  from tools.installed_check import acceptance_chart
-
-  expected_chart = directory / "development-chart.json"
-  expected_chart.write_text(astrology.dumps_chart(acceptance_chart()), encoding="utf-8")
-  for mode in ((), ("-O",)):
-    run(
-      (
-        str(python),
-        *mode,
-        "-I",
-        str(source / "tools/installed_check.py"),
-        metadata["version"],
-        corpus_version,
-        "--knowledge-only",
-      ),
-      cwd=directory,
-    )
-    check_readme_examples(source, python, directory, mode)
-    run(
-      (
-        str(python),
-        *mode,
-        "-I",
-        str(source / "tools/installed_check.py"),
-        metadata["version"],
-        corpus_version,
-        "--expected-chart",
-        str(expected_chart),
-      ),
-      cwd=directory,
-    )
-  check_missing_metadata(environment, python, source / "tools/installed_check.py", expected_chart)
+  check_installed_wheel(source, wheels[0], metadata["version"], directory)
 
 
-def main() -> None:
+def main(*, artifacts_dir: Path | None = None) -> None:
   """Run all checks, stopping on failure. 运行全部检查，失败即停止。"""
   commands = (
     ("-m", "ruff", "check", "."),
@@ -776,8 +784,16 @@ def main() -> None:
     results = (directory / "doctest/output.txt").read_text(encoding="utf-8")
     check_examples(results)
     check_distribution(directory)
+    if artifacts_dir is not None:
+      artifacts_dir.mkdir(parents=True)
+      for artifact in (directory / "artifacts").iterdir():
+        shutil.copyfile(artifact, artifacts_dir / artifact.name)
   print("All checks passed.")
 
 
 if __name__ == "__main__":
-  main()
+  parser = argparse.ArgumentParser(description=__doc__)
+  parser.add_argument(
+    "--artifacts-dir", type=Path, help="Retain checked distributions in a new directory"
+  )
+  main(artifacts_dir=parser.parse_args().artifacts_dir)

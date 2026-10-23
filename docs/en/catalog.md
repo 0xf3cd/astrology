@@ -2,7 +2,7 @@
 
 [简体中文](../zh-CN/catalog.md) · [Guide](knowledge.md) · [API](reference.md)
 
-This development catalog is generated at documentation build time from the packaged
+This catalog is generated at documentation build time from the packaged
 records. All admitted concepts, variants, editions and entries appear below.
 Configuration links identify implemented **request values**, not astronomical
 algorithms. The historical variant has no executable implementation.

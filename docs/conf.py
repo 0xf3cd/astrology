@@ -34,7 +34,7 @@ exclude_patterns = [
 myst_heading_anchors = 6
 nitpicky = True
 html_theme = "alabaster"
-html_title = f"{project} {release} (development / 开发版)"
+html_title = f"{project} {release} documentation / 文档"
 project_urls = tomllib.loads(
   (Path(__file__).resolve().parents[1] / "pyproject.toml").read_text(encoding="utf-8")
 )["project"]["urls"]
