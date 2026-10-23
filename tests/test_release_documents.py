@@ -12,6 +12,8 @@ UNITS = (
   "README.zh-CN.md",
   "docs/en/contributing.md",
   "docs/zh-CN/contributing.md",
+  "docs/en/knowledge.md",
+  "docs/zh-CN/knowledge.md",
   "docs/index.md",
   "docs/_templates/site_index.html",
   "docs/conf.py",
@@ -24,6 +26,8 @@ OLD_SENTENCES = (
   "当前源码准备版本 `0.1.0`，尚未发布到 PyPI；",
   "此候选尚未发布到 PyPI；",
   "这些命令从源码安装，不表示候选包已可从包索引安装。",
+  "is labeled as development documentation.",
+  "并明确标为开发文档。",
 )
 
 
@@ -62,7 +66,7 @@ def documents(tmp_path: Path) -> Path:
 
 @pytest.mark.parametrize("unit", UNITS)
 @pytest.mark.parametrize("sentence", OLD_SENTENCES)
-def test_every_status_unit_rejects_actual_old_denial_sentences(
+def test_every_status_unit_rejects_actual_old_status_claims(
   documents: Path, unit: str, sentence: str
 ) -> None:
   _contract(documents)

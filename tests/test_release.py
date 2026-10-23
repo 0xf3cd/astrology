@@ -262,13 +262,15 @@ def test_sdist_generated_metadata_must_match_release_identity(
     release.inspect_distributions(files.root, IDENTITY, files.directory)
 
 
-def test_wheel_must_include_tracked_package_files_beyond_the_required_list(
-  files: ReleaseFiles, monkeypatch: pytest.MonkeyPatch
+@pytest.mark.parametrize("missing_from", ["sdist", "wheel"])
+def test_archives_must_include_tracked_package_files_beyond_the_required_list(
+  files: ReleaseFiles, monkeypatch: pytest.MonkeyPatch, missing_from: str
 ) -> None:
   name = "src/astrology/additional.py"
   content = b"synthetic additional package source"
   (files.root / name).write_bytes(content)
-  files.sdist_members[name] = content
+  if missing_from == "wheel":
+    files.sdist_members[name] = content
   original = release._git
   monkeypatch.setattr(
     release,
@@ -278,7 +280,12 @@ def test_wheel_must_include_tracked_package_files_beyond_the_required_list(
     ),
   )
   files.write()
-  with pytest.raises(ValueError, match=r"missing source members.*astrology/additional\.py"):
+  message = (
+    "Sdist is missing tracked package sources"
+    if missing_from == "sdist"
+    else r"missing source members.*astrology/additional\.py"
+  )
+  with pytest.raises(ValueError, match=message):
     release.inspect_distributions(files.root, IDENTITY, files.directory)
 
 
