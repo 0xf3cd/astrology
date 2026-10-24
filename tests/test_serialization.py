@@ -7,6 +7,7 @@ import sys
 from collections.abc import Iterator
 from dataclasses import FrozenInstanceError, replace
 from datetime import date, time, timedelta
+from hashlib import sha256
 from importlib import import_module
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
@@ -15,6 +16,7 @@ from typing import Any
 import pytest
 
 from astrology import (
+  AspectRule,
   BirthRecord,
   Body,
   ChartConfig,
@@ -24,6 +26,7 @@ from astrology import (
   FixedOffset,
   HouseSystem,
   Location,
+  MajorAspect,
   NatalChart,
   OrbCombination,
   dumps_chart,
@@ -32,6 +35,15 @@ from astrology import (
   prepare_natal_input,
   recompute_chart,
 )
+
+_REFERENCE = Path(__file__).parent / "reference"
+_RECORD_TEXT = (_REFERENCE / "chart_record_v1.json").read_text(encoding="utf-8")
+_RELEASE_TEXT = (_REFERENCE / "chart_record_v1_v010.json").read_text(encoding="utf-8")
+
+
+@pytest.fixture(params=[_RECORD_TEXT, _RELEASE_TEXT], ids=["development-000", "release-010"])
+def historical_text(request: pytest.FixtureRequest) -> str:
+  return str(request.param)
 
 
 def test_complete_round_trip(recorded_chart: NatalChart) -> None:
@@ -50,19 +62,65 @@ def test_complete_round_trip(recorded_chart: NatalChart) -> None:
     restored.resolved.record.source["new"] = "value"  # type: ignore[index]
 
 
-def test_historical_fixture_restores_and_independent_calculation_retains_numerics() -> None:
-  text = (Path(__file__).parent / "reference/chart_record_v1.json").read_text(encoding="utf-8")
-  stored = loads_chart(text)
-  assert dumps_chart(stored) == text
-  assert stored.provenance.astrology_version == "0.0.0"
-  with pytest.raises(ChartReplayError, match="astrology version"):
-    recompute_chart(stored)
+def test_historical_fixtures_keep_original_bytes() -> None:
+  assert sha256((_REFERENCE / "chart_record_v1.json").read_bytes()).hexdigest() == (
+    "ceb3cdf9c42266919a5c6f0aec17ac5a2e3564935bb5645b3aeb7a815b887f5a"
+  )
+  source = json.loads((_REFERENCE / "chart_record_v1_v010.source.json").read_text())
+  assert sha256((_REFERENCE / source["record"]).read_bytes()).hexdigest() == source["sha256"]
+
+
+def test_historical_record_preservation(historical_text: str) -> None:
+  stored = loads_chart(historical_text)
+  assert dumps_chart(stored) == historical_text
+  original = json.loads(historical_text)
+  assert stored.provenance.astrology_version == original["provenance"]["astrology_version"]
+  assert stored.provenance.celestial_version == original["provenance"]["celestial_version"]
+
+
+def test_historical_replay_eligibility(historical_text: str) -> None:
+  from astrology.celestial import celestial_version, delta_t_model_id
+
+  stored = loads_chart(historical_text)
+  eligible = (
+    stored.provenance.astrology_version == version("celestial-astrology")
+    and stored.provenance.celestial_version == version("celestial-calendar") == celestial_version()
+    and stored.effective.delta_t_model == delta_t_model_id()
+  )
+  if eligible:
+    replayed = recompute_chart(stored)
+    assert replayed.resolved == stored.resolved
+    assert replayed.requested == stored.requested
+    assert replayed.provenance == stored.provenance
+  else:
+    with pytest.raises(ChartReplayError, match=r"version|model"):
+      recompute_chart(stored)
+  assert dumps_chart(stored) == historical_text
+
+
+def test_fresh_calculation_records_current_provenance(historical_text: str) -> None:
+  stored = loads_chart(historical_text)
+  fresh = natal_chart(stored.resolved, stored.requested)
+  assert fresh.resolved == stored.resolved
+  assert fresh.requested == stored.requested
+  assert fresh.provenance.astrology_version == version("celestial-astrology")
+  assert fresh.provenance.celestial_version == version("celestial-calendar")
+  assert fresh.effective.delta_t_model == "algo5"
+  assert fresh.effective.evaluation == "fixed_fourteen_object_joint_snapshot"
+  assert fresh.provenance.position_frame == "apparent_geocentric_true_ecliptic_of_date"
+  assert fresh.provenance.ut1_derivation == "delta_t_model_from_civil_utc"
+  assert dumps_chart(stored) == historical_text
+
+
+def test_historical_numerical_regression(historical_text: str) -> None:
+  stored = loads_chart(historical_text)
   fresh = natal_chart(stored.resolved, stored.requested)
   assert fresh.resolved == stored.resolved
   assert fresh.requested == stored.requested
   assert fresh.effective == stored.effective
-  assert fresh.provenance.astrology_version == version("celestial-astrology")
-  assert replace(fresh.provenance, astrology_version="0.0.0") == stored.provenance
+  assert fresh.provenance.position_frame == stored.provenance.position_frame
+  assert fresh.provenance.ut1_derivation == stored.provenance.ut1_derivation
+  assert fresh.houses.system is stored.houses.system
   assert fresh.times.jd_ut1 == pytest.approx(stored.times.jd_ut1, abs=1e-8, rel=0)
   assert fresh.times.jde_tt == pytest.approx(stored.times.jde_tt, abs=1e-8, rel=0)
   for actual, expected in zip(fresh.positions, stored.positions, strict=True):
@@ -183,6 +241,7 @@ def test_fixed_offset_microseconds_signed_zero_and_clock_rollover() -> None:
     (("input", "resolved", "timezone_key"), "Europe/London"),
     (("input", "resolved", "tzdata_version"), ""),
     (("requested", "zodiac"), "sidereal"),
+    (("requested", "center"), "heliocentric"),
     (("requested", "objects", 0), "earth"),
     (("requested", "aspects", 0, "orb_degrees"), -1),
     (("requested", "aspects", 0, "object_orbs", 0, "identity"), "mean_descending_node"),
@@ -256,11 +315,6 @@ def numeric_paths(
       yield from numeric_paths(child, (*path, index))
 
 
-_RECORD_TEXT = (Path(__file__).parent / "reference/chart_record_v1.json").read_text(
-  encoding="utf-8"
-)
-
-
 @pytest.mark.parametrize("path", tuple(numeric_paths(json.loads(_RECORD_TEXT))))
 @pytest.mark.parametrize("token", ["NaN", "Infinity", "-Infinity", "1e400", "-1e400"])
 def test_nonfinite_json_numbers_rejected(path: tuple[str | int, ...], token: str) -> None:
@@ -272,6 +326,71 @@ def test_nonfinite_json_numbers_rejected(path: tuple[str | int, ...], token: str
   packed = json.dumps(record).replace('"__nonfinite_token__"', token)
   with pytest.raises(ChartRecordError):
     loads_chart(packed)
+
+
+@pytest.mark.parametrize(
+  "path,shape",
+  [
+    (path, shape)
+    for path in (
+      ("requested", "objects"),
+      ("requested", "aspect_objects"),
+      ("requested", "aspects"),
+      ("requested", "aspects", 0, "object_orbs"),
+      ("effective", "aspect_objects"),
+      ("positions",),
+      ("placements",),
+      ("houses", "cusps_deg"),
+      ("aspects",),
+    )
+    for shape in ("object", "string", "empty_string", "null")
+    if not (path == ("requested", "aspect_objects") and shape == "null")
+  ],
+)
+def test_record_array_shapes(path: tuple[str | int, ...], shape: str) -> None:
+  record: Any = json.loads(_RECORD_TEXT)
+  parent = record
+  for key in path[:-1]:
+    parent = parent[key]
+  values = parent[path[-1]]
+  assert isinstance(values, list) and values
+  if shape == "object":
+    parent[path[-1]] = dict.fromkeys(values) if all(isinstance(v, str) for v in values) else {}
+  elif shape == "null":
+    parent[path[-1]] = None
+  else:
+    parent[path[-1]] = "sun" if shape == "string" else ""
+  with pytest.raises(ChartRecordError, match="Expected a JSON array"):
+    loads_chart(json.dumps(record))
+
+
+@pytest.mark.parametrize(
+  "path",
+  [
+    ("requested", "aspects"),
+    ("effective", "aspect_objects"),
+    ("aspects",),
+    ("requested", "aspects", 0, "object_orbs"),
+  ],
+)
+@pytest.mark.parametrize("value", [{}, "", "sun", None])
+def test_empty_record_arrays_reject_other_shapes(
+  path: tuple[str | int, ...], value: object
+) -> None:
+  chart = loads_chart(_RELEASE_TEXT)
+  if path[-1] == "object_orbs":
+    chart = natal_chart(
+      chart.resolved,
+      replace(chart.requested, aspects=(AspectRule(MajorAspect.CONJUNCTION, 0),)),
+    )
+  record: Any = json.loads(dumps_chart(chart))
+  parent = record
+  for key in path[:-1]:
+    parent = parent[key]
+  assert parent[path[-1]] == []
+  parent[path[-1]] = value
+  with pytest.raises(ChartRecordError, match="Expected a JSON array"):
+    loads_chart(json.dumps(record))
 
 
 @pytest.mark.parametrize("text", ["null", "[]", "{}", "[", "[[]]", "[" * 1500 + "]" * 1500])
@@ -362,6 +481,7 @@ def test_restore_and_replay_do_not_reresolve_timezone(
   restored = loads_chart(dumps_chart(chart))
   assert restored.resolved.tzdata_version == "old"
   assert recompute_chart(restored).resolved == resolved
+  assert natal_chart(restored.resolved, restored.requested).resolved == resolved
 
 
 def test_restoration_is_not_native_validation(recorded_chart: NatalChart) -> None:
@@ -373,9 +493,12 @@ def test_restoration_is_not_native_validation(recorded_chart: NatalChart) -> Non
     recompute_chart(restored)
 
 
-def test_restore_and_render_block_native_imports(recorded_chart: NatalChart) -> None:
+@pytest.mark.parametrize("optimized", [False, True])
+def test_historical_restore_and_render_block_native_imports(
+  historical_text: str, optimized: bool
+) -> None:
   program = """
-import importlib.abc, sys
+import importlib.abc, json, sys
 class Block(importlib.abc.MetaPathFinder):
   def find_spec(self, fullname, path=None, target=None):
     if fullname.startswith(("celestial", "astrology.celestial", "tzdata", "zoneinfo")):
@@ -383,18 +506,45 @@ class Block(importlib.abc.MetaPathFinder):
 sys.meta_path.insert(0, Block())
 import astrology
 chart = astrology.loads_chart(sys.stdin.read())
-assert astrology.dumps_chart(chart)
 catalog = astrology.load_catalog()
-assert "本命盘" in astrology.format_chart(chart, catalog, language="zh-CN")
-assert not any(n.startswith(("celestial", "astrology.celestial", "tzdata", "zoneinfo")) for n in sys.modules)
+tables = {language: astrology.format_chart(chart, catalog, language=language)
+          for language in ("en", "zh-CN")}
+if any(n.startswith(("celestial", "astrology.celestial", "tzdata", "zoneinfo")) for n in sys.modules):
+  raise RuntimeError("Restoration or display imported astronomy/timezone data")
+print(json.dumps({"record": astrology.dumps_chart(chart), "tables": tables}))
 """
   result = subprocess.run(
-    [sys.executable, "-c", program],
-    input=dumps_chart(recorded_chart),
+    [sys.executable, *(["-O"] if optimized else []), "-c", program],
+    input=historical_text,
     text=True,
     capture_output=True,
   )
   assert result.returncode == 0, result.stdout + result.stderr
+  output = json.loads(result.stdout)
+  assert output["record"] == historical_text
+  original = json.loads(historical_text)
+  package_version = original["provenance"]["astrology_version"]
+  for language, table in output["tables"].items():
+    assert original["input"]["resolved"]["utc"] in table
+    assert f"{package_version} / {original['provenance']['celestial_version']}" in table
+    assert original["provenance"]["position_frame"] in table
+    assert original["provenance"]["ut1_derivation"] in table
+    assert original["effective"]["delta_t_model"] in table
+    for position in original["positions"]:
+      assert f"[{position['identity']}]" in table
+    if package_version == "0.0.0":
+      row = (
+        "Sun [sun] | Aries 14°50'21\" | 9 | D"
+        if language == "en"
+        else ("太阳 [sun] | 白羊座 14°50'21\" | 9 | D")
+      )
+    else:
+      row = (
+        "Sun [sun] | Capricorn 10°22'08\" | 10 | D"
+        if language == "en"
+        else ("太阳 [sun] | 摩羯座 10°22'08\" | 10 | D")
+      )
+    assert row in table.splitlines()
 
 
 def test_public_input_types(recorded_chart: NatalChart) -> None:

@@ -117,10 +117,60 @@ ChartReplayError
 
 Python 导入名仍是 `astrology`，查询安装元数据时使用 `celestial-astrology`；
 结构版本 v1 的字段名仍为 `astrology_version`。
-历史 `0.0.0` 记录仍可恢复、显示，但不能在 `0.1.0` 下重算；恢复不会改写来源版本。
-用其中保存的已解析输入和请求进行新计算，是另一项计算，不是历史记录重算。
 版本相等只是一项兼容性检查：`0.0.0`、`0.1.0` 这类开发／候选版本号不能唯一标识源码修订，
 也不保证不同代码树的结果逐位相等。
+
+## 跨版本兼容
+
+v0.2.0 支持的历史输入包括：正式发布的 v0.1.0 生成的有效 v1 记录，以及
+`tests/reference/chart_record_v1.json` 中固定的 `0.0.0` 开发样本。
+这不涵盖所有曾用 `0.0.0` 标签的未发布代码树。记录仍须满足 v1 的字段类型、支持的标识及
+纯推导结果一致性要求。
+
+| 操作 | 升级后的行为 |
+| --- | --- |
+| `loads_chart` | 不调用天文库、不查时区，保留原始输入、已解析时刻、数值及来源；不认证它们的来历。 |
+| `format_chart` | 用包含所需名称的传入目录显示恢复后的结果。保留截断规则和分类；记录格式不固定排版或翻译措辞。 |
+| `recompute_chart` | 要求已安装包及原生库的版本精确匹配，并支持记录中的固定模型。版本或模型不匹配时抛出 `ChartReplayError`。 |
+| `natal_chart(stored.resolved, stored.requested)` | 按当前支持的计算方式生成新盘，记录本次计算的来源。保留已解析出生输入，不再查时区，也不修改存储盘。 |
+
+`schema_version` 同时约束结构和含义。字段布局、单位、标识含义或纯规则发生不兼容变化时，
+必须使用新的 schema。v1 的 `zodiac`、`center`、`evaluation`、`position_frame` 和
+`ut1_derivation` 保持原义，星座端点、精确宫头归属、相位成员、容许度合成及运动分类也一样。
+校验不能悄悄将新规则套到旧记录上。新增具名标识可以扩展格式，但不能重新定义已有标识；
+读取器遇到不认识的标识就拒绝。默认值变化影响新计算，不改变记录中已有选择的含义。
+包版本及 ΔT 模型字符串另有规则：如上文所述，未知但非空的值仍可保留、查看。
+
+引入不兼容语义的版本必须声明支持哪些 schema：或者保留旧读取及校验语义，或者明确拒绝
+不支持的 schema，并说明可用的旧环境或另行规定的迁移方法。迁移须保留原始记录，指明转换过的值；
+仅修改 `schema_version` 或来源信息不算迁移。v0.2.0 支持 v1，不表示以后永久支持所有 schema。
+若将来要同时支持新旧纯规则，就需要能区分两种含义的校验方式；当前构造器使用当前规则。
+
+### 升级后重新计算
+
+在源码目录中，读取由正式发布的 v0.1.0 wheel 生成的固定样本，再用其保存的输入计算：
+
+```{doctest}
+>>> from pathlib import Path
+>>> from importlib.metadata import version
+>>> stored = loads_chart(Path("tests/reference/chart_record_v1_v010.json").read_text(encoding="utf-8"))
+>>> original = dumps_chart(stored)
+>>> stored.provenance.astrology_version
+'0.1.0'
+>>> fresh = natal_chart(stored.resolved, stored.requested)
+>>> fresh.resolved == stored.resolved, fresh.requested == stored.requested
+(True, True)
+>>> fresh.provenance.astrology_version == version("celestial-astrology")
+True
+>>> dumps_chart(stored) == original
+True
+```
+
+在匹配的 v0.1.0 / celestial-calendar 0.8.0 / Algo5 环境中，该样本也能通过
+`recompute_chart`。换到 v0.2.0，严格重算会因 astrology 版本不符而抛出
+`ChartReplayError`。上面的显式新计算则记录当前计算的版本和模型，不会改写历史盘的标签来
+绕过重算检查。ΔT 模型变化可能仍允许恢复，却使严格重算不可用，并改变新计算的数值。
+比较数值时须说明采用的模型、约定及容差。
 
 ## 显示不改分类
 
@@ -136,10 +186,17 @@ Python 导入名仍是 `astrology`，查询安装元数据时使用 `celestial-a
 JSON 与开发入口输出，不删来源字段。还会执行恢复、重算、双语显示、不可用模型及请求 Placidus
 失败的用例，并检查导入来源，包括显式加载后的原生适配层。
 
-`tests/reference/chart_record_v1.json` 是项目在开发版本 `0.0.0` 计算的历史夹具，不是独立天文参考。
-原始来源版本和字节保持不变。另用其保存的输入进行当前计算，采用绝对容差：
-角度 1e-8 度、距离 1e-9 AU、速率 1e-9 度/TT 日、儒略日 1e-8 日；
-标识及分类须相同。精确保真的恢复测试另做，不使用这些容差。
+`tests/reference/chart_record_v1.json` 是项目在开发版本 `0.0.0` 计算的历史夹具。
+`chart_record_v1_v010.json` 增加正式发布的 v0.1.0 wheel 生成的样本；相邻的 `.source.json`
+记录 wheel／manifest 摘要、源码提交及生成方法。两份都是合成输入，使用整宫制：旧样本含 IANA
+输入及非统一容许度，新发布样本使用固定偏移、两个天体且不配置相位。它们都不是独立天文参考，
+原始来源版本和字节保持不变。
+
+恢复／显示、重算资格、当前来源及数值回归分别测试。新旧数值比较保留模型、坐标约定及配置检查，
+不要求历史包版本相等。绝对容差为角度 1e-8 度、距离 1e-9 AU、速率 1e-9 度/TT 日、
+儒略日 1e-8 日；标识及分类须相同。实际模型变化须另行说明适用的比较方法。
+精确保真的恢复测试不使用这些容差。这些有限样本用于发现回归；v1 支持政策适用于所有有效的
+受支持记录，不只这几个样本，也不能仅凭样本吻合来证明。
 
 `tests/reference/complete_chart_reference.json` 保存独立执行 Swiss Ephemeris 2.10.03 /
 pyswisseph 2.10.3.2 得到的四个合成时刻的数值，每个时刻包含三种宫制。

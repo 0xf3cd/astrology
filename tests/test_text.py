@@ -3,6 +3,7 @@
 双语显示与命盘记录往返都保留未舍入分类。
 """
 
+import json
 import math
 from dataclasses import replace
 from pathlib import Path
@@ -17,6 +18,7 @@ from astrology import (
   Body,
   ChartConfig,
   ChartHouses,
+  ChartRecordError,
   EclipticPosition,
   FixedOffset,
   HouseSystem,
@@ -298,6 +300,85 @@ def test_truncated_deviation_is_not_exact(recorded_chart: NatalChart) -> None:
   row = next(line for line in output.splitlines() if " | Conjunction | " in line)
   assert " | 0°00'00\" | 720°00'00\" | applying" in row
   assert "-0" not in row
+
+
+@pytest.mark.parametrize("language", ["en", "zh-CN"])
+@pytest.mark.parametrize("angle,seconds", [(1 / 3600, "00"), (2 / 3600, "01")])
+@pytest.mark.parametrize("negative", [False, True])
+def test_exact_arcsecond_position_and_signed_deviation(
+  recorded_chart: NatalChart, language: Language, angle: float, seconds: str, negative: bool
+) -> None:
+  chart = display_case(recorded_chart, angle if negative else 0, second=0 if negative else angle)
+  rows = format_chart(chart, load_catalog(), language=language).splitlines()
+  position = next(row for row in rows if ("[sun]" if negative else "[mars]") in row)
+  assert position.split(" | ")[1] == (
+    ("Aries" if language == "en" else "白羊座") + f" 0°00'{seconds}\""
+  )
+  aspect = next(row for row in rows if " | 720°00'00\" | " in row)
+  sign = ("-" if negative else "+") if seconds != "00" else ""
+  assert aspect.split(" | ")[4] == f"{sign}0°00'{seconds}\""
+  motion = (
+    ("applying" if negative else "separating")
+    if language == "en"
+    else ("入相" if negative else "离相")
+  )
+  assert aspect.split(" | ")[-1] == motion
+
+
+@pytest.mark.parametrize("field,value", [("sign", "aries"), ("house", 1), ("sign_degree_deg", 30)])
+def test_v1_exact_sign_and_cusp_ownership(
+  recorded_chart: NatalChart, field: str, value: object
+) -> None:
+  chart = display_case(recorded_chart, 30)
+  record = json.loads(dumps_chart(chart))
+  record["placements"][0].update(sign="taurus", sign_degree_deg=0.0, house=2)
+  restored = loads_chart(json.dumps(record))
+  assert restored == chart
+  assert restored.placements[0] == Placement(Body.SUN, Sign.TAURUS, 0, 2)
+  record["placements"][0][field] = value
+  with pytest.raises(ChartRecordError):
+    loads_chart(json.dumps(record))
+
+
+@pytest.mark.parametrize(
+  "combination,limit",
+  [
+    (OrbCombination.MEAN_OF_ORBS, 8),
+    (OrbCombination.BOTH_WITHIN_OWN_ORB, 6),
+    (OrbCombination.EITHER_WITHIN_OWN_ORB, 10),
+  ],
+)
+@pytest.mark.parametrize("exact", [False, True])
+def test_v1_aspect_limit_and_motion(
+  recorded_chart: NatalChart, combination: OrbCombination, limit: float, exact: bool
+) -> None:
+  chart = display_case(
+    recorded_chart,
+    0,
+    second=0 if exact else limit,
+    orb=6,
+    object_orbs=(ObjectOrb(Body.SUN, 10),),
+    combination=combination,
+  )
+  record = json.loads(dumps_chart(chart))
+  record["aspects"] = [
+    {
+      "first": "sun",
+      "second": "mars",
+      "aspect": "conjunction",
+      "branch_deg": 0.0,
+      "deviation_deg": 0.0 if exact else limit,
+      "orb_limit_deg": limit,
+      "motion": "exact" if exact else "separating",
+    }
+  ]
+  assert loads_chart(json.dumps(record)) == chart
+  record["aspects"][0]["motion"] = "applying"
+  with pytest.raises(ChartRecordError):
+    loads_chart(json.dumps(record))
+  record["aspects"] = []
+  with pytest.raises(ChartRecordError, match="Stored aspects"):
+    loads_chart(json.dumps(record))
 
 
 def test_truncated_position_tied_with_cusp_keeps_house(recorded_chart: NatalChart) -> None:
