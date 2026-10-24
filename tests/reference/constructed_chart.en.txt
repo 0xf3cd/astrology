@@ -44,4 +44,4 @@ JD(UT1) / JDE(TT): 2461135.1145838792 / 2461135.115384074
 Delta-T model / evaluation: algo5 / fixed_fourteen_object_joint_snapshot
 astrology / celestial-calendar versions: 0.0.0 / 0.8.0
 Position frame / UT1 derivation: apparent_geocentric_true_ecliptic_of_date / delta_t_model_from_civil_utc
-Angles are truncated toward zero to whole arcseconds; stored classifications are unchanged.
+Angles are truncated toward zero to whole arcseconds; classifications are unchanged.

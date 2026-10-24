@@ -132,7 +132,7 @@ intersphinx inventory require network access.
 Use immutable values for inputs, configuration, rules, and results. A frozen
 dataclass still permits mutations inside a list or dictionary: store immutable
 members or copy and isolate mutable input at the boundary. A caller changing its
-input after construction must not change a stored chart.
+input after construction must not change the chart result.
 
 Prefer ordinary functions with explicit arguments and return values. Keep file
 access, native initialization, network calls, and caches visible at their owning

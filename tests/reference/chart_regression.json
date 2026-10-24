@@ -1,6 +1,7 @@
 {
   "purpose": "Project-calculated numerical regressions, not independent astronomy references or saved charts. Inputs are explicit constructors in test_chart_regression.py.",
   "extraction_base": "80b6a592d2d4d63cbbbdef67e97129d0cce80b6a",
+  "extraction": "Origin paths and their SHA-256 digests refer to files at extraction_base, not the current tree.",
   "released_origin": {
     "record": "chart_record_v1_v010.json",
     "sha256": "cbe078380d2fd5cc9c59408a5539078a76389a6b5562852bddb2382ba8b4cc90",

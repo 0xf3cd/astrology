@@ -6,18 +6,14 @@
 
 ### 不兼容变化：撤回命盘持久化
 
-删除 `dumps_chart`、`loads_chart`、`recompute_chart`、`ChartRecordError`、
+下一版删除 `dumps_chart`、`loads_chart`、`recompute_chart`、`ChartRecordError`、
 `ChartReplayError` 及 `astrology.serialization` 模块。命盘保存格式与历史记录兼容政策一并撤回，
 不提供替代格式或兼容壳，包不再读取已保存的命盘 JSON。应用若仍需旧 API，可保留已发布的
 v0.1.0 环境；其标签和制品不变。
 
 用 `natal_chart` 计算，直接使用内存中的不可变 `NatalChart`，用 `format_chart` 显示。
 原始／已解析出生输入、请求／实际配置、天文原值、领域校验和计算来源保留。
-这次删除不改变天文计算、时区政策或依赖钉版。独立参考与项目数值回归仍分别检查，
-源码／安装包对照仍包含完整结果和来源。
-
-显示继续按输入浮点数的精确值向整角秒截断。
-README 反例按实际包版本构造，并确认突变确实改变文本。
+这次删除不改变天文计算、时区政策或依赖钉版。
 
 ## 0.1.0
 

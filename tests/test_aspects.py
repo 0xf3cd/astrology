@@ -51,6 +51,11 @@ def test_aspect_angles_cover_every_aspect_exactly() -> None:
   assert {aspect: aspect_angle(aspect) for aspect in MajorAspect} == expected
 
 
+def test_aspect_hit_rejects_a_branch_outside_its_aspect() -> None:
+  with pytest.raises(ValueError, match="branch_deg does not belong to the aspect"):
+    AspectHit(SUN, MOON, MajorAspect.CONJUNCTION, 42.0, 0.0, 1.0, AspectMotion.EXACT)
+
+
 @pytest.mark.parametrize("value", ["sextile", None, 60])
 def test_aspect_angle_requires_an_aspect_identity(value: object) -> None:
   with pytest.raises(TypeError):

@@ -88,8 +88,9 @@ manifest's SHA-256 values. Use the README's package-index installation command i
 a fresh supported environment, then execute its chart and knowledge examples.
 A successful source-snapshot installation is not this index-install check.
 
-Create `v0.1.0` at the accepted source SHA and a GitHub Release only under the
-publication authorization. Attach the verified wheel, sdist and manifest. GitHub's
+Create the version tag (`v` followed by the authorized release version) at the
+accepted source SHA and a GitHub Release only under the publication authorization.
+Attach the verified wheel, sdist and manifest. GitHub's
 automatic source ZIP/tar archives are git snapshots, not the published sdist.
 Record actual workflow results, artifact identity, downloaded digests, installation
 results and remaining limits in the release. Refresh the manually maintained

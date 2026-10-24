@@ -13,7 +13,9 @@ from astrology import (
   HouseSystem,
   LunarNode,
   MajorAspect,
+  MissingBirthDataError,
   NatalChart,
+  OrbCombination,
 )
 
 
@@ -117,6 +119,21 @@ def test_cross_domain_consistency(recorded_chart: NatalChart) -> None:
     replace(recorded_chart, positions=tuple(reversed(recorded_chart.positions)))
   with pytest.raises(ValueError, match="participants"):
     replace(recorded_chart, effective=replace(recorded_chart.effective, aspect_objects=()))
+  with pytest.raises(ValueError, match="Effective orb combination differs from the request"):
+    replace(
+      recorded_chart,
+      effective=replace(
+        recorded_chart.effective, orb_combination=OrbCombination.EITHER_WITHIN_OWN_ORB
+      ),
+    )
+
+
+def test_complete_result_requires_a_birth_location(recorded_chart: NatalChart) -> None:
+  resolved = replace(
+    recorded_chart.resolved, record=replace(recorded_chart.resolved.record, location=None)
+  )
+  with pytest.raises(MissingBirthDataError, match="A complete chart requires a birth location"):
+    replace(recorded_chart, resolved=resolved)
 
 
 @pytest.mark.parametrize("field,value", [("latitude_deg", 1), ("distance_au", 1)])

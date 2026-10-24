@@ -27,6 +27,10 @@ Do not install the unrelated PyPI project named `astrology`.
 
 Use **Python 3.11–3.14** on one of the platforms listed above.
 
+The commands below install the published v0.1.0, which includes chart
+save/restore. The current source removes that API for the next release;
+the chart and knowledge examples below work with both.
+
 Linux/macOS (replace `python3.14` with your supported Python version):
 
 ```sh

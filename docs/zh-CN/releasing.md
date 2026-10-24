@@ -68,7 +68,8 @@ uv run --locked python tools/check.py --artifacts-dir dist/packages
 在新的受支持环境里执行 README 的包索引安装命令，再运行其中的命盘和知识示例。
 源码快照安装成功不能代替包索引安装验收。
 
-仅按发布授权，在验收的源码 SHA 上创建 `v0.1.0` 和 GitHub Release，附上核验后的 wheel、sdist 和清单。
+仅按发布授权，在验收的源码 SHA 上创建版本标签（`v` 加获准发布的版本号）和 GitHub Release，
+附上核验后的 wheel、sdist 和清单。
 GitHub 自动生成的源码 ZIP／tar 是 git 快照，不是已发布的 sdist。
 发行记录写入实际工作流结果、制品身份、下载摘要、安装结果及剩余限制。
 从同一份验收源码手动更新双语 Pages 站点，并检查受影响的线上页面。

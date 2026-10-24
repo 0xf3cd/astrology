@@ -3,6 +3,7 @@
 import json
 from dataclasses import replace
 from datetime import date, time, timedelta
+from hashlib import sha256
 from pathlib import Path
 from typing import Any
 
@@ -27,9 +28,17 @@ from astrology import (
   prepare_natal_input,
 )
 
-_CASES = json.loads(
+_REFERENCE = json.loads(
   (Path(__file__).parent / "reference/chart_regression.json").read_text(encoding="utf-8")
-)["cases"]
+)
+_CASES = _REFERENCE["cases"]
+
+
+def test_reference_values_and_extraction_provenance_are_unchanged() -> None:
+  canonical = json.dumps(_REFERENCE, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
+  assert sha256(canonical.encode("utf-8")).hexdigest() == (
+    "da230aa43bc8b32be363a0d2130d866c5997cd11893f73c1cba212a612604fbc"
+  )
 
 
 @pytest.fixture(params=["lord-howe-2026", "j2000-two-bodies"])

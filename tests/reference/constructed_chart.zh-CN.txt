@@ -44,4 +44,4 @@ JD(UT1) / JDE(TT): 2461135.1145838792 / 2461135.115384074
 ΔT 模型 / 求值方式: algo5 / fixed_fourteen_object_joint_snapshot
 astrology / celestial-calendar 版本: 0.0.0 / 0.8.0
 位置坐标约定 / UT1 推导方式: apparent_geocentric_true_ecliptic_of_date / delta_t_model_from_civil_utc
-角度向零截断到整角秒；存储的分类结果不变。
+角度向零截断到整角秒；分类结果不变。

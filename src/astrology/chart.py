@@ -242,14 +242,14 @@ class NatalChart:
   caller are not aliased.
 
   Construction checks field types, ranges and pure derived-value consistency. It
-  does not verify that the stored astronomy was calculated from the claimed input.
+  does not verify that the astronomical values were calculated from the claimed input.
   Equality includes the resolved input; hashing excludes it because its source
   mapping is unhashable.
 
   完整且不可变的本命盘结果；对象按请求的顺序排列。按 `requested.aspects` 中的规则，
   在 `effective.aspect_objects` 所列对象之间计算相位，结果顺序见 `find_aspects`。
   位置、落宫和相位会复制成元组，不会引用调用方传入的列表。
-  构造时检查字段类型、范围及纯规则推导结果的一致性，不核实所存天文值是否确实由所称输入算得。
+  构造时检查字段类型、范围及纯规则推导结果的一致性，不核实天文值是否确实由所称输入算得。
   相等判断包括已解析输入；哈希不包括它，因为其中的来源映射不可哈希。
   """
 

@@ -6,7 +6,7 @@
 
 ### Breaking change: chart persistence removed
 
-Remove `dumps_chart`, `loads_chart`, `recompute_chart`, `ChartRecordError`,
+The next release removes `dumps_chart`, `loads_chart`, `recompute_chart`, `ChartRecordError`,
 `ChartReplayError` and the `astrology.serialization` module. The chart storage
 schema and historical-record compatibility policy are withdrawn, with no
 replacement format or compatibility wrapper. The package no longer reads saved
@@ -17,12 +17,7 @@ Calculate with `natal_chart`, use its immutable in-memory `NatalChart` and forma
 it with `format_chart`. Original/resolved birth input, requested/effective
 configuration, astronomical values, domain validation and calculation provenance
 remain. This removal does not change the astronomy, timezone policy or dependency
-pins. Independent references and project-numerical regression remain separate
-checks, and source/install comparisons retain the full result and provenance.
-
-Display continues to truncate to whole arcseconds using the exact value of the
-input float. README negative controls track the actual package version and verify
-that their mutation changes the text.
+pins.
 
 ## 0.1.0
 

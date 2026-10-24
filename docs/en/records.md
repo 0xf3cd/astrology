@@ -64,7 +64,7 @@ Loading the catalog is explicit; formatting itself performs no resource I/O.
 - `provenance` keeps astrology/celestial-calendar versions, position frame and
   UT1 derivation; `effective` keeps the resolved Delta-T model and evaluation.
 
-Direct construction checks field types, ranges and pure derived-value consistency:
+Direct construction of `NatalChart` checks field types, ranges and pure derived-value consistency:
 signs, house membership and aspects must agree with the positions, cusps and rules.
 It does not authenticate the supplied timezone choice, astronomical values,
 their relationship to the claimed UTC/location or the software-version labels.
@@ -72,8 +72,8 @@ Use `natal_chart` to calculate values from resolved input.
 
 Calling `natal_chart(chart.resolved, chart.requested)` calculates a fresh result
 with the current implementation and records its provenance. It keeps the resolved
-birth input without looking up the timezone again. This is ordinary calculation,
-not a version-matched historical replay guarantee. The distribution must be
+birth input without looking up the timezone again. The new result may differ
+from an older result calculated with different code. The distribution must be
 installed: missing `celestial-astrology` metadata raises
 `importlib.metadata.PackageNotFoundError` rather than inventing a version.
 A version label alone does not identify a unique source revision or guarantee
@@ -86,8 +86,9 @@ arcseconds. Aries 29.9999999° displays as Aries 29°59'59", not Taurus 0°00'00
 House and aspect-motion labels come from the unrounded result. An object's
 displayed longitude can match a cusp's while its unrounded position is still in
 the preceding house; a nonzero deviation displayed as zero can still be applying
-or separating. From the unrounded rate, `R` means decreasing longitude, `D` means
-increasing longitude and `S` means exactly zero rate. The text is a rounded
+or separating. In the positions table's last column, `R` means decreasing object
+longitude, `D` means increasing longitude and `S` means exactly zero rate, all
+judged from the unrounded rate. The text is a rounded
 presentation, not a lossless interchange format.
 
 ## Verification and limits
