@@ -1,0 +1,133 @@
+{
+  "purpose": "Project-calculated numerical regressions, not independent astronomy references or saved charts. Inputs are explicit constructors in test_chart_regression.py.",
+  "extraction_base": "80b6a592d2d4d63cbbbdef67e97129d0cce80b6a",
+  "extraction": "Origin paths and their SHA-256 digests refer to files at extraction_base, not the current tree.",
+  "released_origin": {
+    "record": "chart_record_v1_v010.json",
+    "sha256": "cbe078380d2fd5cc9c59408a5539078a76389a6b5562852bddb2382ba8b4cc90",
+    "source_sha": "6b3293fae94b2f61e89a1d95778464f307c0d373",
+    "wheel": {
+      "url": "https://github.com/0xf3cd/astrology/releases/download/v0.1.0/celestial_astrology-0.1.0-py3-none-any.whl",
+      "sha256": "1069b1d0419ecdcca68f2218dafdc8871559f747bb9dc03f58a0cf1b9ac6df8c"
+    },
+    "release_manifest": {
+      "url": "https://github.com/0xf3cd/astrology/releases/download/v0.1.0/manifest.json",
+      "sha256": "932d0f178047f4d3a226130413c715e4dea96a13f0ead8b6749465a7ab145a66"
+    },
+    "environment": {
+      "python": "3.14.7",
+      "celestial-astrology": "0.1.0",
+      "celestial-calendar": "0.8.0",
+      "tzdata": "2026.5"
+    },
+    "generation": "Install the verified release wheel in an isolated environment. Construct the synthetic BirthRecord and ChartConfig encoded in the record, call prepare_natal_input and natal_chart, then write dumps_chart as UTF-8 without a trailing newline. Do not replace provenance fields.",
+    "purpose": "Project-calculated preservation and numerical regression sample, not an independent astronomy reference."
+  },
+  "cases": [
+    {
+      "identifier": "lord-howe-2026",
+      "origin": {
+        "path": "tests/reference/chart_record_v1.json",
+        "sha256": "ceb3cdf9c42266919a5c6f0aec17ac5a2e3564935bb5645b3aeb7a815b887f5a",
+        "provenance": {
+          "astrology_version": "0.0.0",
+          "celestial_version": "0.8.0",
+          "position_frame": "apparent_geocentric_true_ecliptic_of_date",
+          "ut1_derivation": "delta_t_model_from_civil_utc"
+        }
+      },
+      "conventions": {
+        "aspect_objects": ["sun", "moon", "mercury", "venus", "mars", "jupiter", "saturn", "uranus", "neptune", "pluto"],
+        "delta_t_model": "algo5",
+        "evaluation": "fixed_fourteen_object_joint_snapshot",
+        "house_system": "whole_sign",
+        "orb_combination": "mean_of_orbs"
+      },
+      "times": {"jd_ut1": 2461135.1145838792, "jde_tt": 2461135.115384074},
+      "positions": [
+        {"distance_au": 1.000127339202771, "identity": "sun", "latitude_deg": -0.0001625503778892828, "longitude_deg": 14.839304538799706, "longitude_rate_deg_per_tt_day": 0.9848642937204277},
+        {"distance_au": 0.0026822030991138705, "identity": "moon", "latitude_deg": -4.688265297310003, "longitude_deg": 223.54499254409603, "longitude_rate_deg_per_tt_day": 12.144156227573236},
+        {"distance_au": 0.8943402103606153, "identity": "mercury", "latitude_deg": -1.8080684227628212, "longitude_deg": 347.0844873715764, "longitude_rate_deg_per_tt_day": 1.0233304417417608},
+        {"distance_au": 1.5557072650868622, "identity": "venus", "latitude_deg": -0.2915230869353477, "longitude_deg": 36.08748436071362, "longitude_rate_deg_per_tt_day": 1.228961571338824},
+        {"distance_au": 2.2893522223303817, "identity": "mars", "latitude_deg": -1.030458165283511, "longitude_deg": 355.942950846174, "longitude_rate_deg_per_tt_day": 0.7809079795739157},
+        {"distance_au": 5.128645080463002, "identity": "jupiter", "latitude_deg": 0.37361925651188005, "longitude_deg": 106.03492133268364, "longitude_rate_deg_per_tt_day": 0.07542054660022283},
+        {"distance_au": 10.475917769412883, "identity": "saturn", "latitude_deg": -2.131315343986148, "longitude_deg": 5.996509459719293, "longitude_rate_deg_per_tt_day": 0.12387916246277596},
+        {"distance_au": 20.179592492421524, "identity": "uranus", "latitude_deg": -0.17000153314761107, "longitude_deg": 58.92107505003912, "longitude_rate_deg_per_tt_day": 0.04542753001539476},
+        {"distance_au": 30.857757488562417, "identity": "neptune", "latitude_deg": -1.3085821210992732, "longitude_deg": 2.3395756960468406, "longitude_rate_deg_per_tt_day": 0.037199673416266},
+        {"distance_au": 35.821635595836256, "identity": "pluto", "latitude_deg": -3.957868159693668, "longitude_deg": 305.2721754150105, "longitude_rate_deg_per_tt_day": 0.014669097151515114},
+        {"distance_au": null, "identity": "mean_ascending_node", "latitude_deg": 0.0, "longitude_deg": 337.21358004928925, "longitude_rate_deg_per_tt_day": -0.052964479852107615}
+      ],
+      "houses": {
+        "ascendant_deg": 141.81279644246604,
+        "cusps_deg": [120.0, 150.0, 180.0, 210.0, 240.0, 270.0, 300.0, 330.0, 0.0, 30.0, 60.0, 90.0],
+        "descendant_deg": 321.81279644246604,
+        "imum_coeli_deg": 236.4908475126228,
+        "midheaven_deg": 56.4908475126228,
+        "system": "whole_sign"
+      },
+      "placements": [
+        {"house": 9, "identity": "sun", "sign": "aries", "sign_degree_deg": 14.839304538799706},
+        {"house": 4, "identity": "moon", "sign": "scorpio", "sign_degree_deg": 13.544992544096033},
+        {"house": 8, "identity": "mercury", "sign": "pisces", "sign_degree_deg": 17.084487371576415},
+        {"house": 10, "identity": "venus", "sign": "taurus", "sign_degree_deg": 6.087484360713617},
+        {"house": 8, "identity": "mars", "sign": "pisces", "sign_degree_deg": 25.94295084617403},
+        {"house": 12, "identity": "jupiter", "sign": "cancer", "sign_degree_deg": 16.034921332683638},
+        {"house": 9, "identity": "saturn", "sign": "aries", "sign_degree_deg": 5.996509459719293},
+        {"house": 10, "identity": "uranus", "sign": "taurus", "sign_degree_deg": 28.92107505003912},
+        {"house": 9, "identity": "neptune", "sign": "aries", "sign_degree_deg": 2.3395756960468406},
+        {"house": 7, "identity": "pluto", "sign": "aquarius", "sign_degree_deg": 5.2721754150105085},
+        {"house": 8, "identity": "mean_ascending_node", "sign": "pisces", "sign_degree_deg": 7.213580049289249}
+      ],
+      "aspects": [
+        {"aspect": "square", "branch_deg": 90.0, "deviation_deg": 1.1956167938839286, "first": "sun", "motion": "applying", "orb_limit_deg": 8.0, "second": "jupiter"},
+        {"aspect": "trine", "branch_deg": 120.0, "deviation_deg": 3.5394948274803824, "first": "moon", "motion": "applying", "orb_limit_deg": 6.0, "second": "mercury"},
+        {"aspect": "trine", "branch_deg": -120.0, "deviation_deg": 2.489928788587605, "first": "moon", "motion": "applying", "orb_limit_deg": 6.0, "second": "jupiter"},
+        {"aspect": "trine", "branch_deg": 120.0, "deviation_deg": -1.0495660388927774, "first": "mercury", "motion": "separating", "orb_limit_deg": 6.0, "second": "jupiter"},
+        {"aspect": "square", "branch_deg": -90.0, "deviation_deg": -0.8153089457031086, "first": "venus", "motion": "separating", "orb_limit_deg": 6.0, "second": "pluto"},
+        {"aspect": "sextile", "branch_deg": 60.0, "deviation_deg": 2.978124203865093, "first": "mars", "motion": "applying", "orb_limit_deg": 6.0, "second": "uranus"},
+        {"aspect": "conjunction", "branch_deg": 0.0, "deviation_deg": -3.656933763672453, "first": "saturn", "motion": "separating", "orb_limit_deg": 6.0, "second": "neptune"},
+        {"aspect": "sextile", "branch_deg": -60.0, "deviation_deg": -0.7243340447087832, "first": "saturn", "motion": "separating", "orb_limit_deg": 6.0, "second": "pluto"},
+        {"aspect": "sextile", "branch_deg": -60.0, "deviation_deg": 3.418500646007722, "first": "uranus", "motion": "applying", "orb_limit_deg": 6.0, "second": "neptune"},
+        {"aspect": "sextile", "branch_deg": -60.0, "deviation_deg": 2.9325997189636652, "first": "neptune", "motion": "applying", "orb_limit_deg": 6.0, "second": "pluto"}
+      ]
+    },
+    {
+      "identifier": "j2000-two-bodies",
+      "origin": {
+        "path": "tests/reference/chart_record_v1_v010.json",
+        "sha256": "cbe078380d2fd5cc9c59408a5539078a76389a6b5562852bddb2382ba8b4cc90",
+        "provenance": {
+          "astrology_version": "0.1.0",
+          "celestial_version": "0.8.0",
+          "position_frame": "apparent_geocentric_true_ecliptic_of_date",
+          "ut1_derivation": "delta_t_model_from_civil_utc"
+        }
+      },
+      "conventions": {
+        "aspect_objects": [],
+        "delta_t_model": "algo5",
+        "evaluation": "fixed_fourteen_object_joint_snapshot",
+        "house_system": "whole_sign",
+        "orb_combination": null
+      },
+      "times": {"jd_ut1": 2451545.000003745, "jde_tt": 2451545.0007428704},
+      "positions": [
+        {"distance_au": 0.983327676449231, "identity": "sun", "latitude_deg": 0.00023986508858386046, "longitude_deg": 280.3689186019244, "longitude_rate_deg_per_tt_day": 1.0194338030211612},
+        {"distance_au": 0.0026901911904639087, "identity": "moon", "latitude_deg": 5.171147795486901, "longitude_deg": 223.32377356802382, "longitude_rate_deg_per_tt_day": 12.021083611403405}
+      ],
+      "houses": {
+        "ascendant_deg": 11.37536204080294,
+        "cusps_deg": [0.0, 30.0, 60.0, 90.0, 120.0, 150.0, 180.0, 210.0, 240.0, 270.0, 300.0, 330.0],
+        "descendant_deg": 191.37536204080294,
+        "imum_coeli_deg": 99.61233147628042,
+        "midheaven_deg": 279.6123314762804,
+        "system": "whole_sign"
+      },
+      "placements": [
+        {"house": 10, "identity": "sun", "sign": "capricorn", "sign_degree_deg": 10.368918601924406},
+        {"house": 8, "identity": "moon", "sign": "scorpio", "sign_degree_deg": 13.323773568023825}
+      ],
+      "aspects": []
+    }
+  ]
+}

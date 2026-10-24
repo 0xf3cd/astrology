@@ -8,8 +8,8 @@
 
 本包提供不可变的[出生记录与现代时刻解析](https://0xf3cd.github.io/astrology/docs/zh-CN/birth.html)、
 [排盘请求配置](https://0xf3cd.github.io/astrology/docs/zh-CN/configuration.html)、[热带本命盘计算](https://0xf3cd.github.io/astrology/docs/zh-CN/chart.html)、
-[命盘记录与文本输出](https://0xf3cd.github.io/astrology/docs/zh-CN/records.html)、独立[知识目录](https://0xf3cd.github.io/astrology/docs/zh-CN/knowledge.html)、质量检查和双语 [API 文档](https://0xf3cd.github.io/astrology/docs/zh-CN/reference.html)。
-天文库只在请求排盘或重算时导入，导入本包或查询知识都不会初始化它。
+[命盘结果与文本输出](https://0xf3cd.github.io/astrology/docs/zh-CN/records.html)、独立[知识目录](https://0xf3cd.github.io/astrology/docs/zh-CN/knowledge.html)、质量检查和双语 [API 文档](https://0xf3cd.github.io/astrology/docs/zh-CN/reference.html)。
+天文库只在请求排盘时导入，导入本包或查询知识都不会初始化它。
 运行检查见[参与开发](https://0xf3cd.github.io/astrology/docs/zh-CN/contributing.html)。
 
 安装随天文依赖而定：celestial-calendar 0.8.0 只发布 Linux x86_64 与 aarch64、
@@ -22,6 +22,9 @@ macOS 14+ arm64、Windows amd64 的轮子，没有源码分发包。其他平台
 请勿安装 PyPI 上另一个无关的 `astrology` 项目。
 
 请在上述支持的平台使用 **Python 3.11–3.14**。
+
+以下命令安装已发布的 v0.1.0，其中包含命盘存取接口。当前源码为下一版撤回该接口；
+下方的排盘和知识示例在两者中均可运行。
 
 Linux/macOS（可把 `python3.14` 换成其他受支持的 Python 版本）：
 
@@ -111,7 +114,7 @@ moon: scorpio
 时间未知或缺少地点时会明确拒绝，不补正午或推测地点；请求的宫几何无定义时抛出
 `ChartDomainError`，不改用另一宫制。
 [排盘指南](https://0xf3cd.github.io/astrology/docs/zh-CN/chart.html)说明支持范围，
-[记录指南](https://0xf3cd.github.io/astrology/docs/zh-CN/records.html)说明存取、重算与双语文本表格。
+[结果指南](https://0xf3cd.github.io/astrology/docs/zh-CN/records.html)说明结构化结果与双语文本表格。
 
 ## 第一次查询知识
 
@@ -145,10 +148,10 @@ body.sun
 - 计算太阳、月亮、八颗行星及明确选择的月交点。
 - 支持 Whole Sign（整宫制）、Equal（等宫制）、Placidus；请求的几何无定义时显式失败。
 - 计算星座、二维黄经落宫（只用黄经，不用对象黄纬）、五大相位，以及可配置容许度和局部入相／离相状态。
-- 输出不可变结构、文本表格与带版本的序列化，保留输入、配置、天文原值和模型身份。
+- 输出不可变结构及文本表格，在内存中保留输入、配置、天文原值和模型身份。
 
-位置、四轴、宫头、星座、落宫、相位、文本输出及带版本的记录已实现。
-恢复保留存储值，不调用原生天文库；重算则显式检查版本和模型是否可用。
+位置、四轴、宫头、星座、落宫、相位及文本输出已实现。当前源码已撤回命盘持久化；
+与已发布 v0.1.0 API 的差异见[发行说明](https://0xf3cd.github.io/astrology/docs/zh-CN/releases.html)。
 
 交付任务与验收见 [v0.1.0 milestone](https://github.com/0xf3cd/astrology/milestone/1)。
 

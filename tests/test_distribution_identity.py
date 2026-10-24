@@ -4,11 +4,26 @@ import subprocess
 import sys
 import tomllib
 from importlib.metadata import PackageNotFoundError, version
+from importlib.util import find_spec
 from pathlib import Path
 
 import pytest
 
+import astrology
 from astrology import _distribution
+
+
+def test_chart_persistence_is_not_a_public_or_importable_api() -> None:
+  removed = {
+    "dumps_chart",
+    "loads_chart",
+    "recompute_chart",
+    "ChartRecordError",
+    "ChartReplayError",
+  }
+  assert not removed.intersection(astrology.__all__)
+  assert not any(hasattr(astrology, name) for name in removed)
+  assert find_spec("astrology.serialization") is None
 
 
 def test_packaging_and_installed_identity_agree_without_changing_import_name() -> None:
@@ -48,29 +63,24 @@ def test_identity_lookup_keeps_missing_metadata_explicit(monkeypatch: pytest.Mon
 
 
 @pytest.mark.parametrize("mode", [(), ("-O",)])
-def test_import_knowledge_and_historical_restoration_need_no_metadata(
+def test_import_and_knowledge_need_no_metadata(
   mode: tuple[str, ...],
 ) -> None:
   source = """
 import importlib.metadata as metadata
 import sys
 def forbidden(*args, **kwargs):
-  raise RuntimeError('Import, knowledge and restoration must not read distribution metadata')
+  raise RuntimeError('Import and knowledge must not read distribution metadata')
 metadata.version = forbidden
 metadata.distribution = forbidden
 import astrology
-chart = astrology.loads_chart(sys.stdin.read())
-if chart.provenance.astrology_version != '0.0.0':
-  raise RuntimeError('Historical provenance changed')
 if astrology.load_catalog().lookup('Sun')[0].identifier != 'body.sun':
   raise RuntimeError('Knowledge lookup changed')
 if any(name.startswith(('celestial_calendar', 'astrology.celestial')) for name in sys.modules):
-  raise RuntimeError('Metadata-free restoration initialized astronomy')
+  raise RuntimeError('Metadata-free import or knowledge initialized astronomy')
 """
-  fixture = Path(__file__).parent / "reference/chart_record_v1.json"
   result = subprocess.run(
     [sys.executable, *mode, "-c", source],
-    input=fixture.read_text(encoding="utf-8"),
     capture_output=True,
     text=True,
     encoding="utf-8",

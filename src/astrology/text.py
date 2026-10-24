@@ -1,6 +1,6 @@
-"""Render stored charts using caller-supplied bilingual vocabulary, without I/O.
+"""Render chart results using caller-supplied bilingual vocabulary, without I/O.
 
-用调用方提供的双语词汇显示存储盘，不执行 I/O。
+用调用方提供的双语词汇显示命盘结果，不执行 I/O。
 """
 
 from __future__ import annotations
@@ -43,7 +43,7 @@ _HEADINGS = {
     "model": "Delta-T model / evaluation",
     "versions": "astrology / celestial-calendar versions",
     "frame": "Position frame / UT1 derivation",
-    "display": "Angles are truncated toward zero to whole arcseconds; stored classifications are unchanged.",
+    "display": "Angles are truncated toward zero to whole arcseconds; classifications are unchanged.",
   },
   "zh-CN": {
     "title": "热带地心本命盘",
@@ -71,7 +71,7 @@ _HEADINGS = {
     "model": "ΔT 模型 / 求值方式",
     "versions": "astrology / celestial-calendar 版本",
     "frame": "位置坐标约定 / UT1 推导方式",
-    "display": "角度向零截断到整角秒；存储的分类结果不变。",
+    "display": "角度向零截断到整角秒；分类结果不变。",
   },
 }
 _AXES = {
@@ -140,23 +140,23 @@ def _longitude_text(value: float, catalog: Catalog, language: Language) -> str:
 
 
 def format_chart(chart: NatalChart, catalog: Catalog, *, language: Language = "en") -> str:
-  """Return a text table of stored positions, houses, aspects, configuration and provenance.
+  """Return a text table of chart positions, houses, aspects, configuration and provenance.
 
   The caller supplies the loaded Catalog; rendering does no resource I/O or native
   astronomy. Names must exist with current translations for en or zh-CN, otherwise
   raise ValueError (KeyError for a missing sign ID). Angles use truncate_display's
-  whole-arcsecond rule, without changing stored classifications, house or motion.
-  Even a deviation displayed as zero retains its stored motion label. Invalid
+  whole-arcsecond rule, without changing classifications, house or motion.
+  Even a deviation displayed as zero retains its original motion label. Invalid
   chart/catalog types raise TypeError. This table is not a lossless chart record.
   Nonprinting characters, backslashes and table delimiters in supplied names and
-  provenance are escaped for display; stored values are unchanged.
+  provenance are escaped for display; the chart values are unchanged.
 
-  返回存储位置、宫位、相位、配置及来源的文本表格。调用方须提供已加载的 Catalog；
+  返回命盘位置、宫位、相位、配置及来源的文本表格。调用方须提供已加载的 Catalog；
   显示不读取资源或调用原生天文库。en 或 zh-CN 的名称及译文必须齐备且为当前版本，
   否则抛出 ValueError（缺少星座标识时为 KeyError）。角度沿用 truncate_display 的整角秒截断规则，
-  不改存储的分类、宫位或运动状态；偏差显示为零时也保留原运动标签。
+  不改分类、宫位或运动状态；偏差显示为零时也保留原运动标签。
   chart/catalog 类型错误时抛出 TypeError。本表不是无损命盘记录。
-  传入名称及来源中的非打印字符、反斜线和表格分隔符会转义显示，不改存储值。
+  传入名称及来源中的非打印字符、反斜线和表格分隔符会转义显示，不改命盘中的值。
   """
   if type(chart) is not NatalChart or type(catalog) is not Catalog:
     raise TypeError("chart and catalog must be NatalChart and Catalog values")

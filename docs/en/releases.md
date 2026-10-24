@@ -2,6 +2,23 @@
 
 [简体中文](../zh-CN/releases.md) · [Documentation](index.md) · [Release procedure](releasing.md)
 
+## Next release: v0.2.0 (unreleased)
+
+### Breaking change: chart persistence removed
+
+The next release removes `dumps_chart`, `loads_chart`, `recompute_chart`, `ChartRecordError`,
+`ChartReplayError` and the `astrology.serialization` module. The chart storage
+schema and historical-record compatibility policy are withdrawn, with no
+replacement format or compatibility wrapper. The package no longer reads saved
+chart JSON. If an application needs the old API, keep the published v0.1.0
+environment; its tag and artifacts are unchanged.
+
+Calculate with `natal_chart`, use its immutable in-memory `NatalChart` and format
+it with `format_chart`. Original/resolved birth input, requested/effective
+configuration, astronomical values, domain validation and calculation provenance
+remain. This removal does not change the astronomy, timezone policy or dependency
+pins.
+
 ## 0.1.0
 
 The first release provides modern tropical, geocentric natal charts and an
@@ -27,7 +44,8 @@ independently browsable English/Chinese knowledge catalog. Install the distribut
   output eligibility and chart applicability remain distinct. Quotations,
   translations and project-authored explanations retain their own attribution.
 
-The [chart](chart.md), [aspect](aspects.md), [record](records.md) and
+The [chart](chart.md), [aspect](aspects.md),
+[v0.1.0 record](https://github.com/0xf3cd/astrology/blob/6b3293fae94b2f61e89a1d95778464f307c0d373/docs/en/records.md) and
 [knowledge](knowledge.md) guides define the admitted conventions and corpus.
 
 ### Installation and compatibility
@@ -47,7 +65,8 @@ Schema v1 restoration preserves stored values and their original provenance,
 including historical `0.0.0` records, without loading astronomy. Recomputation
 requires exact installed astrology/celestial versions and the recorded model.
 Restoring a historical record does not make it recomputable under `0.1.0`; a
-version or model mismatch raises `ChartReplayError`. See [record compatibility](records.md).
+version or model mismatch raises `ChartReplayError`. See the
+[v0.1.0 record guide](https://github.com/0xf3cd/astrology/blob/6b3293fae94b2f61e89a1d95778464f307c0d373/docs/en/records.md).
 
 ### Verification and limits
 

@@ -6,6 +6,7 @@
 import math
 import subprocess
 import sys
+from fractions import Fraction
 
 import pytest
 
@@ -75,6 +76,14 @@ def test_display_never_rounds_up_across_a_sector_boundary() -> None:
 def test_display_never_changes_the_classification() -> None:
   for longitude in (0.0, 0.0001, 29.9999999, 30.0, 179.9999999, 180.0, 359.9999999):
     assert sign_of(truncate_display(longitude)) is sign_of(longitude)
+
+
+@pytest.mark.parametrize("boundary", [1 / 3600, 2 / 3600, 1 / 16, 1 / 4, 1.0, 30.0])
+@pytest.mark.parametrize("direction", [-math.inf, None, math.inf])
+def test_display_floors_the_exact_binary_fraction(boundary: float, direction: float | None) -> None:
+  value = boundary if direction is None else math.nextafter(boundary, direction)
+  seconds = math.floor(Fraction.from_float(value) * 3600)
+  assert truncate_display(value) == seconds / 3600
 
 
 def test_display_is_monotone_and_never_above_the_input() -> None:

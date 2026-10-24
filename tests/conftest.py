@@ -1,4 +1,4 @@
-"""Shared complete charts for record and rendering tests. 记录与显示测试共用的完整命盘。"""
+"""Shared complete charts for result and rendering tests. 结果与显示测试共用的完整命盘。"""
 
 from datetime import date, time
 

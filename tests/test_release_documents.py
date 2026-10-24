@@ -82,22 +82,52 @@ def test_every_status_unit_rejects_actual_old_status_claims(
 @pytest.mark.parametrize(
   "unit",
   [
-    "README.md",
-    "README.zh-CN.md",
     "docs/index.md",
     "docs/_templates/site_index.html",
     "docs/conf.py",
   ],
 )
-def test_install_method_and_neutral_labels_are_required(documents: Path, unit: str) -> None:
+def test_neutral_labels_are_required(documents: Path, unit: str) -> None:
   path = documents / unit
   text = path.read_text(encoding="utf-8")
-  if unit.startswith("README"):
-    text = text.replace('pip install "celestial-astrology==0.1.0"', 'pip install "astrology"')
-  elif unit == "docs/conf.py":
+  if unit == "docs/conf.py":
     text += '\nhtml_title = "(development / 开发版)"\n'
   else:
     text = text.replace("源码文档快照", "开发版文档")
   path.write_text(text, encoding="utf-8")
+  with pytest.raises(AssertionError):
+    _contract(documents)
+
+
+@pytest.mark.parametrize("unit", ["README.md", "README.zh-CN.md"])
+@pytest.mark.parametrize("next_version", [False, True])
+def test_readme_install_mutation_tracks_fixture_version(
+  documents: Path, unit: str, next_version: bool
+) -> None:
+  project_path = documents / "pyproject.toml"
+  project = tomllib.loads(project_path.read_text(encoding="utf-8"))["project"]
+  if next_version:
+    current = project["version"]
+    future = f"{int(current.split('.')[0]) + 1}.0.0"
+    assert current != future
+    text = project_path.read_text(encoding="utf-8")
+    old_version = f'version = "{current}"'
+    assert old_version in text
+    project_path.write_text(text.replace(old_version, f'version = "{future}"'), encoding="utf-8")
+    for name in ("README.md", "README.zh-CN.md"):
+      path = documents / name
+      text = path.read_text(encoding="utf-8")
+      pinned = f"{project['name']}=={current}"
+      assert pinned in text
+      path.write_text(text.replace(pinned, f"{project['name']}=={future}"), encoding="utf-8")
+  _contract(documents)
+  project = tomllib.loads(project_path.read_text(encoding="utf-8"))["project"]
+  command = f'pip install "{project["name"]}=={project["version"]}"'
+  path = documents / unit
+  text = path.read_text(encoding="utf-8")
+  assert command in text
+  changed = text.replace(command, 'pip install "astrology"')
+  assert changed != text and command not in changed
+  path.write_text(changed, encoding="utf-8")
   with pytest.raises(AssertionError):
     _contract(documents)

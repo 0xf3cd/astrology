@@ -1,10 +1,8 @@
-"""Unrounded classifications survive bilingual display and chart-record round trips.
-
-双语显示与命盘记录往返都保留未舍入分类。
-"""
+"""Bilingual display preserves unrounded classifications. 双语显示保留未舍入分类。"""
 
 import math
 from dataclasses import replace
+from datetime import date, time
 from pathlib import Path
 from typing import get_args
 
@@ -14,24 +12,28 @@ from astrology import (
   AspectMotion,
   AspectObject,
   AspectRule,
+  BirthRecord,
   Body,
   ChartConfig,
   ChartHouses,
+  ChartTimes,
   EclipticPosition,
   FixedOffset,
   HouseSystem,
+  IanaTimezone,
+  Location,
   MajorAspect,
   NatalChart,
   ObjectOrb,
   OrbCombination,
   Placement,
   Sign,
-  dumps_chart,
+  TimePrecision,
   find_aspects,
   format_chart,
   house_of,
   load_catalog,
-  loads_chart,
+  prepare_natal_input,
   sign_degree,
   sign_of,
 )
@@ -144,9 +146,24 @@ def test_complete_table_and_no_mutation(recorded_chart: NatalChart, language: st
 
 
 @pytest.mark.parametrize("language", ["en", "zh-CN"])
-def test_complete_constructed_geometry_table(language: Language) -> None:
+def test_complete_constructed_geometry_table(
+  recorded_chart: NatalChart, language: Language
+) -> None:
   reference = Path(__file__).parent / "reference"
-  base = loads_chart((reference / "chart_record_v1.json").read_text(encoding="utf-8"))
+  record = BirthRecord(
+    date(2026, 4, 5),
+    time(1, 45),
+    IanaTimezone("Australia/Lord_Howe"),
+    Location(0, 0),
+    TimePrecision.MINUTE,
+    {"record": "synthetic"},
+  )
+  base = replace(
+    recorded_chart,
+    resolved=prepare_natal_input(record, fold=0),
+    times=ChartTimes(2461135.1145838792, 2461135.115384074),
+    provenance=replace(recorded_chart.provenance, astrology_version="0.0.0"),
+  )
   chart = display_case(
     base,
     0,
@@ -256,7 +273,7 @@ def test_no_aspects_and_no_overrides_are_rendered(
     (350.0, "pisces", 1),
   ],
 )
-def test_boundary_records_keep_sign_and_cusp_wrap(
+def test_boundary_results_keep_sign_and_cusp_wrap(
   recorded_chart: NatalChart,
   longitude: float,
   expected_sign: str,
@@ -264,10 +281,8 @@ def test_boundary_records_keep_sign_and_cusp_wrap(
 ) -> None:
   cusps = (350.0, *(float(index * 30 + 20) for index in range(11)))
   chart = display_case(recorded_chart, longitude, cusps=cusps)
-  restored = loads_chart(dumps_chart(chart))
-  assert restored == chart
-  assert restored.placements[0].sign.value == expected_sign
-  assert restored.placements[0].house == expected_house
+  assert chart.placements[0].sign.value == expected_sign
+  assert chart.placements[0].house == expected_house
 
 
 @pytest.mark.parametrize(
@@ -298,6 +313,79 @@ def test_truncated_deviation_is_not_exact(recorded_chart: NatalChart) -> None:
   row = next(line for line in output.splitlines() if " | Conjunction | " in line)
   assert " | 0°00'00\" | 720°00'00\" | applying" in row
   assert "-0" not in row
+
+
+@pytest.mark.parametrize("language", ["en", "zh-CN"])
+# These floats lie below one and two arcseconds. 两个浮点数分别略小于一、二角秒。
+@pytest.mark.parametrize("angle,seconds", [(1 / 3600, "00"), (2 / 3600, "01")])
+@pytest.mark.parametrize("negative", [False, True])
+def test_exact_arcsecond_position_and_signed_deviation(
+  recorded_chart: NatalChart, language: Language, angle: float, seconds: str, negative: bool
+) -> None:
+  chart = display_case(recorded_chart, angle if negative else 0, second=0 if negative else angle)
+  rows = format_chart(chart, load_catalog(), language=language).splitlines()
+  position = next(row for row in rows if ("[sun]" if negative else "[mars]") in row)
+  assert position.split(" | ")[1] == (
+    ("Aries" if language == "en" else "白羊座") + f" 0°00'{seconds}\""
+  )
+  aspect = next(row for row in rows if " | 720°00'00\" | " in row)
+  sign = ("-" if negative else "+") if seconds != "00" else ""
+  assert aspect.split(" | ")[4] == f"{sign}0°00'{seconds}\""
+  motion = (
+    ("applying" if negative else "separating")
+    if language == "en"
+    else ("入相" if negative else "离相")
+  )
+  assert aspect.split(" | ")[-1] == motion
+
+
+@pytest.mark.parametrize(
+  "field,value", [("sign", Sign.ARIES), ("house", 1), ("sign_degree_deg", 29)]
+)
+def test_exact_sign_and_cusp_ownership(
+  recorded_chart: NatalChart, field: str, value: object
+) -> None:
+  chart = display_case(recorded_chart, 30)
+  assert chart.placements[0] == Placement(Body.SUN, Sign.TAURUS, 0, 2)
+  inconsistent = replace(chart.placements[0], **{field: value})  # type: ignore[arg-type]
+  with pytest.raises(ValueError, match="placements"):
+    replace(chart, placements=(inconsistent, *chart.placements[1:]))
+
+
+@pytest.mark.parametrize(
+  "combination,limit",
+  [
+    (OrbCombination.MEAN_OF_ORBS, 8),
+    (OrbCombination.BOTH_WITHIN_OWN_ORB, 6),
+    (OrbCombination.EITHER_WITHIN_OWN_ORB, 10),
+  ],
+)
+@pytest.mark.parametrize("exact", [False, True])
+def test_aspect_limit_and_motion(
+  recorded_chart: NatalChart, combination: OrbCombination, limit: float, exact: bool
+) -> None:
+  chart = display_case(
+    recorded_chart,
+    0,
+    second=0 if exact else limit,
+    orb=6,
+    object_orbs=(ObjectOrb(Body.SUN, 10),),
+    combination=combination,
+  )
+  (hit,) = chart.aspects
+  assert (hit.first, hit.second, hit.aspect, hit.branch_deg) == (
+    Body.SUN,
+    Body.MARS,
+    MajorAspect.CONJUNCTION,
+    0.0,
+  )
+  assert hit.deviation_deg == (0.0 if exact else limit)
+  assert hit.orb_limit_deg == limit
+  assert hit.motion is (AspectMotion.EXACT if exact else AspectMotion.SEPARATING)
+  with pytest.raises(ValueError):
+    replace(chart, aspects=(replace(hit, motion=AspectMotion.APPLYING),))
+  with pytest.raises(ValueError, match="Stored aspects"):
+    replace(chart, aspects=())
 
 
 def test_truncated_position_tied_with_cusp_keeps_house(recorded_chart: NatalChart) -> None:
@@ -426,16 +514,15 @@ def test_provenance_cannot_forge_table_rows(recorded_chart: NatalChart, field: s
     )
   else:
     changed = replace(recorded_chart, resolved=replace(recorded_chart.resolved, **{field: payload}))  # type: ignore[arg-type]
-  restored = loads_chart(dumps_chart(changed))
-  assert restored == changed
   catalog = load_catalog()
   baseline = format_chart(recorded_chart, catalog)
-  output = format_chart(restored, catalog)
+  before = repr(changed)
+  output = format_chart(changed, catalog)
   assert len(output.splitlines()) == len(baseline.splitlines())
   assert "FAKE ROW" not in output.splitlines()
   assert r"foreign\\value\|column\nFAKE ROW\r\x85\u2028\u2029\x1b[2J" in output
   assert all(character.isprintable() or character == "\n" for character in output)
-  assert dumps_chart(restored) == dumps_chart(changed)
+  assert repr(changed) == before
 
 
 @pytest.mark.parametrize("language", ["en", "zh-CN"])

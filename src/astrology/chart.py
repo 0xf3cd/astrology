@@ -192,7 +192,7 @@ class EffectiveConfiguration:
     if type(self.house_system) is not HouseSystem:
       raise TypeError("house_system must be a HouseSystem")
     if type(self.delta_t_model) is not str or not self.delta_t_model.strip():
-      raise ValueError("delta_t_model must be a nonempty plain string")
+      raise ValueError("delta_t_model must be a plain string containing a non-whitespace character")
     if type(self.evaluation) is not str or self.evaluation != _EVALUATION:
       raise ValueError("Unknown chart evaluation")
     if not isinstance(self.aspect_objects, Sequence) or isinstance(
@@ -225,7 +225,7 @@ class ChartProvenance:
     for name in ("celestial_version", "astrology_version"):
       value = getattr(self, name)
       if type(value) is not str or not value.strip():
-        raise ValueError(f"{name} must be a nonempty plain string")
+        raise ValueError(f"{name} must be a plain string containing a non-whitespace character")
     if type(self.position_frame) is not str or self.position_frame != _POSITION_FRAME:
       raise ValueError("Unknown position frame")
     if type(self.ut1_derivation) is not str or self.ut1_derivation != _UT1_DERIVATION:
@@ -242,14 +242,14 @@ class NatalChart:
   caller are not aliased.
 
   Construction checks field types, ranges and pure derived-value consistency. It
-  does not verify that the stored astronomy was calculated from the claimed input.
+  does not verify that the astronomical values were calculated from the claimed input.
   Equality includes the resolved input; hashing excludes it because its source
   mapping is unhashable.
 
   完整且不可变的本命盘结果；对象按请求的顺序排列。按 `requested.aspects` 中的规则，
   在 `effective.aspect_objects` 所列对象之间计算相位，结果顺序见 `find_aspects`。
   位置、落宫和相位会复制成元组，不会引用调用方传入的列表。
-  构造时检查字段类型、范围及纯规则推导结果的一致性，不核实所存天文值是否确实由所称输入算得。
+  构造时检查字段类型、范围及纯规则推导结果的一致性，不核实天文值是否确实由所称输入算得。
   相等判断包括已解析输入；哈希不包括它，因为其中的来源映射不可哈希。
   """
 

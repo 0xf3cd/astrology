@@ -5,7 +5,7 @@
 These APIs are rendered from their defining modules. Public summaries
 and contracts are bilingual; both language views use the same definitions.
 See [birth inputs](birth.md), [requested configuration](configuration.md),
-[charts](chart.md), [aspects](aspects.md) and [chart records](records.md) for executed examples. The
+[charts](chart.md), [aspects](aspects.md) and [chart results](records.md) for executed examples. The
 [knowledge guide](knowledge.md) covers chart-independent queries.
 
 ## Birth records and resolution
@@ -35,16 +35,11 @@ See [birth inputs](birth.md), [requested configuration](configuration.md),
    :member-order: bysource
 ```
 
-## Chart records and text
+## Chart text
 
-See the [complete example and record contract](records.md).
+See the [complete result and text example](records.md).
 
 ```{eval-rst}
-.. automodule:: astrology.serialization
-   :members: ChartRecordError, ChartReplayError, dumps_chart, loads_chart, recompute_chart
-   :undoc-members:
-   :member-order: bysource
-
 .. automodule:: astrology.text
    :members: format_chart
 ```

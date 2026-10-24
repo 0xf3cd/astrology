@@ -8,10 +8,10 @@ keeps astrological rules, their sources, and their variants in this repository.
 
 The package provides immutable [birth records and modern time
 resolution](https://0xf3cd.github.io/astrology/docs/en/birth.html), [requested chart configuration](https://0xf3cd.github.io/astrology/docs/en/configuration.html),
-[tropical natal chart calculation](https://0xf3cd.github.io/astrology/docs/en/chart.html), [chart records and text output](https://0xf3cd.github.io/astrology/docs/en/records.html), an independent
+[tropical natal chart calculation](https://0xf3cd.github.io/astrology/docs/en/chart.html), [chart results and text output](https://0xf3cd.github.io/astrology/docs/en/records.html), an independent
 [knowledge catalog](https://0xf3cd.github.io/astrology/docs/en/knowledge.html), quality checks, and bilingual
 [API documentation](https://0xf3cd.github.io/astrology/docs/en/reference.html). The astronomy library is imported only
-when calculation or replay is requested, so importing the package or querying knowledge never
+when calculation is requested, so importing the package or querying knowledge never
 initializes it.
 See [Contributing](https://0xf3cd.github.io/astrology/docs/en/contributing.html) to run the checks.
 
@@ -26,6 +26,10 @@ knowledge browsing is not available either.
 Do not install the unrelated PyPI project named `astrology`.
 
 Use **Python 3.11–3.14** on one of the platforms listed above.
+
+The commands below install the published v0.1.0, which includes chart
+save/restore. The current source removes that API for the next release;
+the chart and knowledge examples below work with both.
 
 Linux/macOS (replace `python3.14` with your supported Python version):
 
@@ -119,8 +123,8 @@ moon: scorpio
 Unknown time or missing location is rejected, not replaced with noon or an inferred
 place. Undefined requested house geometry raises `ChartDomainError` without a
 fallback. See the [chart guide](https://0xf3cd.github.io/astrology/docs/en/chart.html)
-for admitted domains, and the [record guide](https://0xf3cd.github.io/astrology/docs/en/records.html)
-for save/restore/recompute and bilingual text tables.
+for admitted domains, and the [result guide](https://0xf3cd.github.io/astrology/docs/en/records.html)
+for structured results and bilingual text tables.
 
 ## First knowledge lookup
 
@@ -160,12 +164,13 @@ time and location:
   requested geometry is undefined.
 - Derive signs, two-dimensional house placement (longitude only, without object latitude), and the five major
   aspects with configurable orbs and local applying/separating status.
-- Return immutable structured results, a text table, and a versioned serialization
-  that retains inputs, configuration, astronomical values, and model identities.
+- Return immutable structured results and a text table, retaining inputs,
+  configuration, astronomical values and model identities in memory.
 
-Positions, axes, cusps, signs, house placement, aspects, text output and versioned
-records are implemented. Restoration preserves stored results without native
-astronomy; replay explicitly checks available versions and models.
+Positions, axes, cusps, signs, house placement, aspects and text output are
+implemented. Chart persistence is removed in the current source; see the
+[release notes](https://0xf3cd.github.io/astrology/docs/en/releases.html) for the
+difference from the published v0.1.0 API.
 
 See the [v0.1.0 milestone](https://github.com/0xf3cd/astrology/milestone/1) for
 delivery tasks and acceptance criteria.

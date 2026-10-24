@@ -24,7 +24,6 @@ MODULES = (
   "knowledge",
   "knowledge.catalog",
   "knowledge.records",
-  "serialization",
   "text",
   "zodiac",
 )
@@ -54,6 +53,54 @@ def acceptance_chart() -> astrology.NatalChart:
     orb_combination=astrology.OrbCombination.MEAN_OF_ORBS,
   )
   return astrology.natal_chart(astrology.prepare_natal_input(record, fold=0), config)
+
+
+def chart_observations(chart: astrology.NatalChart) -> str:
+  """Capture exact same-revision check values, without a chart restoration path.
+
+  取得同一源码修订的精确检查值，不提供恢复命盘的路径。
+  """
+  values = {
+    "resolved": repr(chart.resolved),
+    "requested": repr(chart.requested),
+    "effective": repr(chart.effective),
+    "provenance": repr(chart.provenance),
+    "times": [chart.times.jd_ut1, chart.times.jde_tt],
+    "positions": [
+      [
+        p.identity.value,
+        p.longitude_deg,
+        p.latitude_deg,
+        p.distance_au,
+        p.longitude_rate_deg_per_tt_day,
+      ]
+      for p in chart.positions
+    ],
+    "houses": [
+      chart.houses.system.value,
+      chart.houses.ascendant_deg,
+      chart.houses.midheaven_deg,
+      chart.houses.descendant_deg,
+      chart.houses.imum_coeli_deg,
+      chart.houses.cusps_deg,
+    ],
+    "placements": [
+      [p.identity.value, p.sign.value, p.sign_degree_deg, p.house] for p in chart.placements
+    ],
+    "aspects": [
+      [
+        a.first.value,
+        a.second.value,
+        a.aspect.value,
+        a.branch_deg,
+        a.deviation_deg,
+        a.orb_limit_deg,
+        a.motion.value,
+      ]
+      for a in chart.aspects
+    ],
+  }
+  return json.dumps(values, sort_keys=True, allow_nan=False)
 
 
 def _check_native_isolation() -> None:
@@ -201,7 +248,7 @@ def _check_birth_and_configuration() -> None:
     raise ValueError("Installed configuration substituted the requested house system")
 
 
-def _check_natal_chart(expected_chart: Path | None = None) -> None:
+def _check_natal_chart(expected_observations: Path | None = None) -> None:
   """Calculate one synthetic natal chart in the installed environment.
 
   The chart is calculated after the isolation checks, so it also shows that the
@@ -231,38 +278,15 @@ def _check_natal_chart(expected_chart: Path | None = None) -> None:
     raise ValueError("Installed aspects did not exercise per-object orbs")
   if chart.effective.aspect_objects != tuple(astrology.Body):
     raise ValueError("Installed aspect participants lost requested object order")
-  packed = astrology.dumps_chart(chart)
-  if expected_chart is not None and packed != expected_chart.read_text(encoding="utf-8"):
+  if expected_observations is not None and chart_observations(
+    chart
+  ) != expected_observations.read_text(encoding="utf-8"):
     raise ValueError("Installed chart differs from the development entry point")
-  restored = astrology.loads_chart(packed)
-  if restored != chart or astrology.dumps_chart(restored) != packed:
-    raise ValueError("Installed chart restoration lost stored values")
-  unsupported_schema = json.loads(packed)
-  unsupported_schema["schema_version"] = 2
-  duplicate_schema = packed.replace(
-    '"schema_version": 1', '"schema_version": 1, "schema_version": 1'
-  )
-  for invalid_record in (json.dumps(unsupported_schema), duplicate_schema):
-    try:
-      astrology.loads_chart(invalid_record)
-    except astrology.ChartRecordError:
-      pass
-    else:
-      raise ValueError("Installed restoration accepted an unsupported schema or duplicate key")
-  if astrology.recompute_chart(restored) != chart:
-    raise ValueError("Installed replay differs from the calculated chart")
   catalog = astrology.load_catalog()
   if "Sun [sun]" not in astrology.format_chart(chart, catalog):
     raise ValueError("Installed English chart output is incomplete")
   if "太阳 [sun]" not in astrology.format_chart(chart, catalog, language="zh-CN"):
     raise ValueError("Installed Chinese chart output is incomplete")
-  unsupported = replace(chart, effective=replace(chart.effective, delta_t_model="unavailable"))
-  try:
-    astrology.recompute_chart(astrology.loads_chart(astrology.dumps_chart(unsupported)))
-  except astrology.ChartReplayError:
-    pass
-  else:
-    raise ValueError("Installed replay silently substituted an unavailable model")
   polar = replace(
     chart.resolved, record=replace(chart.resolved.record, location=astrology.Location(75, 0))
   )
@@ -277,17 +301,12 @@ def _check_natal_chart(expected_chart: Path | None = None) -> None:
     raise ValueError("Installed Placidus calculation did not report undefined geometry")
 
 
-def check_missing_metadata(package: str, chart_path: Path) -> None:
-  """Verify real lookup failures after one distribution's metadata has been hidden.
+def check_missing_metadata() -> None:
+  """Check import, knowledge and calculation with project metadata hidden.
 
-  在一个分发包的元数据已被隐藏后，核验真实查询失败的合同。
+  隐藏项目分发包元数据后，检查导入、知识查询和计算。
   """
-  if package not in ("celestial-astrology", "celestial-calendar"):
-    raise ValueError("Unsupported missing-metadata case")
-  stored = chart_path.read_text(encoding="utf-8")
-  chart = astrology.loads_chart(stored)
-  if astrology.dumps_chart(chart) != stored:
-    raise ValueError("Restoration changed a chart without distribution metadata")
+  package = "celestial-astrology"
   _check_knowledge()
   _check_native_isolation()
   try:
@@ -297,20 +316,12 @@ def check_missing_metadata(package: str, chart_path: Path) -> None:
   else:
     raise ValueError("Missing-metadata case still has installed metadata")
   try:
-    astrology.recompute_chart(chart)
-  except astrology.ChartReplayError as exc:
-    if not isinstance(exc.__cause__, PackageNotFoundError) or exc.__cause__.name != package:
-      raise ValueError("Replay lost the missing-metadata cause") from exc
+    acceptance_chart()
+  except PackageNotFoundError as exc:
+    if exc.name != package:
+      raise ValueError("Calculation reported a different missing distribution") from exc
   else:
-    raise ValueError("Replay accepted missing distribution metadata")
-  if package == "celestial-astrology":
-    try:
-      astrology.natal_chart(chart.resolved, chart.requested)
-    except PackageNotFoundError as exc:
-      if exc.name != package:
-        raise ValueError("Calculation reported a different missing distribution") from exc
-    else:
-      raise ValueError("Calculation invented an installed distribution version")
+    raise ValueError("Calculation invented an installed distribution version")
   print(f"Missing {package} metadata rejected; optimized={sys.flags.optimize}")
 
 
@@ -319,16 +330,17 @@ def main(
   *,
   expected_corpus_version: str | None = None,
   knowledge_only: bool = False,
-  expected_chart: Path | None = None,
+  expected_observations: Path | None = None,
 ) -> None:
   """Check installed identity, API and isolation; compare a supplied corpus version.
 
   None skips corpus comparison. CLI: CODE_VERSION CORPUS_VERSION [--knowledge-only]
-  [--expected-chart PATH]. The chart file holds development-entry-point JSON.
+  [--expected-observations PATH]. The optional check-run file holds exact source
+  observations, including raw numbers, input, configuration and provenance.
 
   检查安装包身份、API 及隔离，并比较传入的语料版本。None 跳过语料版本比较。
-  CLI 参数顺序：CODE_VERSION CORPUS_VERSION [--knowledge-only] [--expected-chart PATH]。
-  命盘文件保存开发入口产出的 JSON。
+  CLI 参数顺序：CODE_VERSION CORPUS_VERSION [--knowledge-only] [--expected-observations PATH]。
+  可选的本次检查文件包含源码产出的精确检查值，包括原始数值、输入、配置和来源。
   """
   metadata = distribution("celestial-astrology")
   for module in (astrology, *(import_module("astrology." + name) for name in MODULES)):
@@ -348,19 +360,19 @@ def main(
     return
   _check_birth_and_configuration()
   _check_native_isolation()
-  _check_natal_chart(expected_chart)
+  _check_natal_chart(expected_observations)
   print(f"Installed celestial-astrology {metadata.version}; optimized={sys.flags.optimize}")
 
 
 if __name__ == "__main__":
   if sys.argv[1] == "--missing-metadata":
-    check_missing_metadata(sys.argv[2], Path(sys.argv[3]))
+    check_missing_metadata()
   else:
     main(
       sys.argv[1],
       expected_corpus_version=sys.argv[2],
       knowledge_only="--knowledge-only" in sys.argv[3:],
-      expected_chart=Path(sys.argv[sys.argv.index("--expected-chart") + 1])
-      if "--expected-chart" in sys.argv[3:]
+      expected_observations=Path(sys.argv[sys.argv.index("--expected-observations") + 1])
+      if "--expected-observations" in sys.argv[3:]
       else None,
     )

@@ -9,7 +9,7 @@ and acceptance criteria.
 
 Use celestial-calendar for time scales, ephemerides, and house geometry. This
 repository owns birth-input interpretation, astrological classifications, rule
-variants, chart composition, and serialization.
+variants, chart composition, and text output.
 
 ## Domain contracts
 
@@ -73,8 +73,8 @@ bilingual paths above. Create source modules only when they contain functionalit
 ## Verification and delivery
 
 Test domain boundaries and independently sourced reference cases with explicit
-configuration and tolerances. A serialization round trip checks preservation;
-recomputation and external references check different properties.
+configuration and tolerances. Source/install comparisons check packaging agreement;
+independently sourced references check numerical correctness.
 
 Run the complete check command before submitting. Demonstrate that new checks
 reject representative defects. Review source fidelity, aliasing, unnecessary

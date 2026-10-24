@@ -443,19 +443,21 @@ def test_consumer_installs_only_retained_wheel_and_keeps_all_acceptance_modes(
   def capture(command: Sequence[str], *, cwd: Path) -> None:
     commands.append(tuple(command))
     assert cwd.is_relative_to(tmp_path)
-    if "--expected-chart" in command:
+    if "--expected-observations" in command:
       assert Path(command[-1]).read_text() == "runner-local-source-result"
 
   monkeypatch.setattr(checker, "run", capture)
   monkeypatch.setattr("tools.installed_check.acceptance_chart", lambda: None)
-  monkeypatch.setattr(astrology, "dumps_chart", lambda _chart: "runner-local-source-result")
+  monkeypatch.setattr(
+    "tools.installed_check.chart_observations", lambda _chart: "runner-local-source-result"
+  )
   monkeypatch.setattr(
     checker, "check_readme_examples", lambda root, python, work, mode: readmes.append(mode)
   )
   monkeypatch.setattr(
     checker,
     "check_missing_metadata",
-    lambda env, python, script, chart: missing_metadata.append(chart),
+    lambda env, python, script: missing_metadata.append(script),
   )
   environment = {**files.expectations(), "SCRATCH": str(tmp_path)}
   release.consume(files.root, IDENTITY, files.directory, environment)

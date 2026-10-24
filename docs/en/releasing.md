@@ -30,9 +30,12 @@ is a blocker; do not switch to a token or weaken protection to continue.
 
 ## Prepare and inspect the candidate
 
+Before publishing a new version, prepare its version bump and matching
+installation and example pins in a separate reviewed change.
+
 1. Review the source, matching bilingual notes and the seven acceptance items in
-   the release tracker. Keep dependency policy, historical provenance and
-   restore/recompute compatibility explicit.
+   the release tracker. Keep dependency policy, calculation conventions and
+   breaking API changes explicit.
 2. Run locked complete checks locally and the PR quality/installation workflows.
    The existing quality matrix is Linux 3.11/3.14 and macOS/Windows 3.14. The seven
    retained-wheel consumers are Linux x86_64 3.11/3.12/3.13/3.14, Linux ARM64 3.14,
@@ -88,8 +91,9 @@ manifest's SHA-256 values. Use the README's package-index installation command i
 a fresh supported environment, then execute its chart and knowledge examples.
 A successful source-snapshot installation is not this index-install check.
 
-Create `v0.1.0` at the accepted source SHA and a GitHub Release only under the
-publication authorization. Attach the verified wheel, sdist and manifest. GitHub's
+Create the version tag (`v` followed by the authorized release version) at the
+accepted source SHA and a GitHub Release only under the publication authorization.
+Attach the verified wheel, sdist and manifest. GitHub's
 automatic source ZIP/tar archives are git snapshots, not the published sdist.
 Record actual workflow results, artifact identity, downloaded digests, installation
 results and remaining limits in the release. Refresh the manually maintained

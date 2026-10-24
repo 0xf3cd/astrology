@@ -204,4 +204,4 @@ records what the references can and cannot detect.
 - The library supplies no default orb. The corpus describes the evaluation as a
   project definition; it makes no claim about any tradition's orbs.
 
-See the [record guide](records.md) for saving, restoring, replaying and text output.
+See the [result guide](records.md) for structured results and text output.
