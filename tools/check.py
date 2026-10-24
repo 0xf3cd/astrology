@@ -51,7 +51,6 @@ PACKAGE_FILES = (
   "astrology/chart.py",
   "astrology/config.py",
   "astrology/houses.py",
-  "astrology/serialization.py",
   "astrology/text.py",
   "astrology/zodiac.py",
   "astrology/knowledge/__init__.py",
@@ -81,9 +80,7 @@ SDIST_FILES = (
   "tools/docs_search.py",
   "tests/reference/natal_reference.json",
   "tests/reference/complete_chart_reference.json",
-  "tests/reference/chart_record_v1.json",
-  "tests/reference/chart_record_v1_v010.json",
-  "tests/reference/chart_record_v1_v010.source.json",
+  "tests/reference/chart_regression.json",
   "tests/reference/constructed_chart.en.txt",
   "tests/reference/constructed_chart.zh-CN.txt",
 )
@@ -301,6 +298,11 @@ def check_wheel(wheel: Path, expected_version: str) -> None:
 
   with ZipFile(wheel) as archive:
     names = archive.namelist()
+    if any(
+      name == "astrology/serialization.py" or name.startswith("astrology/serialization/")
+      for name in names
+    ):
+      raise ValueError("Wheel contains withdrawn chart persistence")
     metadata_paths = [name for name in names if name.endswith(".dist-info/METADATA")]
     if len(metadata_paths) != 1:
       raise ValueError("Wheel must contain one METADATA file")
@@ -326,6 +328,14 @@ def check_sdist(sdist: Path) -> None:
   """
   with tarfile.open(sdist) as archive:
     names = {name.partition("/")[2] for name in archive.getnames()}
+  if any(
+    name == "src/astrology/serialization.py"
+    or name.startswith("src/astrology/serialization/")
+    or name == "tests/test_serialization.py"
+    or name.startswith("tests/reference/chart_record_")
+    for name in names
+  ):
+    raise ValueError("Sdist contains withdrawn chart persistence")
   expected = {"src/" + name for name in PACKAGE_FILES} | set(SDIST_FILES)
   if missing := expected - names:
     raise ValueError(f"Sdist is missing package resources: {sorted(missing)}")
@@ -570,12 +580,10 @@ def check_readme_examples(root: Path, python: Path, directory: Path, mode: tuple
         raise ValueError(f"README example output differs: {name}, example {index}")
 
 
-def check_missing_metadata(
-  environment: Path, python: Path, consumer_script: Path, chart: Path
-) -> None:
-  """Hide each distribution's metadata in a disposable install and restore it on exit.
+def check_missing_metadata(environment: Path, python: Path, consumer_script: Path) -> None:
+  """Hide project metadata in a disposable install and restore it on exit.
 
-  在一次性安装环境中分别隐藏两个分发包的元数据，并在退出时恢复。
+  在一次性安装环境中隐藏项目分发包元数据，并在退出时恢复。
   """
   locate = """
 import json, sys
@@ -587,39 +595,30 @@ if len(paths) != 1:
   raise RuntimeError('Expected one installed dist-info directory')
 print(json.dumps(str(paths[0])))
 """
-  for package in ("celestial-astrology", "celestial-calendar"):
-    output = subprocess.check_output(
-      (str(python), "-I", "-c", locate, package), text=True, encoding="utf-8"
-    )
-    value: object = json.loads(output)
-    if not isinstance(value, str):
-      raise ValueError("Installed metadata location must be a path")
-    metadata = Path(value).resolve()
-    hidden = metadata.with_name(metadata.name + ".hidden")
-    if (
-      not metadata.is_relative_to(environment.resolve())
-      or metadata.suffix != ".dist-info"
-      or not metadata.is_dir()
-      or hidden.exists()
-    ):
-      raise ValueError("Unsafe disposable metadata location")
-    metadata.rename(hidden)
-    try:
-      for mode in ((), ("-O",)):
-        run(
-          (
-            str(python),
-            *mode,
-            "-I",
-            str(consumer_script),
-            "--missing-metadata",
-            package,
-            str(chart),
-          ),
-          cwd=environment.parent,
-        )
-    finally:
-      hidden.rename(metadata)
+  output = subprocess.check_output(
+    (str(python), "-I", "-c", locate, "celestial-astrology"), text=True, encoding="utf-8"
+  )
+  value: object = json.loads(output)
+  if not isinstance(value, str):
+    raise ValueError("Installed metadata location must be a path")
+  metadata = Path(value).resolve()
+  hidden = metadata.with_name(metadata.name + ".hidden")
+  if (
+    not metadata.is_relative_to(environment.resolve())
+    or metadata.suffix != ".dist-info"
+    or not metadata.is_dir()
+    or hidden.exists()
+  ):
+    raise ValueError("Unsafe disposable metadata location")
+  metadata.rename(hidden)
+  try:
+    for mode in ((), ("-O",)):
+      run(
+        (str(python), *mode, "-I", str(consumer_script), "--missing-metadata"),
+        cwd=environment.parent,
+      )
+  finally:
+    hidden.rename(metadata)
 
 
 def check_installed_wheel(source: Path, wheel: Path, version: str, directory: Path) -> None:
@@ -627,15 +626,15 @@ def check_installed_wheel(source: Path, wheel: Path, version: str, directory: Pa
 
   在隔离环境中安装 wheel，并以普通和优化模式检查。
   """
-  from tools.installed_check import acceptance_chart
+  from tools.installed_check import acceptance_chart, chart_observations
 
   environment = directory / "consumer"
   run(("uv", "venv", "--python", sys.executable, str(environment)), cwd=directory)
   python = environment / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
   run(("uv", "pip", "install", "--python", str(python), str(wheel)), cwd=directory)
   corpus_version = load_catalog().version
-  expected_chart = directory / "development-chart.json"
-  expected_chart.write_text(astrology.dumps_chart(acceptance_chart()), encoding="utf-8")
+  observations = directory / "expected-observations.json"
+  observations.write_text(chart_observations(acceptance_chart()), encoding="utf-8")
   script = source / "tools/installed_check.py"
   for mode in ((), ("-O",)):
     run(
@@ -651,12 +650,12 @@ def check_installed_wheel(source: Path, wheel: Path, version: str, directory: Pa
         str(script),
         version,
         corpus_version,
-        "--expected-chart",
-        str(expected_chart),
+        "--expected-observations",
+        str(observations),
       ),
       cwd=directory,
     )
-  check_missing_metadata(environment, python, script, expected_chart)
+  check_missing_metadata(environment, python, script)
 
 
 def check_distribution(directory: Path) -> None:

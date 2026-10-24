@@ -3,7 +3,7 @@
 import json
 import sys
 from collections.abc import Iterator, Sequence
-from dataclasses import replace
+from dataclasses import fields, replace
 from datetime import UTC, date, datetime, timedelta
 from importlib import import_module
 from importlib.metadata import PackageNotFoundError, version
@@ -99,28 +99,12 @@ def test_wrong_chart_distribution_version_is_rejected(
     installed_check.main(version("celestial-astrology"))
 
 
-@pytest.mark.parametrize("package", ["celestial-astrology", "celestial-calendar"])
-@pytest.mark.parametrize(
-  "defect",
-  [
-    "none",
-    "present",
-    "untranslated",
-    "no-cause",
-    "wrong-cause",
-    "replay-accepts",
-    "calculation-accepts",
-  ],
-)
-def test_missing_metadata_consumer_checks_replay_not_just_initial_lookup(
-  tmp_path: Path,
+@pytest.mark.parametrize("defect", ["none", "present", "wrong-distribution", "accepts"])
+def test_missing_metadata_consumer_checks_calculation_not_just_initial_lookup(
   recorded_chart: astrology.NatalChart,
   monkeypatch: pytest.MonkeyPatch,
-  package: str,
   defect: str,
 ) -> None:
-  chart_path = tmp_path / "chart.json"
-  chart_path.write_text(astrology.dumps_chart(recorded_chart), encoding="utf-8")
   monkeypatch.setattr(installed_check, "_check_knowledge", lambda: None)
   monkeypatch.setattr(installed_check, "_check_native_isolation", lambda: None)
 
@@ -129,34 +113,20 @@ def test_missing_metadata_consumer_checks_replay_not_just_initial_lookup(
       return object()
     raise PackageNotFoundError(name)
 
-  def replay(chart: astrology.NatalChart) -> astrology.NatalChart:
-    if defect == "replay-accepts":
-      return chart
-    if defect == "untranslated":
-      raise PackageNotFoundError(package)
-    if defect == "no-cause":
-      raise astrology.ChartReplayError("unavailable")
-    missing = "other" if defect == "wrong-cause" else package
-    raise astrology.ChartReplayError("unavailable") from PackageNotFoundError(missing)
-
   def calculate(
     resolved: astrology.ResolvedBirth, config: astrology.ChartConfig
   ) -> astrology.NatalChart:
-    if defect == "calculation-accepts":
+    if defect == "accepts":
       return recorded_chart
-    raise PackageNotFoundError(package)
+    raise PackageNotFoundError("other" if defect == "wrong-distribution" else "celestial-astrology")
 
   monkeypatch.setattr(installed_check, "distribution", metadata)
-  monkeypatch.setattr(astrology, "recompute_chart", replay)
   monkeypatch.setattr(astrology, "natal_chart", calculate)
-  if defect == "none" or (package == "celestial-calendar" and defect == "calculation-accepts"):
-    installed_check.check_missing_metadata(package, chart_path)
-  elif defect == "untranslated":
-    with pytest.raises(PackageNotFoundError):
-      installed_check.check_missing_metadata(package, chart_path)
+  if defect == "none":
+    installed_check.check_missing_metadata()
   else:
-    with pytest.raises(ValueError, match=r"still has|lost|accepted|invented"):
-      installed_check.check_missing_metadata(package, chart_path)
+    with pytest.raises(ValueError, match=r"still has|different missing|invented"):
+      installed_check.check_missing_metadata()
 
 
 @pytest.mark.parametrize(
@@ -363,29 +333,110 @@ def test_installed_comparison_rejects_different_development_output(consumer: Pat
   expected = consumer.parent / "wrong-chart.json"
   expected.write_text("{}", encoding="utf-8")
   with pytest.raises(ValueError, match="differs from the development"):
-    installed_check.main(version("celestial-astrology"), expected_chart=expected)
+    installed_check.main(version("celestial-astrology"), expected_observations=expected)
 
 
-@pytest.mark.parametrize("defect", ["schema", "duplicates"])
-def test_installed_consumer_rejects_a_permissive_record_loader(
+@pytest.mark.parametrize(
+  "field",
+  [
+    "resolved",
+    "requested",
+    "effective",
+    "provenance",
+    "positions",
+    "times",
+    "houses",
+    "placements",
+    "aspects",
+  ],
+)
+@pytest.mark.parametrize("changed", [False, True])
+def test_installed_comparison_keeps_raw_values_and_metadata(
   consumer: Path,
   monkeypatch: pytest.MonkeyPatch,
-  defect: str,
+  field: str,
+  changed: bool,
 ) -> None:
-  original = astrology.loads_chart
+  expected = consumer.parent / "expected-observations.json"
+  original = installed_check.chart_observations
 
-  def permissive(data: str) -> astrology.NatalChart:
-    record = json.loads(data)
-    if defect == "schema" and record["schema_version"] == 2:
-      record["schema_version"] = 1
-      return original(json.dumps(record))
-    if defect == "duplicates" and data.count('"schema_version"') > 1:
-      return original(json.dumps(record))
-    return original(data)
+  def observe(chart: astrology.NatalChart) -> str:
+    packed = original(chart)
+    values = json.loads(packed)
+    assert set(values) == {field.name for field in fields(chart)}
+    for name in ("resolved", "requested", "effective", "provenance"):
+      assert values[name] == repr(getattr(chart, name))
+    for name in ("times", "houses"):
+      instance = getattr(chart, name)
+      assert values[name] == [
+        list(value) if isinstance(value, tuple) else value
+        for field in fields(instance)
+        for value in (getattr(instance, field.name),)
+      ]
+    for name in ("positions", "placements", "aspects"):
+      assert values[name] == [
+        [getattr(instance, field.name) for field in fields(instance)]
+        for instance in getattr(chart, name)
+      ]
+    if not changed:
+      expected.write_text(packed, encoding="utf-8")
+      return packed
+    if field == "positions":
+      longitude = values[field][0][1]
+      values[field][0][1] += 1e-6
+      assert astrology.truncate_display(longitude) == astrology.truncate_display(
+        values[field][0][1]
+      )
+    else:
+      values[field] = "different"
+    expected.write_text(json.dumps(values, sort_keys=True, allow_nan=False), encoding="utf-8")
+    return packed
 
-  monkeypatch.setattr(astrology, "loads_chart", permissive)
-  with pytest.raises(ValueError, match="unsupported schema or duplicate key"):
-    installed_check.main(version("celestial-astrology"))
+  monkeypatch.setattr(installed_check, "chart_observations", observe)
+  if changed:
+    with pytest.raises(ValueError, match="differs from the development"):
+      installed_check.main(version("celestial-astrology"), expected_observations=expected)
+  else:
+    installed_check.main(version("celestial-astrology"), expected_observations=expected)
+
+
+def test_raw_observations_distinguish_identical_text(recorded_chart: astrology.NatalChart) -> None:
+  positions = (
+    replace(
+      recorded_chart.positions[0], longitude_deg=recorded_chart.positions[0].longitude_deg + 1e-6
+    ),
+    *recorded_chart.positions[1:],
+  )
+  placements = tuple(
+    astrology.Placement(
+      p.identity,
+      astrology.sign_of(p.longitude_deg),
+      astrology.sign_degree(p.longitude_deg),
+      astrology.house_of(p.longitude_deg, recorded_chart.houses.cusps_deg),
+    )
+    for p in positions
+  )
+  aspects = astrology.find_aspects(
+    [
+      astrology.AspectObject(p.identity, p.longitude_deg, p.longitude_rate_deg_per_tt_day)
+      for p in positions
+      if p.identity in recorded_chart.effective.aspect_objects
+    ],
+    recorded_chart.requested.aspects,
+    recorded_chart.requested.orb_combination,
+  )
+  changed = replace(recorded_chart, positions=positions, placements=placements, aspects=aspects)
+  catalog = astrology.load_catalog()
+  languages: tuple[Literal["en", "zh-CN"], ...] = ("en", "zh-CN")
+  for language in languages:
+    assert astrology.format_chart(changed, catalog, language=language) == astrology.format_chart(
+      recorded_chart,
+      catalog,
+      language=language,
+    )
+  assert installed_check.chart_observations(changed) != installed_check.chart_observations(
+    recorded_chart
+  )
 
 
 def test_installed_consumer_checks_native_adapter_origin(

@@ -3,9 +3,9 @@
 [简体中文](../zh-CN/architecture.md) · [Project](../../README.md) · [Knowledge](knowledge.md)
 
 Birth records, modern time resolution, requested configuration, the tropical
-natal chart, major aspects, chart records/text and independent knowledge are implemented; their
+natal chart, major aspects, text output and independent knowledge are implemented; their
 usage and constraints are in the [birth](birth.md), [configuration](configuration.md),
-[chart](chart.md), [aspect](aspects.md), [record](records.md) and [knowledge](knowledge.md) guides.
+[chart](chart.md), [aspect](aspects.md), [result](records.md) and [knowledge](knowledge.md) guides.
 The current chart is
 a reproducible modern tropical, geocentric natal chart, with independent access
 to its underlying knowledge.
@@ -24,8 +24,7 @@ src/astrology/
   houses.py         House-placement rules over supplied geometry
   aspects.py        Aspect definitions, orbs, and local motion
   chart.py          Composition and immutable chart results
-  serialization.py  Versioned records and restoration
-  text.py           Stored-result tables with supplied vocabulary
+  text.py           Result tables with supplied vocabulary
   knowledge/        Concepts, sources, entries, and independent queries
 tests/              Domain tests and installed-consumer tests
 docs/en/            English guides and explanations
@@ -96,11 +95,10 @@ Retain input and resolved configuration, actual models and versions, TT/UT1
 values, raw astronomy, and derived results. Defaults must resolve to named
 choices before being recorded.
 
-Stored-result restoration preserves a record without native astronomy; constructor
-checks verify pure derived-value consistency, not the claimed astronomical origin.
-Recomputation evaluates the recorded UTC and request after version/model checks,
-without re-resolving timezones. Schema v1 and these distinct compatibility rules
-are described in the [record guide](records.md).
+Results remain in memory; constructor checks verify pure derived-value consistency,
+not the claimed astronomical origin. A new natal calculation uses resolved UTC
+and the requested configuration without re-resolving timezones. Structured results,
+provenance and text output are described in the [result guide](records.md).
 
 Numerical agreement with celestial checks composition. Independent cases check
 the complete result under matched conventions. Tests must exercise timezone
@@ -110,7 +108,7 @@ aspects, and undefined house geometry.
 ## Delivery order
 
 Birth/configuration values, the independent knowledge catalog, the tropical
-natal chart, major aspects, versioned records and text output are implemented,
+natal chart, major aspects and text output are implemented,
 with bilingual documentation and installed-package verification.
 
 The [v0.1.0 milestone](https://github.com/0xf3cd/astrology/milestone/1) owns task

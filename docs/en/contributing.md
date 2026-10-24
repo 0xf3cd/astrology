@@ -43,8 +43,8 @@ the API/catalog pages, generated search index and query code, and doctest result
 
 The installed consumer exercises birth,
 timezone provenance and configuration outside the checkout; its complete-chart,
-restoration, replay and text checks are described in the
-[record guide](records.md#verification-and-limits). A separate knowledge-only
+raw-result comparison and text checks are described in the
+[result guide](records.md#verification-and-limits). A separate knowledge-only
 consumer lists, looks up, filters and resolves citations without time/native
 initialization. Both use isolated imports in normal and optimized modes; wheel
 and sdist checks require the actual corpus resources.
@@ -69,7 +69,7 @@ is not sufficient. Do not merge this branch.
 Tool versions are locked in `uv.lock`. Sphinx 8.2.3 serves Python 3.11; Sphinx
 9.1.0 serves newer Python versions. Coverage is reported to locate gaps; it
 cannot certify the astronomy values, which the reference cases do. Tests exercise
-birth/time, chart/configuration, record and text contracts as well as development checks. Add domain
+birth/time, chart/configuration, result and text contracts as well as development checks. Add domain
 tests with each feature.
 
 For local formatting, run `uv run ruff format .`. A failed command stops the
@@ -111,10 +111,10 @@ PyPI project `astrology` is not this library. Confirm the installed identity:
 
 The checks execute both READMEs against an isolated wheel install, compare their
 documented output, inspect the wheel's actual Markdown links, and resolve both
-language paths against the built site. They also hide each distribution's metadata
-separately in a disposable install. With metadata hidden they verify unchanged restoration,
-`ChartReplayError` on replay, and `PackageNotFoundError` on direct calculation when project
-metadata is missing. Both Python modes run before the metadata is restored.
+language paths against the built site. They also hide `celestial-astrology` metadata
+in a disposable install. Import and knowledge remain usable; direct calculation
+raises `PackageNotFoundError` naming that distribution. Both Python modes run
+before the metadata is restored.
 
 For manual Pages delivery, build from a clean committed checkout and set
 `ASTROLOGY_DOCS_SOURCE_SHA` to its full lowercase commit SHA. The root page then
@@ -154,8 +154,8 @@ time ambiguity, coordinate wrap, exact endpoints, missing information, and
 unsupported combinations. Public validation must still run under `python -O`.
 
 Record the source, model/version, time scale, coordinate convention, configuration,
-units, and tolerance with numerical fixtures. A round trip tests preservation;
-recomputation tests execution; an independent source tests agreement. Shared
+units, and tolerance with numerical fixtures. Source/install comparisons test
+packaging agreement; an independent source tests numerical agreement. Shared
 formulas or copied datasets can make apparently independent checks agree on the
 same mistake. Explain why a reference can detect the defect being tested.
 
@@ -220,13 +220,12 @@ and the style page gives parameters, not the aspect list of a chart.
 The separate Swiss complete-chart fixture adds independent rates and all house
 cusps, plus separately derived placements, aspects and motion for four synthetic
 instants. All five aspect identities occur. Its case-specific tolerances and source
-limits are documented in the [record guide](records.md#verification-and-limits).
-The historical records are project-calculated regression samples, not external
-evidence. Follow the [record compatibility policy](records.md#compatibility-across-releases)
-when changing pure rules, schema meanings or dependencies. Keep their original
-bytes and provenance. Restoration/display, replay eligibility, current provenance
-and numerical regression must run independently: a version-only change must not
-prevent numerical comparison. A changed model needs an explicit comparison policy.
+limits are documented in the [result guide](records.md#verification-and-limits).
+The project-calculated numeric regression samples are not external evidence.
+Keep their original numbers and extraction provenance when changing pure rules
+or dependencies. Current provenance and numerical regression are distinct:
+a version-only change must not prevent numerical comparison. A changed model
+needs an explicit comparison policy.
 
 Demonstrate that a regression test accepts valid input and rejects the defect it
 targets. A version-label change alone must pass numerical regression; an internally

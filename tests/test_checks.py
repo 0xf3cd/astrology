@@ -326,7 +326,7 @@ def test_distribution_keeps_dependency_install_and_both_consumer_modes(
   contexts: list[tuple[Path, Mapping[str, str] | None]] = []
   validations: list[tuple[str, Path]] = []
   readme_calls: list[tuple[Path, Path, Path, tuple[str, ...]]] = []
-  metadata_calls: list[tuple[Path, Path, Path, Path]] = []
+  metadata_calls: list[tuple[Path, Path, Path]] = []
   site_calls: list[tuple[Path, Path, str]] = []
   monkeypatch.setenv("ASTROLOGY_DOCS_SOURCE_SHA", "b" * 40)
 
@@ -387,9 +387,7 @@ def test_distribution_keeps_dependency_install_and_both_consumer_modes(
   monkeypatch.setattr(
     checker,
     "check_missing_metadata",
-    lambda environment, python, script, chart: metadata_calls.append(
-      (environment, python, script, chart)
-    ),
+    lambda environment, python, script: metadata_calls.append((environment, python, script)),
   )
   checker.check_distribution(tmp_path)
   source = tmp_path / "source/astrology"
@@ -437,21 +435,24 @@ def test_distribution_keeps_dependency_install_and_both_consumer_modes(
   assert all(load_catalog().version in command for command in consumers)
   assert ["-O" in command for command in consumers] == [False, False, True, True]
   assert ["--knowledge-only" in command for command in consumers] == [True, False, True, False]
-  assert ["--expected-chart" in command for command in consumers] == [False, True, False, True]
+  assert ["--expected-observations" in command for command in consumers] == [
+    False,
+    True,
+    False,
+    True,
+  ]
   assert all(
-    str(tmp_path / "development-chart.json") in command
+    str(tmp_path / "expected-observations.json") in command
     for command in consumers
-    if "--expected-chart" in command
+    if "--expected-observations" in command
   )
-  assert (tmp_path / "development-chart.json").is_file()
+  assert (tmp_path / "expected-observations.json").is_file()
   assert site_calls == [(tmp_path / "source-html", source, "b" * 40)]
   assert readme_calls == [
     (source, python, tmp_path, ()),
     (source, python, tmp_path, ("-O",)),
   ]
-  assert metadata_calls == [
-    (environment, python, source / "tools/installed_check.py", tmp_path / "development-chart.json")
-  ]
+  assert metadata_calls == [(environment, python, source / "tools/installed_check.py")]
 
 
 @pytest.mark.parametrize(
@@ -555,6 +556,55 @@ def test_sdist_resource_contents(tmp_path: Path, missing: str | None) -> None:
       check_sdist(sdist)
 
 
+@pytest.mark.parametrize(
+  "member", ["astrology/serialization.py", "astrology/serialization/__init__.py"]
+)
+def test_wheel_rejects_withdrawn_module_even_if_relisted(
+  tmp_path: Path, monkeypatch: pytest.MonkeyPatch, member: str
+) -> None:
+  wheel = tmp_path / "package.whl"
+  with ZipFile(wheel, "w") as archive:
+    for name in PACKAGE_FILES:
+      archive.writestr(name, "")
+    archive.writestr("a.dist-info/licenses/LICENSE", "MIT")
+    archive.writestr(
+      "a.dist-info/METADATA",
+      "Name: celestial-astrology\nVersion: 0.0.0\n"
+      "Description-Content-Type: text/markdown\n\n[Docs](https://example.org/)\n",
+    )
+  check_wheel(wheel, "0.0.0")
+  with ZipFile(wheel, "a") as archive:
+    archive.writestr(member, "")
+  monkeypatch.setattr(checker, "PACKAGE_FILES", (*PACKAGE_FILES, member))
+  with pytest.raises(ValueError, match="withdrawn chart persistence"):
+    check_wheel(wheel, "0.0.0")
+
+
+@pytest.mark.parametrize(
+  "member",
+  [
+    "src/astrology/serialization.py",
+    "src/astrology/serialization/__init__.py",
+    "tests/test_serialization.py",
+    "tests/reference/chart_record_v1.json",
+  ],
+)
+def test_sdist_rejects_withdrawn_paths_even_if_relisted(
+  tmp_path: Path, monkeypatch: pytest.MonkeyPatch, member: str
+) -> None:
+  sdist = tmp_path / "package.tar.gz"
+  with tarfile.open(sdist, "w:gz") as archive:
+    for name in SDIST_PATHS:
+      archive.addfile(tarfile.TarInfo("astrology/" + name), BytesIO())
+  check_sdist(sdist)
+  monkeypatch.setattr(checker, "SDIST_FILES", (*SDIST_FILES, member))
+  with tarfile.open(sdist, "w:gz") as archive:
+    for name in (*SDIST_PATHS, member):
+      archive.addfile(tarfile.TarInfo("astrology/" + name), BytesIO())
+  with pytest.raises(ValueError, match="withdrawn chart persistence"):
+    check_sdist(sdist)
+
+
 @pytest.mark.parametrize("failure", [False, True])
 def test_metadata_is_hidden_separately_and_restored_on_failure(
   tmp_path: Path, monkeypatch: pytest.MonkeyPatch, failure: bool
@@ -573,7 +623,8 @@ def test_metadata_is_hidden_separately_and_restored_on_failure(
     return json.dumps(str(paths[command[-1]]))
 
   def execute(command: Sequence[str], *, cwd: Path) -> None:
-    package = command[-2]
+    package = "celestial-astrology"
+    assert command[-1] == "--missing-metadata"
     assert cwd == tmp_path
     assert not paths[package].exists()
     assert paths[package].with_suffix(".dist-info.hidden").is_dir()
@@ -584,19 +635,14 @@ def test_metadata_is_hidden_separately_and_restored_on_failure(
 
   monkeypatch.setattr(subprocess, "check_output", locate)
   monkeypatch.setattr(checker, "run", execute)
-  arguments = (environment, Path(sys.executable), tmp_path / "consumer.py", tmp_path / "chart.json")
+  arguments = (environment, Path(sys.executable), tmp_path / "consumer.py")
   if failure:
     with pytest.raises(subprocess.CalledProcessError):
       checker.check_missing_metadata(*arguments)
   else:
     checker.check_missing_metadata(*arguments)
-    assert [command[-2] for command in commands] == [
-      packages[0],
-      packages[0],
-      packages[1],
-      packages[1],
-    ]
-    assert ["-O" in command for command in commands] == [False, True, False, True]
+    assert len(commands) == 2
+    assert ["-O" in command for command in commands] == [False, True]
   assert all(
     path.is_dir() and (path / "METADATA").read_text(encoding="utf-8") == "original"
     for path in paths.values()
@@ -625,7 +671,5 @@ def test_metadata_hiding_refuses_unsafe_locations(
     lambda *args, **kwargs: json.dumps(None if defect == "non-string" else str(path)),
   )
   with pytest.raises(ValueError, match="metadata location"):
-    checker.check_missing_metadata(
-      environment, Path(sys.executable), tmp_path / "script.py", tmp_path / "chart.json"
-    )
+    checker.check_missing_metadata(environment, Path(sys.executable), tmp_path / "script.py")
   assert path.exists()

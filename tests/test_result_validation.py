@@ -1,9 +1,5 @@
-"""The same result invariants apply to direct construction and restoration.
+"""Direct result construction enforces domain invariants. 直接构造结果时检查领域约束。"""
 
-直接构造和恢复遵守同一套结果约束。
-"""
-
-import json
 from collections.abc import Iterator, Sequence
 from dataclasses import replace
 from typing import Any
@@ -14,13 +10,10 @@ from astrology import (
   AspectHit,
   AspectMotion,
   Body,
-  ChartRecordError,
   HouseSystem,
   LunarNode,
   MajorAspect,
   NatalChart,
-  dumps_chart,
-  loads_chart,
 )
 
 
@@ -61,11 +54,18 @@ def test_direct_aspect_hit_accepts_exact_and_inclusive_limit() -> None:
     ("times", "jde_tt", True),
     ("positions", "identity", "sun"),
     ("positions", "longitude_deg", 10**1000),
+    ("positions", "longitude_deg", 360),
+    ("positions", "latitude_deg", -91),
+    ("positions", "distance_au", None),
+    ("positions", "distance_au", 0),
     ("positions", "longitude_rate_deg_per_tt_day", float("inf")),
     ("houses", "system", "equal"),
     ("houses", "cusps_deg", [0] * 12),
+    ("houses", "ascendant_deg", 360),
     ("placements", "sign", "aries"),
     ("placements", "house", True),
+    ("placements", "house", 13),
+    ("placements", "sign_degree_deg", 30),
     ("effective", "delta_t_model", {}),
     ("effective", "aspect_objects", ["sun"]),
     ("effective", "aspect_objects", None),
@@ -119,6 +119,31 @@ def test_cross_domain_consistency(recorded_chart: NatalChart) -> None:
     replace(recorded_chart, effective=replace(recorded_chart.effective, aspect_objects=()))
 
 
+@pytest.mark.parametrize("field,value", [("latitude_deg", 1), ("distance_au", 1)])
+def test_node_results_keep_their_definition(
+  recorded_chart: NatalChart, field: str, value: float
+) -> None:
+  node = next(p for p in recorded_chart.positions if isinstance(p.identity, LunarNode))
+  with pytest.raises(ValueError, match="Lunar nodes"):
+    replace(node, **{field: value})  # type: ignore[arg-type]
+
+
+@pytest.mark.parametrize(
+  "member,field",
+  [
+    ("effective", "delta_t_model"),
+    ("provenance", "astrology_version"),
+    ("provenance", "celestial_version"),
+  ],
+)
+@pytest.mark.parametrize("value", ["", " \t\n\u00a0", None, 1])
+def test_model_and_version_labels_require_content(
+  recorded_chart: NatalChart, member: str, field: str, value: object
+) -> None:
+  with pytest.raises(ValueError, match="non-whitespace"):
+    replace(getattr(recorded_chart, member), **{field: value})
+
+
 def test_result_sequences_are_isolated(recorded_chart: NatalChart) -> None:
   positions = list(recorded_chart.positions)
   placements = list(recorded_chart.placements)
@@ -168,7 +193,7 @@ def test_result_sequences_validate_the_single_stored_snapshot(
 def test_chart_hashing_preserves_equality_and_distinct_birth_metadata(
   recorded_chart: NatalChart,
 ) -> None:
-  restored = loads_chart(dumps_chart(recorded_chart))
+  restored = replace(recorded_chart, positions=list(recorded_chart.positions))  # type: ignore[arg-type]
   assert hash(restored) == hash(recorded_chart)
   other_record = replace(
     recorded_chart.resolved.record, source={"record": "another synthetic source"}
@@ -201,7 +226,3 @@ def test_fixed_result_identities_are_plain_exact_strings(
   for invalid in (StringSubclass(expected), None, True, 1, "unknown"):
     with pytest.raises(ValueError):
       replace(original, **{field: invalid})
-    raw: Any = json.loads(dumps_chart(recorded_chart))
-    raw[member][field] = "unknown" if isinstance(invalid, StringSubclass) else invalid
-    with pytest.raises(ChartRecordError):
-      loads_chart(json.dumps(raw))

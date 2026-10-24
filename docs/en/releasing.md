@@ -31,8 +31,8 @@ is a blocker; do not switch to a token or weaken protection to continue.
 ## Prepare and inspect the candidate
 
 1. Review the source, matching bilingual notes and the seven acceptance items in
-   the release tracker. Keep dependency policy, historical provenance and
-   restore/recompute compatibility explicit.
+   the release tracker. Keep dependency policy, calculation conventions and
+   breaking API changes explicit.
 2. Run locked complete checks locally and the PR quality/installation workflows.
    The existing quality matrix is Linux 3.11/3.14 and macOS/Windows 3.14. The seven
    retained-wheel consumers are Linux x86_64 3.11/3.12/3.13/3.14, Linux ARM64 3.14,

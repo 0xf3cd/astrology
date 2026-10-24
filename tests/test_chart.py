@@ -8,7 +8,7 @@ import subprocess
 import sys
 from dataclasses import FrozenInstanceError, replace
 from datetime import date, datetime, time, timedelta
-from importlib.metadata import version
+from importlib.metadata import PackageNotFoundError, version
 
 import pytest
 
@@ -407,6 +407,76 @@ def test_the_result_is_immutable() -> None:
     chart.provenance = chart.provenance  # type: ignore[misc]
   with pytest.raises(FrozenInstanceError):
     chart.positions[0].longitude_deg = 0.0  # type: ignore[misc]
+
+
+@pytest.mark.parametrize("system", list(HouseSystem))
+@pytest.mark.parametrize("combination", list(OrbCombination))
+def test_all_house_and_orb_policies_reach_the_result(
+  recorded_chart: NatalChart, system: HouseSystem, combination: OrbCombination
+) -> None:
+  config = replace(recorded_chart.requested, house_system=system, orb_combination=combination)
+  chart = natal_chart(recorded_chart.resolved, config)
+  assert chart.resolved == recorded_chart.resolved
+  assert chart.requested == config
+  assert chart.houses.system is chart.effective.house_system is system
+  assert chart.effective.orb_combination is combination
+  assert chart.effective.aspect_objects == config.aspect_participants()
+
+
+@pytest.mark.parametrize("explicit", [False, True])
+def test_requested_participant_omission_stays_distinct(
+  recorded_chart: NatalChart, explicit: bool
+) -> None:
+  config = replace(
+    recorded_chart.requested,
+    aspect_objects=tuple(recorded_chart.requested.objects) if explicit else None,
+  )
+  chart = natal_chart(recorded_chart.resolved, config)
+  assert chart.requested.aspect_objects == config.aspect_objects
+  assert chart.effective.aspect_objects == tuple(config.objects)
+
+
+def test_calculation_preserves_offset_microseconds_and_signed_zero() -> None:
+  source = {"record": "synthetic"}
+  record = BirthRecord(
+    date(2020, 6, 2),
+    time(0, 15, 1, 654321),
+    FixedOffset(timedelta(hours=5, minutes=45, microseconds=123)),
+    Location(-0.0, -0.0),
+    source=source,
+  )
+  source.clear()
+  chart = natal_chart(prepare_natal_input(record), ChartConfig(HouseSystem.EQUAL, (Body.SUN,), ()))
+  assert chart.resolved.utc.date() == date(2020, 6, 1)
+  assert chart.resolved.utc.microsecond == 654198
+  assert chart.resolved.utc_offset.microseconds == 123
+  assert chart.resolved.record.precision is None
+  assert chart.resolved.record.source == {"record": "synthetic"}
+  site = chart.resolved.record.location
+  assert site is not None
+  assert math.copysign(1, site.latitude) == math.copysign(1, site.longitude) == -1
+
+
+def test_calculation_requires_installed_metadata(
+  recorded_chart: NatalChart, monkeypatch: pytest.MonkeyPatch
+) -> None:
+  def missing(name: str) -> str:
+    raise PackageNotFoundError(name)
+
+  monkeypatch.setattr("astrology._distribution.version", missing)
+  with pytest.raises(PackageNotFoundError, match="celestial-astrology"):
+    natal_chart(recorded_chart.resolved, recorded_chart.requested)
+
+
+def test_calculation_does_not_reresolve_timezone(
+  recorded_chart: NatalChart, monkeypatch: pytest.MonkeyPatch
+) -> None:
+  def forbidden(*args: object) -> None:
+    raise AssertionError("Timezone data must not be read")
+
+  monkeypatch.setattr("astrology.birth._load_iana_zone", forbidden)
+  resolved = replace(recorded_chart.resolved, tzdata_version="old", iana_version="old")
+  assert natal_chart(resolved, recorded_chart.requested).resolved == resolved
 
 
 def test_the_result_does_not_alias_sequences_given_by_the_caller() -> None:
