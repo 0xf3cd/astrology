@@ -30,6 +30,9 @@ is a blocker; do not switch to a token or weaken protection to continue.
 
 ## Prepare and inspect the candidate
 
+Before publishing a new version, prepare its version bump and matching
+installation and example pins in a separate reviewed change.
+
 1. Review the source, matching bilingual notes and the seven acceptance items in
    the release tracker. Keep dependency policy, calculation conventions and
    breaking API changes explicit.
