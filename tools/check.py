@@ -82,6 +82,8 @@ SDIST_FILES = (
   "tests/reference/natal_reference.json",
   "tests/reference/complete_chart_reference.json",
   "tests/reference/chart_record_v1.json",
+  "tests/reference/chart_record_v1_v010.json",
+  "tests/reference/chart_record_v1_v010.source.json",
   "tests/reference/constructed_chart.en.txt",
   "tests/reference/constructed_chart.zh-CN.txt",
 )

@@ -1,0 +1,21 @@
+{
+  "record": "chart_record_v1_v010.json",
+  "sha256": "cbe078380d2fd5cc9c59408a5539078a76389a6b5562852bddb2382ba8b4cc90",
+  "source_sha": "6b3293fae94b2f61e89a1d95778464f307c0d373",
+  "wheel": {
+    "url": "https://github.com/0xf3cd/astrology/releases/download/v0.1.0/celestial_astrology-0.1.0-py3-none-any.whl",
+    "sha256": "1069b1d0419ecdcca68f2218dafdc8871559f747bb9dc03f58a0cf1b9ac6df8c"
+  },
+  "release_manifest": {
+    "url": "https://github.com/0xf3cd/astrology/releases/download/v0.1.0/manifest.json",
+    "sha256": "932d0f178047f4d3a226130413c715e4dea96a13f0ead8b6749465a7ab145a66"
+  },
+  "environment": {
+    "python": "3.14.7",
+    "celestial-astrology": "0.1.0",
+    "celestial-calendar": "0.8.0",
+    "tzdata": "2026.5"
+  },
+  "generation": "Install the verified release wheel in an isolated environment. Construct the synthetic BirthRecord and ChartConfig encoded in the record, call prepare_natal_input and natal_chart, then write dumps_chart as UTF-8 without a trailing newline. Do not replace provenance fields.",
+  "purpose": "Project-calculated preservation and numerical regression sample, not an independent astronomy reference."
+}

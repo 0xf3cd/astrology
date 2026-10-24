@@ -192,7 +192,7 @@ class EffectiveConfiguration:
     if type(self.house_system) is not HouseSystem:
       raise TypeError("house_system must be a HouseSystem")
     if type(self.delta_t_model) is not str or not self.delta_t_model.strip():
-      raise ValueError("delta_t_model must be a nonempty plain string")
+      raise ValueError("delta_t_model must be a plain string containing a non-whitespace character")
     if type(self.evaluation) is not str or self.evaluation != _EVALUATION:
       raise ValueError("Unknown chart evaluation")
     if not isinstance(self.aspect_objects, Sequence) or isinstance(
@@ -225,7 +225,7 @@ class ChartProvenance:
     for name in ("celestial_version", "astrology_version"):
       value = getattr(self, name)
       if type(value) is not str or not value.strip():
-        raise ValueError(f"{name} must be a nonempty plain string")
+        raise ValueError(f"{name} must be a plain string containing a non-whitespace character")
     if type(self.position_frame) is not str or self.position_frame != _POSITION_FRAME:
       raise ValueError("Unknown position frame")
     if type(self.ut1_derivation) is not str or self.ut1_derivation != _UT1_DERIVATION:

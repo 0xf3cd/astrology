@@ -221,7 +221,18 @@ The separate Swiss complete-chart fixture adds independent rates and all house
 cusps, plus separately derived placements, aspects and motion for four synthetic
 instants. All five aspect identities occur. Its case-specific tolerances and source
 limits are documented in the [record guide](records.md#verification-and-limits).
-The stored development record tests replay separately; it is not external evidence.
+The historical records are project-calculated regression samples, not external
+evidence. Follow the [record compatibility policy](records.md#compatibility-across-releases)
+when changing pure rules, schema meanings or dependencies. Keep their original
+bytes and provenance. Restoration/display, replay eligibility, current provenance
+and numerical regression must run independently: a version-only change must not
+prevent numerical comparison. A changed model needs an explicit comparison policy.
+
+Demonstrate that a regression test accepts valid input and rejects the defect it
+targets. A version-label change alone must pass numerical regression; an internally
+valid numerical change beyond tolerance must fail at the numerical assertion.
+Record the changed input or implementation, actual exit code and failure location
+in the PR. A constructor or import failure does not demonstrate a numerical check.
 
 ## Knowledge and documentation
 

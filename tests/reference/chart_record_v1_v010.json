@@ -1,0 +1,111 @@
+{
+  "aspects": [],
+  "effective": {
+    "aspect_objects": [],
+    "delta_t_model": "algo5",
+    "evaluation": "fixed_fourteen_object_joint_snapshot",
+    "house_system": "whole_sign",
+    "orb_combination": null
+  },
+  "houses": {
+    "ascendant_deg": 11.37536204080294,
+    "cusps_deg": [
+      0.0,
+      30.0,
+      60.0,
+      90.0,
+      120.0,
+      150.0,
+      180.0,
+      210.0,
+      240.0,
+      270.0,
+      300.0,
+      330.0
+    ],
+    "descendant_deg": 191.37536204080294,
+    "imum_coeli_deg": 99.61233147628042,
+    "midheaven_deg": 279.6123314762804,
+    "system": "whole_sign"
+  },
+  "input": {
+    "record": {
+      "calendar": "gregorian",
+      "date": "2000-01-01",
+      "location": {
+        "latitude": 0.0,
+        "longitude": 0.0
+      },
+      "precision": "minute",
+      "source": {
+        "example": "synthetic"
+      },
+      "time": "12:00:00",
+      "timezone": {
+        "kind": "fixed_offset",
+        "offset_microseconds": 0
+      }
+    },
+    "resolved": {
+      "fold": null,
+      "iana_version": null,
+      "timezone_key": null,
+      "tzdata_version": null,
+      "utc": "2000-01-01T12:00:00+00:00",
+      "utc_offset_microseconds": 0
+    }
+  },
+  "placements": [
+    {
+      "house": 10,
+      "identity": "sun",
+      "sign": "capricorn",
+      "sign_degree_deg": 10.368918601924406
+    },
+    {
+      "house": 8,
+      "identity": "moon",
+      "sign": "scorpio",
+      "sign_degree_deg": 13.323773568023825
+    }
+  ],
+  "positions": [
+    {
+      "distance_au": 0.983327676449231,
+      "identity": "sun",
+      "latitude_deg": 0.00023986508858386046,
+      "longitude_deg": 280.3689186019244,
+      "longitude_rate_deg_per_tt_day": 1.0194338030211612
+    },
+    {
+      "distance_au": 0.0026901911904639087,
+      "identity": "moon",
+      "latitude_deg": 5.171147795486901,
+      "longitude_deg": 223.32377356802382,
+      "longitude_rate_deg_per_tt_day": 12.021083611403405
+    }
+  ],
+  "provenance": {
+    "astrology_version": "0.1.0",
+    "celestial_version": "0.8.0",
+    "position_frame": "apparent_geocentric_true_ecliptic_of_date",
+    "ut1_derivation": "delta_t_model_from_civil_utc"
+  },
+  "requested": {
+    "aspect_objects": null,
+    "aspects": [],
+    "center": "geocentric",
+    "house_system": "whole_sign",
+    "objects": [
+      "sun",
+      "moon"
+    ],
+    "orb_combination": null,
+    "zodiac": "tropical"
+  },
+  "schema_version": 1,
+  "times": {
+    "jd_ut1": 2451545.000003745,
+    "jde_tt": 2451545.0007428704
+  }
+}
