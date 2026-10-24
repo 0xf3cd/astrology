@@ -89,8 +89,8 @@ The caller owns file/network I/O and any resource limits for untrusted input.
 `loads_chart` rejects duplicate, unknown or missing fields, wrong types (including
 booleans used as numbers), nonfinite numbers, unsupported schema/enum/frame identities
 and inconsistent derived results with `ChartRecordError`. These derivations are
-pure: signs, house membership and aspects are calculated from the stored positions
-and rules without astronomy. Direct result construction uses the same domain
+pure: signs, house membership and aspects are calculated from the stored positions,
+house cusps and rules without astronomy. Direct result construction uses the same domain
 checks. Stored values are checked, not replaced.
 
 This does **not** authenticate the original timezone choice, astronomical values,
@@ -99,8 +99,9 @@ No native time/house computation occurs at restoration. If a later version chang
 a pure rule, its schema compatibility must be handled explicitly; old values must
 not silently acquire new meanings.
 
-Unknown nonempty package-version or Delta-T-model strings remain restorable because
-their stored results are still inspectable. Unknown frame, UT1-derivation or
+Unknown package-version or Delta-T-model strings remain restorable if they contain
+at least one non-whitespace character, so their stored results can still be inspected.
+Unknown frame, UT1-derivation or
 evaluation identities are not restorable under schema v1: the interpretation of
 the values would be unknown.
 
@@ -152,7 +153,7 @@ identities and pure-result consistency.
 | --- | --- |
 | `loads_chart` | Preserves original input, resolved time, values and provenance without astronomy or timezone lookup. It does not authenticate their origin. |
 | `format_chart` | Displays the restored result using a supplied catalog with the required names. The truncation rule and classifications are preserved; layout and translated wording are not fixed by the record format. |
-| `recompute_chart` | Requires recorded versions to match installed `celestial-astrology`, installed `celestial-calendar` and its native library, with the recorded fixed model available. A version/model mismatch raises `ChartReplayError`. |
+| `recompute_chart` | Requires exact version matches for installed `celestial-astrology`, installed `celestial-calendar` and the loaded `celestial_calendar` module, with the recorded fixed model available. A version/model mismatch raises `ChartReplayError`. |
 | `natal_chart(stored.resolved, stored.requested)` | Calculates a new chart with the current supported calculation and its provenance. It retains the resolved birth input, does not look up the timezone again, and leaves the stored chart intact. |
 
 `schema_version` identifies both structure and meaning. An incompatible change to
@@ -163,7 +164,7 @@ membership, orb combination and motion classification. Validation must not apply
 a changed rule silently to old records. New named identities can extend the
 format without redefining existing ones; readers reject identities they do not
 recognize. A changed default applies to new calculations, not to a stored choice.
-Package-version and Delta-T-model strings are different: unknown nonempty values
+Package-version and Delta-T-model strings are different: unknown nonblank values
 can still be preserved and inspected, as described above.
 
 A release introducing incompatible semantics must state which schemas it

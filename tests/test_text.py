@@ -303,6 +303,7 @@ def test_truncated_deviation_is_not_exact(recorded_chart: NatalChart) -> None:
 
 
 @pytest.mark.parametrize("language", ["en", "zh-CN"])
+# These floats lie below one and two arcseconds. 两个浮点数分别略小于一、二角秒。
 @pytest.mark.parametrize("angle,seconds", [(1 / 3600, "00"), (2 / 3600, "01")])
 @pytest.mark.parametrize("negative", [False, True])
 def test_exact_arcsecond_position_and_signed_deviation(
