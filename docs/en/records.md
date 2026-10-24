@@ -9,7 +9,7 @@ Restoration never resolves the timezone again or imports native astronomy.
 
 ## A complete example
 
-This synthetic record falls in the repeated half-hour on Lord Howe Island.
+This synthetic record falls in the half-hour repeated when clocks move back on Lord Howe Island.
 Choose the earlier occurrence with `fold=0`. The location here is deliberately
 synthetic, not inferred from the timezone. There are no default aspect orbs.
 
@@ -88,9 +88,10 @@ The caller owns file/network I/O and any resource limits for untrusted input.
 
 `loads_chart` rejects duplicate, unknown or missing fields, wrong types (including
 booleans used as numbers), nonfinite numbers, unsupported schema/enum/frame identities
-and inconsistent pure results with `ChartRecordError`. Direct result construction
-uses the same domain checks: signs, house membership and aspects must agree with
-the stored positions and rules. Stored values are checked, not replaced.
+and inconsistent derived results with `ChartRecordError`. These derivations are
+pure: signs, house membership and aspects are calculated from the stored positions
+and rules without astronomy. Direct result construction uses the same domain
+checks. Stored values are checked, not replaced.
 
 This does **not** authenticate the original timezone choice, astronomical values,
 their relationship to the claimed UTC/location, or the claimed software versions.
@@ -136,9 +137,8 @@ Direct `natal_chart` calculation requires installed distribution metadata and ra
 
 The import remains `astrology`, while installed project metadata is read under
 `celestial-astrology`. Schema v1 keeps the field name `astrology_version`.
-Version equality is only a compatibility check: development/candidate labels such
-as `0.0.0` or `0.1.0` do not identify a unique source revision or guarantee bitwise
-equality between trees.
+Version equality is only a compatibility check. A version label alone does not
+identify a unique source revision or guarantee bitwise equality between trees.
 
 ## Compatibility across releases
 
@@ -152,7 +152,7 @@ identities and pure-result consistency.
 | --- | --- |
 | `loads_chart` | Preserves original input, resolved time, values and provenance without astronomy or timezone lookup. It does not authenticate their origin. |
 | `format_chart` | Displays the restored result using a supplied catalog with the required names. The truncation rule and classifications are preserved; layout and translated wording are not fixed by the record format. |
-| `recompute_chart` | Requires exact installed/native package versions and the recorded fixed model. A version/model mismatch raises `ChartReplayError`. |
+| `recompute_chart` | Requires recorded versions to match installed `celestial-astrology`, installed `celestial-calendar` and its native library, with the recorded fixed model available. A version/model mismatch raises `ChartReplayError`. |
 | `natal_chart(stored.resolved, stored.requested)` | Calculates a new chart with the current supported calculation and its provenance. It retains the resolved birth input, does not look up the timezone again, and leaves the stored chart intact. |
 
 `schema_version` identifies both structure and meaning. An incompatible change to
@@ -167,22 +167,25 @@ Package-version and Delta-T-model strings are different: unknown nonempty values
 can still be preserved and inspected, as described above.
 
 A release introducing incompatible semantics must state which schemas it
-supports. It must either retain the old reader and validation meanings or reject
-the unsupported schema explicitly, documenting an older compatible environment
-or a separately specified migration. A migration keeps the original record and
-identifies any transformed values. Editing `schema_version` or provenance alone
-is not a migration. v0.2.0's v1 support is not a promise to support every schema
-indefinitely. Supporting old and new pure rules together would require validation
-that distinguishes their meanings; the current constructors use the current rules.
+supports. For an older schema, it must either preserve that schema's reading and
+validation rules or reject it explicitly. If it rejects a schema, its documentation
+must give an older compatible environment or a separately specified migration.
+A migration keeps the original record and identifies any transformed values.
+Editing `schema_version` or provenance alone is not a migration. v0.2.0's v1
+support is not a promise to support every schema indefinitely. Supporting old and
+changed pure rules together would require validation that distinguishes their
+meanings; the current constructors use the current rules.
 
 ### Calculate again after upgrading
 
 From a source checkout, load the fixed sample produced by the published v0.1.0
-wheel, then calculate from its saved input:
+wheel, then calculate from its saved input. Replace the sample path with your own
+saved JSON file to use this with your chart:
 
 ```{doctest}
 >>> from pathlib import Path
 >>> from importlib.metadata import version
+>>> from astrology import dumps_chart, loads_chart, natal_chart
 >>> stored = loads_chart(Path("tests/reference/chart_record_v1_v010.json").read_text(encoding="utf-8"))
 >>> original = dumps_chart(stored)
 >>> stored.provenance.astrology_version
@@ -196,8 +199,9 @@ True
 True
 ```
 
-In the matching v0.1.0 / celestial-calendar 0.8.0 / Algo5 environment, this sample
-can also pass `recompute_chart`. Under v0.2.0, that strict replay raises
+With celestial-astrology v0.1.0, celestial-calendar 0.8.0 and the fixed Delta-T
+model Algo5, this sample can also pass `recompute_chart`. Once the installed
+celestial-astrology package is upgraded to v0.2.0, that strict replay raises
 `ChartReplayError` because the astrology version differs. The explicit fresh
 calculation above instead records the current calculation's versions and model;
 it does not relabel the historical chart to make replay pass. A changed Delta-T
@@ -211,9 +215,9 @@ arcseconds. Aries 29.9999999° displays as Aries 29°59'59", not Taurus 0°00'00
 House and aspect-motion labels always come from the stored result. An object's
 displayed longitude can match a cusp's while its unrounded position is still in
 the preceding house; a nonzero deviation displayed as zero
-can still be applying or separating. `R` uses the sign of the unrounded rate, `D`
-means increasing longitude, and `S` means exactly zero rate. The text is not a
-lossless alternative to JSON.
+can still be applying or separating. From the unrounded rate, `R` means decreasing
+longitude, `D` means increasing longitude, and `S` means exactly zero rate.
+The text is not a lossless alternative to JSON.
 
 ## Verification and limits
 

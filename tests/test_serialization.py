@@ -67,7 +67,11 @@ def test_historical_fixtures_keep_original_bytes() -> None:
     "ceb3cdf9c42266919a5c6f0aec17ac5a2e3564935bb5645b3aeb7a815b887f5a"
   )
   source = json.loads((_REFERENCE / "chart_record_v1_v010.source.json").read_text())
+  assert source["record"] == "chart_record_v1_v010.json"
   assert sha256((_REFERENCE / source["record"]).read_bytes()).hexdigest() == source["sha256"]
+  provenance = json.loads(_RELEASE_TEXT)["provenance"]
+  assert source["environment"]["celestial-astrology"] == provenance["astrology_version"]
+  assert source["environment"]["celestial-calendar"] == provenance["celestial_version"]
 
 
 def test_historical_record_preservation(historical_text: str) -> None:
@@ -253,6 +257,8 @@ def test_fixed_offset_microseconds_signed_zero_and_clock_rollover() -> None:
     (("provenance", "position_frame"), "j2000"),
     (("provenance", "ut1_derivation"), "utc_is_ut1"),
     (("provenance", "astrology_version"), ""),
+    (("provenance", "celestial_version"), ""),
+    (("effective", "delta_t_model"), ""),
     (("times", "jd_ut1"), True),
     (("times", "jde_tt"), "2450000"),
     (("positions", 0, "identity"), "moon"),
@@ -393,6 +399,38 @@ def test_empty_record_arrays_reject_other_shapes(
     loads_chart(json.dumps(record))
 
 
+@pytest.mark.parametrize(
+  "path",
+  [
+    ("input",),
+    ("input", "record"),
+    ("input", "resolved"),
+    ("input", "record", "timezone"),
+    ("input", "record", "location"),
+    ("input", "record", "source"),
+    ("requested",),
+    ("requested", "aspects", 0),
+    ("requested", "aspects", 0, "object_orbs", 0),
+    ("effective",),
+    ("provenance",),
+    ("times",),
+    ("houses",),
+    ("positions", 0),
+    ("placements", 0),
+    ("aspects", 0),
+  ],
+)
+def test_nested_record_objects_reject_arrays(path: tuple[str | int, ...]) -> None:
+  record: Any = json.loads(_RECORD_TEXT)
+  parent = record
+  for key in path[:-1]:
+    parent = parent[key]
+  assert isinstance(parent[path[-1]], dict)
+  parent[path[-1]] = []
+  with pytest.raises(ChartRecordError, match="Expected a JSON object"):
+    loads_chart(json.dumps(record))
+
+
 @pytest.mark.parametrize("text", ["null", "[]", "{}", "[", "[[]]", "[" * 1500 + "]" * 1500])
 def test_bad_json_or_shape(text: str) -> None:
   with pytest.raises(ChartRecordError):
@@ -409,15 +447,22 @@ def test_duplicate_keys_at_root_and_nested(recorded_chart: NatalChart) -> None:
       loads_chart(text)
 
 
-@pytest.mark.parametrize("field", ["astrology_version", "celestial_version", "delta_t_model"])
+@pytest.mark.parametrize(
+  "field,message",
+  [
+    ("astrology_version", "astrology version"),
+    ("celestial_version", "celestial-calendar version"),
+    ("delta_t_model", "Delta-T model"),
+  ],
+)
 def test_unknown_executable_version_restores_but_cannot_replay(
-  recorded_chart: NatalChart, field: str
+  recorded_chart: NatalChart, field: str, message: str
 ) -> None:
   record = json.loads(dumps_chart(recorded_chart))
   record["effective" if field == "delta_t_model" else "provenance"][field] = "unavailable"
   restored = loads_chart(json.dumps(record))
   assert "unavailable" in dumps_chart(restored)
-  with pytest.raises(ChartReplayError):
+  with pytest.raises(ChartReplayError, match=message):
     recompute_chart(restored)
 
 

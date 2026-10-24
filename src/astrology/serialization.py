@@ -467,16 +467,16 @@ def loads_chart(data: str) -> NatalChart:
   """Restore schema v1 without astronomy, timezone lookup or replacing stored values.
 
   Reject unknown/missing/duplicate fields, unsupported identities, nonfinite values,
-  noncanonical ISO timestamps and inconsistent pure derivations with ChartRecordError.
-  JSON whitespace/key order need not be canonical. Free-string model/package versions
-  may be unknown; replay checks their availability. This does not authenticate astronomy
-  or the original timezone resolution. Non-string input raises TypeError.
+  noncanonical ISO timestamps and inconsistent derivations from stored fields with
+  ChartRecordError. JSON whitespace/key order need not be canonical. Nonempty model and
+  package-version strings may be unknown; replay checks their availability. This does not
+  authenticate astronomy or the original timezone resolution. Non-string input raises TypeError.
 
   Release support and upgrades are described in `the record guide <records.html>`_.
 
   恢复结构版本 v1，不调用天文库、不查时区，也不替换存储值。未知、缺失或重复字段、
-  不支持的标识、非有限数、非规范 ISO 时间文本或纯推导结果不一致时，抛出 ChartRecordError。
-  JSON 的空白和键顺序不必规范化。自由字符串形式的模型及包版本可以未知，能否执行由重算检查。
+  不支持的标识、非有限数、非规范 ISO 时间文本或与存储字段的推导结果不一致时，抛出 ChartRecordError。
+  JSON 的空白和键顺序不必规范化。非空的模型及包版本字符串可以未知，重算时再检查它们是否可用。
   这不认证天文值或原来的时区解析；输入不是字符串时抛出 TypeError。
 
   各版本的支持范围及升级方式见 `记录指南 <records.html>`_。

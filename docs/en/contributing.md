@@ -228,16 +228,11 @@ bytes and provenance. Restoration/display, replay eligibility, current provenanc
 and numerical regression must run independently: a version-only change must not
 prevent numerical comparison. A changed model needs an explicit comparison policy.
 
-Check that the regression tests distinguish the intended defects. Removing the
-JSON-array guard must fail the public shape-rejection cases, including objects
-whose keys masquerade as identity lists and empty objects masquerading as empty
-arrays. Float-multiply arcsecond truncation must fail exact value assertions,
-using an independent rational oracle and bilingual text rows. A version-label
-change alone must pass numerical regression; an internally valid numerical change
-beyond tolerance must fail there. README negative controls derive the install
-command from their own fixture metadata, verify the mutation changed it, and run
-for both the current and a synthetic next version. Record actual exits and failure
-locations; a constructor/import failure is not evidence of a numerical check.
+Demonstrate that a regression test accepts valid input and rejects the defect it
+targets. A version-label change alone must pass numerical regression; an internally
+valid numerical change beyond tolerance must fail at the numerical assertion.
+Record the changed input or implementation, actual exit code and failure location
+in the PR. A constructor or import failure does not demonstrate a numerical check.
 
 ## Knowledge and documentation
 

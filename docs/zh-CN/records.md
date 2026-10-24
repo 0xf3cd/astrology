@@ -76,9 +76,9 @@ JSON 根字段为 `schema_version`、`input`、`requested`、`effective`、`prov
 ## 恢复不等于重算
 
 重复、未知或缺失字段、类型错误（包括拿布尔值当数值）、非有限数、不支持的结构版本、
-枚举或坐标标识，以及纯推导结果不一致，都会使 `loads_chart` 抛出 `ChartRecordError`。
-直接构造结果也要经过同样的领域检查：星座、落宫及相位必须与所存位置和规则一致。
-检查不会用新值替换存储值。
+枚举或坐标标识，以及推导结果不一致，都会使 `loads_chart` 抛出 `ChartRecordError`。
+这里的纯推导是指：只用存储的位置及规则计算星座、落宫和相位，不调用天文库。
+直接构造结果也要经过同样的领域检查。检查不会用新值替换存储值。
 
 这**不认证**原来的时区选择、天文值、天文值与所称 UTC/地点之间的关系，或所称的软件版本。
 恢复不执行原生时刻或宫位计算。以后若改变纯规则，须明确处理结构版本兼容，不能悄悄改变旧值的含义。
@@ -117,7 +117,7 @@ ChartReplayError
 
 Python 导入名仍是 `astrology`，查询安装元数据时使用 `celestial-astrology`；
 结构版本 v1 的字段名仍为 `astrology_version`。
-版本相等只是一项兼容性检查：`0.0.0`、`0.1.0` 这类开发／候选版本号不能唯一标识源码修订，
+版本相等只是一项兼容性检查。仅凭版本号不能唯一标识源码修订，
 也不保证不同代码树的结果逐位相等。
 
 ## 跨版本兼容
@@ -131,7 +131,7 @@ v0.2.0 支持的历史输入包括：正式发布的 v0.1.0 生成的有效 v1 �
 | --- | --- |
 | `loads_chart` | 不调用天文库、不查时区，保留原始输入、已解析时刻、数值及来源；不认证它们的来历。 |
 | `format_chart` | 用包含所需名称的传入目录显示恢复后的结果。保留截断规则和分类；记录格式不固定排版或翻译措辞。 |
-| `recompute_chart` | 要求已安装包及原生库的版本精确匹配，并支持记录中的固定模型。版本或模型不匹配时抛出 `ChartReplayError`。 |
+| `recompute_chart` | 要求记录中的版本与已安装的 `celestial-astrology`、`celestial-calendar` 及其原生库精确匹配，并支持记录中的固定模型。版本或模型不匹配时抛出 `ChartReplayError`。 |
 | `natal_chart(stored.resolved, stored.requested)` | 按当前支持的计算方式生成新盘，记录本次计算的来源。保留已解析出生输入，不再查时区，也不修改存储盘。 |
 
 `schema_version` 同时约束结构和含义。字段布局、单位、标识含义或纯规则发生不兼容变化时，
@@ -141,18 +141,21 @@ v0.2.0 支持的历史输入包括：正式发布的 v0.1.0 生成的有效 v1 �
 读取器遇到不认识的标识就拒绝。默认值变化影响新计算，不改变记录中已有选择的含义。
 包版本及 ΔT 模型字符串另有规则：如上文所述，未知但非空的值仍可保留、查看。
 
-引入不兼容语义的版本必须声明支持哪些 schema：或者保留旧读取及校验语义，或者明确拒绝
-不支持的 schema，并说明可用的旧环境或另行规定的迁移方法。迁移须保留原始记录，指明转换过的值；
-仅修改 `schema_version` 或来源信息不算迁移。v0.2.0 支持 v1，不表示以后永久支持所有 schema。
+引入不兼容语义的版本必须声明支持哪些 schema。对于旧 schema，或者保留其读取及校验规则，
+或者明确拒绝。若拒绝，其文档须说明可用的旧环境或另行规定的迁移方法。
+迁移须保留原始记录，指明转换过的值；仅修改 `schema_version` 或来源信息不算迁移。
+v0.2.0 支持 v1，不表示以后永久支持所有 schema。
 若将来要同时支持新旧纯规则，就需要能区分两种含义的校验方式；当前构造器使用当前规则。
 
 ### 升级后重新计算
 
-在源码目录中，读取由正式发布的 v0.1.0 wheel 生成的固定样本，再用其保存的输入计算：
+在源码目录中，读取由正式发布的 v0.1.0 wheel 生成的固定样本，再用其保存的输入计算。
+处理自己的命盘时，把样本路径换成已保存的 JSON 文件路径：
 
 ```{doctest}
 >>> from pathlib import Path
 >>> from importlib.metadata import version
+>>> from astrology import dumps_chart, loads_chart, natal_chart
 >>> stored = loads_chart(Path("tests/reference/chart_record_v1_v010.json").read_text(encoding="utf-8"))
 >>> original = dumps_chart(stored)
 >>> stored.provenance.astrology_version
@@ -166,8 +169,9 @@ True
 True
 ```
 
-在匹配的 v0.1.0 / celestial-calendar 0.8.0 / Algo5 环境中，该样本也能通过
-`recompute_chart`。换到 v0.2.0，严格重算会因 astrology 版本不符而抛出
+使用 celestial-astrology v0.1.0、celestial-calendar 0.8.0 和固定 ΔT 模型 Algo5 时，
+该样本也能通过 `recompute_chart`。将已安装的 celestial-astrology 包升级到 v0.2.0 后，
+严格重算会因 astrology 版本不符而抛出
 `ChartReplayError`。上面的显式新计算则记录当前计算的版本和模型，不会改写历史盘的标签来
 绕过重算检查。ΔT 模型变化可能仍允许恢复，却使严格重算不可用，并改变新计算的数值。
 比较数值时须说明采用的模型、约定及容差。
