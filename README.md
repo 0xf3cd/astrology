@@ -33,22 +33,23 @@ Do not install the unrelated PyPI project named `astrology`.
 
 Use **Python 3.11–3.14** on one of the platforms listed above.
 
-The commands below install the published v0.1.0, which includes chart
-save/restore. The current source removes that API for the next release;
-the chart and knowledge examples below work with both.
+This checkout prepares 0.2.0. To try the candidate now,
+[install from source](https://0xf3cd.github.io/astrology/README.html#install-from-source).
+After 0.2.0 is published on PyPI, use the commands below.
+The examples show output from 0.2.0.
 
 Linux/macOS (replace `python3.14` with your supported Python version):
 
 ```sh
 python3.14 -m venv .venv
-.venv/bin/python -m pip install "celestial-astrology==0.1.0"
+.venv/bin/python -m pip install "celestial-astrology==0.2.0"
 ```
 
 Windows PowerShell:
 
 ```powershell
 py -3.14 -m venv .venv
-.venv\Scripts\python.exe -m pip install "celestial-astrology==0.1.0"
+.venv\Scripts\python.exe -m pip install "celestial-astrology==0.2.0"
 ```
 
 Runtime dependencies remain exactly pinned to `celestial-calendar==0.8.0` and
@@ -120,7 +121,7 @@ for placement in chart.placements:
 Output:
 
 ```text
-0.1.0
+0.2.0
 2000-01-01T12:00:00+00:00
 sun: capricorn
 moon: scorpio

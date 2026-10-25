@@ -27,25 +27,27 @@ macOS 14+ arm64、Windows amd64 的轮子，没有源码分发包。其他平台
 
 请在上述支持的平台使用 **Python 3.11–3.14**。
 
-以下命令安装已发布的 v0.1.0，其中包含命盘存取接口。当前源码为下一版撤回该接口；
-下方的排盘和知识示例在两者中均可运行。
+当前源码准备 0.2.0。试用候选版请[从源码安装](https://0xf3cd.github.io/astrology/README.zh-CN.html#install-from-source-zh-cn)。
+0.2.0 发布到 PyPI 后，再使用下面的命令。示例输出对应 0.2.0。
 
 Linux/macOS（可把 `python3.14` 换成其他受支持的 Python 版本）：
 
 ```sh
 python3.14 -m venv .venv
-.venv/bin/python -m pip install "celestial-astrology==0.1.0"
+.venv/bin/python -m pip install "celestial-astrology==0.2.0"
 ```
 
 Windows PowerShell：
 
 ```powershell
 py -3.14 -m venv .venv
-.venv\Scripts\python.exe -m pip install "celestial-astrology==0.1.0"
+.venv\Scripts\python.exe -m pip install "celestial-astrology==0.2.0"
 ```
 
 运行依赖仍精确固定为 `celestial-calendar==0.8.0` 和 `tzdata==2026.5`，
 可能与要求其他版本的应用发生依赖冲突。详见[发行说明](https://0xf3cd.github.io/astrology/docs/zh-CN/releases.html)。
+
+<a id="install-from-source-zh-cn"></a>
 
 ## 从源码安装
 
@@ -109,7 +111,7 @@ for placement in chart.placements:
 输出：
 
 ```text
-0.1.0
+0.2.0
 2000-01-01T12:00:00+00:00
 sun: capricorn
 moon: scorpio

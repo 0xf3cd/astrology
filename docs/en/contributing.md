@@ -99,14 +99,14 @@ inputs, while sibling directories are not. Warnings in these document sources st
 fail the strict build.
 
 Install this development package from the checkout using `uv sync` above. Its
-distribution name/version is `celestial-astrology` / `0.1.0`; the Python import
+distribution name/version is `celestial-astrology` / `0.2.0`; the Python import
 remains `astrology`. The unrelated
 PyPI project `astrology` is not this library. Confirm the installed identity:
 
 ```{doctest}
 >>> from importlib.metadata import version
 >>> version("celestial-astrology")
-'0.1.0'
+'0.2.0'
 ```
 
 The checks execute both READMEs against an isolated wheel install, compare their
