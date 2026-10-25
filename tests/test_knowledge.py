@@ -167,7 +167,12 @@ def test_ashmand_groups_have_names_sources_and_separate_states(catalog: Catalog)
   assert entry.output_eligibility is OutputEligibility.REFERENCE_ONLY
   assert entry.chart_applicability == "not_assessed"
   citations = catalog.citations(entry.identifier)
-  assert all(source.identifier == "source.ptolemy.ashmand1822" for _, source in citations)
+  assert sum(source.identifier == "source.ptolemy.ashmand1822" for _, source in citations) == 4
+  citation, implementation = citations[-1]
+  assert implementation.identifier == "source.astrology.sign_groups.c92ac82"
+  assert implementation.url.endswith("/c92ac826c3065fc9e4a2cc949cf87c64c79c0c63")
+  assert "ashmand_sign_group" in citation.locator
+  assert "not independent historical" in implementation.scope.en
   excerpts = [c for c, _ in citations if c.excerpt is not None]
   assert len(excerpts) == 3
   assert all(c.excerpt is not None and c.excerpt.zh for c in excerpts)
