@@ -579,8 +579,8 @@ def test_cross_policy_is_independently_retrievable_without_chart_applicability(
   assert entry.output_eligibility is OutputEligibility.REFERENCE_ONLY
   assert entry.chart_applicability == "not_assessed"
   citation, source = catalog.citations(entry.identifier)[0]
-  assert source.identifier == "source.astrology.cross_aspects.ea5c37b"
-  assert source.url.endswith("/ea5c37b77e035e39776b90300172996d7b26578c")
+  assert source.identifier == "source.astrology.cross_aspects.4c2bde2"
+  assert source.url.endswith("/4c2bde2b3655ac6982acc024733074f2b635079e")
   assert "src/astrology/cross_aspects.py" in citation.locator
   assert source.verification is SourceVerification.VERIFIED
   assert citation.excerpt is None
