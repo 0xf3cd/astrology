@@ -107,6 +107,7 @@ True
 (ashmand-sign-groups-zh-cn)=
 ## Ashmand 1822 年版星座分组
 
+这四组出自 Ashmand 的 1822 年英译本 *Ptolemy's Tetrabiblos, or Quadripartite*。
 此查询属于当前源码，不在已发布的 v0.1.0 中。提供一个 `Sign`，不需命盘、位置、出生记录或原生天文库：
 
 ```{doctest}
@@ -130,7 +131,7 @@ True
 
 四组中文名为**至点星座、分点星座、固定星座、双体星座**，对应 tropical、equinoctial、fixed、bicorporeal。
 这里的 tropical 只指两个至点星座，不是热带黄道的全部十二星座。原文直接点名至点与分点两对星座。
-在黄道次序中，固定星座紧接这两组星座，双体星座紧接固定星座。因此
+在黄道次序中，固定星座分别紧接这些星座，双体星座分别紧接固定星座。因此
 {ref}`十二星座表 <catalog-zh-cn-rule-ptolemy-ashmand-sign-groups>`是项目推导，不是原文逐项列举。
 
 `source.ptolemy.ashmand1822` 将定义定位至第一卷第 XIV 章、印刷页 34–35（PDF 第 72–73 页）。

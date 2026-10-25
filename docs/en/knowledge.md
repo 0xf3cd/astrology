@@ -131,6 +131,7 @@ chart-evidence store.
 
 ## Ashmand 1822 sign groups
 
+These groups come from Ashmand's 1822 *Ptolemy's Tetrabiblos, or Quadripartite*.
 This lookup is in current source, not the published v0.1.0. Supply a `Sign`,
 without a chart, position, birth record or native astronomy:
 
