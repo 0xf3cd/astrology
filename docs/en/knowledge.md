@@ -2,12 +2,12 @@
 
 [简体中文](../zh-CN/knowledge.md) · [Project](../../README.md) · [Architecture](architecture.md)
 
-The package provides a chart-independent knowledge catalog. List
-concepts and variants, find bilingual names/aliases, filter entries and sources,
-and inspect citations without birth data or native astronomy. Chart calculation
-is available through the [chart guide](chart.md) and is never needed to browse
-the catalog.
-See the generated [catalog](catalog.md) and [API](reference.md).
+The knowledge catalog lets you look up English and Chinese names and aliases,
+read rule definitions, and find the cited books or code. For example, look up the
+Sun as "Sol" or find Aries' group in Ashmand's 1822 edition. These queries need no
+birth data or chart. Browse the [complete catalog](catalog.md), or use the Python
+queries below. See the [API](reference.md) for interfaces and the [chart guide](chart.md)
+for calculation.
 
 ## Browse without a chart
 
@@ -27,19 +27,22 @@ True
 >>> catalog.filter_entries(concept_id="body.sun")[0].identifier
 'entry.body_requests'
 >>> len(catalog.filter_sources(verification=SourceVerification.VERIFIED))
-4
+5
 >>> bool(catalog.version)
 True
 ```
 
-In the built-in catalog, body and node-direction concepts have no separate rule
-variants, so the empty tuple for `body.sun` is expected. Their identity information
-remains on the concepts and entries; see [rule-ID changes](#pre-release-rule-id-changes).
+Several names can identify one concept: `Sun`, `Sol` and `日轮` all refer to
+`body.sun`. A rule variant records a particular definition, such as a house
+system or lunar-node algorithm. Body names and ascending/descending node directions
+do not get separate rules, so `list_variants(concept_id="body.sun")` returns `()`.
+The Sun's names and related entries remain available; see [rule-ID changes](#pre-release-rule-id-changes)
+for the old identifiers.
 
-`entry.cross_aspect_evaluation` and `rule.project.cross_aspect_evaluation` describe
-the [static cross-chart policy](cross_aspects.md), with its own fixed implementation
-source. Even with complete prerequisites, this entry remains reference-only;
-retrieving it does not assess a chart:
+You can also look up the rules for [cross-chart aspect comparison](cross_aspects.md).
+`entry.cross_aspect_evaluation` is the explanatory entry;
+`rule.project.cross_aspect_evaluation` is its linked rule. Retrieving the entry
+returns the explanation rather than running a comparison:
 
 ```{doctest}
 >>> comparison = catalog.entry("entry.cross_aspect_evaluation")
@@ -47,14 +50,20 @@ retrieving it does not assess a chart:
 ('complete', 'reference_only', 'not_assessed')
 ```
 
-Each `load_catalog()` explicitly reads the packaged JSON, without a cache or
-network. Constructors copy sequences into tuples. Invalid record types, duplicate
-IDs, dangling links and conflicting aliases raise `TypeError` or `ValueError`,
-including under `python -O`.
+Here, `complete` means the entry has stated its prerequisites, `reference_only`
+means it is for reference, and `not_assessed` means no chart has been checked
+against those prerequisites. These answer different questions; see [status meanings](#status-has-several-dimensions).
+
+### Return values and errors
+
+Each `load_catalog()` reads the packaged JSON file without network access or a
+cache. Record constructors copy input sequences into immutable tuples. Invalid
+record types, duplicate IDs, links to missing records and conflicting aliases
+raise `TypeError` or `ValueError`; these checks also run under `python -O`.
 
 `lookup()` normalizes NFC, trims and case-folds, then matches exact names/aliases.
-It returns an immutable tuple: `()` for no match, several distinct identities for
-ambiguous display names. Select `language="en"` or `language="zh-CN"` to restrict
+It returns an immutable tuple: `()` for no match, several distinct concepts for
+ambiguous names. Select `language="en"` or `language="zh-CN"` to restrict
 lookup; omission searches both. Unknown well-formed IDs in getters/filters raise
 `KeyError`; malformed strings raise `ValueError`, non-string IDs `TypeError`.
 Entry filters combine all selected criteria; they never evaluate prerequisites.
@@ -62,18 +71,24 @@ Entry filters combine all selected criteria; they never evaluate prerequisites.
 (knowledge-source-definitions-en)=
 ## Follow a source to a definition
 
-The corpus contains project configuration contracts, the project conventions for
-sign sectors and house placement, and one single-source historical grouping. It
-names every admitted configuration identity and twelve sign concepts, and links the
-executable rules in the chart implementation. Each project-defined aspect rule has
-a name, a written definition and a link to its implementation. The corpus provides
-no default orbs, dignity or interpretation rules.
-Concepts reference actual configuration enum members. Separate variants describe
-house-system bindings, named node definitions and aspect-angle rules, with limits
-specific to each rule. Reference pages add an exact-angle line from the executable
-definition; the angles in concept descriptions are checked against that definition.
-Body and node-direction identities do not
-need a second rule record.
+The catalog currently includes:
+
+- Available bodies, house systems, lunar-node definitions and aspects, with their
+  English and Chinese names.
+- How this project divides the zodiac into twelve signs, places objects in houses,
+  and calculates single-chart and cross-chart aspects.
+- The four sign groups in Ashmand's 1822 edition, with bibliographic records,
+  excerpts and Chinese translations.
+
+Configuration entries link to the enum members the program uses; rule descriptions
+link to their implementations. House systems, node definitions and aspect angles
+have separate explanations of the chosen definitions and their limits. Reference
+pages take exact aspect angles directly from the calculation code and check the
+angles in explanatory text against it. The catalog supplies no default orbs,
+dignity or interpretation rules.
+
+For example, inspect the equinoctial-sign entry's source, excerpt, translation
+and status:
 
 ```{doctest}
 >>> entry = catalog.entry("entry.equinoctial_example")
@@ -96,16 +111,20 @@ The citation locates Book I, chapter XIV, printed pp. 34–35 (PDF pages 72–73
 of Ashmand's English translation of the paraphrase attributed to Proclus. The
 {ref}`catalog example <catalog-en-entry-equinoctial-example>` preserves the complete
 English sentence and a separately credited project Chinese translation. The
-historical equal-day/night rationale is retained, not endorsed as an observed
-daylight guarantee. Statements, definitions and limitations are project
-explanations, not additional quotations.
+source explains the name using equal day and night; retaining that historical
+explanation does not guarantee observed daylight duration. The source has been
+checked (`verified`), but the entry's prerequisites for chart interpretation remain
+unclear (`unresolved`). The entry is marked `reference_only`, for consultation
+rather than chart conclusions. The entry's statements,
+definitions and limits are project explanations, separate from the quotation.
 
-The source records the edition, scan hash, transcription normalization and bounded
-reproduction status. Only a short transcription is included, not scan images,
-watermarks or modern website prose. Mirrors/catalogs corroborate the edition,
-not independent rule authorship. Config citations identify package version and
-symbols at a fixed commit; they do not verify an author's book formula merely
-because a project definition bears that author's name.
+Source records give the edition, scan hash, transcription changes and reproduction
+terms. The package includes limited definition excerpts, not scan images,
+watermarks or modern website prose. Mirrors and bibliographic records can help
+confirm an edition; they are not independent evidence for its rules. Code
+citations identify the package version and symbols at a fixed commit. A definition
+bearing an author's name does not mean the formulas in that author's book have
+been checked.
 
 Implementation source records stay pinned to the inspected commits instead of
 following the package version. The chart source record locates the node-comparison
@@ -114,8 +133,9 @@ node longitudes from the formulas recorded there and compares them with upstream
 results. This does not verify Meeus's printed text, establish an error bound or show
 equivalence to an osculating node.
 
-The following is synthetic partial evidence, not a traditional claim or matching
-API. The catalog does not consume it or promote the entry to applicable:
+The hand-written data below illustrates knowing only some of the conditions:
+the first is true, while the second remains unknown. The catalog does not read
+this dictionary or change the entry's chart-applicability status:
 
 ```{doctest}
 >>> partial_evidence = {"condition_a": True, "condition_b": None}
@@ -125,8 +145,50 @@ API. The catalog does not consume it or promote the entry to applicable:
 'not_assessed'
 ```
 
-All built-in entries are reference-only. This package has no matcher or
-chart-evidence store.
+All built-in entries are for reference. The package does not check whether a chart
+satisfies an entry or store chart evidence for that judgment.
+
+## Ashmand 1822 sign groups
+
+These groups come from Ashmand's 1822 *Ptolemy's Tetrabiblos, or Quadripartite*.
+New in 0.2.0, `ashmand_sign_group` takes a `Sign` and returns its group:
+
+```{doctest}
+>>> from astrology import AshmandSignGroup, Sign, ashmand_sign_group
+>>> from astrology.knowledge import load_catalog
+>>> catalog = load_catalog()
+>>> ashmand_sign_group(Sign.ARIES) is AshmandSignGroup.EQUINOCTIAL
+True
+>>> group = ashmand_sign_group(Sign.CANCER)
+>>> group.value
+'tropical'
+>>> catalog.concept(f"sign_group.ashmand1822.{group.value}").name.text("en")
+'Tropical signs'
+>>> historical = catalog.entry("entry.ashmand_sign_groups")
+>>> historical.prerequisite_status.value, historical.output_eligibility.value, historical.chart_applicability
+('complete', 'reference_only', 'not_assessed')
+```
+
+Raw strings and unrelated enums raise `TypeError`; convert user input to `Sign`
+explicitly. The result is a group label, not a score or interpretation. Here,
+`complete` means the membership lookup has all its required input: a `Sign`.
+The earlier equinoctial entry remains `unresolved` because prerequisites for
+chart interpretation are a separate question.
+
+The four labels are **tropical**, **equinoctial**, **fixed** and **bicorporeal**.
+Tropical here means the two solstitial signs, not all twelve signs of the tropical
+zodiac. The source directly names the tropical and equinoctial pairs. In zodiac
+order, fixed signs immediately follow those signs, and bicorporeal signs
+immediately follow fixed signs. The
+{ref}`twelve-sign table <catalog-en-rule-ptolemy-ashmand-sign-groups>` is
+project-derived, not a verbatim source list.
+
+The definitions appear in Book I, chapter XIV, printed pp. 34–35 (PDF pp. 72–73),
+recorded as `source.ptolemy.ashmand1822`. The catalog labels English excerpts,
+credited Chinese translations and project explanations separately, with the
+extent of each excerpt recorded in its citation. This classification follows
+Ashmand's edition; it does not establish agreement across traditions or predict
+actual weather or daylight.
 
 ## Translation revisions and search
 
@@ -239,18 +301,19 @@ source's wording and locator, and document reproduction rights for included mate
 
 ## Status has several dimensions
 
-This catalog uses `verified` / `unverified` for source inspection,
-`complete` / `unresolved` for prerequisite representation, and
-`eligible` / `reference_only` for editorial output eligibility. `eligible` does
-not mean that a chart satisfies the prerequisites. Retrieval leaves chart
-applicability `not_assessed`, regardless of the other fields. The questions are:
+Finding a source does not establish a rule's prerequisites for use in a chart;
+stating those prerequisites does not establish that a particular chart meets
+them. The catalog records these questions separately:
 
-1. Has the stated source been checked?
-2. Are the entry's prerequisites understood and represented?
-3. Is the entry eligible for the default output?
-4. Does a particular chart satisfy the represented prerequisites?
+| Question | Field and values | Meaning |
+|---|---|---|
+| Has the source been checked? | `source.verification`: `verified` / `unverified` | Whether the cited source was inspected, not whether its historical claim is true. |
+| Are the prerequisites clear? | `entry.prerequisite_status`: `complete` / `unresolved` | Whether the prerequisites are understood and fully stated, or something remains unclear. |
+| Can the entry appear in default output? | `entry.output_eligibility`: `eligible` / `reference_only` | An editorial decision; `eligible` does not mean a chart meets the prerequisites. |
+| Does a chart meet the conditions? | `entry.chart_applicability`: `not_assessed` | Catalog lookup does not make this judgment, regardless of the other three fields. |
 
-An eventual matcher must distinguish satisfied, not satisfied, and unknown.
+Any future chart-condition evaluator must distinguish satisfied, not satisfied,
+and unknown.
 Matching part of a condition must remain partial evidence. For example, a
 calculated aspect alone cannot establish a statement that also requires sect and
 dignity when those conditions have not been evaluated.
@@ -263,9 +326,9 @@ Related design: [bazi](https://github.com/0xf3cd/bazi).
 - Guides and explanations use matching paths in `docs/en/` and `docs/zh-CN/`, with
   links to their language counterpart. Both cover the same supported behavior.
 - Public API documentation exposes Chinese and English descriptions, constraints,
-  and examples. Signatures, units, defaults, identifiers, and error contracts have
-  one source. Keep public docstring summaries/contracts bilingual; render language
-  views without maintaining separate signature or parameter tables.
+  and examples. Signatures, units, defaults, identifiers and error behavior are
+  defined once. Public docstring summaries and usage requirements are bilingual;
+  both language views share signatures and parameter tables.
 - A concept or entry has one semantic identity with localized text. Record which
   semantic revision a translation covers; absence or staleness is visible rather
   than silently replaced with text in another language.

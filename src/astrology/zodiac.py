@@ -1,11 +1,12 @@
-"""Tropical zodiac classification over supplied longitudes, without astronomy.
+"""Tropical sign sectors and Ashmand's historical sign groups, without astronomy.
 
-对给定的黄经做热带黄道分类，不涉及天文计算。
+热带黄道星座区间与 Ashmand 的历史星座分组，不涉及天文计算。
 """
 
 from __future__ import annotations
 
 from enum import StrEnum
+from types import MappingProxyType
 
 from astrology._validation import finite_number
 
@@ -28,6 +29,60 @@ class Sign(StrEnum):
   CAPRICORN = "capricorn"
   AQUARIUS = "aquarius"
   PISCES = "pisces"
+
+
+class AshmandSignGroup(StrEnum):
+  """One of four sign groups in Ashmand's 1822 edition, Book I, chapter XIV.
+
+  TROPICAL means the two solstitial signs, not the whole tropical zodiac.
+  A group label alone gives no chart interpretation or observed-season guarantee.
+
+  Ashmand 1822 年版第一卷第 XIV 章的四种星座分组之一。TROPICAL 指两个至点星座，
+  不是整个热带黄道。组别本身不提供命盘解读，也不保证实际季节现象。
+  """
+
+  TROPICAL = "tropical"
+  EQUINOCTIAL = "equinoctial"
+  FIXED = "fixed"
+  BICORPOREAL = "bicorporeal"
+
+
+_ASHMAND_GROUPS = MappingProxyType(
+  {
+    Sign.ARIES: AshmandSignGroup.EQUINOCTIAL,
+    Sign.TAURUS: AshmandSignGroup.FIXED,
+    Sign.GEMINI: AshmandSignGroup.BICORPOREAL,
+    Sign.CANCER: AshmandSignGroup.TROPICAL,
+    Sign.LEO: AshmandSignGroup.FIXED,
+    Sign.VIRGO: AshmandSignGroup.BICORPOREAL,
+    Sign.LIBRA: AshmandSignGroup.EQUINOCTIAL,
+    Sign.SCORPIO: AshmandSignGroup.FIXED,
+    Sign.SAGITTARIUS: AshmandSignGroup.BICORPOREAL,
+    Sign.CAPRICORN: AshmandSignGroup.TROPICAL,
+    Sign.AQUARIUS: AshmandSignGroup.FIXED,
+    Sign.PISCES: AshmandSignGroup.BICORPOREAL,
+  }
+)
+
+
+def ashmand_sign_group(sign: Sign) -> AshmandSignGroup:
+  """Return a sign's group in Ashmand 1822, without a chart or I/O.
+
+  Accept a Sign member; raw strings and unrelated enums raise TypeError.
+  In zodiac order, fixed signs immediately follow tropical or equinoctial signs;
+  bicorporeal signs immediately follow fixed signs. This expands the source's
+  ordering, not a verbatim twelve-sign list. Source: Book I, chapter XIV,
+  printed pp. 34-35; knowledge rule: rule.ptolemy_ashmand.sign_groups.
+
+  返回星座在 Ashmand 1822 年版中的分组，不需命盘，也不执行 I/O。只接受 Sign 成员；
+  字符串或其他枚举抛出 TypeError。在黄道次序中，固定星座紧接至点星座或分点星座，
+  双体星座紧接固定星座。这是按原文次序展开的名单，不是原书逐项列出的十二星座表。
+  来源为第一卷第 XIV 章、印刷页 34-35；
+  知识规则标识为 rule.ptolemy_ashmand.sign_groups。
+  """
+  if type(sign) is not Sign:
+    raise TypeError("sign must be a Sign")
+  return _ASHMAND_GROUPS[sign]
 
 
 _SIGNS = tuple(Sign)

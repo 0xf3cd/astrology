@@ -68,13 +68,25 @@ def test_query_contracts(catalog: Catalog) -> None:
   assert len(catalog.list_concepts(kind=ConceptKind.BODY)) == len(Body)
   assert len(catalog.list_concepts(kind=ConceptKind.SIGN)) == 12
   sign_rules = catalog.list_variants(concept_id="sign.taurus")
-  assert [rule.identifier for rule in sign_rules] == ["rule.project.tropical_sign_sectors"]
+  assert [rule.identifier for rule in sign_rules] == [
+    "rule.project.tropical_sign_sectors",
+    "rule.ptolemy_ashmand.sign_groups",
+  ]
   assert catalog.list_variants(concept_id="body.sun") == ()
+  vocabulary = catalog.entry("entry.sign_vocabulary")
+  assert "rule.ptolemy_ashmand.sign_groups" in vocabulary.rule_ids
+  assert "source.astrology.sign_groups.c92ac82" in {c.source_id for c in vocabulary.citations}
   assert catalog.concept("body.sun").configuration is Body.SUN
   assert len(catalog.list_variants()) == len(catalog.variants)
   assert catalog.filter_entries() == tuple(catalog.entries)
-  assert len(catalog.filter_entries(concept_id="sign.aries")) == 2
-  assert len(catalog.filter_entries(source_id="source.ptolemy.ashmand1822")) == 2
+  assert [entry.identifier for entry in catalog.filter_entries(concept_id="sign.aries")] == [
+    "entry.sign_vocabulary",
+    "entry.equinoctial_example",
+    "entry.ashmand_sign_groups",
+  ]
+  assert catalog.filter_entries(source_id="source.ptolemy.ashmand1822") == catalog.filter_entries(
+    concept_id="sign.aries"
+  )
   assert catalog.filter_entries(output_eligibility=OutputEligibility.ELIGIBLE) == ()
   assert catalog.filter_entries(output_eligibility=OutputEligibility.REFERENCE_ONLY) == tuple(
     catalog.entries
@@ -84,6 +96,7 @@ def test_query_contracts(catalog: Catalog) -> None:
     for entry in catalog.filter_entries(prerequisite_status=PrerequisiteStatus.COMPLETE)
   } == {
     "entry.aspect_evaluation",
+    "entry.ashmand_sign_groups",
     "entry.aspect_requests",
     "entry.cross_aspect_evaluation",
     "entry.body_requests",
@@ -139,6 +152,39 @@ def test_source_layers_and_four_independent_states(catalog: Catalog) -> None:
   assert "not a guarantee" in catalog.variant(entry.rule_ids[0]).limits.en
 
 
+def test_ashmand_groups_have_names_sources_and_separate_states(catalog: Catalog) -> None:
+  from astrology import AshmandSignGroup, Sign, ashmand_sign_group
+
+  expected_names = ("至点星座", "分点星座", "固定星座", "双体星座")
+  concepts = catalog.list_concepts(kind=ConceptKind.SIGN_GROUP)
+  assert tuple(c.name.zh for c in concepts) == expected_names
+  assert tuple(c.identifier for c in concepts) == tuple(
+    f"sign_group.ashmand1822.{group.value}" for group in AshmandSignGroup
+  )
+  assert all(c.configuration is None for c in concepts)
+  for sign in Sign:
+    concept = catalog.concept(f"sign_group.ashmand1822.{ashmand_sign_group(sign).value}")
+    assert catalog.lookup(concept.name.zh or "")[0] is concept
+  entry = catalog.entry("entry.ashmand_sign_groups")
+  assert entry.prerequisite_status is PrerequisiteStatus.COMPLETE
+  assert entry.output_eligibility is OutputEligibility.REFERENCE_ONLY
+  assert entry.chart_applicability == "not_assessed"
+  citations = catalog.citations(entry.identifier)
+  assert sum(source.identifier == "source.ptolemy.ashmand1822" for _, source in citations) == 4
+  citation, implementation = citations[-1]
+  assert implementation.identifier == "source.astrology.sign_groups.c92ac82"
+  assert implementation.url.endswith("/c92ac826c3065fc9e4a2cc949cf87c64c79c0c63")
+  assert "ashmand_sign_group" in citation.locator
+  assert "not independent historical" in implementation.scope.en
+  excerpts = [c for c, _ in citations if c.excerpt is not None]
+  assert len(excerpts) == 3
+  assert all(c.excerpt is not None and c.excerpt.zh for c in excerpts)
+  assert all(c.excerpt is not None and c.excerpt.translation_credit for c in excerpts)
+  assert "sentence fragment" in excerpts[1].locator
+  assert "opening clause" in excerpts[2].locator
+  assert "project-derived" in entry.exceptions.en
+
+
 def test_partial_computation_cannot_promote_retrieval(catalog: Catalog) -> None:
   # Synthetic evidence, not a traditional claim or a bibliography.
   partial_evidence = {"condition_a": True, "condition_b": None}
@@ -154,7 +200,7 @@ def test_partial_computation_cannot_promote_retrieval(catalog: Catalog) -> None:
     replace(entry, output_eligibility=OutputEligibility.ELIGIBLE).chart_applicability
     == "not_assessed"
   )
-  assert catalog.filter_entries(concept_id="sign.aries")[-1] is entry
+  assert entry in catalog.filter_entries(concept_id="sign.aries")
 
 
 def test_container_ownership(catalog: Catalog) -> None:
@@ -393,6 +439,10 @@ if first != second or first is second or len(calls) != 2:
   raise RuntimeError('unexpected catalog cache or nondeterminism')
 first.lookup('日轮')
 first.citations('entry.equinoctial_example')
+from astrology import AshmandSignGroup, Sign, ashmand_sign_group
+if {ashmand_sign_group(sign) for sign in Sign} != set(AshmandSignGroup):
+  raise RuntimeError('historical lookup lost a group')
+first.citations('entry.ashmand_sign_groups')
 if any(name.startswith(('celestial', 'tzdata', 'zoneinfo', 'ctypes')) for name in sys.modules):
   raise RuntimeError('knowledge initialized time or native machinery')
 """
@@ -549,6 +599,7 @@ def test_retained_rule_ids_and_order(catalog: Catalog) -> None:
     "rule.project.tropical_sign_sectors",
     "rule.project.cusp_ownership",
     "rule.ptolemy_ashmand.equinoctial_signs",
+    "rule.ptolemy_ashmand.sign_groups",
     "rule.project.aspect_deviation",
     "rule.project.aspect_motion",
     "rule.project.aspect_participation",

@@ -2,9 +2,10 @@
 
 [English](../en/knowledge.md) · [项目入口](../../README.zh-CN.md) · [结构设计](architecture.md)
 
-本包提供独立于命盘的知识目录：无需出生资料或原生天文库，即可列概念与变体、查双语名称与别名、
-筛选条目及来源、查看引用。排盘计算见[排盘指南](chart.md)，浏览目录从不需要它。
-参见生成的[目录](catalog.md)与 [API](reference.md)。
+知识目录可以查中英文名称和别名、查看规则定义，并找到引用的书籍或代码。
+例如，可以用“日轮”查到太阳，也可以查白羊座在 Ashmand 1822 年版中属于哪一组。
+这些查询不需要出生资料或先排盘。直接浏览见[完整目录](catalog.md)，下面介绍 Python 查询方法；
+接口说明见 [API](reference.md)，排盘见[排盘指南](chart.md)。
 
 ## 不排盘，先查知识
 
@@ -24,17 +25,19 @@ True
 >>> catalog.filter_entries(concept_id="body.sun")[0].identifier
 'entry.body_requests'
 >>> len(catalog.filter_sources(verification=SourceVerification.VERIFIED))
-4
+5
 >>> bool(catalog.version)
 True
 ```
 
-内置目录中的天体和交点方向概念没有单独的规则变体，因此 `body.sun` 返回空元组是预期结果。
-身份信息仍保留在概念和条目中，参见[规则标识变更](#首发前的规则标识变更)。
+同一个概念可以有多个名称，但只有一个标识。例如，`Sun`、`Sol` 和“日轮”都指向 `body.sun`。
+规则变体则记录某套具体定义，例如采用哪种宫制或月交点算法。天体名称和升降交点方向本身不另建规则，
+所以 `list_variants(concept_id="body.sun")` 返回 `()`；仍可查询太阳的名称和相关条目。
+旧标识的处理见[规则标识变更](#首发前的规则标识变更)。
 
-`entry.cross_aspect_evaluation` 和 `rule.project.cross_aspect_evaluation` 描述
-[静态双盘政策](cross_aspects.md)，引用单独的固定实现来源。即使前提完整，此条目仍仅供参考，
-检索它不会判断命盘：
+也可以查询[双盘相位比较](cross_aspects.md)采用的规则。
+`entry.cross_aspect_evaluation` 是相关说明条目，`rule.project.cross_aspect_evaluation` 是它链接的规则。
+查到条目只会返回说明，不会运行双盘比较：
 
 ```{doctest}
 >>> comparison = catalog.entry("entry.cross_aspect_evaluation")
@@ -42,12 +45,17 @@ True
 ('complete', 'reference_only', 'not_assessed')
 ```
 
-每次 `load_catalog()` 均显式读取包内 JSON，不使用缓存或网络。构造时将序列复制为元组。
-非法记录类型、重复标识、悬空链接和别名冲突会抛出 `TypeError` 或 `ValueError`，
-即使在 `python -O` 下也如此。
+这里的 `complete` 表示条目已经写清所需前提；`reference_only` 表示它仅供参考，
+`not_assessed` 表示没有判断某张命盘是否满足这些前提。三者回答不同的问题，详见[状态说明](#状态需要分开表达)。
+
+### 返回值与错误
+
+`load_catalog()` 每次都从包内 JSON 文件读取目录，不访问网络，也不使用缓存。
+构造记录时会把传入的序列复制为不可变元组。记录类型错误、标识重复、链接指向不存在的记录或别名冲突时，
+会抛出 `TypeError` 或 `ValueError`；这些检查在 `python -O` 下仍然执行。
 
 `lookup()` 先做 NFC 规范化、去首尾空白及大小写折叠，再精确匹配名称与别名。
-结果为不可变元组：无匹配为 `()`，歧义显示名称返回多个不同身份。
+结果为不可变元组：无匹配时返回 `()`，名称有歧义时返回多个不同的概念。
 可用 `language="en"` 或 `language="zh-CN"` 限定语言，不选则查两种语言。
 获取及筛选遇到格式正确但未知的标识时抛出 `KeyError`；格式不合法的字符串抛出 `ValueError`，
 非字符串标识抛出 `TypeError`。条目筛选同时应用全部所选条件，从不判断前提。
@@ -55,12 +63,18 @@ True
 (knowledge-source-definitions-zh-cn)=
 ## 从来源查到定义
 
-语料收录项目配置合同、星座区间与落宫的项目约定，以及一条单源历史分组，
-列出全部接纳的配置身份和十二个星座概念，并链接排盘实现中的可执行规则。
-本项目的相位规则各有名称和文字说明，并链接对应的实现。语料不提供默认容许度、尊贵或解释规则。
-概念引用实际配置枚举成员。宫制绑定、具名交点定义与相位角规则另有变体，各自说明适用限制。
-参考页从可执行定义读取并添加精确角度一行；概念说明中的角度也会与该定义核对。
-天体和交点方向身份不需要另一份规则记录。
+目录目前包括：
+
+- 排盘时可选的天体、宫制、月交点定义和相位，以及它们的中英文名称。
+- 本项目如何划分十二星座、判断落宫，以及计算单盘和双盘相位。
+- Ashmand 1822 年版中的四组星座分类，以及相关书目、摘录和中文译文。
+
+配置项链接到程序实际使用的枚举成员；规则说明链接到对应的实现。
+宫制、月交点定义和相位角各有说明，写明采用哪种定义及其限制。
+参考页中的精确相位角直接取自计算代码，并核对说明文字中的角度。
+目录不提供默认容许度、尊贵或解读规则。
+
+例如，下面查看分点星座条目的出处、原文和译文，以及条目的状态：
 
 ```{doctest}
 >>> entry = catalog.entry("entry.equinoctial_example")
@@ -81,18 +95,21 @@ True
 
 引文定位至 Ashmand 对被归于 Proclus 的转述本所作英文译文：《第一卷》第 XIV 章，印刷页 34–35
 （PDF 第 72–73 页）。{ref}`目录例子 <catalog-zh-cn-entry-equinoctial-example>`保留完整英文句子及单独署名的项目中文译文。
-原文的昼夜等长历史理由保留，但不认可为实际日照时长保证。
-条目陈述、定义及限度是项目说明，不是额外引文。
+原文用昼夜等长解释这种命名；保留这段历史说明不表示程序保证实际日照时长。
+来源已经核实（`verified`），但条目用于命盘解读时需要哪些条件仍未明确（`unresolved`）。
+该条目标为 `reference_only`，供查阅，不作为命盘结论。
+条目的陈述、定义和限制是项目撰写的说明，与引文分开。
 
-来源记录说明版次、扫描文件哈希、转录规范化及有限的转载状态；仅收录一段短文，
-不附带扫描图、水印或现代网站说明。镜像及书目可旁证版本，不能算规则的独立作者。
-配置引用标明包版本及固定提交中的符号；项目定义名称含作者名，不表示已核验该作者书中的公式。
+来源记录给出版本、扫描文件哈希、转录时的文字处理和转载条件。包内只收录有限的定义摘录，
+不附扫描图、水印或现代网站说明。同一本书的镜像和书目可以帮助确认版本，但不能当作多份独立依据。
+代码引用给出包版本及固定提交中的符号；程序中的定义用了某位作者的名字，不表示已经核对过其原书公式。
 
 项目实现来源记录保留已查核的提交，不跟随包版本改写。排盘来源记录还定位到同一提交中
 `tests/test_reference.py` 的交点对拍测试。测试按其中记录的公式计算交点参考黄经，再与上游
 结果比较。这不等于核验 Meeus 印刷原文、确立误差界或证明与密切轨道交点等价。
 
-下方是合成的部分证据，不是传统断言或判别 API。目录不消费它，也不将条目提升为适用：
+下面用手工构造的数据表示“只知道部分条件”的情况：第一个条件为真，第二个仍未知。
+目录不会读取这个字典，也不会因此改变条目的命盘适用状态：
 
 ```{doctest}
 >>> partial_evidence = {"condition_a": True, "condition_b": None}
@@ -102,7 +119,42 @@ True
 'not_assessed'
 ```
 
-内置条目均仅供参考。当前包没有判别器或命盘证据存储。
+内置条目均仅供参考。当前包不判断某张命盘是否符合条目，也不存储这种判断所需的命盘证据。
+
+(ashmand-sign-groups-zh-cn)=
+## Ashmand 1822 年版星座分组
+
+这四组出自 Ashmand 的 1822 年英译本 *Ptolemy's Tetrabiblos, or Quadripartite*。
+0.2.0 新增 `ashmand_sign_group`，输入一个 `Sign`，即可查到它所属的组别：
+
+```{doctest}
+>>> from astrology import AshmandSignGroup, Sign, ashmand_sign_group
+>>> from astrology.knowledge import load_catalog
+>>> catalog = load_catalog()
+>>> ashmand_sign_group(Sign.ARIES) is AshmandSignGroup.EQUINOCTIAL
+True
+>>> group = ashmand_sign_group(Sign.CANCER)
+>>> group.value
+'tropical'
+>>> catalog.concept(f"sign_group.ashmand1822.{group.value}").name.text("zh-CN")
+'至点星座'
+>>> historical = catalog.entry("entry.ashmand_sign_groups")
+>>> historical.prerequisite_status.value, historical.output_eligibility.value, historical.chart_applicability
+('complete', 'reference_only', 'not_assessed')
+```
+
+字符串或其他枚举会抛出 `TypeError`；用户输入须显式转为 `Sign`。返回的是组别，不是评分或解读。
+这里的 `complete` 只表示成员查询所需的条件已齐备：提供一个 `Sign` 即可。
+前面分点星座条目的 `unresolved` 仍然保留，因为那是关于命盘解读条件的另一个问题。
+
+四组中文名为**至点星座、分点星座、固定星座、双体星座**，对应 tropical、equinoctial、fixed、bicorporeal。
+这里的 tropical 只指两个至点星座，不是热带黄道的全部十二星座。原文直接点名至点与分点两对星座。
+在黄道次序中，固定星座分别紧接这些星座，双体星座分别紧接固定星座。因此
+{ref}`十二星座表 <catalog-zh-cn-rule-ptolemy-ashmand-sign-groups>`是项目推导，不是原文逐项列举。
+
+原文见第一卷第 XIV 章、印刷页 34–35（PDF 第 72–73 页），记录在 `source.ptolemy.ashmand1822` 中。
+目录中的英文摘录、署名中文译文和项目说明分别标明，引用也注明了摘录范围。
+这里依据的是 Ashmand 的这一版本，不能据此认为各流派都采用相同分类，也不能用组名预测实际天气或日照。
 
 ## 译文修订与搜索
 
@@ -193,16 +245,17 @@ rule.node.meeus_five_term_true_descending
 
 ## 状态需要分开表达
 
-本目录用 `verified`／`unverified` 表示出处查核状态，`complete`／`unresolved` 表示前提的表达完整性，
-`eligible`／`reference_only` 表示整理层面的输出资格。`eligible` 不表示命盘满足前提。
-不论其他字段如何，检索始终将命盘适用性留为 `not_assessed`。对应的问题是：
+查到出处，不等于已经知道一条规则用于命盘时需要什么条件；写清条件，也不等于某张命盘已经满足它。
+所以条目分别记录以下状态：
 
-1. 所列出处核实了吗？
-2. 条目的前提已理解并表达清楚了吗？
-3. 条目可以进入默认输出吗？
-4. 某张具体命盘满足已经表达的前提吗？
+| 问题 | 字段及取值 | 怎样理解 |
+|---|---|---|
+| 出处核实了吗？ | `source.verification`：`verified`／`unverified` | 表示是否查核过所列来源，不是认定历史主张为真。 |
+| 所需前提写清了吗？ | `entry.prerequisite_status`：`complete`／`unresolved` | 表示前提已理解并表达完整，或仍有未明确之处。 |
+| 条目可以进入默认输出吗？ | `entry.output_eligibility`：`eligible`／`reference_only` | 是条目的整理决定；`eligible` 也不表示某张命盘满足前提。 |
+| 某张命盘符合条件吗？ | `entry.chart_applicability`：`not_assessed` | 查询目录没有做这种判断，不论上面三个状态如何。 |
 
-将来的判别器须区分满足、不满足、未知。只验证部分条件时，只能返回部分证据。
+将来若增加命盘条件判断，需要区分满足、不满足和未知。只验证部分条件时，只能返回部分证据。
 例如，一条陈述同时要求相位、昼夜派与尊贵状态，程序只算出相位，不能声称整条前提成立。
 
 相关设计：[bazi](https://github.com/0xf3cd/bazi)。
@@ -211,8 +264,8 @@ rule.node.meeus_five_term_true_descending
 
 - `README.md` 与 `README.zh-CN.md` 提供内容对应的项目入口。
 - 指南与解释采用 `docs/en/`、`docs/zh-CN/` 下的对应路径，互链另一语言页面，覆盖同一支持范围。
-- 公开 API 文档提供中英文说明、约束与例子。签名、单位、默认值、标识与错误合同只有一份来源。
-  公开 docstring 的概述／合同保留双语，语言视图不再各维护一套签名或参数表。
+- 公开 API 文档提供中英文说明、约束与例子。签名、单位、默认值、标识和异常行为只定义一次。
+  公开 docstring 的概述和使用约定保留双语；两种语言共用签名与参数表。
 - 每个概念／条目只有一个语义身份，附带各语言文本。记录译文对应的语义修订；
   缺译或过期须可见，不能静默换成另一语言并当作翻译完成。
 - 原文保留原语言，读者选择译文后仍能找到原文。

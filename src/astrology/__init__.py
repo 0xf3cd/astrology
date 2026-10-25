@@ -52,10 +52,18 @@ from astrology.cross_aspects import CrossAspectHit, CrossChartAspects, cross_cha
 from astrology.houses import house_of
 from astrology.knowledge import Catalog, load_catalog
 from astrology.text import format_chart
-from astrology.zodiac import Sign, sign_degree, sign_of, truncate_display
+from astrology.zodiac import (
+  AshmandSignGroup,
+  Sign,
+  ashmand_sign_group,
+  sign_degree,
+  sign_of,
+  truncate_display,
+)
 
 __all__ = [
   "AmbiguousBirthTimeError",
+  "AshmandSignGroup",
   "AspectHit",
   "AspectMotion",
   "AspectObject",
@@ -89,6 +97,7 @@ __all__ = [
   "ResolvedBirth",
   "Sign",
   "TimePrecision",
+  "ashmand_sign_group",
   "aspect_angle",
   "cross_chart_aspects",
   "find_aspects",

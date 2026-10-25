@@ -10,14 +10,16 @@ The package provides immutable [birth records and modern time
 resolution](https://0xf3cd.github.io/astrology/docs/en/birth.html), [requested chart configuration](https://0xf3cd.github.io/astrology/docs/en/configuration.html),
 [tropical natal chart calculation](https://0xf3cd.github.io/astrology/docs/en/chart.html), [chart results and text output](https://0xf3cd.github.io/astrology/docs/en/records.html), an independent
 [knowledge catalog](https://0xf3cd.github.io/astrology/docs/en/knowledge.html), quality checks, and bilingual
-[API documentation](https://0xf3cd.github.io/astrology/docs/en/reference.html). The astronomy library is imported only
-when calculation is requested, so importing the package or querying knowledge never
-initializes it.
+[API documentation](https://0xf3cd.github.io/astrology/docs/en/reference.html).
 See [Contributing](https://0xf3cd.github.io/astrology/docs/en/contributing.html) to run the checks.
 
-The current source also provides [static cross-chart aspects](https://0xf3cd.github.io/astrology/docs/en/cross_aspects.html)
-between two in-memory natal results, retaining both sources and distinct left/right
-endpoints without a motion label. This API is not in the published v0.1.0.
+New in 0.2.0 (in development):
+
+- [Static cross-chart aspects](https://0xf3cd.github.io/astrology/docs/en/cross_aspects.html)
+  between two natal charts, retaining both source charts and distinct left/right
+  objects, without applying/separating labels.
+- `ashmand_sign_group(Sign.ARIES)` queries the twelve signs' four groups in
+  Ashmand's 1822 edition. See [the source and lookup example](https://0xf3cd.github.io/astrology/docs/en/knowledge.html#ashmand-1822-sign-groups).
 
 Installation follows the astronomy dependency: celestial-calendar 0.8.0 publishes
 wheels for Linux x86_64 and aarch64, macOS 14+ arm64 and Windows amd64, and no source
@@ -133,8 +135,7 @@ for structured results and bilingual text tables.
 ## First knowledge lookup
 
 Save this separate script as `first_knowledge.py` and run it with the same
-virtual-environment Python. It reads the packaged catalog without a chart or
-native astronomy initialization; installation still has the platform limits above.
+virtual-environment Python. This example finds the Sun by name and alias:
 
 ```python
 from astrology import load_catalog
@@ -184,11 +185,6 @@ delivery tasks and acceptance criteria.
 - [Repository structure and calculation boundaries](https://0xf3cd.github.io/astrology/docs/en/architecture.html)
 - [Knowledge organization and bilingual documentation](https://0xf3cd.github.io/astrology/docs/en/knowledge.html)
 - [Development and review conventions](https://0xf3cd.github.io/astrology/docs/en/contributing.html)
-
-Knowledge browsing is a first-release goal in its own right: readers should be
-able to find a concept, its rule variants, and its sources without creating a
-chart or loading the native astronomy library. Source status, applicability, and
-display eligibility are recorded separately.
 
 Project guides and public reference documentation are provided in Chinese and
 English. Both languages refer to the same identifiers, executable rules, and

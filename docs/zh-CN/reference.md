@@ -50,7 +50,7 @@
 
 ```{eval-rst}
 .. automodule:: astrology.zodiac
-   :members: Sign, sign_of, sign_degree, truncate_display
+   :members: Sign, AshmandSignGroup, ashmand_sign_group, sign_of, sign_degree, truncate_display
    :undoc-members:
    :member-order: bysource
    :no-index:

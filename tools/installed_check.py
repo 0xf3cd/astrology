@@ -290,7 +290,7 @@ def _check_knowledge(expected_corpus_version: str | None = None) -> None:
   if not catalog.filter_sources(verification=SourceVerification.VERIFIED):
     raise ValueError("Installed source filtering lost verified sources")
   entry = catalog.entry("entry.equinoctial_example")
-  if catalog.filter_entries(source_id="source.ptolemy.ashmand1822")[-1] != entry:
+  if entry not in catalog.filter_entries(source_id="source.ptolemy.ashmand1822"):
     raise ValueError("Installed entry filtering lost the worked source example")
   citation, source = catalog.citations(entry.identifier)[0]
   if source.verification is not SourceVerification.VERIFIED or citation.excerpt is None:
@@ -307,6 +307,32 @@ def _check_knowledge(expected_corpus_version: str | None = None) -> None:
     raise ValueError(
       "Installed retrieval collapsed editorial states or claimed chart applicability"
     )
+  groups = tuple(astrology.ashmand_sign_group(sign) for sign in astrology.Sign)
+  if (
+    len(astrology.AshmandSignGroup) != 4
+    or any(type(group) is not astrology.AshmandSignGroup for group in groups)
+    or sorted(groups.count(group) for group in astrology.AshmandSignGroup) != [2, 2, 4, 4]
+  ):
+    raise ValueError("Installed Ashmand lookup lost its four-group partition")
+  group_concepts = tuple(
+    catalog.concept(f"sign_group.ashmand1822.{group.value}") for group in astrology.AshmandSignGroup
+  )
+  expected_ids = {f"sign.{sign.value}" for sign in astrology.Sign} | {
+    concept.identifier for concept in group_concepts
+  }
+  historical = catalog.entry("entry.ashmand_sign_groups")
+  if (
+    set(historical.concept_ids) != expected_ids
+    or historical.rule_ids != ("rule.ptolemy_ashmand.sign_groups",)
+    or set(catalog.variant(historical.rule_ids[0]).concept_ids) != expected_ids
+    or historical.prerequisite_status is not PrerequisiteStatus.COMPLETE
+    or historical.output_eligibility is not OutputEligibility.REFERENCE_ONLY
+    or historical.chart_applicability != "not_assessed"
+  ):
+    raise ValueError("Installed Ashmand knowledge lost rule links or separate editorial states")
+  excerpts = [c.excerpt for c in historical.citations if c.excerpt is not None]
+  if len(excerpts) != 3 or any(text.zh is None or not text.translation_credit for text in excerpts):
+    raise ValueError("Installed Ashmand definitions lost credited translations")
   aliases = ["isolated alias"]
   concept = replace(catalog.concepts[0], en_aliases=aliases)
   aliases.clear()
