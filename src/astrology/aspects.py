@@ -14,7 +14,7 @@ exact. This module needs no chart and does not call the astronomy library.
 from __future__ import annotations
 
 import sys
-from collections.abc import Sequence
+from collections.abc import Iterator, Sequence
 from dataclasses import dataclass
 from enum import StrEnum
 from math import remainder
@@ -122,14 +122,9 @@ class AspectHit:
       raise ValueError("An aspect needs distinct endpoints, not two lunar nodes")
     if type(self.aspect) is not MajorAspect or type(self.motion) is not AspectMotion:
       raise TypeError("aspect and motion must use their owning enum types")
-    for name in ("branch_deg", "deviation_deg", "orb_limit_deg"):
-      object.__setattr__(self, name, finite_number(getattr(self, name), name))
-    if self.branch_deg not in _branches(aspect_angle(self.aspect)):
-      raise ValueError("branch_deg does not belong to the aspect")
-    if not -180.0 < self.deviation_deg <= 180.0:
-      raise ValueError("deviation_deg must be in (-180, 180]")
-    if self.orb_limit_deg < 0.0 or abs(self.deviation_deg) > self.orb_limit_deg:
-      raise ValueError("The aspect deviation must be within its nonnegative orb limit")
+    values = _geometry_values(self.aspect, self.branch_deg, self.deviation_deg, self.orb_limit_deg)
+    for name, value in zip(("branch_deg", "deviation_deg", "orb_limit_deg"), values, strict=True):
+      object.__setattr__(self, name, value)
     if (self.deviation_deg == 0.0) != (self.motion is AspectMotion.EXACT):
       raise ValueError("Only a zero deviation has exact motion status")
 
@@ -176,6 +171,22 @@ def _branches(angle: float) -> tuple[float, ...]:
   return (-angle, angle)
 
 
+def _geometry_values(
+  aspect: MajorAspect, branch_deg: float, deviation_deg: float, orb_limit_deg: float
+) -> tuple[float, float, float]:
+  """Validate the shared geometric fields of an aspect hit. 校验相位命中共用的几何字段。"""
+  branch = finite_number(branch_deg, "branch_deg")
+  deviation = finite_number(deviation_deg, "deviation_deg")
+  limit = finite_number(orb_limit_deg, "orb_limit_deg")
+  if branch not in _branches(aspect_angle(aspect)):
+    raise ValueError("branch_deg does not belong to the aspect")
+  if not -180.0 < deviation <= 180.0:
+    raise ValueError("deviation_deg must be in (-180, 180]")
+  if limit < 0.0 or abs(deviation) > limit:
+    raise ValueError("The aspect deviation must be within its nonnegative orb limit")
+  return branch, deviation, limit
+
+
 def _mean(first: float, second: float) -> float:
   """Return the correctly rounded mean of two finite nonnegative numbers, never infinite.
 
@@ -220,6 +231,27 @@ def _motion(deviation: float, first: AspectObject, second: AspectObject) -> Aspe
   if deviation == 180.0:
     return AspectMotion.INDETERMINATE
   return AspectMotion.SEPARATING if (deviation > 0.0) == (relative > 0.0) else AspectMotion.APPLYING
+
+
+def _pair_geometry(
+  first: Body | LunarNode,
+  first_longitude_deg: float,
+  second: Body | LunarNode,
+  second_longitude_deg: float,
+  ordered_rules: Sequence[AspectRule],
+  combination: OrbCombination | None,
+) -> Iterator[tuple[MajorAspect, float, float, float]]:
+  """Yield matching geometry in supplied rule order; eligibility and motion belong to callers.
+
+  按传入的规则顺序产出几何命中；配对准入与运动状态由调用方负责。
+  """
+  separation = _signed(_signed(second_longitude_deg) - _signed(first_longitude_deg))
+  for rule in ordered_rules:
+    limit = _limit(rule, first, second, combination)
+    for branch in _branches(_ANGLES[rule.aspect]):
+      deviation = _deviation(separation, branch)
+      if abs(deviation) <= limit:
+        yield rule.aspect, branch, deviation, limit
 
 
 def find_aspects(
@@ -269,21 +301,23 @@ def find_aspects(
     for second in members[index + 1 :]:
       if isinstance(first.identity, LunarNode) and isinstance(second.identity, LunarNode):
         continue
-      separation = _signed(_signed(second.longitude_deg) - _signed(first.longitude_deg))
-      for rule in by_angle:
-        limit = _limit(rule, first.identity, second.identity, combination)
-        for branch in _branches(_ANGLES[rule.aspect]):
-          deviation = _deviation(separation, branch)
-          if abs(deviation) <= limit:
-            hits.append(
-              AspectHit(
-                first.identity,
-                second.identity,
-                rule.aspect,
-                branch,
-                deviation,
-                limit,
-                _motion(deviation, first, second),
-              )
-            )
+      for aspect, branch, deviation, limit in _pair_geometry(
+        first.identity,
+        first.longitude_deg,
+        second.identity,
+        second.longitude_deg,
+        by_angle,
+        combination,
+      ):
+        hits.append(
+          AspectHit(
+            first.identity,
+            second.identity,
+            aspect,
+            branch,
+            deviation,
+            limit,
+            _motion(deviation, first, second),
+          )
+        )
   return tuple(hits)

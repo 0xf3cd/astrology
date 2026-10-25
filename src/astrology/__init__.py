@@ -48,6 +48,7 @@ from astrology.config import (
   ObjectOrb,
   OrbCombination,
 )
+from astrology.cross_aspects import CrossAspectHit, CrossChartAspects, cross_chart_aspects
 from astrology.houses import house_of
 from astrology.knowledge import Catalog, load_catalog
 from astrology.text import format_chart
@@ -67,6 +68,8 @@ __all__ = [
   "ChartHouses",
   "ChartProvenance",
   "ChartTimes",
+  "CrossAspectHit",
+  "CrossChartAspects",
   "EclipticPosition",
   "EffectiveConfiguration",
   "FixedOffset",
@@ -87,6 +90,7 @@ __all__ = [
   "Sign",
   "TimePrecision",
   "aspect_angle",
+  "cross_chart_aspects",
   "find_aspects",
   "format_chart",
   "house_of",

@@ -444,12 +444,21 @@ def test_consumer_installs_only_retained_wheel_and_keeps_all_acceptance_modes(
     commands.append(tuple(command))
     assert cwd.is_relative_to(tmp_path)
     if "--expected-observations" in command:
-      assert Path(command[-1]).read_text() == "runner-local-source-result"
+      assert Path(command[command.index("--expected-observations") + 1]).read_text() == (
+        "runner-local-source-result"
+      )
+      assert Path(command[command.index("--expected-cross-observations") + 1]).read_text() == (
+        "runner-local-cross-result"
+      )
 
   monkeypatch.setattr(checker, "run", capture)
   monkeypatch.setattr("tools.installed_check.acceptance_chart", lambda: None)
   monkeypatch.setattr(
     "tools.installed_check.chart_observations", lambda _chart: "runner-local-source-result"
+  )
+  monkeypatch.setattr("tools.installed_check.acceptance_cross_aspects", lambda: None)
+  monkeypatch.setattr(
+    "tools.installed_check.cross_observations", lambda _result: "runner-local-cross-result"
   )
   monkeypatch.setattr(
     checker, "check_readme_examples", lambda root, python, work, mode: readmes.append(mode)
@@ -471,6 +480,12 @@ def test_consumer_installs_only_retained_wheel_and_keeps_all_acceptance_modes(
   assert len(consumers) == 4
   assert ["--knowledge-only" in command for command in consumers] == [True, False, True, False]
   assert ["-O" in command for command in consumers] == [False, False, True, True]
+  assert ["--expected-cross-observations" in command for command in consumers] == [
+    False,
+    True,
+    False,
+    True,
+  ]
   assert all("-I" in command and "0.1.0" in command for command in consumers)
   assert readmes == [(), ("-O",)]
   assert len(missing_metadata) == 1

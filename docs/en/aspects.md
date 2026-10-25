@@ -8,6 +8,9 @@ for comparison, the signed deviation from it, the orb limit and the current moti
 supplies every orb; there is no default. [`natal_chart`](chart.md) calls the same
 function to calculate the requested aspects.
 
+For static comparison of two supplied charts, use [cross-chart aspects](cross_aspects.md).
+That API keeps left/right ownership and has no motion field.
+
 ## Judge aspects from plain values
 
 `find_aspects` needs no chart and does not call the astronomy library. Give it objects with a longitude in
@@ -119,7 +122,7 @@ mean_of_orbs [8.0]
 
 ## Choose the objects
 
-Two lunar nodes never form an aspect with each other. The four node identities are
+In this single-chart evaluation, two lunar nodes never form an aspect with each other. The four node identities are
 one pair of nodes under two definitions and two directions, so the ascending and
 descending nodes are always exactly opposite. A node can form an aspect with a body.
 

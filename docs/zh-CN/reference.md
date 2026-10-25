@@ -76,6 +76,18 @@
    :no-index:
 ```
 
+## 静态双盘交叉相位
+
+见[双盘示例与静态合同](cross_aspects.md)。
+
+```{eval-rst}
+.. automodule:: astrology.cross_aspects
+   :members: CrossAspectHit, CrossChartAspects, cross_chart_aspects
+   :undoc-members:
+   :member-order: bysource
+   :no-index:
+```
+
 ## 独立知识查询
 
 字段职责见[知识记录字段](knowledge.md#记录与归属)。
