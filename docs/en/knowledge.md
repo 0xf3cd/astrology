@@ -27,7 +27,7 @@ True
 >>> catalog.filter_entries(concept_id="body.sun")[0].identifier
 'entry.body_requests'
 >>> len(catalog.filter_sources(verification=SourceVerification.VERIFIED))
-3
+4
 >>> bool(catalog.version)
 True
 ```
@@ -35,6 +35,18 @@ True
 In the built-in catalog, body and node-direction concepts have no separate rule
 variants, so the empty tuple for `body.sun` is expected. Their identity information
 remains on the concepts and entries; see [rule-ID changes](#pre-release-rule-id-changes).
+
+`entry.cross_aspect_evaluation` and `rule.project.cross_aspect_evaluation` describe
+the [static cross-chart policy](cross_aspects.md), with its own fixed implementation
+source. Existing participation and motion rules retain their identities and are
+scoped to single-chart evaluation and shared-instant rates respectively. A complete
+prerequisite description still does not make a retrieved entry a chart conclusion:
+
+```{doctest}
+>>> comparison = catalog.entry("entry.cross_aspect_evaluation")
+>>> comparison.prerequisite_status.value, comparison.output_eligibility.value, comparison.chart_applicability
+('complete', 'reference_only', 'not_assessed')
+```
 
 Each `load_catalog()` explicitly reads the packaged JSON, without a cache or
 network. Constructors copy sequences into tuples. Invalid record types, duplicate

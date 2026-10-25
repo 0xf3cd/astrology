@@ -24,13 +24,23 @@ True
 >>> catalog.filter_entries(concept_id="body.sun")[0].identifier
 'entry.body_requests'
 >>> len(catalog.filter_sources(verification=SourceVerification.VERIFIED))
-3
+4
 >>> bool(catalog.version)
 True
 ```
 
 内置目录中的天体和交点方向概念没有单独的规则变体，因此 `body.sun` 返回空元组是预期结果。
 身份信息仍保留在概念和条目中，参见[规则标识变更](#首发前的规则标识变更)。
+
+`entry.cross_aspect_evaluation` 和 `rule.project.cross_aspect_evaluation` 描述
+[静态双盘政策](cross_aspects.md)，引用单独的固定实现来源。已有参与者和运动规则的标识保持不变，
+适用范围分别限定为单盘判断及同一时刻的速率。前提描述完整，仍不表示检索条目已成为命盘结论：
+
+```{doctest}
+>>> comparison = catalog.entry("entry.cross_aspect_evaluation")
+>>> comparison.prerequisite_status.value, comparison.output_eligibility.value, comparison.chart_applicability
+('complete', 'reference_only', 'not_assessed')
+```
 
 每次 `load_catalog()` 均显式读取包内 JSON，不使用缓存或网络。构造时将序列复制为元组。
 非法记录类型、重复标识、悬空链接和别名冲突会抛出 `TypeError` 或 `ValueError`，
