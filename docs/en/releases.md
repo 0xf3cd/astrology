@@ -15,10 +15,9 @@ field or common-epoch conversion. See the [cross-chart guide](cross_aspects.md).
 ### Ashmand 1822 sign groups
 
 `ashmand_sign_group` maps an existing `Sign` to an `AshmandSignGroup`: tropical,
-equinoctial, fixed or bicorporeal. No chart or astronomy initialization is needed.
-The bilingual catalog table reads the same definition and separates the historical
-text, credited translations and expanded membership. This named-edition lookup
-does not provide chart matching or interpretation. See the [knowledge guide](knowledge.md#ashmand-1822-sign-groups).
+equinoctial, fixed or bicorporeal. The [knowledge guide](knowledge.md#ashmand-1822-sign-groups)
+links the complete twelve-sign table, explains the historical names, and provides
+source excerpts and Chinese translations.
 
 ### Breaking change: chart persistence removed
 

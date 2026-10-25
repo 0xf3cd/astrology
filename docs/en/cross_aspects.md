@@ -7,7 +7,7 @@ A Sun in the left chart and a Sun in the right chart remain separate endpoints;
 no renaming or chart merging is needed. Comparing supplied results performs no
 astronomy, timezone resolution, version lookup or I/O.
 
-This API is in the current source, not the published v0.1.0. Use the
+This API is available from 0.2.0, which is still in development. Use the
 [source installation instructions](../../README.md#install-from-source).
 
 ## Compare two synthetic birth records

@@ -9,15 +9,12 @@
 本包提供不可变的[出生记录与现代时刻解析](https://0xf3cd.github.io/astrology/docs/zh-CN/birth.html)、
 [排盘请求配置](https://0xf3cd.github.io/astrology/docs/zh-CN/configuration.html)、[热带本命盘计算](https://0xf3cd.github.io/astrology/docs/zh-CN/chart.html)、
 [命盘结果与文本输出](https://0xf3cd.github.io/astrology/docs/zh-CN/records.html)、独立[知识目录](https://0xf3cd.github.io/astrology/docs/zh-CN/knowledge.html)、质量检查和双语 [API 文档](https://0xf3cd.github.io/astrology/docs/zh-CN/reference.html)。
-天文库只在请求排盘时导入，导入本包或查询知识都不会初始化它。
 运行检查见[参与开发](https://0xf3cd.github.io/astrology/docs/zh-CN/contributing.html)。
 
-当前源码另提供两张内存本命盘之间的[静态交叉相位](https://0xf3cd.github.io/astrology/docs/zh-CN/cross_aspects.html)，
-保留双侧来源及左右端点，不标运动状态。此 API 不在已发布的 v0.1.0 中。
+0.2.0（开发中）新增：
 
-当前源码还可用 `ashmand_sign_group(Sign.ARIES)` 不排盘查询十二星座在 Ashmand 1822 年版中的四组归属，
-见[来源及查询示例](https://0xf3cd.github.io/astrology/docs/zh-CN/knowledge.html#ashmand-sign-groups-zh-cn)。
-此 API 不在已发布的 v0.1.0 中。
+- 两张本命盘之间的[静态交叉相位](https://0xf3cd.github.io/astrology/docs/zh-CN/cross_aspects.html)，保留两张源盘并区分左右对象，不标入相／离相。
+- 用 `ashmand_sign_group(Sign.ARIES)` 查询十二星座在 Ashmand 1822 年版中的四组归属。见[来源及查询示例](https://0xf3cd.github.io/astrology/docs/zh-CN/knowledge.html#ashmand-sign-groups-zh-cn)。
 
 安装随天文依赖而定：celestial-calendar 0.8.0 只发布 Linux x86_64 与 aarch64、
 macOS 14+ arm64、Windows amd64 的轮子，没有源码分发包。其他平台无法安装本包，
@@ -126,7 +123,7 @@ moon: scorpio
 ## 第一次查询知识
 
 把这份独立脚本保存为 `first_knowledge.py`，用同一个虚拟环境的 Python 运行。
-它读取包内目录，不排盘，也不初始化原生天文库；安装仍受上述平台限制。
+下面按名称和别名查找太阳：
 
 ```python
 from astrology import load_catalog
@@ -167,9 +164,6 @@ body.sun
 - [仓库结构与计算边界](https://0xf3cd.github.io/astrology/docs/zh-CN/architecture.html)
 - [知识组织与双语文档](https://0xf3cd.github.io/astrology/docs/zh-CN/knowledge.html)
 - [开发与审阅约定](https://0xf3cd.github.io/astrology/docs/zh-CN/contributing.html)
-
-首版也要支持独立查知识：无需先排盘或加载原生天文库，就能找到概念、规则变体和出处。
-来源状态、适用前提和展示资格分别记录。
 
 项目指南与公开参考文档提供中英文。两种语言引用同一组标识、可执行规则和来源记录。
 引文保留原文语言，译文单独标明。
