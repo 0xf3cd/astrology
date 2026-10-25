@@ -36,6 +36,7 @@ _EXAMPLE_PAGES = (
   "configuration",
   "chart",
   "aspects",
+  "cross_aspects",
   "records",
   "knowledge",
 )

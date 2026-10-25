@@ -20,6 +20,7 @@ MODULES = (
   "birth",
   "chart",
   "config",
+  "cross_aspects",
   "houses",
   "knowledge",
   "knowledge.catalog",
@@ -101,6 +102,153 @@ def chart_observations(chart: astrology.NatalChart) -> str:
     ],
   }
   return json.dumps(values, sort_keys=True, allow_nan=False)
+
+
+def _cross_source(
+  year: int, label: str, coordinates: tuple[tuple[astrology.Body | astrology.LunarNode, float], ...]
+) -> astrology.NatalChart:
+  """Construct a pure synthetic source, not a calculated astronomical reference.
+
+  纯构造合成源盘，不把它当作计算所得的天文参考。
+  """
+  record = astrology.BirthRecord(
+    date(year, 1, 1),
+    time(0),
+    astrology.FixedOffset(timedelta(0)),
+    astrology.Location(0, 0),
+    source={"record": "synthetic", "side": label},
+  )
+  resolved = astrology.ResolvedBirth(
+    record, datetime(year, 1, 1, tzinfo=UTC), timedelta(0), None, None, None, None
+  )
+  config = astrology.ChartConfig(
+    astrology.HouseSystem.WHOLE_SIGN, tuple(identity for identity, _ in coordinates), ()
+  )
+  houses = astrology.ChartHouses(
+    config.house_system, 0, 270, 180, 90, tuple(float(n) for n in range(0, 360, 30))
+  )
+  positions = tuple(
+    astrology.EclipticPosition(
+      identity, longitude, 0, None if isinstance(identity, astrology.LunarNode) else 1, 1
+    )
+    for identity, longitude in coordinates
+  )
+  return astrology.NatalChart(
+    resolved,
+    config,
+    astrology.EffectiveConfiguration(
+      config.house_system, "synthetic-model", "fixed_fourteen_object_joint_snapshot", (), None
+    ),
+    astrology.ChartProvenance(
+      "synthetic-" + label,
+      "apparent_geocentric_true_ecliptic_of_date",
+      "delta_t_model_from_civil_utc",
+      "synthetic-" + label,
+    ),
+    astrology.ChartTimes(2451544.5, 2451544.5),
+    positions,
+    houses,
+    tuple(
+      astrology.Placement(
+        p.identity,
+        astrology.sign_of(p.longitude_deg),
+        astrology.sign_degree(p.longitude_deg),
+        astrology.house_of(p.longitude_deg, houses.cusps_deg),
+      )
+      for p in positions
+    ),
+    (),
+  )
+
+
+def acceptance_cross_aspects() -> astrology.CrossChartAspects:
+  """Compare two synthetic in-memory sources without astronomy or time resolution.
+
+  比较两张合成内存源盘，不调用天文库或时刻解析。
+  """
+  chart_left = _cross_source(
+    2000,
+    "left",
+    (
+      (astrology.Body.MOON, 350),
+      (astrology.Body.SUN, 10),
+      (astrology.LunarNode.MEAN_ASCENDING, 190),
+    ),
+  )
+  chart_right = _cross_source(
+    2001,
+    "right",
+    (
+      (astrology.Body.SUN, 68),
+      (astrology.Body.MOON, 8),
+      (astrology.LunarNode.MEAN_ASCENDING, 10),
+    ),
+  )
+  rules = tuple(
+    astrology.AspectRule(aspect, 3, (astrology.ObjectOrb(astrology.Body.MOON, 5),))
+    for aspect in (
+      astrology.MajorAspect.OPPOSITION,
+      astrology.MajorAspect.SEXTILE,
+      astrology.MajorAspect.CONJUNCTION,
+    )
+  )
+  return astrology.cross_chart_aspects(
+    chart_left=chart_left,
+    chart_right=chart_right,
+    rules=rules,
+    combination=astrology.OrbCombination.MEAN_OF_ORBS,
+  )
+
+
+def cross_observations(result: astrology.CrossChartAspects) -> str:
+  """Capture full-precision cross checks and both complete sources, with no restoration path.
+
+  取得完整精度的双盘检查值及两侧完整来源，不提供恢复路径。
+  """
+  values = {
+    "chart_left": json.loads(chart_observations(result.chart_left)),
+    "chart_right": json.loads(chart_observations(result.chart_right)),
+    "left_objects": [identity.value for identity in result.left_objects],
+    "right_objects": [identity.value for identity in result.right_objects],
+    "rules": repr(result.rules),
+    "combination": result.combination,
+    "hits": [
+      [
+        h.left_object.value,
+        h.right_object.value,
+        h.aspect.value,
+        h.branch_deg,
+        h.deviation_deg,
+        h.orb_limit_deg,
+      ]
+      for h in result.hits
+    ],
+  }
+  return json.dumps(values, sort_keys=True, allow_nan=False)
+
+
+def _check_cross_chart(expected_observations: Path | None = None) -> None:
+  _check_native_isolation()
+  result = acceptance_cross_aspects()
+  node = astrology.LunarNode.MEAN_ASCENDING
+  sun, moon = astrology.Body.SUN, astrology.Body.MOON
+  expected = [
+    (sun, sun, astrology.MajorAspect.SEXTILE, 60.0, -2.0, 3.0),
+    (sun, moon, astrology.MajorAspect.CONJUNCTION, 0.0, -2.0, 4.0),
+    (sun, node, astrology.MajorAspect.CONJUNCTION, 0.0, 0.0, 3.0),
+    (node, moon, astrology.MajorAspect.OPPOSITION, 180.0, -2.0, 4.0),
+    (node, node, astrology.MajorAspect.OPPOSITION, 180.0, 0.0, 3.0),
+  ]
+  if [
+    (h.left_object, h.right_object, h.aspect, h.branch_deg, h.deviation_deg, h.orb_limit_deg)
+    for h in result.hits
+  ] != expected:
+    raise ValueError("Installed cross aspects differ from hand-worked geometry")
+  if expected_observations is not None and cross_observations(
+    result
+  ) != expected_observations.read_text(encoding="utf-8"):
+    raise ValueError("Installed cross aspects differ from the development entry point")
+  _check_native_isolation()
 
 
 def _check_native_isolation() -> None:
@@ -309,6 +457,7 @@ def check_missing_metadata() -> None:
   package = "celestial-astrology"
   _check_knowledge()
   _check_native_isolation()
+  _check_cross_chart()
   try:
     distribution(package)
   except PackageNotFoundError:
@@ -331,16 +480,19 @@ def main(
   expected_corpus_version: str | None = None,
   knowledge_only: bool = False,
   expected_observations: Path | None = None,
+  expected_cross_observations: Path | None = None,
 ) -> None:
   """Check installed identity, API and isolation; compare a supplied corpus version.
 
   None skips corpus comparison. CLI: CODE_VERSION CORPUS_VERSION [--knowledge-only]
-  [--expected-observations PATH]. The optional check-run file holds exact source
-  observations, including raw numbers, input, configuration and provenance.
+  [--expected-observations PATH] [--expected-cross-observations PATH]. Optional
+  check-run files hold exact source observations, including raw numbers, input,
+  configuration and provenance for natal and cross results separately.
 
   检查安装包身份、API 及隔离，并比较传入的语料版本。None 跳过语料版本比较。
   CLI 参数顺序：CODE_VERSION CORPUS_VERSION [--knowledge-only] [--expected-observations PATH]。
-  可选的本次检查文件包含源码产出的精确检查值，包括原始数值、输入、配置和来源。
+  另可给 --expected-cross-observations PATH。可选的本次检查文件分别保存本命及双盘的源码
+  精确检查值，包括原始数值、输入、配置和来源。
   """
   metadata = distribution("celestial-astrology")
   for module in (astrology, *(import_module("astrology." + name) for name in MODULES)):
@@ -360,6 +512,7 @@ def main(
     return
   _check_birth_and_configuration()
   _check_native_isolation()
+  _check_cross_chart(expected_cross_observations)
   _check_natal_chart(expected_observations)
   print(f"Installed celestial-astrology {metadata.version}; optimized={sys.flags.optimize}")
 
@@ -374,5 +527,10 @@ if __name__ == "__main__":
       knowledge_only="--knowledge-only" in sys.argv[3:],
       expected_observations=Path(sys.argv[sys.argv.index("--expected-observations") + 1])
       if "--expected-observations" in sys.argv[3:]
+      else None,
+      expected_cross_observations=Path(
+        sys.argv[sys.argv.index("--expected-cross-observations") + 1]
+      )
+      if "--expected-cross-observations" in sys.argv[3:]
       else None,
     )

@@ -50,6 +50,7 @@ PACKAGE_FILES = (
   "astrology/celestial.py",
   "astrology/chart.py",
   "astrology/config.py",
+  "astrology/cross_aspects.py",
   "astrology/houses.py",
   "astrology/text.py",
   "astrology/zodiac.py",
@@ -183,6 +184,7 @@ def check_examples(report: str) -> None:
       "configuration",
       "chart",
       "aspects",
+      "cross_aspects",
       "records",
       "knowledge",
     ):
@@ -626,7 +628,12 @@ def check_installed_wheel(source: Path, wheel: Path, version: str, directory: Pa
 
   在隔离环境中安装 wheel，并以普通和优化模式检查。
   """
-  from tools.installed_check import acceptance_chart, chart_observations
+  from tools.installed_check import (
+    acceptance_chart,
+    acceptance_cross_aspects,
+    chart_observations,
+    cross_observations,
+  )
 
   environment = directory / "consumer"
   run(("uv", "venv", "--python", sys.executable, str(environment)), cwd=directory)
@@ -635,6 +642,8 @@ def check_installed_wheel(source: Path, wheel: Path, version: str, directory: Pa
   corpus_version = load_catalog().version
   observations = directory / "expected-observations.json"
   observations.write_text(chart_observations(acceptance_chart()), encoding="utf-8")
+  cross_values = directory / "expected-cross-observations.json"
+  cross_values.write_text(cross_observations(acceptance_cross_aspects()), encoding="utf-8")
   script = source / "tools/installed_check.py"
   for mode in ((), ("-O",)):
     run(
@@ -652,6 +661,8 @@ def check_installed_wheel(source: Path, wheel: Path, version: str, directory: Pa
         corpus_version,
         "--expected-observations",
         str(observations),
+        "--expected-cross-observations",
+        str(cross_values),
       ),
       cwd=directory,
     )

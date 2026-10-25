@@ -506,6 +506,7 @@ def test_knowledge_only_does_not_run_birth_consumer(
     pytest.fail("Knowledge-only consumer reached birth calculations")
 
   monkeypatch.setattr(installed_check, "_check_birth_and_configuration", forbidden)
+  monkeypatch.setattr(installed_check, "_check_cross_chart", forbidden)
   monkeypatch.setattr(installed_check, "_check_knowledge", lambda expected: None)
   monkeypatch.setattr(
     sys,
@@ -517,6 +518,80 @@ def test_knowledge_only_does_not_run_birth_consumer(
     },
   )
   installed_check.main(version("celestial-astrology"), knowledge_only=True)
+
+
+def test_cross_consumer_rejects_a_missing_hand_worked_pair(monkeypatch: pytest.MonkeyPatch) -> None:
+  result = installed_check.acceptance_cross_aspects()
+  monkeypatch.setattr(
+    installed_check,
+    "acceptance_cross_aspects",
+    lambda: SimpleNamespace(hits=result.hits[:-1]),
+  )
+  with pytest.raises(ValueError, match="hand-worked geometry"):
+    installed_check._check_cross_chart()
+
+
+def test_cross_consumer_rejects_native_initialization(monkeypatch: pytest.MonkeyPatch) -> None:
+  original = installed_check.acceptance_cross_aspects
+
+  def polluted() -> astrology.CrossChartAspects:
+    result = original()
+    monkeypatch.setitem(sys.modules, "astrology.celestial", ModuleType("astrology.celestial"))
+    return result
+
+  monkeypatch.setattr(installed_check, "acceptance_cross_aspects", polluted)
+  with pytest.raises(ValueError, match="initialized"):
+    installed_check._check_cross_chart()
+
+
+def test_main_forwards_the_cross_observation_file(consumer: Path) -> None:
+  expected = consumer.parent / "wrong-cross-observations.json"
+  expected.write_text("{}", encoding="utf-8")
+  with pytest.raises(ValueError, match="cross aspects differ from the development"):
+    installed_check.main(version("celestial-astrology"), expected_cross_observations=expected)
+
+
+@pytest.mark.parametrize(
+  "field",
+  [
+    "chart_left",
+    "chart_right",
+    "left_objects",
+    "right_objects",
+    "rules",
+    "combination",
+    "hits",
+  ],
+)
+@pytest.mark.parametrize("changed", [False, True])
+def test_cross_observations_cover_every_field_and_both_complete_sources(
+  tmp_path: Path, field: str, changed: bool
+) -> None:
+  result = installed_check.acceptance_cross_aspects()
+  observations = installed_check.cross_observations(result)
+  values = json.loads(observations)
+  assert set(values) == {f.name for f in fields(result)}
+  assert values["chart_left"] == json.loads(installed_check.chart_observations(result.chart_left))
+  assert values["chart_right"] == json.loads(installed_check.chart_observations(result.chart_right))
+  assert values["left_objects"] == list(result.left_objects)
+  assert values["right_objects"] == list(result.right_objects)
+  assert values["rules"] == repr(result.rules)
+  assert values["combination"] == result.combination
+  assert values["hits"] == [[getattr(hit, f.name) for f in fields(hit)] for hit in result.hits]
+  if changed:
+    if field == "hits":
+      values[field][0][4] += 1e-12
+    elif field in ("chart_left", "chart_right"):
+      values[field]["provenance"] = "changed provenance"
+    else:
+      values[field] = "different"
+  expected = tmp_path / "cross-observations.json"
+  expected.write_text(json.dumps(values, sort_keys=True, allow_nan=False), encoding="utf-8")
+  if changed:
+    with pytest.raises(ValueError, match="cross aspects differ from the development"):
+      installed_check._check_cross_chart(expected)
+  else:
+    installed_check._check_cross_chart(expected)
 
 
 @pytest.mark.parametrize(

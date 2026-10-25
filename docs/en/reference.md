@@ -71,6 +71,17 @@ See the [complete result and text example](records.md).
    :member-order: bysource
 ```
 
+## Static cross-chart aspects
+
+See the [two-chart example and static contract](cross_aspects.md).
+
+```{eval-rst}
+.. automodule:: astrology.cross_aspects
+   :members: CrossAspectHit, CrossChartAspects, cross_chart_aspects
+   :undoc-members:
+   :member-order: bysource
+```
+
 ## Independent knowledge
 
 Field roles are explained in the

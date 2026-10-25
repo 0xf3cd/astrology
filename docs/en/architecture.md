@@ -5,7 +5,8 @@
 Birth records, modern time resolution, requested configuration, the tropical
 natal chart, major aspects, text output and independent knowledge are implemented; their
 usage and constraints are in the [birth](birth.md), [configuration](configuration.md),
-[chart](chart.md), [aspect](aspects.md), [result](records.md) and [knowledge](knowledge.md) guides.
+[chart](chart.md), [aspect](aspects.md), [cross-chart](cross_aspects.md), [result](records.md)
+and [knowledge](knowledge.md) guides.
 The current chart is
 a reproducible modern tropical, geocentric natal chart, with independent access
 to its underlying knowledge.
@@ -24,6 +25,7 @@ src/astrology/
   houses.py         House-placement rules over supplied geometry
   aspects.py        Aspect definitions, orbs, and local motion
   chart.py          Composition and immutable chart results
+  cross_aspects.py  Static comparison of supplied charts, retaining both sources
   text.py           Result tables with supplied vocabulary
   knowledge/        Concepts, sources, entries, and independent queries
 tests/              Domain tests and installed-consumer tests
@@ -35,6 +37,10 @@ Executable definitions live with their domain. `chart.py` composes them and owns
 the success contract of a complete chart; it does not become the owner of every
 shared definition. Common values move to a shared module only when actual users
 need them. Package imports and knowledge queries must not initialize celestial.
+
+`cross_aspects.py` composes existing chart results without astronomy. Shared
+angular/orb arithmetic remains in `aspects.py`; single-chart pair eligibility
+and local motion stay with `find_aspects`, separate from static cross pairing.
 
 Knowledge and calculation remain connected by stable identifiers, described in
 [Knowledge organization](knowledge.md). Additional UI applications can consume

@@ -27,7 +27,7 @@ True
 >>> catalog.filter_entries(concept_id="body.sun")[0].identifier
 'entry.body_requests'
 >>> len(catalog.filter_sources(verification=SourceVerification.VERIFIED))
-3
+4
 >>> bool(catalog.version)
 True
 ```
@@ -35,6 +35,17 @@ True
 In the built-in catalog, body and node-direction concepts have no separate rule
 variants, so the empty tuple for `body.sun` is expected. Their identity information
 remains on the concepts and entries; see [rule-ID changes](#pre-release-rule-id-changes).
+
+`entry.cross_aspect_evaluation` and `rule.project.cross_aspect_evaluation` describe
+the [static cross-chart policy](cross_aspects.md), with its own fixed implementation
+source. Even with complete prerequisites, this entry remains reference-only;
+retrieving it does not assess a chart:
+
+```{doctest}
+>>> comparison = catalog.entry("entry.cross_aspect_evaluation")
+>>> comparison.prerequisite_status.value, comparison.output_eligibility.value, comparison.chart_applicability
+('complete', 'reference_only', 'not_assessed')
+```
 
 Each `load_catalog()` explicitly reads the packaged JSON, without a cache or
 network. Constructors copy sequences into tuples. Invalid record types, duplicate
@@ -196,9 +207,12 @@ concept. `list_variants()` for their concepts returns `()`. Use `concept()`,
 The three `rule.house.*`, two `rule.node_definition.*`, five `rule.aspect.*` and
 nine original authored rule IDs remain. Their relative order is unchanged:
 the ten configuration-linked rules precede the original nine authored rules.
-There are now 19 variants, with 36 concepts, 3 sources and 8 entries unchanged in
+That revision had 19 variants, with 36 concepts, 3 sources and 8 entries unchanged in
 count. Source status, prerequisite completeness, output eligibility and chart
 applicability retain their separate meanings.
+
+The cross-chart addition preserves existing rule identities while scoping
+participation to single-chart evaluation and motion to rates at one shared instant.
 
 ## Records and ownership
 

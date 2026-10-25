@@ -85,6 +85,7 @@ def test_query_contracts(catalog: Catalog) -> None:
   } == {
     "entry.aspect_evaluation",
     "entry.aspect_requests",
+    "entry.cross_aspect_evaluation",
     "entry.body_requests",
     "entry.house_requests",
     "entry.node_directions",
@@ -554,6 +555,7 @@ def test_retained_rule_ids_and_order(catalog: Catalog) -> None:
     "rule.project.orb_either_within_own_orb",
     "rule.project.orb_both_within_own_orb",
     "rule.project.orb_mean_of_orbs",
+    "rule.project.cross_aspect_evaluation",
   ]
   for identifier, configuration in expected:
     variant = catalog.variant(identifier)
@@ -563,6 +565,28 @@ def test_retained_rule_ids_and_order(catalog: Catalog) -> None:
     assert variant.configuration is configuration
     if isinstance(configuration, (HouseSystem, NodeDefinition)):
       assert "orb" not in variant.limits.en.lower()
+
+
+def test_cross_policy_is_independently_retrievable_without_chart_applicability(
+  catalog: Catalog,
+) -> None:
+  entry = catalog.entry("entry.cross_aspect_evaluation")
+  assert entry.rule_ids[0] == "rule.project.cross_aspect_evaluation"
+  assert "rule.project.aspect_motion" not in entry.rule_ids
+  assert "rule.project.aspect_participation" not in entry.rule_ids
+  assert set(entry.concept_ids) == {f"aspect.{aspect.value}" for aspect in MajorAspect}
+  assert entry.prerequisite_status is PrerequisiteStatus.COMPLETE
+  assert entry.output_eligibility is OutputEligibility.REFERENCE_ONLY
+  assert entry.chart_applicability == "not_assessed"
+  citation, source = catalog.citations(entry.identifier)[0]
+  assert source.identifier == "source.astrology.cross_aspects.0d7122a"
+  assert source.url.endswith("/0d7122a7f7ef86ecc5798c9ea12668c68bb4a516")
+  assert "src/astrology/cross_aspects.py" in citation.locator
+  assert source.verification is SourceVerification.VERIFIED
+  assert citation.excerpt is None
+  assert "single-chart" in catalog.variant("rule.project.aspect_participation").definition.en
+  assert "单盘" in (catalog.entry("entry.aspect_evaluation").statement.zh or "")
+  assert "one shared instant" in catalog.variant("rule.project.aspect_motion").definition.en
 
 
 def test_fixed_implementation_source_and_node_test_locator(catalog: Catalog) -> None:

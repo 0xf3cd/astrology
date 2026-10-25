@@ -4,7 +4,7 @@
 
 出生记录、现代时刻解析、请求配置、热带本命盘、主要相位、文本及独立知识已实现，用法和约束见[出生](birth.md)、
 [配置](configuration.md)、[排盘](chart.md)、[相位](aspects.md)、
-[结果](records.md)及[知识](knowledge.md)指南。
+[结果](records.md)及[知识](knowledge.md)指南；另可[静态比较两张源盘的交叉相位](cross_aspects.md)。
 当前命盘是可复现的现代热带黄道、地心本命盘，
 并能独立查阅排盘所依据的知识。
 
@@ -21,6 +21,7 @@ src/astrology/
   houses.py         基于给定宫位几何的落宫规则
   aspects.py        相位定义、容许度与局部运动
   chart.py          组合与不可变命盘结果
+  cross_aspects.py  静态比较给定命盘，保留双侧来源
   text.py           用传入词汇显示结果表格
   knowledge/        概念、来源、条目及独立查询
 tests/              领域测试与真实安装消费测试
@@ -30,6 +31,9 @@ docs/zh-CN/         对应的中文指南与说明
 
 可执行定义归各自领域模块。`chart.py` 负责组合及完整命盘的成功条件，不收容所有共享定义。
 有真实共同使用方时才提取共享值模块。包导入与知识查询不得初始化 celestial。
+
+`cross_aspects.py` 组合已有命盘结果，不调用天文库。共享角度／容许度算术仍归 `aspects.py`；
+单盘配对准入及局部运动仍由 `find_aspects` 负责，与静态双盘配对分开。
 
 知识与计算通过稳定标识关联，见[知识组织](knowledge.md)。后续界面应用消费已有结果，
 不必把计算搬到前端。
