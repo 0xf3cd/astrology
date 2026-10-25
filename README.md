@@ -19,6 +19,10 @@ The current source also provides [static cross-chart aspects](https://0xf3cd.git
 between two in-memory natal results, retaining both sources and distinct left/right
 endpoints without a motion label. This API is not in the published v0.1.0.
 
+Also in current source, `ashmand_sign_group(Sign.ARIES)` queries the historical
+four-group classification without a chart. See [the source and lookup example](https://0xf3cd.github.io/astrology/docs/en/knowledge.html#ashmand-1822-sign-groups).
+This API is not in the published v0.1.0.
+
 Installation follows the astronomy dependency: celestial-calendar 0.8.0 publishes
 wheels for Linux x86_64 and aarch64, macOS 14+ arm64 and Windows amd64, and no source
 distribution. On any other platform this package cannot be installed, and

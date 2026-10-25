@@ -12,6 +12,14 @@
 Same-named objects and cross-chart node pairs are allowed. There is no motion
 field or common-epoch conversion. See the [cross-chart guide](cross_aspects.md).
 
+### Ashmand 1822 sign groups
+
+`ashmand_sign_group` maps an existing `Sign` to an `AshmandSignGroup`: tropical,
+equinoctial, fixed or bicorporeal. No chart or astronomy initialization is needed.
+The bilingual catalog table reads the same definition and separates the historical
+text, credited translations and expanded membership. This named-edition lookup
+does not provide chart matching or interpretation. See the [knowledge guide](knowledge.md#ashmand-1822-sign-groups).
+
 ### Breaking change: chart persistence removed
 
 The next release removes `dumps_chart`, `loads_chart`, `recompute_chart`, `ChartRecordError`,

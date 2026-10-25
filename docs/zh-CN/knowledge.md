@@ -55,8 +55,8 @@ True
 (knowledge-source-definitions-zh-cn)=
 ## 从来源查到定义
 
-语料收录项目配置合同、星座区间与落宫的项目约定，以及一条单源历史分组，
-列出全部接纳的配置身份和十二个星座概念，并链接排盘实现中的可执行规则。
+语料收录项目配置合同、星座区间与落宫的项目约定，以及一种分为四组的单源历史分类，
+列出全部接纳的配置身份、十二个星座概念及四个历史分组概念，并链接排盘实现中的可执行规则。
 本项目的相位规则各有名称和文字说明，并链接对应的实现。语料不提供默认容许度、尊贵或解释规则。
 概念引用实际配置枚举成员。宫制绑定、具名交点定义与相位角规则另有变体，各自说明适用限制。
 参考页从可执行定义读取并添加精确角度一行；概念说明中的角度也会与该定义核对。
@@ -84,7 +84,7 @@ True
 原文的昼夜等长历史理由保留，但不认可为实际日照时长保证。
 条目陈述、定义及限度是项目说明，不是额外引文。
 
-来源记录说明版次、扫描文件哈希、转录规范化及有限的转载状态；仅收录一段短文，
+来源记录说明版次、扫描文件哈希、转录规范化及有限的转载状态；仅收录范围有限的定义摘录，
 不附带扫描图、水印或现代网站说明。镜像及书目可旁证版本，不能算规则的独立作者。
 配置引用标明包版本及固定提交中的符号；项目定义名称含作者名，不表示已核验该作者书中的公式。
 
@@ -103,6 +103,39 @@ True
 ```
 
 内置条目均仅供参考。当前包没有判别器或命盘证据存储。
+
+(ashmand-sign-groups-zh-cn)=
+## Ashmand 1822 年版星座分组
+
+此查询属于当前源码，不在已发布的 v0.1.0 中。提供一个 `Sign`，不需命盘、位置、出生记录或原生天文库：
+
+```{doctest}
+>>> from astrology import AshmandSignGroup, Sign, ashmand_sign_group
+>>> ashmand_sign_group(Sign.ARIES) is AshmandSignGroup.EQUINOCTIAL
+True
+>>> group = ashmand_sign_group(Sign.CANCER)
+>>> group.value
+'tropical'
+>>> catalog.concept(f"sign_group.ashmand1822.{group.value}").name.text("zh-CN")
+'至点星座'
+>>> historical = catalog.entry("entry.ashmand_sign_groups")
+>>> historical.prerequisite_status.value, historical.output_eligibility.value, historical.chart_applicability
+('complete', 'reference_only', 'not_assessed')
+```
+
+字符串或其他枚举会抛出 `TypeError`；用户输入须显式转为 `Sign`。返回的是组别，不是评分或解读。
+此条目的完整前提只针对这一查询；原有 `entry.equinoctial_example` 的命盘层面前提仍保持未决。
+
+四组中文名为**至点星座、分点星座、固定星座、双体星座**，对应 tropical、equinoctial、fixed、bicorporeal。
+这里的 tropical 只指两个至点星座，不是热带黄道的全部十二星座。原文直接点名前两对星座；
+固定与双体星座的完整名单按原文的黄道先后关系展开，因此
+{ref}`十二星座表 <catalog-zh-cn-rule-ptolemy-ashmand-sign-groups>`是项目推导，不是原文逐项列举，
+也不以现代三分法替换。
+
+`source.ptolemy.ashmand1822` 将定义定位至第一卷第 XIV 章、印刷页 34–35（PDF 第 72–73 页）。
+新条目收录至点定义的第一个完整句子，以及固定／双体定义的有限片段，各定位说明写明摘录终点。
+完整分点星座句保留在原有例子中，不在另一条目重复。英文摘录、署名的项目中文译文及原作说明分别标明，
+不暗中扩写或修正未引述的季节解释。这只有一个历史来源，不是跨流派共识，也不保证实际天气或日照现象。
 
 ## 译文修订与搜索
 

@@ -32,6 +32,8 @@ from astrology import knowledge
 from astrology.knowledge import Concept, Entry, RuleVariant, Source, load_catalog
 from astrology.knowledge.records import Language
 from tools.catalog_docs import (
+  ASHMAND_RULE_ID,
+  ashmand_group_concept,
   catalog_anchor,
   check_catalog_data,
   configuration_reference,
@@ -354,12 +356,20 @@ class _CatalogHtml(_ApiHtml):
     self.link_labels: dict[str, list[str]] = {}
     self._link: str | None = None
     self._label: list[str] = []
+    self.rows: dict[str, list[tuple[str, tuple[str, ...]]]] = {}
+    self._row: list[str] | None = None
+    self._row_links: list[str] = []
 
   def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
     super().handle_starttag(tag, attrs)
+    if tag == "tr":
+      self._row = []
+      self._row_links = []
     if tag == "a":
       self._link = dict(attrs).get("href")
       self._label = []
+      if self._row is not None and self._link is not None:
+        self._row_links.append(self._link)
     if tag == "section":
       self._sections.append(None)
     identifier = dict(attrs).get("id")
@@ -370,6 +380,16 @@ class _CatalogHtml(_ApiHtml):
 
   def handle_endtag(self, tag: str) -> None:
     super().handle_endtag(tag)
+    if self._row is not None:
+      if tag in ("td", "th"):
+        self._row.append(" ")
+      if tag == "tr":
+        for identifier, block in self.records.items():
+          if any(section is block for section in self._sections):
+            self.rows.setdefault(identifier, []).append(
+              ("".join(self._row), tuple(self._row_links))
+            )
+        self._row = None
     if tag == "a" and self._link is not None:
       self.link_labels.setdefault(self._link, []).append("".join(self._label))
       self._link = None
@@ -378,6 +398,8 @@ class _CatalogHtml(_ApiHtml):
 
   def handle_data(self, data: str) -> None:
     super().handle_data(data)
+    if self._row is not None:
+      self._row.append(data)
     if self._link is not None:
       self._label.append(data)
     self.text.append(data)
@@ -467,6 +489,26 @@ def check_catalog_html(directory: Path) -> None:
           )
         if any(content(value) not in block for value in required):
           raise ValueError(f"Missing rendered catalog metadata: {record.identifier} ({language})")
+    expected_rows: list[tuple[str, tuple[str, ...]]] = [
+      ("Sign Group" if language == "en" else "星座 分组", ())
+    ]
+    for sign in astrology.Sign:
+      sign_concept = catalog.concept(f"sign.{sign.value}")
+      group_concept = ashmand_group_concept(catalog, astrology.ashmand_sign_group(sign))
+      expected_rows.append(
+        (
+          content(f"{sign_concept.name.text(language)} {group_concept.name.text(language)}"),
+          (
+            f"#{catalog_anchor(sign_concept.identifier, language)}",
+            f"#{catalog_anchor(group_concept.identifier, language)}",
+          ),
+        )
+      )
+    rows = parser.rows.get(catalog_anchor(ASHMAND_RULE_ID, language), [])
+    if [(content(text), links) for text, links in rows] != expected_rows:
+      raise ValueError(
+        f"Rendered Ashmand sign-group rows differ from the executable rule: {language}"
+      )
     for target in parser.links:
       if target.startswith("#catalog-") and target[1:] not in parser.records:
         raise ValueError(f"Dangling rendered catalog link: {target}")

@@ -63,8 +63,9 @@ Entry filters combine all selected criteria; they never evaluate prerequisites.
 ## Follow a source to a definition
 
 The corpus contains project configuration contracts, the project conventions for
-sign sectors and house placement, and one single-source historical grouping. It
-names every admitted configuration identity and twelve sign concepts, and links the
+sign sectors and house placement, and one single-source historical classification
+with four groups. It names every admitted configuration identity, twelve sign
+concepts and four historical group concepts, and links the
 executable rules in the chart implementation. Each project-defined aspect rule has
 a name, a written definition and a link to its implementation. The corpus provides
 no default orbs, dignity or interpretation rules.
@@ -101,7 +102,7 @@ daylight guarantee. Statements, definitions and limitations are project
 explanations, not additional quotations.
 
 The source records the edition, scan hash, transcription normalization and bounded
-reproduction status. Only a short transcription is included, not scan images,
+reproduction status. Only bounded definition excerpts are included, not scan images,
 watermarks or modern website prose. Mirrors/catalogs corroborate the edition,
 not independent rule authorship. Config citations identify package version and
 symbols at a fixed commit; they do not verify an author's book formula merely
@@ -127,6 +128,48 @@ API. The catalog does not consume it or promote the entry to applicable:
 
 All built-in entries are reference-only. This package has no matcher or
 chart-evidence store.
+
+## Ashmand 1822 sign groups
+
+This lookup is in current source, not the published v0.1.0. Supply a `Sign`,
+without a chart, position, birth record or native astronomy:
+
+```{doctest}
+>>> from astrology import AshmandSignGroup, Sign, ashmand_sign_group
+>>> ashmand_sign_group(Sign.ARIES) is AshmandSignGroup.EQUINOCTIAL
+True
+>>> group = ashmand_sign_group(Sign.CANCER)
+>>> group.value
+'tropical'
+>>> catalog.concept(f"sign_group.ashmand1822.{group.value}").name.text("en")
+'Tropical signs'
+>>> historical = catalog.entry("entry.ashmand_sign_groups")
+>>> historical.prerequisite_status.value, historical.output_eligibility.value, historical.chart_applicability
+('complete', 'reference_only', 'not_assessed')
+```
+
+Raw strings and unrelated enums raise `TypeError`; convert user input to `Sign`
+explicitly. The result is a group label, not a score or interpretation. Its
+complete prerequisites describe this lookup only; the older
+`entry.equinoctial_example` keeps its unresolved chart-level prerequisites.
+
+The four labels are **tropical**, **equinoctial**, **fixed** and **bicorporeal**.
+Tropical here means the two solstitial signs, not all twelve signs of the tropical
+zodiac. The source directly names the first two pairs. The fixed and bicorporeal
+memberships expand its next-sign relations in zodiac order, so the
+{ref}`twelve-sign table <catalog-en-rule-ptolemy-ashmand-sign-groups>` is
+project-derived, not a verbatim source list. It is not replaced with the modern
+three-mode classification.
+
+`source.ptolemy.ashmand1822` locates the definitions in Book I, chapter XIV,
+printed pp. 34–35 (PDF pp. 72–73). The new entry includes the first complete
+tropical-definition sentence and bounded fixed/bicorporeal fragments; each
+locator states where its excerpt ends. The full equinoctial sentence remains in
+the earlier example, rather than being copied into another entry. English
+excerpts, credited project Chinese translations and authored explanations remain
+separate. The unquoted seasonal explanation is not silently expanded or corrected.
+This is one historical source, not a cross-tradition consensus or an observed
+weather/daylight guarantee.
 
 ## Translation revisions and search
 

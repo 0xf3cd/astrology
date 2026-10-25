@@ -6,11 +6,19 @@
 import math
 import subprocess
 import sys
+from enum import StrEnum
 from fractions import Fraction
 
 import pytest
 
-from astrology import Sign, sign_degree, sign_of, truncate_display
+from astrology import (
+  AshmandSignGroup,
+  Sign,
+  ashmand_sign_group,
+  sign_degree,
+  sign_of,
+  truncate_display,
+)
 
 _SECTOR_STARTS = (
   (0.0, Sign.ARIES),
@@ -128,6 +136,67 @@ except TypeError:
     pass
 else:
     raise RuntimeError('optimized mode skipped the longitude type check')
+"""
+  for mode in ((), ("-O",)):
+    result = subprocess.run([sys.executable, *mode, "-c", code], text=True, capture_output=True)
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+@pytest.mark.parametrize(
+  ("group", "signs"),
+  [
+    (AshmandSignGroup.TROPICAL, (Sign.CANCER, Sign.CAPRICORN)),
+    (AshmandSignGroup.EQUINOCTIAL, (Sign.ARIES, Sign.LIBRA)),
+    (AshmandSignGroup.FIXED, (Sign.TAURUS, Sign.LEO, Sign.SCORPIO, Sign.AQUARIUS)),
+    (AshmandSignGroup.BICORPOREAL, (Sign.GEMINI, Sign.VIRGO, Sign.SAGITTARIUS, Sign.PISCES)),
+  ],
+)
+def test_ashmand_memberships_from_the_source_names_and_order(
+  group: AshmandSignGroup, signs: tuple[Sign, ...]
+) -> None:
+  assert tuple(sign for sign in Sign if ashmand_sign_group(sign) is group) == signs
+
+
+def test_ashmand_groups_form_one_exhaustive_partition() -> None:
+  from astrology.zodiac import _ASHMAND_GROUPS
+
+  assert set(_ASHMAND_GROUPS) == set(Sign)
+  assert len(_ASHMAND_GROUPS) == 12
+  assert {ashmand_sign_group(sign) for sign in Sign} == set(AshmandSignGroup)
+  assert [group.value for group in AshmandSignGroup] == [
+    "tropical",
+    "equinoctial",
+    "fixed",
+    "bicorporeal",
+  ]
+  with pytest.raises(TypeError):
+    _ASHMAND_GROUPS[Sign.ARIES] = AshmandSignGroup.TROPICAL  # type: ignore[index]
+
+
+class OtherSign(StrEnum):
+  ARIES = "aries"
+
+
+@pytest.mark.parametrize("value", ["aries", OtherSign.ARIES, None, True, 0, 30.0, [], {}])
+def test_ashmand_query_rejects_values_that_only_resemble_signs(value: object) -> None:
+  with pytest.raises(TypeError, match="sign must be a Sign"):
+    ashmand_sign_group(value)  # type: ignore[arg-type]
+
+
+def test_ashmand_query_type_checks_survive_optimization() -> None:
+  code = """
+from enum import StrEnum
+from astrology import AshmandSignGroup, Sign, ashmand_sign_group
+class Other(StrEnum):
+    ARIES = 'aries'
+if ashmand_sign_group(Sign.ARIES) is not AshmandSignGroup.EQUINOCTIAL:
+    raise RuntimeError('wrong historical group')
+for value in ('aries', Other.ARIES, True, 0, None):
+    try:
+        ashmand_sign_group(value)
+    except TypeError:
+        continue
+    raise RuntimeError('optimized mode accepted a non-Sign')
 """
   for mode in ((), ("-O",)):
     result = subprocess.run([sys.executable, *mode, "-c", code], text=True, capture_output=True)

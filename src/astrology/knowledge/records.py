@@ -66,6 +66,7 @@ class ConceptKind(StrEnum):
 
   BODY = "body"
   SIGN = "sign"
+  SIGN_GROUP = "sign_group"
   HOUSE_SYSTEM = "house_system"
   NODE_DEFINITION = "node_definition"
   LUNAR_NODE = "lunar_node"

@@ -10,6 +10,12 @@
 `CrossChartAspects` 保留双侧完整来源及比较请求。允许同名对象和交点间跨盘配对，
 不设运动字段，也不转换共同历元。见[双盘指南](cross_aspects.md)。
 
+### Ashmand 1822 年版星座分组
+
+`ashmand_sign_group` 将已有 `Sign` 归入一个 `AshmandSignGroup`：至点、分点、固定或双体星座。
+查询不需命盘，也不初始化天文库。双语目录表读取同一定义，区分历史原文、署名译文与展开后的名单。
+此具名版本查询不提供命盘匹配或解读。见{ref}`知识指南 <ashmand-sign-groups-zh-cn>`。
+
 ### 不兼容变化：撤回命盘持久化
 
 下一版删除 `dumps_chart`、`loads_chart`、`recompute_chart`、`ChartRecordError`、

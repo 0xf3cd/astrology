@@ -8,11 +8,38 @@ from pathlib import Path
 
 import pytest
 
-from astrology.knowledge import Entry, LocalizedText, Source, load_catalog
+from astrology.knowledge import ConceptKind, Entry, LocalizedText, Source, load_catalog
 from astrology.knowledge.records import Language
 from tools.catalog_docs import catalog_anchor, check_catalog_data, localized_texts, render_catalog
 from tools.check import check_catalog_html
 from tools.docs_search import JS_SPLITTER, BilingualSearch, check_search_html, read_search_index
+
+_ASHMAND_EXPECTED = (
+  ("aries", "equinoctial"),
+  ("taurus", "fixed"),
+  ("gemini", "bicorporeal"),
+  ("cancer", "tropical"),
+  ("leo", "fixed"),
+  ("virgo", "bicorporeal"),
+  ("libra", "equinoctial"),
+  ("scorpio", "fixed"),
+  ("sagittarius", "bicorporeal"),
+  ("capricorn", "tropical"),
+  ("aquarius", "fixed"),
+  ("pisces", "bicorporeal"),
+)
+
+
+def _ashmand_fixture_row(sign: str, group: str, language: Language) -> str:
+  catalog = load_catalog()
+  sign_concept = catalog.concept(f"sign.{sign}")
+  group_concept = catalog.concept(f"sign_group.ashmand1822.{group}")
+  return (
+    f'<tr data-sign="{sign}"><td><a href="#{catalog_anchor(sign_concept.identifier, language)}">'
+    f"{html.escape(sign_concept.name.text(language) or '')}</a></td>"
+    f'<td><a href="#{catalog_anchor(group_concept.identifier, language)}">'
+    f"{html.escape(group_concept.name.text(language) or '')}</a></td></tr>"
+  )
 
 
 def test_all_localized_fields_and_configuration_coverage() -> None:
@@ -59,6 +86,15 @@ def test_generation_covers_every_record(language: Language) -> None:
   assert "Original excerpt (English)" in rendered
   assert "project Chinese translation of Ashmand's English" in rendered
   assert "No prerequisites recorded / 未记录前提" in rendered
+  expected_rows = ["| Sign | Group |" if language == "en" else "| 星座 | 分组 |", "|---|---|"]
+  for sign, group_value in _ASHMAND_EXPECTED:
+    sign_concept = catalog.concept(f"sign.{sign}")
+    group_concept = catalog.concept(f"sign_group.ashmand1822.{group_value}")
+    expected_rows.append(
+      f"| {{ref}}`{sign_concept.name.text(language)} <{catalog_anchor(sign_concept.identifier, language)}>`"
+      f" | {{ref}}`{group_concept.name.text(language)} <{catalog_anchor(group_concept.identifier, language)}>` |"
+    )
+  assert [line for line in rendered.splitlines() if line.startswith("|")] == expected_rows
 
 
 def _strings(value: object, language: Language) -> list[str]:
@@ -110,6 +146,17 @@ def catalog_html(tmp_path: Path) -> Path:
           f'<section id="{catalog_anchor(record.identifier, language)}">'
           + html.escape("\n".join(content))
           + source_link
+          + (
+            "<table><tr><th>"
+            + ("Sign</th><th>Group" if language == "en" else "星座</th><th>分组")
+            + "</th></tr>"
+            + "".join(
+              _ashmand_fixture_row(sign, group, language) for sign, group in _ASHMAND_EXPECTED
+            )
+            + "</table>"
+            if record.identifier == "rule.ptolemy_ashmand.sign_groups"
+            else ""
+          )
           + "</section>"
         )
     directory = tmp_path / "docs" / language
@@ -126,6 +173,60 @@ def catalog_html(tmp_path: Path) -> Path:
 
 def test_complete_catalog_html(catalog_html: Path) -> None:
   check_catalog_html(catalog_html)
+
+
+@pytest.mark.parametrize("language", ["en", "zh-CN"])
+@pytest.mark.parametrize("defect", ["missing_row", "wrong_group", "wrong_link", "detached"])
+def test_rendered_ashmand_rows_are_checked_as_pairs(
+  catalog_html: Path, language: Language, defect: str
+) -> None:
+  page = catalog_html / "docs" / language / "catalog.html"
+  text = page.read_text(encoding="utf-8")
+  row = _ashmand_fixture_row("aries", "equinoctial", language)
+  assert text.count(row) == 1
+  if defect == "missing_row":
+    changed = ""
+  elif defect == "wrong_group":
+    changed = _ashmand_fixture_row("aries", "tropical", language)
+  elif defect == "wrong_link":
+    changed = row.replace("ashmand1822-equinoctial", "ashmand1822-tropical")
+  else:
+    changed = ""
+    text = text.replace("</html>", row + "</html>")
+  page.write_text(text.replace(row, changed, 1), encoding="utf-8")
+  with pytest.raises(ValueError, match="sign-group rows"):
+    check_catalog_html(catalog_html)
+
+
+@pytest.mark.parametrize("defect", ["group_kind", "rule_sign", "entry_group", "entry_rule"])
+def test_ashmand_catalog_links_cannot_drift_from_the_domain(defect: str) -> None:
+  catalog = load_catalog()
+  rule = catalog.variant("rule.ptolemy_ashmand.sign_groups")
+  entry = catalog.entry("entry.ashmand_sign_groups")
+  if defect == "group_kind":
+    concept = catalog.concept("sign_group.ashmand1822.tropical")
+    catalog = replace(
+      catalog,
+      concepts=tuple(
+        replace(c, kind=ConceptKind.SIGN) if c is concept else c for c in catalog.concepts
+      ),
+    )
+  elif defect == "rule_sign":
+    catalog = replace(
+      catalog,
+      variants=tuple(
+        replace(r, concept_ids=r.concept_ids[1:]) if r is rule else r for r in catalog.variants
+      ),
+    )
+  else:
+    changed = (
+      replace(entry, concept_ids=entry.concept_ids[:-1])
+      if defect == "entry_group"
+      else replace(entry, rule_ids=("rule.project.tropical_sign_sectors",))
+    )
+    catalog = replace(catalog, entries=tuple(changed if e is entry else e for e in catalog.entries))
+  with pytest.raises(ValueError, match="Ashmand"):
+    check_catalog_data(catalog)
 
 
 @pytest.mark.parametrize("language", ["en", "zh-CN"])
@@ -170,7 +271,15 @@ def test_catalog_artifact_defects(catalog_html: Path, language: Language, defect
   # Chinese fixtures retain English originals too; removing the selected description must target Chinese.
   if language == "zh-CN" and defect == "description":
     old = "太阳的物理天体请求。排盘适配层计算它的地心视位置；本目录不计算位置。"
-  page.write_text(text.replace(old, new), encoding="utf-8")
+  if defect in ("locator", "condition"):
+    marker = f'<section id="{catalog_anchor("entry.equinoctial_example", language)}">'
+    before, separator, after = text.partition(marker)
+    block, end, tail = after.partition("</section>")
+    assert separator and end and old in block
+    text = before + separator + block.replace(old, new) + end + tail
+  else:
+    text = text.replace(old, new)
+  page.write_text(text, encoding="utf-8")
   with pytest.raises(ValueError):
     check_catalog_html(catalog_html)
 

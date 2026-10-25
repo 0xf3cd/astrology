@@ -11,8 +11,16 @@ from typing import get_args
 
 from astrology.aspects import aspect_angle
 from astrology.config import HouseSystem, LunarNode, MajorAspect, NodeDefinition
-from astrology.knowledge import Catalog, LocalizedText, TranslationStatus
+from astrology.knowledge import Catalog, Concept, ConceptKind, LocalizedText, TranslationStatus
 from astrology.knowledge.records import CONFIGURATION_TYPES, ConfigurationIdentity, Language
+from astrology.zodiac import AshmandSignGroup, Sign, ashmand_sign_group
+
+ASHMAND_RULE_ID = "rule.ptolemy_ashmand.sign_groups"
+
+
+def ashmand_group_concept(catalog: Catalog, group: AshmandSignGroup) -> Concept:
+  """Resolve a historical group to its catalog name. 将历史分组解析至目录名称。"""
+  return catalog.concept(f"sign_group.ashmand1822.{group.value}")
 
 
 def localized_texts(value: object, path: str = "catalog") -> Iterator[tuple[str, LocalizedText]]:
@@ -59,6 +67,18 @@ def check_catalog_data(catalog: Catalog) -> None:
       definition_ids[concept.configuration.definition] not in concept.related
     ):
       raise ValueError(f"Missing owning node-definition relation: {concept.identifier}")
+  group_ids = {f"sign_group.ashmand1822.{group.value}" for group in AshmandSignGroup}
+  if {c.identifier for c in catalog.list_concepts(kind=ConceptKind.SIGN_GROUP)} != group_ids:
+    raise ValueError("Catalog must cover exactly the four Ashmand sign groups")
+  expected_ids = group_ids | {f"sign.{sign.value}" for sign in Sign}
+  rule = catalog.variant(ASHMAND_RULE_ID)
+  entry = catalog.entry("entry.ashmand_sign_groups")
+  if (
+    set(rule.concept_ids) != expected_ids
+    or set(entry.concept_ids) != expected_ids
+    or entry.rule_ids != (ASHMAND_RULE_ID,)
+  ):
+    raise ValueError("Ashmand rule and entry must link the twelve signs and four groups")
   for path, text in localized_texts(catalog):
     for language in get_args(Language):
       if text.status(language) is not TranslationStatus.CURRENT:
@@ -137,6 +157,16 @@ def render_catalog(catalog: Catalog, language: Language, code_version: str) -> s
     )
     lines.extend(["Concepts / 概念：" + ", ".join(map(link, variant.concept_ids)), ""])
     config(variant.configuration)
+    if variant.identifier == ASHMAND_RULE_ID:
+      headings = "| Sign | Group |" if language == "en" else "| 星座 | 分组 |"
+      lines.extend([headings, "|---|---|"])
+      for sign in Sign:
+        sign_concept = catalog.concept(f"sign.{sign.value}")
+        group_concept = ashmand_group_concept(catalog, ashmand_sign_group(sign))
+        sign_link = f"{{ref}}`{text(sign_concept.name)} <{catalog_anchor(sign_concept.identifier, language)}>`"
+        group_link = f"{{ref}}`{text(group_concept.name)} <{catalog_anchor(group_concept.identifier, language)}>`"
+        lines.append(f"| {sign_link} | {group_link} |")
+      lines.append("")
   for source in catalog.sources:
     heading(source.identifier, source.title)
     lines.extend(

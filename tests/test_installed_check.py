@@ -610,6 +610,8 @@ def test_cross_observations_cover_every_field_and_both_complete_sources(
 def test_installed_knowledge_defects(consumer: Path, defect: str) -> None:
   path = consumer / "knowledge/catalog.json"
   data = json.loads(path.read_text(encoding="utf-8"))
+  example = next(row for row in data["entries"] if row["identifier"] == "entry.equinoctial_example")
+  source = next(row for row in data["sources"] if row["identifier"] == "source.ptolemy.ashmand1822")
   if defect == "body_link":
     data["entries"][0]["concept_ids"] = ["body.moon"]
   elif defect == "rule_link":
@@ -618,13 +620,44 @@ def test_installed_knowledge_defects(consumer: Path, defect: str) -> None:
   elif defect == "alias":
     data["concepts"][0]["en_aliases"] = ["different"]
   elif defect == "translation":
-    del data["entries"][-1]["citations"][0]["excerpt"]["zh"]
+    del example["citations"][0]["excerpt"]["zh"]
   elif defect == "source_condition":
-    data["entries"][-1]["citations"][0]["excerpt"]["en"] = "Truncated quotation."
+    example["citations"][0]["excerpt"]["en"] = "Truncated quotation."
   elif defect == "verification":
-    data["sources"][-1]["verification"] = "unverified"
+    source["verification"] = "unverified"
   else:
-    data["entries"][-1][defect] = "complete" if defect == "prerequisite_status" else "eligible"
+    example[defect] = "complete" if defect == "prerequisite_status" else "eligible"
   path.write_text(json.dumps(data), encoding="utf-8")
   with pytest.raises(ValueError):
+    installed_check._check_knowledge()
+
+
+@pytest.mark.parametrize("defect", ["concept_link", "rule_link", "translation", "status", "output"])
+def test_installed_ashmand_knowledge_defects(consumer: Path, defect: str) -> None:
+  path = consumer / "knowledge/catalog.json"
+  data = json.loads(path.read_text(encoding="utf-8"))
+  entry = next(row for row in data["entries"] if row["identifier"] == "entry.ashmand_sign_groups")
+  if defect == "concept_link":
+    entry["concept_ids"] = entry["concept_ids"][1:]
+  elif defect == "rule_link":
+    entry["rule_ids"] = ["rule.project.tropical_sign_sectors"]
+  elif defect == "translation":
+    del entry["citations"][0]["excerpt"]["zh"]
+    del entry["citations"][0]["excerpt"]["translation_credit"]
+  elif defect == "status":
+    entry["prerequisite_status"] = "unresolved"
+  else:
+    entry["output_eligibility"] = "eligible"
+  path.write_text(json.dumps(data), encoding="utf-8")
+  with pytest.raises(ValueError, match="Ashmand"):
+    installed_check._check_knowledge()
+
+
+def test_installed_ashmand_lookup_defect_is_rejected(
+  consumer: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+  monkeypatch.setattr(
+    astrology, "ashmand_sign_group", lambda sign: astrology.AshmandSignGroup.FIXED
+  )
+  with pytest.raises(ValueError, match="four-group partition"):
     installed_check._check_knowledge()

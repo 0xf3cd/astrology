@@ -15,6 +15,10 @@
 当前源码另提供两张内存本命盘之间的[静态交叉相位](https://0xf3cd.github.io/astrology/docs/zh-CN/cross_aspects.html)，
 保留双侧来源及左右端点，不标运动状态。此 API 不在已发布的 v0.1.0 中。
 
+当前源码还可用 `ashmand_sign_group(Sign.ARIES)` 不排盘查询历史四分组，
+见[来源及查询示例](https://0xf3cd.github.io/astrology/docs/zh-CN/knowledge.html#ashmand-sign-groups-zh-cn)。
+此 API 不在已发布的 v0.1.0 中。
+
 安装随天文依赖而定：celestial-calendar 0.8.0 只发布 Linux x86_64 与 aarch64、
 macOS 14+ arm64、Windows amd64 的轮子，没有源码分发包。其他平台无法安装本包，
 连知识浏览也不可用。
