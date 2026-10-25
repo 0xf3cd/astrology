@@ -4,6 +4,14 @@
 
 ## Next release: v0.2.0 (unreleased)
 
+### Static cross-chart aspects
+
+`cross_chart_aspects` compares two in-memory natal results with explicit rules.
+`CrossAspectHit` records static geometry with distinct left/right endpoints;
+`CrossChartAspects` retains both complete sources and the comparison request.
+Same-named objects and cross-chart node pairs are allowed. There is no motion
+field or common-epoch conversion. See the [cross-chart guide](cross_aspects.md).
+
 ### Breaking change: chart persistence removed
 
 The next release removes `dumps_chart`, `loads_chart`, `recompute_chart`, `ChartRecordError`,

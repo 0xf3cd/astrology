@@ -168,12 +168,13 @@ def test_natal_participants_and_rules_are_not_inherited() -> None:
     (OrbCombination.MEAN_OF_ORBS, 8.0),
   ],
 )
+@pytest.mark.parametrize("overridden", [MOON, *LunarNode])
 def test_asymmetric_orbs_and_nextafter_boundaries(
-  combination: OrbCombination, limit: float
+  combination: OrbCombination, limit: float, overridden: Body | LunarNode
 ) -> None:
-  rule = AspectRule(MajorAspect.CONJUNCTION, 3, [ObjectOrb(MOON, 13)])
+  rule = AspectRule(MajorAspect.CONJUNCTION, 3, [ObjectOrb(overridden, 13)])
   for longitude, admitted in ((limit, True), (math.nextafter(limit, math.inf), False)):
-    left, right = chart_at((SUN, 0)), chart_at((MOON, longitude))
+    left, right = chart_at((SUN, 0)), chart_at((overridden, longitude))
     for first, second in ((left, right), (right, left)):
       result = cross_chart_aspects(first, second, [rule], combination=combination)
       assert bool(result.hits) is admitted
@@ -183,10 +184,13 @@ def test_asymmetric_orbs_and_nextafter_boundaries(
 
 
 @pytest.mark.parametrize("combination", list(OrbCombination))
-def test_same_identity_override_applies_on_both_sides(combination: OrbCombination) -> None:
-  rule = AspectRule(MajorAspect.CONJUNCTION, 1, [ObjectOrb(SUN, 5)])
+@pytest.mark.parametrize("identity", [SUN, *LunarNode])
+def test_same_identity_override_applies_on_both_sides(
+  combination: OrbCombination, identity: Body | LunarNode
+) -> None:
+  rule = AspectRule(MajorAspect.CONJUNCTION, 1, [ObjectOrb(identity, 5)])
   (hit,) = cross_chart_aspects(
-    chart_at((SUN, 0)), chart_at((SUN, 5)), [rule], combination=combination
+    chart_at((identity, 0)), chart_at((identity, 5)), [rule], combination=combination
   ).hits
   assert hit.orb_limit_deg == hit.deviation_deg == 5
 
@@ -349,6 +353,45 @@ def test_request_validation_is_not_skipped_for_empty_outputs() -> None:
   for left, right in ((None, source), (source, None)):
     with pytest.raises(TypeError, match="NatalChart"):
       cross_chart_aspects(cast(Any, left), cast(Any, right), ())
+
+
+@pytest.mark.parametrize("selected_side", [None, "left", "right"])
+def test_override_identity_must_be_selected_on_at_least_one_side(
+  selected_side: str | None,
+) -> None:
+  left = chart_at((SUN, 0), (NODE, 10))
+  right = chart_at((SUN, 5), (NODE, 5))
+  rules = [AspectRule(MajorAspect.CONJUNCTION, 1, [ObjectOrb(NODE, 13)])]
+  assert NODE in left.requested.objects and NODE in right.requested.objects
+  options: dict[str, Any] = {
+    "left_objects": [SUN],
+    "right_objects": [SUN],
+    "combination": OrbCombination.MEAN_OF_ORBS,
+  }
+  if selected_side is None:
+    with pytest.raises(ValueError, match="only selected"):
+      cross_chart_aspects(left, right, rules, **options)
+  else:
+    options[selected_side + "_objects"] = [SUN, NODE]
+    result = cross_chart_aspects(left, right, rules, **options)
+    (hit,) = result.hits
+    assert (hit.left_object, hit.right_object) == (
+      (NODE, SUN) if selected_side == "left" else (SUN, NODE)
+    )
+    assert hit.orb_limit_deg == 7 and abs(hit.deviation_deg) == 5
+
+
+@pytest.mark.parametrize("side,identity", [("left", NODE), ("right", MOON)])
+def test_selection_cannot_borrow_an_object_from_the_other_source(
+  side: str, identity: Body | LunarNode
+) -> None:
+  left = chart_at((SUN, 0), (MOON, 1))
+  right = chart_at((SUN, 2), (NODE, 3))
+  selected, opposite = (left, right) if side == "left" else (right, left)
+  assert identity not in selected.requested.objects
+  assert identity in opposite.requested.objects
+  with pytest.raises(ValueError, match=side + "_objects must name only objects available"):
+    cross_chart_aspects(left, right, (), **{side + "_objects": cast(Any, [identity])})
 
 
 def test_empty_rules_selections_and_no_matches_are_valid_and_distinguishable() -> None:

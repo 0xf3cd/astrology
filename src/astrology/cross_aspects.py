@@ -50,12 +50,12 @@ class CrossChartAspects:
   """Immutable sources, effective selections, explicit rules and all static cross hits.
 
   Both complete source charts are retained unchanged. Sequences are isolated in
-  tuples; selections follow their source's position order. Construction checks
-  that the complete hit sequence matches pure derivation, not that the sources'
-  astronomical values or provenance labels are authentic.
+  tuples; selections follow their source's position order. Construction recomputes
+  all hits from the two sources, selections and rules and rejects any difference.
+  It does not authenticate the sources' astronomical values or provenance labels.
 
   不可变的双侧来源、实际参与对象、显式规则与全部静态交叉命中。保留两张完整源盘，不改变它们。
-  序列复制为元组；参与对象按各自源盘的位置顺序排列。构造时核对完整命中序列与纯推导一致，
+  序列复制为元组；参与对象按各自源盘的位置顺序排列。构造时按两侧来源、选择和规则重算全部命中，拒绝任何差异，
   不认证源盘的天文值或来源标签是否真实。
   """
 
@@ -194,7 +194,7 @@ def cross_chart_aspects(
 
   将每个所选左盘位置与每个所选右盘位置比较，不判断运动状态。None 选该侧全部位置，
   不继承本命相位参与者；空选择和空规则合法。允许同名对象、跨盘交点配对及同一张盘占两个角色。
-  规则须显式给出，不继承源盘规则。对象 orb 按标识作用于两侧，只能指向所选对象；有覆盖时
+  规则须显式给出，不继承源盘规则。对象容许度按标识作用于两侧，只能指向所选对象；有覆盖时
   必须给合成方式，无覆盖时不能给。拒绝重复规则、重复参与对象及源盘没有的对象。
   返回全部命中分支，按左位置、右位置、相位角升序及负分支在前排序。容许度包含等号，
   带符号偏差和上限以度计。两盘的黄道、中心和位置坐标约定须一致；比较各自日期的热带黄经，

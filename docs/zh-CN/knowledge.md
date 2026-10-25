@@ -33,8 +33,8 @@ True
 身份信息仍保留在概念和条目中，参见[规则标识变更](#首发前的规则标识变更)。
 
 `entry.cross_aspect_evaluation` 和 `rule.project.cross_aspect_evaluation` 描述
-[静态双盘政策](cross_aspects.md)，引用单独的固定实现来源。已有参与者和运动规则的标识保持不变，
-适用范围分别限定为单盘判断及同一时刻的速率。前提描述完整，仍不表示检索条目已成为命盘结论：
+[静态双盘政策](cross_aspects.md)，引用单独的固定实现来源。即使前提完整，此条目仍仅供参考，
+检索它不会判断命盘：
 
 ```{doctest}
 >>> comparison = catalog.entry("entry.cross_aspect_evaluation")
@@ -168,8 +168,10 @@ rule.node.meeus_five_term_true_descending
 按对应概念调用 `list_variants()` 会返回 `()`；保留的身份信息可用 `concept()`、`lookup()`
 或 `filter_entries()` 查询。三条 `rule.house.*`、两条 `rule.node_definition.*`、五条
 `rule.aspect.*` 以及原有九条显式规则标识均保留，相对顺序不变：十条带配置链接的规则在前，
-原有九条显式规则在后。当前有 19 条变体，概念、来源和条目数量仍为 36、3 和 8。
+原有九条显式规则在后。该修订当时含 19 条变体，概念、来源和条目数量仍为 36、3 和 8。
 来源状态、前提完整性、输出资格和命盘适用性仍各自独立。
+
+新增双盘判断后，已有规则标识保持不变，参与者规则限定用于单盘判断，运动规则限定用于同一时刻的速率。
 
 ## 记录与归属
 

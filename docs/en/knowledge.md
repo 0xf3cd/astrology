@@ -38,9 +38,8 @@ remains on the concepts and entries; see [rule-ID changes](#pre-release-rule-id-
 
 `entry.cross_aspect_evaluation` and `rule.project.cross_aspect_evaluation` describe
 the [static cross-chart policy](cross_aspects.md), with its own fixed implementation
-source. Existing participation and motion rules retain their identities and are
-scoped to single-chart evaluation and shared-instant rates respectively. A complete
-prerequisite description still does not make a retrieved entry a chart conclusion:
+source. Even with complete prerequisites, this entry remains reference-only;
+retrieving it does not assess a chart:
 
 ```{doctest}
 >>> comparison = catalog.entry("entry.cross_aspect_evaluation")
@@ -208,9 +207,12 @@ concept. `list_variants()` for their concepts returns `()`. Use `concept()`,
 The three `rule.house.*`, two `rule.node_definition.*`, five `rule.aspect.*` and
 nine original authored rule IDs remain. Their relative order is unchanged:
 the ten configuration-linked rules precede the original nine authored rules.
-There are now 19 variants, with 36 concepts, 3 sources and 8 entries unchanged in
+That revision had 19 variants, with 36 concepts, 3 sources and 8 entries unchanged in
 count. Source status, prerequisite completeness, output eligibility and chart
 applicability retain their separate meanings.
+
+The cross-chart addition preserves existing rule identities while scoping
+participation to single-chart evaluation and motion to rates at one shared instant.
 
 ## Records and ownership
 

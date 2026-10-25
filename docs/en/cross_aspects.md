@@ -50,8 +50,9 @@ neither chart's natal rules or participants are inherited.
 all positions on that side, even if its natal aspects used a smaller subset.
 Selections follow source position order, not the order of the selection argument.
 Every selected left object is paired with every selected right object. This
-includes same-named objects, all named cross-chart node pairs, and the same chart
-in both roles. These are project geometry choices, not traditional interpretations.
+includes same-named objects and every selected node identity on one side with
+every selected node identity on the other. The same chart can occupy both roles.
+These are project geometry choices, not traditional interpretations.
 The [single-chart node exclusion](aspects.md#choose-the-objects) remains unchanged.
 
 Object-orb overrides use the existing `Body` or `LunarNode` identity on either
@@ -75,8 +76,10 @@ and inclusive limits are the same arithmetic as for a natal pair.
 
 Empty selections, empty rules and no matches all yield empty hits; their recorded
 selections/rules distinguish them. Invalid requests still fail: duplicate or
-unavailable participants, duplicate aspect identities, unused override identities
-and an inappropriate or missing combination are rejected even with no pairs.
+unavailable participants, duplicate aspect identities, unused override identities,
+a combination given without overrides, or overrides without a combination are
+rejected even with no pairs. Mismatched zodiac, center or position-frame
+conventions raise `ValueError`.
 Caller-owned sequences are copied into immutable tuples.
 
 ## Read static geometry
@@ -94,11 +97,13 @@ identifies exact static geometry, without predicting a later event.
 
 The sources must use matching zodiac, center and position-frame conventions.
 The current source types admit tropical/geocentric positions on the true ecliptic
-and equinox of each chart's own date. Those longitudes are compared directly;
-there is no common-epoch conversion or claim of a simultaneous spatial angle.
+and equinox of each chart's own date. Different dates therefore use different
+equinox references: a hit compares the stored longitudes, not the angle between
+two positions at one moment. There is no common-epoch conversion.
 Different dates, locations, house systems, models and software labels are retained
-and do not by themselves cause rejection. Constructor checks validate pure result
-consistency, not the authenticity of supplied astronomical values or labels.
+and do not by themselves cause rejection. Construction recomputes all hits from
+the sources, selections and rules and rejects any difference. It does not
+authenticate the supplied astronomical values or provenance labels.
 
 Composite/Davison charts, house overlays, transit searches and interpretation
-remain outside this API. It provides no chart persistence or separate text formatter.
+remain outside this API. It provides no separate text formatter.

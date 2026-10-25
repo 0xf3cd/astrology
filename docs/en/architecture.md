@@ -6,7 +6,7 @@ Birth records, modern time resolution, requested configuration, the tropical
 natal chart, major aspects, text output and independent knowledge are implemented; their
 usage and constraints are in the [birth](birth.md), [configuration](configuration.md),
 [chart](chart.md), [aspect](aspects.md), [cross-chart](cross_aspects.md), [result](records.md)
-and [knowledge](knowledge.md) guides. Static cross-chart comparison is also available.
+and [knowledge](knowledge.md) guides.
 The current chart is
 a reproducible modern tropical, geocentric natal chart, with independent access
 to its underlying knowledge.

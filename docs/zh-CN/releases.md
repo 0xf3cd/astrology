@@ -4,6 +4,12 @@
 
 ## 下一版：v0.2.0（未发布）
 
+### 静态双盘交叉相位
+
+`cross_chart_aspects` 用显式规则比较两张内存本命盘结果。`CrossAspectHit` 记录静态几何并区分左右端点，
+`CrossChartAspects` 保留双侧完整来源及比较请求。允许同名对象和交点间跨盘配对，
+不设运动字段，也不转换共同历元。见[双盘指南](cross_aspects.md)。
+
 ### 不兼容变化：撤回命盘持久化
 
 下一版删除 `dumps_chart`、`loads_chart`、`recompute_chart`、`ChartRecordError`、
