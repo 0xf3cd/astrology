@@ -75,11 +75,10 @@ and inclusive limits are the same arithmetic as for a natal pair.
 ```
 
 Empty selections, empty rules and no matches all yield empty hits; their recorded
-selections/rules distinguish them. Invalid requests still fail: duplicate or
-unavailable participants, duplicate aspect identities, unused override identities,
-a combination given without overrides, or overrides without a combination are
-rejected even with no pairs. Mismatched zodiac, center or position-frame
-conventions raise `ValueError`.
+selections/rules distinguish them. These requests raise `ValueError` even with no
+pairs: duplicate participants within one side's selection, unavailable participants,
+duplicate aspect identities, unused override identities, a combination given
+without overrides, or overrides without a combination.
 Caller-owned sequences are copied into immutable tuples.
 
 ## Read static geometry
@@ -95,8 +94,9 @@ There is no motion field, including no applying/separating label. Rates at two
 birth instants do not describe a shared time evolution. Zero deviation still
 identifies exact static geometry, without predicting a later event.
 
-The sources must use matching zodiac, center and position-frame conventions.
-The current source types admit tropical/geocentric positions on the true ecliptic
+The sources must use matching zodiac, center and position-frame conventions;
+a mismatch raises `ValueError`. Current public constructors admit only one such
+convention: tropical/geocentric positions on the true ecliptic
 and equinox of each chart's own date. Different dates therefore use different
 equinox references: a hit compares the stored longitudes, not the angle between
 two positions at one moment. There is no common-epoch conversion.
