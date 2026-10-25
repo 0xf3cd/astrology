@@ -73,6 +73,9 @@ def test_query_contracts(catalog: Catalog) -> None:
     "rule.ptolemy_ashmand.sign_groups",
   ]
   assert catalog.list_variants(concept_id="body.sun") == ()
+  vocabulary = catalog.entry("entry.sign_vocabulary")
+  assert "rule.ptolemy_ashmand.sign_groups" in vocabulary.rule_ids
+  assert "source.astrology.sign_groups.c92ac82" in {c.source_id for c in vocabulary.citations}
   assert catalog.concept("body.sun").configuration is Body.SUN
   assert len(catalog.list_variants()) == len(catalog.variants)
   assert catalog.filter_entries() == tuple(catalog.entries)

@@ -136,6 +136,8 @@ without a chart, position, birth record or native astronomy:
 
 ```{doctest}
 >>> from astrology import AshmandSignGroup, Sign, ashmand_sign_group
+>>> from astrology.knowledge import load_catalog
+>>> catalog = load_catalog()
 >>> ashmand_sign_group(Sign.ARIES) is AshmandSignGroup.EQUINOCTIAL
 True
 >>> group = ashmand_sign_group(Sign.CANCER)
@@ -155,11 +157,11 @@ complete prerequisites describe this lookup only; the older
 
 The four labels are **tropical**, **equinoctial**, **fixed** and **bicorporeal**.
 Tropical here means the two solstitial signs, not all twelve signs of the tropical
-zodiac. The source directly names the first two pairs. The fixed and bicorporeal
-memberships expand its next-sign relations in zodiac order, so the
+zodiac. The source directly names the tropical and equinoctial pairs. In zodiac
+order, fixed signs immediately follow those signs, and bicorporeal signs
+immediately follow fixed signs. The
 {ref}`twelve-sign table <catalog-en-rule-ptolemy-ashmand-sign-groups>` is
-project-derived, not a verbatim source list. It is not replaced with the modern
-three-mode classification.
+project-derived, not a verbatim source list.
 
 `source.ptolemy.ashmand1822` locates the definitions in Book I, chapter XIV,
 printed pp. 34–35 (PDF pp. 72–73). The new entry includes the first complete
@@ -167,7 +169,7 @@ tropical-definition sentence and bounded fixed/bicorporeal fragments; each
 locator states where its excerpt ends. The full equinoctial sentence remains in
 the earlier example, rather than being copied into another entry. English
 excerpts, credited project Chinese translations and authored explanations remain
-separate. The unquoted seasonal explanation is not silently expanded or corrected.
+separate.
 This is one historical source, not a cross-tradition consensus or an observed
 weather/daylight guarantee.
 

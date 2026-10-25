@@ -111,6 +111,8 @@ True
 
 ```{doctest}
 >>> from astrology import AshmandSignGroup, Sign, ashmand_sign_group
+>>> from astrology.knowledge import load_catalog
+>>> catalog = load_catalog()
 >>> ashmand_sign_group(Sign.ARIES) is AshmandSignGroup.EQUINOCTIAL
 True
 >>> group = ashmand_sign_group(Sign.CANCER)
@@ -127,15 +129,14 @@ True
 此条目的完整前提只针对这一查询；原有 `entry.equinoctial_example` 的命盘层面前提仍保持未决。
 
 四组中文名为**至点星座、分点星座、固定星座、双体星座**，对应 tropical、equinoctial、fixed、bicorporeal。
-这里的 tropical 只指两个至点星座，不是热带黄道的全部十二星座。原文直接点名前两对星座；
-固定与双体星座的完整名单按原文的黄道先后关系展开，因此
-{ref}`十二星座表 <catalog-zh-cn-rule-ptolemy-ashmand-sign-groups>`是项目推导，不是原文逐项列举，
-也不以现代三分法替换。
+这里的 tropical 只指两个至点星座，不是热带黄道的全部十二星座。原文直接点名至点与分点两对星座。
+在黄道次序中，固定星座紧接这两组星座，双体星座紧接固定星座。因此
+{ref}`十二星座表 <catalog-zh-cn-rule-ptolemy-ashmand-sign-groups>`是项目推导，不是原文逐项列举。
 
 `source.ptolemy.ashmand1822` 将定义定位至第一卷第 XIV 章、印刷页 34–35（PDF 第 72–73 页）。
 新条目收录至点定义的第一个完整句子，以及固定／双体定义的有限片段，各定位说明写明摘录终点。
-完整分点星座句保留在原有例子中，不在另一条目重复。英文摘录、署名的项目中文译文及原作说明分别标明，
-不暗中扩写或修正未引述的季节解释。这只有一个历史来源，不是跨流派共识，也不保证实际天气或日照现象。
+完整分点星座句保留在原有例子中，不在另一条目重复。英文摘录、署名的项目中文译文及原作说明分别标明。
+这只有一个历史来源，不是跨流派共识，也不保证实际天气或日照现象。
 
 ## 译文修订与搜索
 

@@ -69,13 +69,15 @@ def ashmand_sign_group(sign: Sign) -> AshmandSignGroup:
   """Return a sign's group in Ashmand 1822, without a chart or I/O.
 
   Accept a Sign member; raw strings and unrelated enums raise TypeError.
-  The fixed and bicorporeal memberships expand the source's next-sign relations,
-  not a verbatim twelve-sign list. Source: Book I, chapter XIV, printed pp. 34-35;
+  In zodiac order, fixed signs immediately follow tropical or equinoctial signs;
+  bicorporeal signs immediately follow fixed signs. This expands the source's
+  ordering, not a verbatim twelve-sign list. Source: Book I, XIV, printed pp. 34-35;
   knowledge rule: rule.ptolemy_ashmand.sign_groups.
 
   返回星座在 Ashmand 1822 年版中的分组，不需命盘，也不执行 I/O。只接受 Sign 成员；
-  字符串或其他枚举抛出 TypeError。固定与双体星座的名单按原文的先后关系展开，
-  不是原书逐项列出的十二星座表。来源为第一卷第 XIV 章、印刷页 34-35；
+  字符串或其他枚举抛出 TypeError。在黄道次序中，固定星座紧接至点星座或分点星座，
+  双体星座紧接固定星座。这是按原文次序展开的名单，不是原书逐项列出的十二星座表。
+  来源为第一卷第 XIV 章、印刷页 34-35；
   知识规则标识为 rule.ptolemy_ashmand.sign_groups。
   """
   if type(sign) is not Sign:

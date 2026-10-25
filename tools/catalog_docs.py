@@ -19,7 +19,7 @@ ASHMAND_RULE_ID = "rule.ptolemy_ashmand.sign_groups"
 
 
 def ashmand_group_concept(catalog: Catalog, group: AshmandSignGroup) -> Concept:
-  """Resolve a historical group to its catalog name. 将历史分组解析至目录名称。"""
+  """Return the group's catalog concept record. 返回分组对应的目录概念记录。"""
   return catalog.concept(f"sign_group.ashmand1822.{group.value}")
 
 

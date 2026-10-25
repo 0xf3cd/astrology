@@ -1,5 +1,6 @@
 """Discriminating catalog/search artifact checks. 目录及搜索产物检查的区分力。"""
 
+import doctest
 import html
 import json
 from dataclasses import fields, is_dataclass, replace
@@ -95,6 +96,18 @@ def test_generation_covers_every_record(language: Language) -> None:
       f" | {{ref}}`{group_concept.name.text(language)} <{catalog_anchor(group_concept.identifier, language)}>` |"
     )
   assert [line for line in rendered.splitlines() if line.startswith("|")] == expected_rows
+
+
+@pytest.mark.parametrize("language", ["en", "zh-CN"])
+def test_ashmand_guide_example_runs_without_earlier_sections(language: Language) -> None:
+  path = Path(__file__).resolve().parents[1] / "docs" / language / "knowledge.md"
+  heading = "## Ashmand 1822"
+  section = path.read_text(encoding="utf-8").split(heading, 1)[1].split("\n## ", 1)[0]
+  example = section.split("```{doctest}\n", 1)[1].split("```", 1)[0]
+  case = doctest.DocTestParser().get_doctest(example, {}, str(path), str(path), 0)
+  runner = doctest.DocTestRunner()
+  result = runner.run(case)
+  assert result.attempted > 0 and result.failed == 0
 
 
 def _strings(value: object, language: Language) -> list[str]:

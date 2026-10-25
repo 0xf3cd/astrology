@@ -15,7 +15,7 @@
 当前源码另提供两张内存本命盘之间的[静态交叉相位](https://0xf3cd.github.io/astrology/docs/zh-CN/cross_aspects.html)，
 保留双侧来源及左右端点，不标运动状态。此 API 不在已发布的 v0.1.0 中。
 
-当前源码还可用 `ashmand_sign_group(Sign.ARIES)` 不排盘查询历史四分组，
+当前源码还可用 `ashmand_sign_group(Sign.ARIES)` 不排盘查询十二星座在 Ashmand 1822 年版中的四组归属，
 见[来源及查询示例](https://0xf3cd.github.io/astrology/docs/zh-CN/knowledge.html#ashmand-sign-groups-zh-cn)。
 此 API 不在已发布的 v0.1.0 中。
 
