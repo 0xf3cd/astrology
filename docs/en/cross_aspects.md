@@ -25,21 +25,21 @@ the comparison takes its rules explicitly.
 ...   record = BirthRecord(date(year, 7, 17), time(6), FixedOffset(timedelta(0)),
 ...     Location(0, 0), source={"record": "synthetic", "year": str(year)})
 ...   return natal_chart(prepare_natal_input(record), config)
->>> left, right = source_chart(2003), source_chart(2004)
+>>> chart_left, chart_right = source_chart(2003), source_chart(2004)
 >>> rules = [AspectRule(MajorAspect.CONJUNCTION, 3)]
->>> result = cross_chart_aspects(left, right, rules)
+>>> result = cross_chart_aspects(chart_left=chart_left, chart_right=chart_right, rules=rules)
 >>> [(h.left_object.value, h.right_object.value, h.aspect.value) for h in result.hits]
 [('sun', 'sun', 'conjunction')]
->>> result.left is left, result.right is right
+>>> result.chart_left is chart_left, result.chart_right is chart_right
 (True, True)
->>> result.left.resolved.utc.year, result.right.resolved.utc.year
+>>> result.chart_left.resolved.utc.year, result.chart_right.resolved.utc.year
 (2003, 2004)
 >>> hit = result.hits[0]
 >>> abs(hit.deviation_deg) <= hit.orb_limit_deg == 3
 True
 ```
 
-Both complete charts remain available as `result.left` and `result.right`,
+Both complete charts remain available as `result.chart_left` and `result.chart_right`,
 including original/resolved birth inputs, positions, requested/effective choices
 and provenance. `rules` and `combination` record the fresh comparison request;
 neither chart's natal rules or participants are inherited.
@@ -64,13 +64,13 @@ and inclusive limits are the same arithmetic as for a natal pair.
 
 ```{doctest}
 >>> own_sun = [AspectRule(MajorAspect.CONJUNCTION, 1, [ObjectOrb(Body.SUN, 5)])]
->>> adjusted = cross_chart_aspects(left, right, own_sun,
+>>> adjusted = cross_chart_aspects(chart_left, chart_right, own_sun,
 ...   combination=OrbCombination.MEAN_OF_ORBS)
 >>> adjusted.hits[0].orb_limit_deg
 5.0
->>> cross_chart_aspects(left, right, rules, left_objects=[]).hits
+>>> cross_chart_aspects(chart_left, chart_right, rules, left_objects=[]).hits
 ()
->>> cross_chart_aspects(left, right, ()).rules
+>>> cross_chart_aspects(chart_left, chart_right, ()).rules
 ()
 ```
 

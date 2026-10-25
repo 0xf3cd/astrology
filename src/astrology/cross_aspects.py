@@ -49,18 +49,19 @@ class CrossAspectHit:
 class CrossChartAspects:
   """Immutable sources, effective selections, explicit rules and all static cross hits.
 
-  Both complete source charts are retained unchanged. Sequences are isolated in
-  tuples; selections follow their source's position order. Construction recomputes
-  all hits from the two sources, selections and rules and rejects any difference.
+  `chart_left` and `chart_right` retain the complete source charts unchanged.
+  Sequences are isolated in tuples; selections follow their source's position order.
+  Construction recomputes all hits from the two sources, selections and rules and rejects any difference.
   It does not authenticate the sources' astronomical values or provenance labels.
 
-  不可变的双侧来源、实际参与对象、显式规则与全部静态交叉命中。保留两张完整源盘，不改变它们。
+  不可变的双侧来源、实际参与对象、显式规则与全部静态交叉命中。`chart_left` 与 `chart_right`
+  保留两张完整源盘，不改变它们。
   序列复制为元组；参与对象按各自源盘的位置顺序排列。构造时按两侧来源、选择和规则重算全部命中，拒绝任何差异，
   不认证源盘的天文值或来源标签是否真实。
   """
 
-  left: NatalChart
-  right: NatalChart
+  chart_left: NatalChart
+  chart_right: NatalChart
   left_objects: tuple[Body | LunarNode, ...]
   right_objects: tuple[Body | LunarNode, ...]
   rules: tuple[AspectRule, ...]
@@ -68,9 +69,9 @@ class CrossChartAspects:
   hits: tuple[CrossAspectHit, ...]
 
   def __post_init__(self) -> None:
-    _sources(self.left, self.right)
-    left_objects = _selection(self.left, self.left_objects, "left_objects")
-    right_objects = _selection(self.right, self.right_objects, "right_objects")
+    _sources(self.chart_left, self.chart_right)
+    left_objects = _selection(self.chart_left, self.left_objects, "left_objects")
+    right_objects = _selection(self.chart_right, self.right_objects, "right_objects")
     rules = _rules(self.rules, self.combination, (*left_objects, *right_objects))
     if not isinstance(self.hits, Sequence) or isinstance(self.hits, (str, bytes)):
       raise TypeError("hits must be a sequence of CrossAspectHit values")
@@ -84,17 +85,19 @@ class CrossChartAspects:
       ("hits", hits),
     ):
       object.__setattr__(self, name, value)
-    if hits != _hits(self.left, self.right, left_objects, right_objects, rules, self.combination):
+    if hits != _hits(
+      self.chart_left, self.chart_right, left_objects, right_objects, rules, self.combination
+    ):
       raise ValueError("Cross hits differ from complete pure derivation")
 
 
-def _sources(left: NatalChart, right: NatalChart) -> None:
-  if type(left) is not NatalChart or type(right) is not NatalChart:
-    raise TypeError("left and right must be NatalChart values")
+def _sources(chart_left: NatalChart, chart_right: NatalChart) -> None:
+  if type(chart_left) is not NatalChart or type(chart_right) is not NatalChart:
+    raise TypeError("chart_left and chart_right must be NatalChart values")
   if (
-    left.requested.zodiac != right.requested.zodiac
-    or left.requested.center != right.requested.center
-    or left.provenance.position_frame != right.provenance.position_frame
+    chart_left.requested.zodiac != chart_right.requested.zodiac
+    or chart_left.requested.center != chart_right.requested.center
+    or chart_left.provenance.position_frame != chart_right.provenance.position_frame
   ):
     raise ValueError("Cross charts must use matching zodiac, center and position frame")
 
@@ -140,8 +143,8 @@ def _rules(
 
 
 def _hits(
-  left: NatalChart,
-  right: NatalChart,
+  chart_left: NatalChart,
+  chart_right: NatalChart,
   left_objects: tuple[Body | LunarNode, ...],
   right_objects: tuple[Body | LunarNode, ...],
   rules: tuple[AspectRule, ...],
@@ -150,9 +153,9 @@ def _hits(
   ordered = sorted(rules, key=lambda rule: aspect_angle(rule.aspect))
   return tuple(
     CrossAspectHit(first.identity, second.identity, aspect, branch, deviation, limit)
-    for first in left.positions
+    for first in chart_left.positions
     if first.identity in left_objects
-    for second in right.positions
+    for second in chart_right.positions
     if second.identity in right_objects
     for aspect, branch, deviation, limit in _pair_geometry(
       first.identity,
@@ -166,8 +169,8 @@ def _hits(
 
 
 def cross_chart_aspects(
-  left: NatalChart,
-  right: NatalChart,
+  chart_left: NatalChart,
+  chart_right: NatalChart,
   rules: Sequence[AspectRule],
   *,
   left_objects: Sequence[Body | LunarNode] | None = None,
@@ -201,15 +204,19 @@ def cross_chart_aspects(
   不转换共同历元，也不声称是同时刻的空间角。保留不同日期、地点、宫制、模型和版本标签，
   不因此自动拒绝。不执行 I/O、时刻解析、版本查询或原生天文；源盘保持不变。
   """
-  _sources(left, right)
+  _sources(chart_left, chart_right)
   selected_left = _selection(
-    left, left.requested.objects if left_objects is None else left_objects, "left_objects"
+    chart_left,
+    chart_left.requested.objects if left_objects is None else left_objects,
+    "left_objects",
   )
   selected_right = _selection(
-    right, right.requested.objects if right_objects is None else right_objects, "right_objects"
+    chart_right,
+    chart_right.requested.objects if right_objects is None else right_objects,
+    "right_objects",
   )
   requested_rules = _rules(rules, combination, (*selected_left, *selected_right))
-  hits = _hits(left, right, selected_left, selected_right, requested_rules, combination)
+  hits = _hits(chart_left, chart_right, selected_left, selected_right, requested_rules, combination)
   return CrossChartAspects(
-    left, right, selected_left, selected_right, requested_rules, combination, hits
+    chart_left, chart_right, selected_left, selected_right, requested_rules, combination, hits
   )

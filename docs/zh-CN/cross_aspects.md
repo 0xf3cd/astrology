@@ -21,21 +21,21 @@
 ...   record = BirthRecord(date(year, 7, 17), time(6), FixedOffset(timedelta(0)),
 ...     Location(0, 0), source={"record": "synthetic", "year": str(year)})
 ...   return natal_chart(prepare_natal_input(record), config)
->>> left, right = source_chart(2003), source_chart(2004)
+>>> chart_left, chart_right = source_chart(2003), source_chart(2004)
 >>> rules = [AspectRule(MajorAspect.CONJUNCTION, 3)]
->>> result = cross_chart_aspects(left, right, rules)
+>>> result = cross_chart_aspects(chart_left=chart_left, chart_right=chart_right, rules=rules)
 >>> [(h.left_object.value, h.right_object.value, h.aspect.value) for h in result.hits]
 [('sun', 'sun', 'conjunction')]
->>> result.left is left, result.right is right
+>>> result.chart_left is chart_left, result.chart_right is chart_right
 (True, True)
->>> result.left.resolved.utc.year, result.right.resolved.utc.year
+>>> result.chart_left.resolved.utc.year, result.chart_right.resolved.utc.year
 (2003, 2004)
 >>> hit = result.hits[0]
 >>> abs(hit.deviation_deg) <= hit.orb_limit_deg == 3
 True
 ```
 
-`result.left` 与 `result.right` 保留两张完整源盘，包括原始／已解析出生输入、位置、
+`result.chart_left` 与 `result.chart_right` 保留两张完整源盘，包括原始／已解析出生输入、位置、
 请求／实际配置及来源。`rules` 和 `combination` 保存本次比较请求；不继承任一盘的本命规则或参与对象。
 
 ## 选择配对与容许度
@@ -53,13 +53,13 @@ True
 
 ```{doctest}
 >>> own_sun = [AspectRule(MajorAspect.CONJUNCTION, 1, [ObjectOrb(Body.SUN, 5)])]
->>> adjusted = cross_chart_aspects(left, right, own_sun,
+>>> adjusted = cross_chart_aspects(chart_left, chart_right, own_sun,
 ...   combination=OrbCombination.MEAN_OF_ORBS)
 >>> adjusted.hits[0].orb_limit_deg
 5.0
->>> cross_chart_aspects(left, right, rules, left_objects=[]).hits
+>>> cross_chart_aspects(chart_left, chart_right, rules, left_objects=[]).hits
 ()
->>> cross_chart_aspects(left, right, ()).rules
+>>> cross_chart_aspects(chart_left, chart_right, ()).rules
 ()
 ```
 

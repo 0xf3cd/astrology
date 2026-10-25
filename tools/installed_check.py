@@ -166,7 +166,7 @@ def acceptance_cross_aspects() -> astrology.CrossChartAspects:
 
   比较两张合成内存源盘，不调用天文库或时刻解析。
   """
-  left = _cross_source(
+  chart_left = _cross_source(
     2000,
     "left",
     (
@@ -175,7 +175,7 @@ def acceptance_cross_aspects() -> astrology.CrossChartAspects:
       (astrology.LunarNode.MEAN_ASCENDING, 190),
     ),
   )
-  right = _cross_source(
+  chart_right = _cross_source(
     2001,
     "right",
     (
@@ -193,7 +193,10 @@ def acceptance_cross_aspects() -> astrology.CrossChartAspects:
     )
   )
   return astrology.cross_chart_aspects(
-    left, right, rules, combination=astrology.OrbCombination.MEAN_OF_ORBS
+    chart_left=chart_left,
+    chart_right=chart_right,
+    rules=rules,
+    combination=astrology.OrbCombination.MEAN_OF_ORBS,
   )
 
 
@@ -203,8 +206,8 @@ def cross_observations(result: astrology.CrossChartAspects) -> str:
   取得完整精度的双盘检查值及两侧完整来源，不提供恢复路径。
   """
   values = {
-    "left": json.loads(chart_observations(result.left)),
-    "right": json.loads(chart_observations(result.right)),
+    "chart_left": json.loads(chart_observations(result.chart_left)),
+    "chart_right": json.loads(chart_observations(result.chart_right)),
     "left_objects": [identity.value for identity in result.left_objects],
     "right_objects": [identity.value for identity in result.right_objects],
     "rules": repr(result.rules),

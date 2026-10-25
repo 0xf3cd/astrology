@@ -554,8 +554,8 @@ def test_main_forwards_the_cross_observation_file(consumer: Path) -> None:
 @pytest.mark.parametrize(
   "field",
   [
-    "left",
-    "right",
+    "chart_left",
+    "chart_right",
     "left_objects",
     "right_objects",
     "rules",
@@ -571,8 +571,8 @@ def test_cross_observations_cover_every_field_and_both_complete_sources(
   observations = installed_check.cross_observations(result)
   values = json.loads(observations)
   assert set(values) == {f.name for f in fields(result)}
-  assert values["left"] == json.loads(installed_check.chart_observations(result.left))
-  assert values["right"] == json.loads(installed_check.chart_observations(result.right))
+  assert values["chart_left"] == json.loads(installed_check.chart_observations(result.chart_left))
+  assert values["chart_right"] == json.loads(installed_check.chart_observations(result.chart_right))
   assert values["left_objects"] == list(result.left_objects)
   assert values["right_objects"] == list(result.right_objects)
   assert values["rules"] == repr(result.rules)
@@ -581,7 +581,7 @@ def test_cross_observations_cover_every_field_and_both_complete_sources(
   if changed:
     if field == "hits":
       values[field][0][4] += 1e-12
-    elif field in ("left", "right"):
+    elif field in ("chart_left", "chart_right"):
       values[field]["provenance"] = "changed provenance"
     else:
       values[field] = "different"

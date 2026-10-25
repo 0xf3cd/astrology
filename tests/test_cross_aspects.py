@@ -16,6 +16,7 @@ from astrology import (
   Body,
   ChartConfig,
   CrossAspectHit,
+  CrossChartAspects,
   HouseSystem,
   Location,
   LunarNode,
@@ -34,6 +35,36 @@ NODE = LunarNode.MEAN_ASCENDING
 
 def chart_at(*coordinates: tuple[Body | LunarNode, float]) -> NatalChart:
   return _cross_source(2000, "unit", coordinates)
+
+
+def test_chart_keywords_and_result_fields_keep_the_same_source_roles() -> None:
+  chart_left = _cross_source(2000, "left", ((SUN, 10),))
+  chart_right = _cross_source(2001, "right", ((MOON, 68),))
+  rules = (AspectRule(MajorAspect.SEXTILE, 3),)
+  result = cross_chart_aspects(chart_right=chart_right, rules=rules, chart_left=chart_left)
+  assert result.chart_left is chart_left and result.chart_right is chart_right
+  assert {f.name for f in fields(result)} == {
+    "chart_left",
+    "chart_right",
+    "left_objects",
+    "right_objects",
+    "rules",
+    "combination",
+    "hits",
+  }
+  assert result.hits == (CrossAspectHit(SUN, MOON, MajorAspect.SEXTILE, 60, -2, 3),)
+  assert (
+    CrossChartAspects(
+      chart_right=chart_right,
+      chart_left=chart_left,
+      left_objects=(SUN,),
+      right_objects=(MOON,),
+      rules=rules,
+      combination=None,
+      hits=result.hits,
+    )
+    == result
+  )
 
 
 def natal_policy(chart: NatalChart, aspect: MajorAspect, orb: float, object_: Body) -> NatalChart:
@@ -128,7 +159,7 @@ def test_same_source_in_both_roles_returns_full_cartesian_product_and_all_branch
     for right in (MOON, SUN, NODE)
     for aspect, branch in expected_branches
   ]
-  assert result.left is result.right is source
+  assert result.chart_left is result.chart_right is source
   assert result.rules == tuple(rules)
 
 
@@ -268,9 +299,9 @@ def test_identical_geometry_keeps_distinct_source_ownership() -> None:
   left = _cross_source(2000, "left", ((SUN, 10),))
   right = _cross_source(2001, "right", ((SUN, 10),))
   result = cross_chart_aspects(left, right, [AspectRule(MajorAspect.CONJUNCTION, 0)])
-  assert result.left is left and result.right is right
-  assert result.left.resolved != result.right.resolved
-  assert result.left.provenance != result.right.provenance
+  assert result.chart_left is left and result.chart_right is right
+  assert result.chart_left.resolved != result.chart_right.resolved
+  assert result.chart_left.provenance != result.chart_right.provenance
   assert result.hits[0].deviation_deg == 0
 
 
@@ -278,29 +309,31 @@ def test_sources_and_geometrically_irrelevant_differences_are_retained() -> None
   result = acceptance_cross_aspects()
   source = {"record": "another synthetic source"}
   right = replace(
-    result.right,
+    result.chart_right,
     resolved=replace(
-      result.right.resolved,
-      record=replace(result.right.resolved.record, location=Location(23, 45), source=source),
+      result.chart_right.resolved,
+      record=replace(result.chart_right.resolved.record, location=Location(23, 45), source=source),
     ),
     provenance=replace(
-      result.right.provenance, celestial_version="other", astrology_version="other"
+      result.chart_right.provenance, celestial_version="other", astrology_version="other"
     ),
     effective=replace(
-      result.right.effective, delta_t_model="other", house_system=HouseSystem.EQUAL
+      result.chart_right.effective, delta_t_model="other", house_system=HouseSystem.EQUAL
     ),
-    times=replace(result.right.times, jd_ut1=2460000, jde_tt=2460001),
-    requested=replace(result.right.requested, house_system=HouseSystem.EQUAL),
-    houses=replace(result.right.houses, system=HouseSystem.EQUAL),
+    times=replace(result.chart_right.times, jd_ut1=2460000, jde_tt=2460001),
+    requested=replace(result.chart_right.requested, house_system=HouseSystem.EQUAL),
+    houses=replace(result.chart_right.houses, system=HouseSystem.EQUAL),
   )
-  changed = cross_chart_aspects(result.left, right, result.rules, combination=result.combination)
+  changed = cross_chart_aspects(
+    result.chart_left, right, result.rules, combination=result.combination
+  )
   source.clear()
   assert changed.hits == result.hits
-  assert changed.left is result.left and changed.right is right
-  assert changed.right.resolved.record.source["record"] == "another synthetic source"
-  assert changed.right.requested.house_system is HouseSystem.EQUAL
-  assert changed.right.provenance.astrology_version == "other"
-  assert changed.right.effective.delta_t_model == "other"
+  assert changed.chart_left is result.chart_left and changed.chart_right is right
+  assert changed.chart_right.resolved.record.source["record"] == "another synthetic source"
+  assert changed.chart_right.requested.house_system is HouseSystem.EQUAL
+  assert changed.chart_right.provenance.astrology_version == "other"
+  assert changed.chart_right.effective.delta_t_model == "other"
   assert changed != result
 
 
@@ -437,8 +470,8 @@ def test_hit_numeric_fields_reject_invalid_numbers(field: str, bad: object) -> N
 @pytest.mark.parametrize(
   "field,bad",
   [
-    ("left", None),
-    ("right", {}),
+    ("chart_left", None),
+    ("chart_right", {}),
     ("left_objects", None),
     ("right_objects", "sun"),
     ("rules", None),
@@ -528,7 +561,8 @@ _check_cross_chart()
 if len(result.hits) != 5 or any(hasattr(h, 'motion') for h in result.hits):
   raise RuntimeError('Static result changed')
 try:
-  astrology.cross_chart_aspects(result.left, result.right, [result.rules[0], result.rules[0]])
+  astrology.cross_chart_aspects(chart_left=result.chart_left, chart_right=result.chart_right,
+    rules=[result.rules[0], result.rules[0]])
 except ValueError:
   pass
 else:
