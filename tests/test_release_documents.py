@@ -56,7 +56,7 @@ def _contract(root: Path) -> None:
       assert index_command in installation, name
       context = installation[: installation.index(index_command)]
       assert guard in context and f"]({source_link})" in context, name
-    normalized = " ".join(installation.split()).casefold()
+    normalized = " ".join(text.split()).casefold()
     assert not any(
       claim.casefold() in normalized
       for claim in (
@@ -175,6 +175,7 @@ def test_readme_install_mutation_tracks_fixture_version(
     "unversioned_guard",
     "missing_source_link",
     "already_published",
+    "already_published_outside_release_section",
   ],
 )
 def test_candidate_installation_context_rejects_misleading_edits(
@@ -217,7 +218,12 @@ def test_candidate_installation_context_rejects_misleading_edits(
       if english
       else f"以下命令安装已发布的 {version}。"
     )
-    changed = text.replace(guard, claim + "\n" + guard)
+    if defect == "already_published":
+      changed = text.replace(guard, claim + "\n" + guard)
+    else:
+      heading = "## Install from source" if english else "## 从源码安装"
+      assert text.count(heading) == 1
+      changed = text.replace(heading, heading + "\n" + claim)
   assert changed != text
   path.write_text(changed, encoding="utf-8")
   with pytest.raises(AssertionError):
@@ -235,6 +241,17 @@ def test_candidate_installation_context_rejects_misleading_edits(
   ],
 )
 def test_truthful_candidate_wording_is_allowed(documents: Path, unit: str, sentence: str) -> None:
+  path = documents / unit
+  with path.open("a", encoding="utf-8") as stream:
+    stream.write("\n" + sentence + "\n")
+  _contract(documents)
+
+
+@pytest.mark.parametrize("unit", ["README.md", "README.zh-CN.md"])
+def test_historical_published_release_wording_is_allowed(documents: Path, unit: str) -> None:
+  sentence = (
+    "Install the published v0.1.0." if unit == "README.md" else "以下命令安装已发布的 v0.1.0。"
+  )
   path = documents / unit
   with path.open("a", encoding="utf-8") as stream:
     stream.write("\n" + sentence + "\n")
