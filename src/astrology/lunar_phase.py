@@ -81,29 +81,18 @@ class LunarPhaseResult:
 
 
 def lunar_phase(sun_longitude_deg: float, moon_longitude_deg: float) -> LunarPhaseResult:
-  """Classify (Moon minus Sun) modulo 360 under Rudhyar's eight-type convention.
+  """Return (Moon minus Sun) modulo 360 and its Rudhyar lunation type.
 
-  Arguments are Sun first, Moon second, in finite degrees, with any number of
-  turns. The caller must supply the same instant and coordinate convention;
-  bare numbers cannot authenticate either. Wrong types (including bool) raise
-  TypeError; nonfinite values raise ValueError. Inputs use finite_number's float
-  conversion. Exact ratios of those binary values avoid overflow and determine
-  the boundary side before float conversion. If nearest conversion erases that
-  side, adjust by one adjacent float. The result is in [0, 360), not an exact
-  real-valued angle. Rotating inputs can itself introduce input-rounding error.
+  Supply finite degrees, Sun first; whole turns are allowed. The caller must
+  ensure the same instant and coordinate convention. Wrong types (including bool)
+  raise TypeError; nonfinite values raise ValueError. The angle is a float
+  approximation in [0, 360). Sources, boundary policies and numerical details
+  are in the :doc:`summary guide <summaries>`.
 
-  Source: Your Lunation Birthday, Part Four, online archival transcription,
-  reporting January 1950 publication. The project assigns exact multiples of
-  45° to the following interval. Whole categories are not exact lunar events;
-  direction describes the supplied arc, not a prediction from motion rates.
-
-  按 Rudhyar 八分型对（月亮减太阳）模 360 分类。参数依次为太阳、月亮，单位为有限的度数，
-  可包含任意整圈。调用方须保证同一时刻和坐标约定；裸数值无法核实这两项。类型非法（包括
-  bool）抛出 TypeError，非有限值抛出 ValueError。输入按 finite_number 转为浮点值，再以
-  这些二进制值的精确比值避免溢出，并在转回浮点前判断边界一侧；若最近浮点值抹去该侧，
-  则移到相邻浮点值。结果在 [0, 360)，不是精确实数角度；旋转输入本身可能引入输入舍入误差。
-  来源为 Your Lunation Birthday 第四部分的在线档案转录，页面自述发表于 1950 年 1 月。
-  项目把恰好 45° 的整数倍归后段。整个类别不是精确月相事件；方向描述给定弧，不根据速率预测运动。
+  返回（月亮减太阳）模 360 的角度及 Rudhyar 月相类型。输入依次为太阳、月亮黄经，
+  单位为有限度数，可包含整圈；调用方须保证同一时刻和坐标约定。类型非法（包括 bool）
+  抛出 TypeError，非有限值抛出 ValueError。返回角度为 [0, 360) 内的浮点近似值。
+  来源、边界约定及数值细节见 :doc:`摘要指南 <summaries>`。
   """
   sun = finite_number(sun_longitude_deg, "sun_longitude_deg")
   moon = finite_number(moon_longitude_deg, "moon_longitude_deg")
