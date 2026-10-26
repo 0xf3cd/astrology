@@ -24,7 +24,9 @@ environment `pypi`。pending publisher 不保留项目名。已有项目使用�
 
 ## 准备并检查候选
 
-1. 审阅源码、配套双语说明，以及发行追踪单的七项验收。明确依赖政策、历史来源和恢复／重算兼容边界。
+发布新版本前，另行准备并审阅版本升级及对应的安装、示例版本钉版。
+
+1. 审阅源码、配套双语说明，以及发行追踪单的七项验收。明确依赖政策、计算约定及不兼容的 API 变化。
 2. 本地运行锁定依赖的完整检查，并运行 PR 质量／安装工作流。
    既有完整质量矩阵是 Linux 3.11／3.14 及 macOS／Windows 3.14；七项保留 wheel 的消费者是
    Linux x86_64 3.11／3.12／3.13／3.14、Linux ARM64 3.14、macOS ARM64 3.14 和 Windows amd64 3.14。
@@ -68,7 +70,8 @@ uv run --locked python tools/check.py --artifacts-dir dist/packages
 在新的受支持环境里执行 README 的包索引安装命令，再运行其中的命盘和知识示例。
 源码快照安装成功不能代替包索引安装验收。
 
-仅按发布授权，在验收的源码 SHA 上创建 `v0.1.0` 和 GitHub Release，附上核验后的 wheel、sdist 和清单。
+仅按发布授权，在验收的源码 SHA 上创建版本标签（`v` 加获准发布的版本号）和 GitHub Release，
+附上核验后的 wheel、sdist 和清单。
 GitHub 自动生成的源码 ZIP／tar 是 git 快照，不是已发布的 sdist。
 发行记录写入实际工作流结果、制品身份、下载摘要、安装结果及剩余限制。
 从同一份验收源码手动更新双语 Pages 站点，并检查受影响的线上页面。

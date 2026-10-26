@@ -5,18 +5,18 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>保存、恢复、重算和查看命盘 &#8212; celestial-astrology 0.1.0 documentation / 文档</title>
+    <title>命盘结果与文本显示 &#8212; celestial-astrology 0.2.0 documentation / 文档</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
-    <script src="../../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../../_static/documentation_options.js?v=938c9ccc"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/zh-CN/records.html" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="公开 API 参考" href="reference.html" />
-    <link rel="prev" title="相位" href="aspects.html" />
+    <link rel="prev" title="静态双盘交叉相位" href="cross_aspects.html" />
    
   <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
   
@@ -35,20 +35,18 @@
           <div class="body" role="main">
             
   <section id="id1">
-<h1>保存、恢复、重算和查看命盘<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h1>
+<h1>命盘结果与文本显示<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h1>
 <p><a class="reference internal" href="../en/records.html"><span class="std std-doc">English</span></a> · <a class="reference internal" href="chart.html"><span class="std std-doc">排盘</span></a> · <a class="reference internal" href="reference.html"><span class="std std-doc">API</span></a></p>
-<p><code class="docutils literal notranslate"><span class="pre">NatalChart.resolved</span></code> 保留实际使用的已解析出生输入，其中包含原始记录。
-用 <code class="docutils literal notranslate"><span class="pre">dumps_chart</span></code> 保存，用 <code class="docutils literal notranslate"><span class="pre">loads_chart</span></code> 恢复存储值；需要重新计算时，显式调用
-<code class="docutils literal notranslate"><span class="pre">recompute_chart</span></code>。恢复不会重新解析时区，也不会导入原生天文库。</p>
+<p><code class="docutils literal notranslate"><span class="pre">natal_chart</span></code> 返回内存中的不可变 <code class="docutils literal notranslate"><span class="pre">NatalChart</span></code>。可以直接查看结构化结果，或显式提供知识目录，
+交给 <code class="docutils literal notranslate"><span class="pre">format_chart</span></code> 显示。包不提供命盘存取接口或保存格式；接口撤回说明见<a class="reference internal" href="releases.html"><span class="std std-doc">发行说明</span></a>。</p>
 <section id="id2">
 <h2>一个完整例子<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
 <p>这份合成记录落在豪勋爵岛时钟回拨后重复的半小时内。用 <code class="docutils literal notranslate"><span class="pre">fold=0</span></code> 选择较早的一次。
-这里的地点是另行指定的合成数据，不是按时区推定的。相位没有默认容许度。</p>
+地点另行指定，不按时区推定。相位没有默认容许度。</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">date</span><span class="p">,</span> <span class="n">time</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">astrology</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">AspectRule</span><span class="p">,</span> <span class="n">BirthRecord</span><span class="p">,</span> <span class="n">Body</span><span class="p">,</span> <span class="n">ChartConfig</span><span class="p">,</span> <span class="n">HouseSystem</span><span class="p">,</span>
 <span class="gp">... </span>  <span class="n">IanaTimezone</span><span class="p">,</span> <span class="n">Location</span><span class="p">,</span> <span class="n">LunarNode</span><span class="p">,</span> <span class="n">MajorAspect</span><span class="p">,</span> <span class="n">ObjectOrb</span><span class="p">,</span> <span class="n">OrbCombination</span><span class="p">,</span>
-<span class="gp">... </span>  <span class="n">TimePrecision</span><span class="p">,</span> <span class="n">dumps_chart</span><span class="p">,</span> <span class="n">format_chart</span><span class="p">,</span> <span class="n">load_catalog</span><span class="p">,</span> <span class="n">loads_chart</span><span class="p">,</span>
-<span class="gp">... </span>  <span class="n">natal_chart</span><span class="p">,</span> <span class="n">prepare_natal_input</span><span class="p">,</span> <span class="n">recompute_chart</span><span class="p">)</span>
+<span class="gp">... </span>  <span class="n">TimePrecision</span><span class="p">,</span> <span class="n">format_chart</span><span class="p">,</span> <span class="n">load_catalog</span><span class="p">,</span> <span class="n">natal_chart</span><span class="p">,</span> <span class="n">prepare_natal_input</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">record</span> <span class="o">=</span> <span class="n">BirthRecord</span><span class="p">(</span><span class="n">date</span><span class="p">(</span><span class="mi">2026</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">time</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">45</span><span class="p">),</span> <span class="n">IanaTimezone</span><span class="p">(</span><span class="s2">"Australia/Lord_Howe"</span><span class="p">),</span>
 <span class="gp">... </span>  <span class="n">Location</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">TimePrecision</span><span class="o">.</span><span class="n">MINUTE</span><span class="p">,</span> <span class="p">{</span><span class="s2">"record"</span><span class="p">:</span> <span class="s2">"synthetic"</span><span class="p">})</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">config</span> <span class="o">=</span> <span class="n">ChartConfig</span><span class="p">(</span><span class="n">HouseSystem</span><span class="o">.</span><span class="n">WHOLE_SIGN</span><span class="p">,</span> <span class="p">(</span><span class="o">*</span><span class="n">Body</span><span class="p">,</span> <span class="n">LunarNode</span><span class="o">.</span><span class="n">MEAN_ASCENDING</span><span class="p">),</span>
@@ -59,14 +57,8 @@
 <span class="go">'2026-04-04T14:45:00+00:00'</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">positions</span><span class="p">),</span> <span class="nb">bool</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">aspects</span><span class="p">),</span> <span class="nb">sorted</span><span class="p">({</span><span class="n">h</span><span class="o">.</span><span class="n">orb_limit_deg</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">chart</span><span class="o">.</span><span class="n">aspects</span><span class="p">})</span>
 <span class="go">(11, True, [6.0, 8.0])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">packed</span> <span class="o">=</span> <span class="n">dumps_chart</span><span class="p">(</span><span class="n">chart</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">restored</span> <span class="o">=</span> <span class="n">loads_chart</span><span class="p">(</span><span class="n">packed</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">restored</span> <span class="o">==</span> <span class="n">chart</span><span class="p">,</span> <span class="n">dumps_chart</span><span class="p">(</span><span class="n">restored</span><span class="p">)</span> <span class="o">==</span> <span class="n">packed</span>
-<span class="go">(True, True)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">recompute_chart</span><span class="p">(</span><span class="n">restored</span><span class="p">)</span> <span class="o">==</span> <span class="n">chart</span>
-<span class="go">True</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">catalog</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">table</span> <span class="o">=</span> <span class="n">format_chart</span><span class="p">(</span><span class="n">restored</span><span class="p">,</span> <span class="n">catalog</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="s2">"zh-CN"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">table</span> <span class="o">=</span> <span class="n">format_chart</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">catalog</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="s2">"zh-CN"</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()[</span><span class="mi">7</span><span class="p">:</span><span class="mi">10</span><span class="p">]))</span>
 <span class="go">太阳 [sun] | 白羊座 14°50'21" | 9 | D</span>
 <span class="go">月亮 [moon] | 天蝎座 13°32'41" | 4 | D</span>
@@ -74,106 +66,64 @@
 </pre></div>
 </div>
 <p>太阳的容许度为 10°，其他对象用 6°；取平均后，含太阳的对象对上限为 8°，其他对象对为 6°。
-显式参与列表不含交点，并以反序记录各天体；实际参与顺序仍按请求对象的顺序。
-上面的重算在同一份代码中执行，因此结果恰好完全相等。跨代码树比较时，应像
-<a class="reference internal" href="#id5">验证与限度</a>中的测试一样，为数值字段指定容差。</p>
-<p>完整表格还包括全部请求对象、四轴、十二宫头、带方向分支及偏差、上限和运动状态的相位，
+显式参与列表不含交点，并以反序列出各天体；实际参与顺序仍按请求对象的顺序。</p>
+<p>完整表格包括全部请求对象、四轴、十二宫头、带方向分支及偏差、上限和运动状态的相位，
 以及请求配置、实际配置和来源。省略 <code class="docutils literal notranslate"><span class="pre">language</span></code> 或传入 <code class="docutils literal notranslate"><span class="pre">&quot;en&quot;</span></code> 可显示英文。
 传入的目录须包含所选语言的当前名称；缺译或名称对应不唯一时会报错，不回退到另一种语言。
 加载目录须显式进行，显示本身不读取资源。</p>
 </section>
-<section id="v1">
-<h2>结构版本 v1 保存什么<a class="headerlink" href="#v1" title="Link to this heading">¶</a></h2>
-<p>JSON 根字段为 <code class="docutils literal notranslate"><span class="pre">schema_version</span></code>、<code class="docutils literal notranslate"><span class="pre">input</span></code>、<code class="docutils literal notranslate"><span class="pre">requested</span></code>、<code class="docutils literal notranslate"><span class="pre">effective</span></code>、<code class="docutils literal notranslate"><span class="pre">provenance</span></code>、
-<code class="docutils literal notranslate"><span class="pre">times</span></code>、<code class="docutils literal notranslate"><span class="pre">positions</span></code>、<code class="docutils literal notranslate"><span class="pre">houses</span></code>、<code class="docutils literal notranslate"><span class="pre">placements</span></code> 和 <code class="docutils literal notranslate"><span class="pre">aspects</span></code>，保存对应的公开结果值，
-不是已舍入的文本表格。</p>
+<section id="id3">
+<h2>查看结构化结果<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">input.record</span></code> 保留公历日期、钟点、声明的精度、时区形式、地点和字符串来源元数据。
-<code class="docutils literal notranslate"><span class="pre">input.resolved</span></code> 另存 UTC、偏移量、IANA 标识、fold 和两种时区数据版本。
-日期和钟点使用规范 ISO 文本；UTC 显式写 <code class="docutils literal notranslate"><span class="pre">+00:00</span></code>。偏移量用带符号的整数微秒，
-不用浮点秒。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">resolved.record</span></code> 保留原始公历日期、钟点、声明的精度、时区形式、地点和来源元数据。
+<code class="docutils literal notranslate"><span class="pre">resolved</span></code> 另存 UTC、偏移量、IANA 标识、fold 和两种时区数据版本。</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">requested</span></code> 保留对象及规则顺序、按对象容许度、合成规则，以及省略相位参与对象
-（<code class="docutils literal notranslate"><span class="pre">null</span></code>）和显式指定之间的区别。<code class="docutils literal notranslate"><span class="pre">effective.aspect_objects</span></code> 按请求对象顺序列出实际参与者。</p></li>
+（<code class="docutils literal notranslate"><span class="pre">None</span></code>）和显式指定之间的区别。<code class="docutils literal notranslate"><span class="pre">effective.aspect_objects</span></code> 按请求对象顺序列出实际参与者。</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">positions</span></code> 保留未舍入的黄经、黄纬（度）、物理距离（AU）和黄经速率（度/TT 日）。
-月交点没有距离（<code class="docutils literal notranslate"><span class="pre">null</span></code>）。<code class="docutils literal notranslate"><span class="pre">times</span></code> 保留 JD(UT1) 和 JDE(TT)。四轴、宫头、归属结果及
-每条相位的分支、带符号偏差、上限和运动状态都会保存。</p></li>
+月交点没有距离（<code class="docutils literal notranslate"><span class="pre">None</span></code>）。<code class="docutils literal notranslate"><span class="pre">times</span></code> 保留 JD(UT1) 和 JDE(TT)。四轴、宫头、星座与落宫结果及
+每条相位的分支、带符号偏差、上限和运动状态都可直接查看。</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">provenance</span></code> 保留 astrology、celestial-calendar 版本、位置坐标约定及 UT1 推导方式；
 <code class="docutils literal notranslate"><span class="pre">effective</span></code> 保留已确定的 ΔT 模型及求值方式。</p></li>
 </ul>
-<p>输出的 JSON 对象键排序，格式确定；数组保留顺序，有限浮点数不做十进制舍入，带符号的零也保留。
-输入 JSON 可以使用不同的空白和对象键顺序，但时间文本须为规范形式。接口接收字符串，
-不读取文件或解释任意字节编码。文件、网络 I/O，以及不可信输入所需的资源限制，由调用方负责。</p>
-</section>
-<section id="id3">
-<h2>恢复不等于重算<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
-<p>重复、未知或缺失字段、类型错误（包括拿布尔值当数值）、非有限数、不支持的结构版本、
-枚举或坐标标识，以及纯推导结果不一致，都会使 <code class="docutils literal notranslate"><span class="pre">loads_chart</span></code> 抛出 <code class="docutils literal notranslate"><span class="pre">ChartRecordError</span></code>。
-直接构造结果也要经过同样的领域检查：星座、落宫及相位必须与所存位置和规则一致。
-检查不会用新值替换存储值。</p>
-<p>这<strong>不认证</strong>原来的时区选择、天文值、天文值与所称 UTC/地点之间的关系，或所称的软件版本。
-恢复不执行原生时刻或宫位计算。以后若改变纯规则，须明确处理结构版本兼容，不能悄悄改变旧值的含义。</p>
-<p>未知但非空的包版本或 ΔT 模型字符串仍可恢复，以便查看存储结果。
-未知的位置坐标约定、UT1 推导方式或求值方式则不能按 v1 恢复，因为无法确定数值的含义。</p>
-<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">replace</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">astrology</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChartRecordError</span><span class="p">,</span> <span class="n">ChartReplayError</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">unsupported</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">packed</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">unsupported</span><span class="p">[</span><span class="s2">"schema_version"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">999</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
-<span class="gp">... </span>  <span class="n">loads_chart</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">unsupported</span><span class="p">))</span>
-<span class="gp">... </span><span class="k">except</span> <span class="n">ChartRecordError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
-<span class="gp">... </span>  <span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">error</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
-<span class="go">ChartRecordError</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">old_model</span> <span class="o">=</span> <span class="n">replace</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">effective</span><span class="o">=</span><span class="n">replace</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">effective</span><span class="p">,</span> <span class="n">delta_t_model</span><span class="o">=</span><span class="s2">"unavailable"</span><span class="p">))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">old_model</span> <span class="o">=</span> <span class="n">loads_chart</span><span class="p">(</span><span class="n">dumps_chart</span><span class="p">(</span><span class="n">old_model</span><span class="p">))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">old_model</span><span class="o">.</span><span class="n">effective</span><span class="o">.</span><span class="n">delta_t_model</span>
-<span class="go">'unavailable'</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
-<span class="gp">... </span>  <span class="n">recompute_chart</span><span class="p">(</span><span class="n">old_model</span><span class="p">)</span>
-<span class="gp">... </span><span class="k">except</span> <span class="n">ChartReplayError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
-<span class="gp">... </span>  <span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">error</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
-<span class="go">ChartReplayError</span>
-</pre></div>
-</div>
-<p>重算要求 celestial-astrology、celestial-calendar 的版本精确匹配，并且固定的 ΔT 模型可用。
-它使用记录中的已解析 UTC 和请求，不查今天的时区库；返回新盘，不改存储盘。
-已安装元数据缺失、版本或模型不可用时抛出 <code class="docutils literal notranslate"><span class="pre">ChartReplayError</span></code>；元数据失败保留
-<code class="docutils literal notranslate"><span class="pre">PackageNotFoundError</span></code> 作为异常原因。请求超出上游计算域时仍抛出 <code class="docutils literal notranslate"><span class="pre">ChartDomainError</span></code>，不替换宫制。
-直接调用 <code class="docutils literal notranslate"><span class="pre">natal_chart</span></code> 需要已安装分发包的元数据；缺失时抛出
-<code class="docutils literal notranslate"><span class="pre">importlib.metadata.PackageNotFoundError</span></code>，不编造版本号。</p>
-<p>Python 导入名仍是 <code class="docutils literal notranslate"><span class="pre">astrology</span></code>，查询安装元数据时使用 <code class="docutils literal notranslate"><span class="pre">celestial-astrology</span></code>；
-结构版本 v1 的字段名仍为 <code class="docutils literal notranslate"><span class="pre">astrology_version</span></code>。
-历史 <code class="docutils literal notranslate"><span class="pre">0.0.0</span></code> 记录仍可恢复、显示，但不能在 <code class="docutils literal notranslate"><span class="pre">0.1.0</span></code> 下重算；恢复不会改写来源版本。
-用其中保存的已解析输入和请求进行新计算，是另一项计算，不是历史记录重算。
-版本相等只是一项兼容性检查：<code class="docutils literal notranslate"><span class="pre">0.0.0</span></code>、<code class="docutils literal notranslate"><span class="pre">0.1.0</span></code> 这类开发／候选版本号不能唯一标识源码修订，
-也不保证不同代码树的结果逐位相等。</p>
+<p>直接构造 <code class="docutils literal notranslate"><span class="pre">NatalChart</span></code> 时检查字段类型、范围及纯推导结果一致性：星座、落宫和相位须与位置、宫头及规则吻合。
+这不认证所提供的时区选择、天文值、天文值与所称 UTC/地点之间的关系，或软件版本标签。
+从已解析输入计算天文值，请使用 <code class="docutils literal notranslate"><span class="pre">natal_chart</span></code>。</p>
+<p>调用 <code class="docutils literal notranslate"><span class="pre">natal_chart(chart.resolved,</span> <span class="pre">chart.requested)</span></code> 按当前实现计算新结果，并记录本次来源。
+它保留已解析出生输入，不再查时区。新结果可能与用不同代码算得的旧结果不同。
+分发包必须已安装：缺少 <code class="docutils literal notranslate"><span class="pre">celestial-astrology</span></code> 元数据时抛出
+<code class="docutils literal notranslate"><span class="pre">importlib.metadata.PackageNotFoundError</span></code>，不编造版本号。
+仅凭版本标签不能唯一标识源码修订，也不保证不同代码树的结果逐位相等。</p>
 </section>
 <section id="id4">
 <h2>显示不改分类<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h2>
 <p>角度沿用具名的 <code class="docutils literal notranslate"><span class="pre">truncate_display</span></code> 规则，向零截断到整角秒。
 白羊座 29.9999999° 显示为白羊座 29°59’59”，不会显示成金牛座 0°00’00”。
-宫位及相位运动标签始终取自存储结果：对象的显示黄经可以与宫头相同，但未舍入位置仍在前一宫；非零偏差显示为零后，
-也可能仍为入相或离相。<code class="docutils literal notranslate"><span class="pre">R</span></code> 按未舍入速率的负号判断，<code class="docutils literal notranslate"><span class="pre">D</span></code> 表示黄经增大，<code class="docutils literal notranslate"><span class="pre">S</span></code> 表示速率恰为零。
-文本不能代替无损 JSON。</p>
+宫位及相位运动标签取自未舍入结果：对象的显示黄经可以与宫头相同，但未舍入位置仍在前一宫；
+非零偏差显示为零后，也可能仍为入相或离相。位置表最后一列的 <code class="docutils literal notranslate"><span class="pre">R</span></code> 表示对象黄经减小，
+<code class="docutils literal notranslate"><span class="pre">D</span></code> 表示黄经增大，<code class="docutils literal notranslate"><span class="pre">S</span></code> 表示速率恰为零，均按未舍入速率判断。
+文本是降低精度后的显示，不是无损交换格式。</p>
 </section>
 <section id="id5">
 <h2>验证与限度<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h2>
-<p><a class="reference internal" href="contributing.html"><span class="std std-doc">完整检查</span></a> 经 sdist 构建，在源码树之外安装 wheel，并逐字比较安装环境完整盘的
-JSON 与开发入口输出，不删来源字段。还会执行恢复、重算、双语显示、不可用模型及请求 Placidus
+<p><a class="reference internal" href="contributing.html"><span class="std std-doc">完整检查</span></a> 经 sdist 构建，在源码树之外安装 wheel，并对同一源码修订的完整数值结果、
+已解析输入、请求／实际配置及来源与源码结果作精确比较。还会执行双语显示及请求 Placidus
 失败的用例，并检查导入来源，包括显式加载后的原生适配层。</p>
-<p><code class="docutils literal notranslate"><span class="pre">tests/reference/chart_record_v1.json</span></code> 是项目在开发版本 <code class="docutils literal notranslate"><span class="pre">0.0.0</span></code> 计算的历史夹具，不是独立天文参考。
-原始来源版本和字节保持不变。另用其保存的输入进行当前计算，采用绝对容差：
-角度 1e-8 度、距离 1e-9 AU、速率 1e-9 度/TT 日、儒略日 1e-8 日；
-标识及分类须相同。精确保真的恢复测试另做，不使用这些容差。</p>
+<p><code class="docutils literal notranslate"><span class="pre">tests/reference/chart_regression.json</span></code> 保留两份项目计算的合成整宫制样本数值：
+<code class="docutils literal notranslate"><span class="pre">0.0.0</span></code> 开发树中的 IANA 输入、非统一相位容许度案例，以及正式发布 v0.1.0 wheel 中的
+固定偏移、两个天体且无相位的案例。提取来源包括原样本哈希，以及发布 wheel／manifest 摘要、
+源码提交及生成方法。它们是回归样本，不是独立天文参考。测试显式构造各案例的输入，不恢复已保存命盘。</p>
+<p>数值回归检查模型、坐标约定、配置、标识及分类，不要求历史包版本相等。
+绝对容差为角度 1e-8 度、距离 1e-9 AU、速率 1e-9 度/TT 日、儒略日 1e-8 日。
+模型变化须另行说明适用的比较方法。这些有限案例不能证明全域精度。</p>
 <p><code class="docutils literal notranslate"><span class="pre">tests/reference/complete_chart_reference.json</span></code> 保存独立执行 Swiss Ephemeris 2.10.03 /
 pyswisseph 2.10.3.2 得到的四个合成时刻的数值，每个时刻包含三种宫制。
 其中记录 pyswisseph Python wheel 文件的 SHA-256 哈希、标志、坐标和时标约定、来源 URL、
-独立的校准样本及各字段容差。
-显式请求 Moshier，并检查 <code class="docutils literal notranslate"><span class="pre">calc</span></code> 返回的实际标志。Swiss 宫位使用 Swiss 自己的 UT1 和 ΔT，
-不是适配层固定使用的 Algo5 ΔT 模型；容差包含这部分时刻模型差异。
-星座、二维黄经落宫（只用黄经，不用对象黄纬）、相位及运动状态是对 Swiss 状态
-另写算术推导的项目结果，不是 Swiss 自带的相位表。平均交点黄经及速率按具名模型比较，
-不假定公式完全相同。交点距离和真交点不作等价比较，交点零黄纬只作定义级检查。</p>
+独立的校准样本及各字段容差。显式请求 Moshier，并检查 <code class="docutils literal notranslate"><span class="pre">calc</span></code> 返回的实际标志。
+Swiss 宫位使用 Swiss 自己的 UT1 和 ΔT，不是适配层固定使用的 Algo5 ΔT 模型；
+容差包含这部分时刻模型差异。星座、二维黄经落宫（只用黄经，不用对象黄纬）、相位及运动状态
+是对 Swiss 状态另写算术推导的项目结果，不是 Swiss 自带的相位表。
+平均交点黄经及速率按具名模型比较，不假定公式完全相同。
+交点距离和真交点不作等价比较，交点零黄纬只作定义级检查。</p>
 <p>参考点到宫头的距离若不超过黄经与宫头容差之和，比较就容许相邻两宫之一，
 不把该点当作独立的精确落宫证据。</p>
 <p><a class="reference external" href="https://www.astro.com/swisseph/swisseph.htm">Swiss 文档</a> 说明了 Moshier 的精度级别。
@@ -218,7 +168,8 @@ pyswisseph 2.10.3.2 得到的四个合成时刻的数值，每个时刻包含三
 <li class="toctree-l2"><a class="reference internal" href="configuration.html">排盘请求配置</a></li>
 <li class="toctree-l2"><a class="reference internal" href="chart.html">本命盘</a></li>
 <li class="toctree-l2"><a class="reference internal" href="aspects.html">相位</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">保存、恢复、重算和查看命盘</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cross_aspects.html">静态双盘交叉相位</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">命盘结果与文本显示</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference.html">公开 API 参考</a></li>
 <li class="toctree-l2"><a class="reference internal" href="architecture.html">仓库结构与计算边界</a></li>
 <li class="toctree-l2"><a class="reference internal" href="knowledge.html">知识组织与双语文档</a></li>
@@ -235,7 +186,7 @@ pyswisseph 2.10.3.2 得到的四个合成时刻的数值，每个时刻包含三
 <ul>
   <li><a href="../index.html">Documentation overview</a><ul>
   <li><a href="index.html">文档入口</a><ul>
-      <li>Previous: <a href="aspects.html" title="previous chapter">相位</a></li>
+      <li>Previous: <a href="cross_aspects.html" title="previous chapter">静态双盘交叉相位</a></li>
       <li>Next: <a href="reference.html" title="next chapter">公开 API 参考</a></li>
   </ul></li>
   </ul></li>

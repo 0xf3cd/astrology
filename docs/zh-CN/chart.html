@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>本命盘 &#8212; celestial-astrology 0.1.0 documentation / 文档</title>
+    <title>本命盘 &#8212; celestial-astrology 0.2.0 documentation / 文档</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
-    <script src="../../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../../_static/documentation_options.js?v=938c9ccc"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/zh-CN/chart.html" />
@@ -93,7 +93,7 @@
 </pre></div>
 </div>
 <p>结果还在 <code class="docutils literal notranslate"><span class="pre">chart.resolved</span></code> 中保留实际输入，在 <code class="docutils literal notranslate"><span class="pre">chart.provenance.astrology_version</span></code> 中记录
-astrology 包版本。保存、恢复、重算及双语文本输出见<a class="reference internal" href="records.html"><span class="std std-doc">记录指南</span></a>。</p>
+astrology 包版本。结构化结果与双语文本输出见<a class="reference internal" href="records.html"><span class="std std-doc">结果指南</span></a>。</p>
 <p><code class="docutils literal notranslate"><span class="pre">position_frame</span></code> 说明这些值是瞬时真黄道、真春分点上的地心视位置。
 <code class="docutils literal notranslate"><span class="pre">ut1_derivation</span></code> 说明 UT1 由民用 UTC 经 ΔT 模型推得，不是观测的 DUT1。
 月交点以同一真春分点为基准，因此已含黄经章动。<code class="docutils literal notranslate"><span class="pre">ChartTimes</span></code> 记录该时刻的
@@ -254,7 +254,7 @@ UT1 儒略日与 TT 儒略历书日。</p>
 Meeus 第 47 章公式，闰秒关系 <code class="docutils literal notranslate"><span class="pre">JDE(TT)</span> <span class="pre">-</span> <span class="pre">JD(UTC)</span></code> 精确成立。各条参考能检出和检不出
 哪些缺陷见<a class="reference internal" href="contributing.html#id4"><span class="std std-ref">参与开发</span></a>。</p>
 <p>另有完整盘例与 Swiss 的位置、速率及全部十二宫头比较，归属及相位由独立算术推导。
-其约定、容差和限度见<a class="reference internal" href="records.html#id5"><span class="std std-ref">记录指南</span></a>。</p>
+其约定、容差和限度见<a class="reference internal" href="records.html#id5"><span class="std std-ref">结果指南</span></a>。</p>
 </section>
 <section id="id9">
 <h2>限度<a class="headerlink" href="#id9" title="Link to this heading">¶</a></h2>
@@ -304,7 +304,8 @@ Meeus 第 47 章公式，闰秒关系 <code class="docutils literal notranslate"
 <li class="toctree-l2"><a class="reference internal" href="configuration.html">排盘请求配置</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">本命盘</a></li>
 <li class="toctree-l2"><a class="reference internal" href="aspects.html">相位</a></li>
-<li class="toctree-l2"><a class="reference internal" href="records.html">保存、恢复、重算和查看命盘</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cross_aspects.html">静态双盘交叉相位</a></li>
+<li class="toctree-l2"><a class="reference internal" href="records.html">命盘结果与文本显示</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference.html">公开 API 参考</a></li>
 <li class="toctree-l2"><a class="reference internal" href="architecture.html">仓库结构与计算边界</a></li>
 <li class="toctree-l2"><a class="reference internal" href="knowledge.html">知识组织与双语文档</a></li>

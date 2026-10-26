@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>知识目录参考 &#8212; celestial-astrology 0.1.0 documentation / 文档</title>
+    <title>知识目录参考 &#8212; celestial-astrology 0.2.0 documentation / 文档</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
-    <script src="../../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../../_static/documentation_options.js?v=938c9ccc"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/zh-CN/catalog.html" />
@@ -38,12 +38,13 @@
 <h1>知识目录参考<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h1>
 <p><a class="reference internal" href="../en/catalog.html"><span class="std std-doc">English</span></a> · <a class="reference internal" href="knowledge.html"><span class="std std-doc">指南</span></a> · <a class="reference internal" href="reference.html"><span class="std std-doc">API</span></a></p>
 <p>目录在构建文档时从包内记录生成，下方列出全部接纳的概念、变体、版本和条目。
-配置链接标识已实现的<strong>请求值</strong>，不表示天文算法已实现；历史变体没有可执行实现。</p>
+配置链接标识已实现的<strong>请求值</strong>，不表示天文算法已实现。Ashmand 1822 年版的分组表读取
+可执行的星座分组定义；历史依据及其限度仍与命盘适用性分开。</p>
 <p><a class="reference internal" href="knowledge.html"><span class="std std-doc">知识指南</span></a>说明查询、来源范围、译文修订和搜索限制。
 原文引述、项目译文和原作陈述分别标明；检索从不确立命盘适用性。
-下方来源、前提、输出及命盘状态见指南的<a class="reference internal" href="knowledge.html#id8"><span class="std std-ref">状态说明</span></a>，
-译文状态见<a class="reference internal" href="knowledge.html#id4"><span class="std std-ref">翻译修订</span></a>。书目及版本内定位保留来源语言。</p>
-<p><code class="docutils literal notranslate"><span class="pre">code=0.1.0</span></code> · <code class="docutils literal notranslate"><span class="pre">corpus=2026.10.21.1</span></code></p>
+下方来源、前提、输出及命盘状态见指南的<a class="reference internal" href="knowledge.html#id9"><span class="std std-ref">状态说明</span></a>，
+译文状态见<a class="reference internal" href="knowledge.html#id5"><span class="std std-ref">翻译修订</span></a>。书目及版本内定位保留来源语言。</p>
+<p><code class="docutils literal notranslate"><span class="pre">code=0.2.0</span></code> · <code class="docutils literal notranslate"><span class="pre">corpus=2026.10.25.10</span></code></p>
 <section id="body-sun">
 <span id="catalog-zh-cn-body-sun"></span><h2>body.sun · 太阳<a class="headerlink" href="#body-sun" title="Link to this heading">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">kind=body</span></code></p>
@@ -331,6 +332,34 @@
 <p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.MajorAspect.OPPOSITION</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">opposition</span></code></p>
 <p>Exact angle / 精确角度：180°</p>
 </section>
+<section id="sign-group-ashmand1822-tropical">
+<span id="catalog-zh-cn-sign-group-ashmand1822-tropical"></span><h2>sign_group.ashmand1822.tropical · 至点星座<a class="headerlink" href="#sign-group-ashmand1822-tropical" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=sign_group</span></code></p>
+<p>Ashmand 1822 年版的至点分组。此处 tropical 指这个组别，不是整个热带黄道。成员由 astrology.zodiac.ashmand_sign_group 定义。</p>
+<p>English names / 英文名称：Tropical signs</p>
+<p>Chinese names / 中文名称：至点星座</p>
+</section>
+<section id="sign-group-ashmand1822-equinoctial">
+<span id="catalog-zh-cn-sign-group-ashmand1822-equinoctial"></span><h2>sign_group.ashmand1822.equinoctial · 分点星座<a class="headerlink" href="#sign-group-ashmand1822-equinoctial" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=sign_group</span></code></p>
+<p>Ashmand 1822 年版的分点分组。原文的昼夜等长理由是历史说法，不保证实际日照时长。成员由 astrology.zodiac.ashmand_sign_group 定义。</p>
+<p>English names / 英文名称：Equinoctial signs</p>
+<p>Chinese names / 中文名称：分点星座</p>
+</section>
+<section id="sign-group-ashmand1822-fixed">
+<span id="catalog-zh-cn-sign-group-ashmand1822-fixed"></span><h2>sign_group.ashmand1822.fixed · 固定星座<a class="headerlink" href="#sign-group-ashmand1822-fixed" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=sign_group</span></code></p>
+<p>Ashmand 1822 年版中在黄道次序里紧接至点星座与分点星座的分组。完整名单按这一次序展开，不是原文逐项列举。成员由 astrology.zodiac.ashmand_sign_group 定义。</p>
+<p>English names / 英文名称：Fixed signs</p>
+<p>Chinese names / 中文名称：固定星座</p>
+</section>
+<section id="sign-group-ashmand1822-bicorporeal">
+<span id="catalog-zh-cn-sign-group-ashmand1822-bicorporeal"></span><h2>sign_group.ashmand1822.bicorporeal · 双体星座<a class="headerlink" href="#sign-group-ashmand1822-bicorporeal" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=sign_group</span></code></p>
+<p>Ashmand 1822 年版中在黄道次序里紧接固定星座的分组，完整名单按这一次序展开。组名不提供性质评分或解读。成员由 astrology.zodiac.ashmand_sign_group 定义。</p>
+<p>English names / 英文名称：Bicorporeal signs</p>
+<p>Chinese names / 中文名称：双体星座</p>
+</section>
 <section id="rule-house-whole-sign">
 <span id="catalog-zh-cn-rule-house-whole-sign"></span><h2>rule.house.whole_sign · 整宫制<a class="headerlink" href="#rule-house-whole-sign" title="Link to this heading">¶</a></h2>
 <p>排盘适配层显式选择 celestial-calendar 的 WHOLE_SIGN 几何，再按 rule.project.cusp_ownership 将黄经归入给定宫头所界定的宫。上升点不必与第一宫头重合。</p>
@@ -420,7 +449,7 @@
 <span id="catalog-zh-cn-rule-project-tropical-sign-sectors"></span><h2>rule.project.tropical_sign_sectors · 热带星座区间<a class="headerlink" href="#rule-project-tropical-sign-sectors" title="Link to this heading">¶</a></h2>
 <p>热带黄道把黄经分为十二个半开的 30 度区间；恰好落在区间边界上的黄经归入后一个星座。</p>
 <p>热带黄道的项目约定；不表示关于天文星座或历史星座划分的断言。</p>
-<p>只适用于热带黄经。恒星黄道及本目录中的历史分组未实现。</p>
+<p>只适用于热带黄经；恒星黄道未实现。基于 Sign 值的历史分组另见 rule.ptolemy_ashmand.sign_groups。</p>
 <p>Concepts / 概念：<a class="reference internal" href="#catalog-zh-cn-sign-aries"><span class="std std-ref">sign.aries</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-taurus"><span class="std std-ref">sign.taurus</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-gemini"><span class="std std-ref">sign.gemini</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-cancer"><span class="std std-ref">sign.cancer</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-leo"><span class="std std-ref">sign.leo</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-virgo"><span class="std std-ref">sign.virgo</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-libra"><span class="std std-ref">sign.libra</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-scorpio"><span class="std std-ref">sign.scorpio</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-sagittarius"><span class="std std-ref">sign.sagittarius</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-capricorn"><span class="std std-ref">sign.capricorn</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-aquarius"><span class="std std-ref">sign.aquarius</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-pisces"><span class="std std-ref">sign.pisces</span></a></p>
 </section>
 <section id="rule-project-cusp-ownership">
@@ -434,8 +463,60 @@
 <span id="catalog-zh-cn-rule-ptolemy-ashmand-equinoctial-signs"></span><h2>rule.ptolemy_ashmand.equinoctial_signs · Ashmand 所译托勒密的分点星座<a class="headerlink" href="#rule-ptolemy-ashmand-equinoctial-signs-ashmand" title="Link to this heading">¶</a></h2>
 <p>此版本称白羊座与天秤座为分点星座，所引整句保留其解释理由。</p>
 <p>托勒密经被归于 Proclus 的转述本，由 Ashmand 于 1822 年译为英文；单源历史记录。</p>
-<p>不可执行。历史原文的昼夜等长说法不保证实际日照时长；它不定义现代星座归属算法、宫制或命盘解释。</p>
+<p>此记录保留历史原句；可执行成员归属见 rule.ptolemy_ashmand.sign_groups。昼夜等长的解释不保证实际日照时长，也不提供宫制或命盘解读。</p>
 <p>Concepts / 概念：<a class="reference internal" href="#catalog-zh-cn-sign-aries"><span class="std std-ref">sign.aries</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-libra"><span class="std std-ref">sign.libra</span></a></p>
+</section>
+<section id="rule-ptolemy-ashmand-sign-groups-ashmand-1822">
+<span id="catalog-zh-cn-rule-ptolemy-ashmand-sign-groups"></span><h2>rule.ptolemy_ashmand.sign_groups · Ashmand 1822 年版星座分组<a class="headerlink" href="#rule-ptolemy-ashmand-sign-groups-ashmand-1822" title="Link to this heading">¶</a></h2>
+<p>astrology.zodiac.ashmand_sign_group 将每个 Sign 归入一个 AshmandSignGroup。原文直接点名至点与分点两对星座；固定星座在黄道次序中分别紧接这些星座，双体星座分别紧接固定星座。参考表读取这一可执行定义。</p>
+<p>托勒密经被归于 Proclus 的转述本，由 Ashmand 于 1822 年译为英文；这是一个历史来源，不是跨流派共识。</p>
+<p>展开后的十二星座表由项目推导，不是原文逐项列举。此处 tropical 只指至点分组。不提供实际季节保证、命盘匹配、评分或解读。</p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-zh-cn-sign-aries"><span class="std std-ref">sign.aries</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-taurus"><span class="std std-ref">sign.taurus</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-gemini"><span class="std std-ref">sign.gemini</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-cancer"><span class="std std-ref">sign.cancer</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-leo"><span class="std std-ref">sign.leo</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-virgo"><span class="std std-ref">sign.virgo</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-libra"><span class="std std-ref">sign.libra</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-scorpio"><span class="std std-ref">sign.scorpio</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-sagittarius"><span class="std std-ref">sign.sagittarius</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-capricorn"><span class="std std-ref">sign.capricorn</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-aquarius"><span class="std std-ref">sign.aquarius</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-pisces"><span class="std std-ref">sign.pisces</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-group-ashmand1822-tropical"><span class="std std-ref">sign_group.ashmand1822.tropical</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-group-ashmand1822-equinoctial"><span class="std std-ref">sign_group.ashmand1822.equinoctial</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-group-ashmand1822-fixed"><span class="std std-ref">sign_group.ashmand1822.fixed</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-group-ashmand1822-bicorporeal"><span class="std std-ref">sign_group.ashmand1822.bicorporeal</span></a></p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>星座</p></th>
+<th class="head"><p>分组</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference internal" href="#catalog-zh-cn-sign-aries"><span class="std std-ref">白羊座</span></a></p></td>
+<td><p><a class="reference internal" href="#catalog-zh-cn-sign-group-ashmand1822-equinoctial"><span class="std std-ref">分点星座</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#catalog-zh-cn-sign-taurus"><span class="std std-ref">金牛座</span></a></p></td>
+<td><p><a class="reference internal" href="#catalog-zh-cn-sign-group-ashmand1822-fixed"><span class="std std-ref">固定星座</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#catalog-zh-cn-sign-gemini"><span class="std std-ref">双子座</span></a></p></td>
+<td><p><a class="reference internal" href="#catalog-zh-cn-sign-group-ashmand1822-bicorporeal"><span class="std std-ref">双体星座</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#catalog-zh-cn-sign-cancer"><span class="std std-ref">巨蟹座</span></a></p></td>
+<td><p><a class="reference internal" href="#catalog-zh-cn-sign-group-ashmand1822-tropical"><span class="std std-ref">至点星座</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#catalog-zh-cn-sign-leo"><span class="std std-ref">狮子座</span></a></p></td>
+<td><p><a class="reference internal" href="#catalog-zh-cn-sign-group-ashmand1822-fixed"><span class="std std-ref">固定星座</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#catalog-zh-cn-sign-virgo"><span class="std std-ref">处女座</span></a></p></td>
+<td><p><a class="reference internal" href="#catalog-zh-cn-sign-group-ashmand1822-bicorporeal"><span class="std std-ref">双体星座</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#catalog-zh-cn-sign-libra"><span class="std std-ref">天秤座</span></a></p></td>
+<td><p><a class="reference internal" href="#catalog-zh-cn-sign-group-ashmand1822-equinoctial"><span class="std std-ref">分点星座</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#catalog-zh-cn-sign-scorpio"><span class="std std-ref">天蝎座</span></a></p></td>
+<td><p><a class="reference internal" href="#catalog-zh-cn-sign-group-ashmand1822-fixed"><span class="std std-ref">固定星座</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#catalog-zh-cn-sign-sagittarius"><span class="std std-ref">射手座</span></a></p></td>
+<td><p><a class="reference internal" href="#catalog-zh-cn-sign-group-ashmand1822-bicorporeal"><span class="std std-ref">双体星座</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#catalog-zh-cn-sign-capricorn"><span class="std std-ref">摩羯座</span></a></p></td>
+<td><p><a class="reference internal" href="#catalog-zh-cn-sign-group-ashmand1822-tropical"><span class="std std-ref">至点星座</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#catalog-zh-cn-sign-aquarius"><span class="std std-ref">水瓶座</span></a></p></td>
+<td><p><a class="reference internal" href="#catalog-zh-cn-sign-group-ashmand1822-fixed"><span class="std std-ref">固定星座</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#catalog-zh-cn-sign-pisces"><span class="std std-ref">双鱼座</span></a></p></td>
+<td><p><a class="reference internal" href="#catalog-zh-cn-sign-group-ashmand1822-bicorporeal"><span class="std std-ref">双体星座</span></a></p></td>
+</tr>
+</tbody>
+</table>
 </section>
 <section id="rule-project-aspect-deviation">
 <span id="catalog-zh-cn-rule-project-aspect-deviation"></span><h2>rule.project.aspect_deviation · 相位偏差与分支<a class="headerlink" href="#rule-project-aspect-deviation" title="Link to this heading">¶</a></h2>
@@ -446,16 +527,16 @@
 </section>
 <section id="rule-project-aspect-motion">
 <span id="catalog-zh-cn-rule-project-aspect-motion"></span><h2>rule.project.aspect_motion · 入相与离相状态<a class="headerlink" href="#rule-project-aspect-motion" title="Link to this heading">¶</a></h2>
-<p>相对黄经速率是第二个对象的速率减去第一个的速率。偏差不为 180 度时，相对速率与偏差异号表示入相，同号表示离相。偏差恰为零表示精确；相对速率恰为零且偏差不为零表示静止，意思是两个对象没有相对运动，不表示某颗行星的黄经速率为零。缺少速率时为不确定。偏差恰为 180 度且存在相对运动时，回绕后的绝对偏差没有双侧导数，状态为不确定。直接比较浮点数，不使用容差。</p>
+<p>对同一时刻的位置和速率，相对黄经速率是第二个对象的速率减去第一个的速率。偏差不为 180 度时，相对速率与偏差异号表示入相，同号表示离相。偏差恰为零表示精确；相对速率恰为零且偏差不为零表示静止，意思是两个对象没有相对运动，不表示某颗行星的黄经速率为零。缺少速率时为不确定。偏差恰为 180 度且存在相对运动时，回绕后的绝对偏差没有双侧导数，状态为不确定。直接比较浮点数，不使用容差。</p>
 <p>项目定义，不归于某个传统。</p>
 <p>只描述当前时刻，不预测相位之后会不会变得精确；任一对象都可能在达到精确相位前改变运动方向。</p>
 <p>Concepts / 概念：<a class="reference internal" href="#catalog-zh-cn-aspect-conjunction"><span class="std std-ref">aspect.conjunction</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-sextile"><span class="std std-ref">aspect.sextile</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-square"><span class="std std-ref">aspect.square</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-trine"><span class="std std-ref">aspect.trine</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-opposition"><span class="std std-ref">aspect.opposition</span></a></p>
 </section>
 <section id="rule-project-aspect-participation">
 <span id="catalog-zh-cn-rule-project-aspect-participation"></span><h2>rule.project.aspect_participation · 参与相位的对象<a class="headerlink" href="#rule-project-aspect-participation" title="Link to this heading">¶</a></h2>
-<p>相位在已请求的对象之间判断，或在其中选出的子集之间判断。两个月交点之间不构成相位：四个交点标识只是同一对交点的两种定义和两个方向。月交点可以与天体构成相位。轴线不是排盘请求里的对象，不参与。</p>
+<p>在单盘判断中，相位在已请求的对象之间判断，或在其中选出的子集之间判断。两个月交点之间不构成相位：四个交点标识只是同一对交点的两种定义和两个方向。月交点可以与天体构成相位。轴线不是排盘请求里的对象，不参与。</p>
 <p>项目约定，不归于某个传统。</p>
-<p>不判月交点之间的相位，是项目约定。某个惯例若根本不为月交点画相位，就把它排除在所选子集之外。</p>
+<p>单盘判断中不判月交点之间的相位，是项目约定。某个惯例若根本不为月交点画相位，就把它排除在所选子集之外。</p>
 <p>Concepts / 概念：<a class="reference internal" href="#catalog-zh-cn-aspect-conjunction"><span class="std std-ref">aspect.conjunction</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-sextile"><span class="std std-ref">aspect.sextile</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-square"><span class="std std-ref">aspect.square</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-trine"><span class="std std-ref">aspect.trine</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-opposition"><span class="std std-ref">aspect.opposition</span></a></p>
 </section>
 <section id="rule-project-orb-either-within-own-orb">
@@ -478,6 +559,31 @@
 <p>项目定义，不归于某个传统。</p>
 <p>仅在相位规则给出按对象的容许度时需要。目录不提供默认容许度。</p>
 <p>Concepts / 概念：<a class="reference internal" href="#catalog-zh-cn-aspect-conjunction"><span class="std std-ref">aspect.conjunction</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-sextile"><span class="std std-ref">aspect.sextile</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-square"><span class="std std-ref">aspect.square</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-trine"><span class="std std-ref">aspect.trine</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-opposition"><span class="std std-ref">aspect.opposition</span></a></p>
+</section>
+<section id="rule-project-cross-aspect-evaluation">
+<span id="catalog-zh-cn-rule-project-cross-aspect-evaluation"></span><h2>rule.project.cross_aspect_evaluation · 静态双盘交叉相位判断<a class="headerlink" href="#rule-project-cross-aspect-evaluation" title="Link to this heading">¶</a></h2>
+<p>将每个所选左位置与每个所选右位置配对，保留双侧源盘。省略选择表示该侧全部位置，不继承本命参与者。允许同名对象及所有具名交点之间的配对，也允许同一张盘占两个角色。使用调用方给出的相位规则及按对象标识设置的容许度，不继承任一盘的本命规则。保留每个匹配的有向分支、带符号偏差及包含等号的容许度上限，不赋予运动状态。</p>
+<p>项目几何政策，不归于某个传统，也不提供解读。</p>
+<p>在热带地心自身日期的位置坐标约定相同时直接比较，不转换共同历元，也不声称是同时刻的空间角。不同出生时刻的速率不能确立共同演化。不提供默认容许度、解读、宫位叠加或组合盘构造。</p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-zh-cn-aspect-conjunction"><span class="std std-ref">aspect.conjunction</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-sextile"><span class="std std-ref">aspect.sextile</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-square"><span class="std std-ref">aspect.square</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-trine"><span class="std std-ref">aspect.trine</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-opposition"><span class="std std-ref">aspect.opposition</span></a></p>
+</section>
+<section id="source-astrology-sign-groups-c92ac82-astrology-ashmand-sign-group-implementation">
+<span id="catalog-zh-cn-source-astrology-sign-groups-c92ac82"></span><h2>source.astrology.sign_groups.c92ac82 · astrology Ashmand sign-group implementation<a class="headerlink" href="#source-astrology-sign-groups-c92ac82-astrology-ashmand-sign-group-implementation" title="Link to this heading">¶</a></h2>
+<p>astrology contributors. src/astrology/zodiac.py and tests/test_zodiac.py at c92ac826c3065fc9e4a2cc949cf87c64c79c0c63. <code class="docutils literal notranslate"><span class="pre">language=en</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">source_verification=verified</span></code></p>
+<p><a class="reference external" href="https://github.com/0xf3cd/astrology/tree/c92ac826c3065fc9e4a2cc949cf87c64c79c0c63"><code class="docutils literal notranslate"><span class="pre">https://github.com/0xf3cd/astrology/tree/c92ac826c3065fc9e4a2cc949cf87c64c79c0c63</span></code></a></p>
+<p>项目按原文直接点名的两对星座及先后关系展开成员，附成员归属与类型边界测试。历史定义仍归于 source.ptolemy.ashmand1822。</p>
+<p>项目自写代码、翻译及说明采用本仓 MIT 许可证。</p>
+<p>支持此固定提交中的不可变星座分组定义、纯查询及按来源推导的测试期望。这是项目实现证据，不是独立历史互证、实际季节模型或命盘解读。</p>
+</section>
+<section id="source-astrology-cross-aspects-0d7122a-astrology-static-cross-chart-implementation">
+<span id="catalog-zh-cn-source-astrology-cross-aspects-0d7122a"></span><h2>source.astrology.cross_aspects.0d7122a · astrology static cross-chart implementation<a class="headerlink" href="#source-astrology-cross-aspects-0d7122a-astrology-static-cross-chart-implementation" title="Link to this heading">¶</a></h2>
+<p>astrology contributors. src/astrology/cross_aspects.py, shared aspects.py arithmetic and tests at 0d7122a7f7ef86ecc5798c9ea12668c68bb4a516. <code class="docutils literal notranslate"><span class="pre">language=en</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">source_verification=verified</span></code></p>
+<p><a class="reference external" href="https://github.com/0xf3cd/astrology/tree/0d7122a7f7ef86ecc5798c9ea12668c68bb4a516"><code class="docutils literal notranslate"><span class="pre">https://github.com/0xf3cd/astrology/tree/0d7122a7f7ef86ecc5798c9ea12668c68bb4a516</span></code></a></p>
+<p>项目自写的静态双盘组合与手算合成测试，与单盘实现来源 source.astrology.chart.fc845fa 分开。</p>
+<p>项目自写文本，采用本仓 MIT 许可证。</p>
+<p>支持此固定提交中的双盘配对、显式容许度选择、静态几何及来源保留；不是独立的天文互证，不确立传统解读或精度界。</p>
 </section>
 <section id="source-astrology-chart-fc845fa-astrology-chart-implementation">
 <span id="catalog-zh-cn-source-astrology-chart-fc845fa"></span><h2>source.astrology.chart.fc845fa · astrology chart implementation<a class="headerlink" href="#source-astrology-chart-fc845fa-astrology-chart-implementation" title="Link to this heading">¶</a></h2>
@@ -503,8 +609,8 @@
 <p><code class="docutils literal notranslate"><span class="pre">source_verification=verified</span></code></p>
 <p><a class="reference external" href="https://commons.wikimedia.org/w/index.php?title=File:Ptolemy%27s_Tetrabiblos_or_Quadripartite_(1822).pdf&amp;oldid=1078168290"><code class="docutils literal notranslate"><span class="pre">https://commons.wikimedia.org/w/index.php?title=File:Ptolemy%27s_Tetrabiblos_or_Quadripartite_(1822).pdf&amp;oldid=1078168290</span></code></a></p>
 <p>直接转录 Wikimedia Commons 托管的 Google Books 扫描本印刷页 34–35（PDF 第 72–73 页）。下载文件 SHA-256：8ab3073b2200ba85b3dd812acc0b2edd2d2757f196cc641de42e9a46293189cb。合并换行、断词连字符及规范标点空格，保留措辞。纯文本转录不编码排版强调。不是 1900 年重印本或现代网页转录。版本旁证：https://wdl.warburg.sas.ac.uk/object-wdl-awa-aaan 。镜像及目录不算独立规则作者。</p>
-<p>1822 年文本：Commons 文件修订 1078168290 标为原出版国、作者终身加 70 年或更短保护期地区及美国的公版（模板 PD-old-70-1923，并显示 Public Domain Mark 1.0 声明）；不作全球权限保证。仅收录一段人工转录短文，不再分发扫描图、水印或网站说明。项目中文翻译及原作说明采用 MIT 许可证。</p>
-<p>《第一卷》第 XIV 章的一条历史星座分组陈述，不是实证主张、多源共识或适用于命盘的结论。</p>
+<p>1822 年文本：Commons 文件修订 1078168290 标为原出版国、作者终身加 70 年或更短保护期地区及美国的公版（模板 PD-old-70-1923，并显示 Public Domain Mark 1.0 声明）；不作全球权限保证。仅收录范围有限的人工转录短文，不再分发扫描图、水印或网站说明。项目中文翻译及原作说明采用 MIT 许可证。</p>
+<p>《第一卷》第 XIV 章的四种星座分组：直接点名的至点／分点两对星座，以及定义固定／双体成员的先后关系。收录完整的分点星座句及范围有限的定义摘录；各定位说明标明片段边界。展开后的十二星座表由项目推导。这不是实证主张、多源共识或适用于命盘的结论。</p>
 </section>
 <section id="entry-body-requests-statement">
 <span id="catalog-zh-cn-entry-body-requests"></span><h2>entry.body_requests · Statement / 陈述<a class="headerlink" href="#entry-body-requests-statement" title="Link to this heading">¶</a></h2>
@@ -577,7 +683,7 @@
 </section>
 <section id="entry-aspect-evaluation-statement">
 <span id="catalog-zh-cn-entry-aspect-evaluation"></span><h2>entry.aspect_evaluation · Statement / 陈述<a class="headerlink" href="#entry-aspect-evaluation-statement" title="Link to this heading">¶</a></h2>
-<p>主要相位按黄经和显式容许度判断，结果里保留有向分支和局部的入相或离相状态。</p>
+<p>单盘主要相位按黄经和显式容许度判断，结果里保留有向分支和局部的入相或离相状态。</p>
 <p><code class="docutils literal notranslate"><span class="pre">prerequisites=complete</span></code> · <code class="docutils literal notranslate"><span class="pre">output=reference_only</span></code> · <code class="docutils literal notranslate"><span class="pre">chart=not_assessed</span></code></p>
 <p>Concepts / 概念：<a class="reference internal" href="#catalog-zh-cn-aspect-conjunction"><span class="std std-ref">aspect.conjunction</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-sextile"><span class="std std-ref">aspect.sextile</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-square"><span class="std std-ref">aspect.square</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-trine"><span class="std std-ref">aspect.trine</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-opposition"><span class="std std-ref">aspect.opposition</span></a></p>
 <p>Variants / 变体：<a class="reference internal" href="#catalog-zh-cn-rule-project-aspect-deviation"><span class="std std-ref">rule.project.aspect_deviation</span></a>, <a class="reference internal" href="#catalog-zh-cn-rule-project-aspect-motion"><span class="std std-ref">rule.project.aspect_motion</span></a>, <a class="reference internal" href="#catalog-zh-cn-rule-project-aspect-participation"><span class="std std-ref">rule.project.aspect_participation</span></a>, <a class="reference internal" href="#catalog-zh-cn-rule-project-orb-either-within-own-orb"><span class="std std-ref">rule.project.orb_either_within_own_orb</span></a>, <a class="reference internal" href="#catalog-zh-cn-rule-project-orb-both-within-own-orb"><span class="std std-ref">rule.project.orb_both_within_own_orb</span></a>, <a class="reference internal" href="#catalog-zh-cn-rule-project-orb-mean-of-orbs"><span class="std std-ref">rule.project.orb_mean_of_orbs</span></a></p>
@@ -586,22 +692,38 @@
 <li><p>每个容许度都由调用方给出；此条目不提供任何容许度。</p></li>
 <li><p>按对象的容许度需要选定一种合成规则。</p></li>
 </ul>
-<p>Exceptions / 例外：两个月交点之间不构成相位。</p>
+<p>Exceptions / 例外：在此单盘判断中，两个月交点之间不构成相位。</p>
 <p>Limits / 限度：此条目是项目定义，不是独立互证或传统规则。不提供默认容许度、强度或解释，检索也从不判断命盘。</p>
 <p><a class="reference internal" href="#catalog-zh-cn-source-astrology-chart-fc845fa"><span class="std std-ref">source.astrology.chart.fc845fa</span></a>: astrology 0.0.0 / src/astrology/aspects.py at the recorded commit</p>
+</section>
+<section id="entry-cross-aspect-evaluation-statement">
+<span id="catalog-zh-cn-entry-cross-aspect-evaluation"></span><h2>entry.cross_aspect_evaluation · Statement / 陈述<a class="headerlink" href="#entry-cross-aspect-evaluation-statement" title="Link to this heading">¶</a></h2>
+<p>静态主要交叉相位比较两张给定本命盘结果，区分左右端点并保留双侧完整来源，不设运动字段。</p>
+<p><code class="docutils literal notranslate"><span class="pre">prerequisites=complete</span></code> · <code class="docutils literal notranslate"><span class="pre">output=reference_only</span></code> · <code class="docutils literal notranslate"><span class="pre">chart=not_assessed</span></code></p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-zh-cn-aspect-conjunction"><span class="std std-ref">aspect.conjunction</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-sextile"><span class="std std-ref">aspect.sextile</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-square"><span class="std std-ref">aspect.square</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-trine"><span class="std std-ref">aspect.trine</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-opposition"><span class="std std-ref">aspect.opposition</span></a></p>
+<p>Variants / 变体：<a class="reference internal" href="#catalog-zh-cn-rule-project-cross-aspect-evaluation"><span class="std std-ref">rule.project.cross_aspect_evaluation</span></a>, <a class="reference internal" href="#catalog-zh-cn-rule-project-aspect-deviation"><span class="std std-ref">rule.project.aspect_deviation</span></a>, <a class="reference internal" href="#catalog-zh-cn-rule-project-orb-either-within-own-orb"><span class="std std-ref">rule.project.orb_either_within_own_orb</span></a>, <a class="reference internal" href="#catalog-zh-cn-rule-project-orb-both-within-own-orb"><span class="std std-ref">rule.project.orb_both_within_own_orb</span></a>, <a class="reference internal" href="#catalog-zh-cn-rule-project-orb-mean-of-orbs"><span class="std std-ref">rule.project.orb_mean_of_orbs</span></a></p>
+<p>Prerequisites / 前提：</p>
+<ul class="simple">
+<li><p>两张给定不可变本命盘结果，其黄道、中心和位置坐标约定相同，并由调用方显式给出相位规则。</p></li>
+<li><p>有对象覆盖时必须给容许度合成方式，无覆盖时不能给；覆盖只能指向任一侧所选标识。</p></li>
+</ul>
+<p>Exceptions / 例外：允许同名对象、交点间跨盘配对、同一张盘占两个角色、空选择及空规则；单盘交点排除规则不适用。</p>
+<p>Limits / 限度：项目自定几何，不是独立互证或传统解读。自身日期的黄经不转换到共同历元。比较不需要原生天文或时刻解析；目录检索本身从不判断命盘。</p>
+<p><a class="reference internal" href="#catalog-zh-cn-source-astrology-cross-aspects-0d7122a"><span class="std std-ref">source.astrology.cross_aspects.0d7122a</span></a>: src/astrology/cross_aspects.py; src/astrology/aspects.py shared geometry; tests/test_cross_aspects.py at 0d7122a7f7ef86ecc5798c9ea12668c68bb4a516</p>
 </section>
 <section id="entry-sign-vocabulary-statement">
 <span id="catalog-zh-cn-entry-sign-vocabulary"></span><h2>entry.sign_vocabulary · Statement / 陈述<a class="headerlink" href="#entry-sign-vocabulary-statement" title="Link to this heading">¶</a></h2>
 <p>白羊座与天秤座出现在所引历史分点星座分组中；本目录将星座名称与计算分开。</p>
 <p><code class="docutils literal notranslate"><span class="pre">prerequisites=complete</span></code> · <code class="docutils literal notranslate"><span class="pre">output=reference_only</span></code> · <code class="docutils literal notranslate"><span class="pre">chart=not_assessed</span></code></p>
 <p>Concepts / 概念：<a class="reference internal" href="#catalog-zh-cn-sign-aries"><span class="std std-ref">sign.aries</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-libra"><span class="std std-ref">sign.libra</span></a></p>
-<p>Variants / 变体：<a class="reference internal" href="#catalog-zh-cn-rule-ptolemy-ashmand-equinoctial-signs"><span class="std std-ref">rule.ptolemy_ashmand.equinoctial_signs</span></a>, <a class="reference internal" href="#catalog-zh-cn-rule-project-tropical-sign-sectors"><span class="std std-ref">rule.project.tropical_sign_sectors</span></a></p>
+<p>Variants / 变体：<a class="reference internal" href="#catalog-zh-cn-rule-ptolemy-ashmand-equinoctial-signs"><span class="std std-ref">rule.ptolemy_ashmand.equinoctial_signs</span></a>, <a class="reference internal" href="#catalog-zh-cn-rule-project-tropical-sign-sectors"><span class="std std-ref">rule.project.tropical_sign_sectors</span></a>, <a class="reference internal" href="#catalog-zh-cn-rule-ptolemy-ashmand-sign-groups"><span class="std std-ref">rule.ptolemy_ashmand.sign_groups</span></a></p>
 <p>Prerequisites / 前提：</p>
 <p>No prerequisites recorded / 未记录前提</p>
 <p>Exceptions / 例外：来源是一个具名历史版本，不是跨流派通用定义。</p>
-<p>Limits / 限度：其余星座名称仅作词汇；30 度区间边界与可执行归属是排盘实现中的项目约定，不是所引版本的主张。</p>
+<p>Limits / 限度：十二星座的历史分组见 rule.ptolemy_ashmand.sign_groups。黄经区间边界仍是另一项项目约定，不是所引版本的主张。</p>
 <p><a class="reference internal" href="#catalog-zh-cn-source-ptolemy-ashmand1822"><span class="std std-ref">source.ptolemy.ashmand1822</span></a>: Book I, chapter XIV, printed pp. 34–35; PDF pages 72–73</p>
 <p><a class="reference internal" href="#catalog-zh-cn-source-astrology-chart-fc845fa"><span class="std std-ref">source.astrology.chart.fc845fa</span></a>: astrology 0.0.0 / src/astrology/zodiac.py at the recorded commit</p>
+<p><a class="reference internal" href="#catalog-zh-cn-source-astrology-sign-groups-c92ac82"><span class="std std-ref">source.astrology.sign_groups.c92ac82</span></a>: src/astrology/zodiac.py: AshmandSignGroup and ashmand_sign_group; tests/test_zodiac.py at c92ac826c3065fc9e4a2cc949cf87c64c79c0c63</p>
 </section>
 <section id="entry-equinoctial-example-statement">
 <span id="catalog-zh-cn-entry-equinoctial-example"></span><h2>entry.equinoctial_example · Statement / 陈述<a class="headerlink" href="#entry-equinoctial-example-statement" title="Link to this heading">¶</a></h2>
@@ -614,7 +736,7 @@
 <li><p>若用于命盘，需要显式黄道约定、已计算的位置，以及另行明确的历史分组用法；此处未判断这些前提。</p></li>
 </ul>
 <p>Exceptions / 例外：保留历史原文的昼夜等长理由，不将其认可为实际日照时长保证。</p>
-<p>Limits / 限度：单源、仅供参考、不可执行的例子。缺少的前提保持未决；算出一个条件不能使检索结果变为完全适用。</p>
+<p>Limits / 限度：单源、仅供参考的例子，未实现命盘层面的用法。纯星座分组查询另有接口；查询结果不能补全未决前提，也不能使检索结果变为完全适用。</p>
 <p><a class="reference internal" href="#catalog-zh-cn-source-ptolemy-ashmand1822"><span class="std std-ref">source.ptolemy.ashmand1822</span></a>: Book I, chapter XIV, printed pp. 34–35; PDF pages 72–73; complete equinoctial-sign sentence</p>
 <p>Original excerpt (English) / 原文引述（英文）：</p>
 <blockquote>
@@ -624,6 +746,48 @@
 <blockquote>
 <div><p>分点星座也有两个：白羊座，春分之后的第一个；天秤座，秋分之后的第一个。它们如此命名，是因为太阳位于二者任一的起点时，使昼与夜等长。</p>
 </div></blockquote>
+</section>
+<section id="entry-ashmand-sign-groups-statement">
+<span id="catalog-zh-cn-entry-ashmand-sign-groups"></span><h2>entry.ashmand_sign_groups · Statement / 陈述<a class="headerlink" href="#entry-ashmand-sign-groups-statement" title="Link to this heading">¶</a></h2>
+<p>十二个 Sign 值各自属于 Ashmand 1822 年版的四组之一。astrology.zodiac.ashmand_sign_group 查询这一归属，不判断命盘。</p>
+<p><code class="docutils literal notranslate"><span class="pre">prerequisites=complete</span></code> · <code class="docutils literal notranslate"><span class="pre">output=reference_only</span></code> · <code class="docutils literal notranslate"><span class="pre">chart=not_assessed</span></code></p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-zh-cn-sign-aries"><span class="std std-ref">sign.aries</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-taurus"><span class="std std-ref">sign.taurus</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-gemini"><span class="std std-ref">sign.gemini</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-cancer"><span class="std std-ref">sign.cancer</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-leo"><span class="std std-ref">sign.leo</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-virgo"><span class="std std-ref">sign.virgo</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-libra"><span class="std std-ref">sign.libra</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-scorpio"><span class="std std-ref">sign.scorpio</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-sagittarius"><span class="std std-ref">sign.sagittarius</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-capricorn"><span class="std std-ref">sign.capricorn</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-aquarius"><span class="std std-ref">sign.aquarius</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-pisces"><span class="std std-ref">sign.pisces</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-group-ashmand1822-tropical"><span class="std std-ref">sign_group.ashmand1822.tropical</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-group-ashmand1822-equinoctial"><span class="std std-ref">sign_group.ashmand1822.equinoctial</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-group-ashmand1822-fixed"><span class="std std-ref">sign_group.ashmand1822.fixed</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-group-ashmand1822-bicorporeal"><span class="std std-ref">sign_group.ashmand1822.bicorporeal</span></a></p>
+<p>Variants / 变体：<a class="reference internal" href="#catalog-zh-cn-rule-ptolemy-ashmand-sign-groups"><span class="std std-ref">rule.ptolemy_ashmand.sign_groups</span></a></p>
+<p>Prerequisites / 前提：</p>
+<ul class="simple">
+<li><p>提供一个已有的 Sign 值；此查询不需位置、出生资料或原生天文库。</p></li>
+</ul>
+<p>Exceptions / 例外：直接点名的两对星座及各自紧接的星座定义的是一种历史分类。展开后的表由项目推导，不是原文逐项列出的十二星座表。</p>
+<p>Limits / 限度：只有一个历史来源。组名不表示实际季节、昼夜等长、性质评分或解读。检索及纯成员查询不判断命盘适用性；原有分点星座例子的前提仍保持未决。</p>
+<p><a class="reference internal" href="#catalog-zh-cn-source-ptolemy-ashmand1822"><span class="std std-ref">source.ptolemy.ashmand1822</span></a>: Book I, chapter XIV, printed p. 34 / PDF p. 72; complete first sentence of the tropical definition</p>
+<p>Original excerpt (English) / 原文引述（英文）：</p>
+<blockquote>
+<div><p>The tropical signs are two: viz. the first thirty degrees after the summer solstice, which compose the sign of Cancer; and the first thirty degrees after the winter solstice, composing the sign of Capricorn.</p>
+</div></blockquote>
+<p>Chinese translation / 中文译文: <code class="docutils literal notranslate"><span class="pre">current</span></code>, revision=1; astrology contributors (project Chinese translation of Ashmand’s English)</p>
+<blockquote>
+<div><p>至点星座有两个：夏至之后的最初三十度构成巨蟹座；冬至之后的最初三十度构成摩羯座。</p>
+</div></blockquote>
+<p><a class="reference internal" href="#catalog-zh-cn-source-ptolemy-ashmand1822"><span class="std std-ref">source.ptolemy.ashmand1822</span></a>: Book I, chapter XIV, printed pp. 34–35 / PDF pp. 72–73; equinoctial definition, complete sentence preserved in entry.equinoctial_example</p>
+<p><a class="reference internal" href="#catalog-zh-cn-source-ptolemy-ashmand1822"><span class="std std-ref">source.ptolemy.ashmand1822</span></a>: Book I, chapter XIV, printed p. 35 / PDF p. 73; fixed definition, sentence fragment ending at fixed; following explanation not reproduced</p>
+<p>Original excerpt (English) / 原文引述（英文）：</p>
+<blockquote>
+<div><p>Those signs, which severally follow immediately after the two tropical and the two equinoctial signs, are termed fixed</p>
+</div></blockquote>
+<p>Chinese translation / 中文译文: <code class="docutils literal notranslate"><span class="pre">current</span></code>, revision=1; astrology contributors (project Chinese translation of Ashmand’s English)</p>
+<blockquote>
+<div><p>分别紧接在两个至点星座和两个分点星座之后的那些星座，称为固定星座</p>
+</div></blockquote>
+<p><a class="reference internal" href="#catalog-zh-cn-source-ptolemy-ashmand1822"><span class="std std-ref">source.ptolemy.ashmand1822</span></a>: Book I, chapter XIV, printed p. 35 / PDF p. 73; bicorporeal definition, opening clause through the semicolon; following seasonal explanation not reproduced</p>
+<p>Original excerpt (English) / 原文引述（英文）：</p>
+<blockquote>
+<div><p>The bicorporeal signs severally follow the fixed signs;</p>
+</div></blockquote>
+<p>Chinese translation / 中文译文: <code class="docutils literal notranslate"><span class="pre">current</span></code>, revision=2; astrology contributors (project Chinese translation of Ashmand’s English)</p>
+<blockquote>
+<div><p>双体星座分别位于固定星座之后；</p>
+</div></blockquote>
+<p><a class="reference internal" href="#catalog-zh-cn-source-astrology-sign-groups-c92ac82"><span class="std std-ref">source.astrology.sign_groups.c92ac82</span></a>: src/astrology/zodiac.py: AshmandSignGroup and ashmand_sign_group; tests/test_zodiac.py at c92ac826c3065fc9e4a2cc949cf87c64c79c0c63</p>
 </section>
 </section>
 
@@ -661,7 +825,8 @@
 <li class="toctree-l2"><a class="reference internal" href="configuration.html">排盘请求配置</a></li>
 <li class="toctree-l2"><a class="reference internal" href="chart.html">本命盘</a></li>
 <li class="toctree-l2"><a class="reference internal" href="aspects.html">相位</a></li>
-<li class="toctree-l2"><a class="reference internal" href="records.html">保存、恢复、重算和查看命盘</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cross_aspects.html">静态双盘交叉相位</a></li>
+<li class="toctree-l2"><a class="reference internal" href="records.html">命盘结果与文本显示</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference.html">公开 API 参考</a></li>
 <li class="toctree-l2"><a class="reference internal" href="architecture.html">仓库结构与计算边界</a></li>
 <li class="toctree-l2"><a class="reference internal" href="knowledge.html">知识组织与双语文档</a></li>

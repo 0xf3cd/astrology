@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Static cross-chart aspects &#8212; celestial-astrology 0.2.0 documentation / 文档</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
+    <script src="../../_static/documentation_options.js?v=938c9ccc"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/en/cross_aspects.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Chart results and text" href="records.html" />
+    <link rel="prev" title="Aspects" href="aspects.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="static-cross-chart-aspects">
+<h1>Static cross-chart aspects<a class="headerlink" href="#static-cross-chart-aspects" title="Link to this heading">¶</a></h1>
+<p><a class="reference internal" href="../zh-CN/cross_aspects.html"><span class="std std-doc">简体中文</span></a> · <a class="reference internal" href="index.html"><span class="std std-doc">Documentation</span></a> · <a class="reference internal" href="reference.html"><span class="std std-doc">API</span></a></p>
+<p><code class="docutils literal notranslate"><span class="pre">cross_chart_aspects</span></code> compares two existing in-memory <code class="docutils literal notranslate"><span class="pre">NatalChart</span></code> results.
+A Sun in the left chart and a Sun in the right chart remain separate endpoints;
+no renaming or chart merging is needed. Comparing supplied results performs no
+astronomy, timezone resolution, version lookup or I/O.</p>
+<p>This API is available from 0.2.0, which is still in development. Use the
+<a class="reference internal" href="../../README.html#install-from-source"><span class="std std-ref">source installation instructions</span></a>.</p>
+<section id="compare-two-synthetic-birth-records">
+<h2>Compare two synthetic birth records<a class="headerlink" href="#compare-two-synthetic-birth-records" title="Link to this heading">¶</a></h2>
+<p>Calculate the source charts first. Their own natal aspect rules can be empty:
+the comparison takes its rules explicitly.</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">date</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">astrology</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">AspectRule</span><span class="p">,</span> <span class="n">BirthRecord</span><span class="p">,</span> <span class="n">Body</span><span class="p">,</span> <span class="n">ChartConfig</span><span class="p">,</span> <span class="n">FixedOffset</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">HouseSystem</span><span class="p">,</span> <span class="n">Location</span><span class="p">,</span> <span class="n">MajorAspect</span><span class="p">,</span> <span class="n">ObjectOrb</span><span class="p">,</span> <span class="n">OrbCombination</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">cross_chart_aspects</span><span class="p">,</span> <span class="n">natal_chart</span><span class="p">,</span> <span class="n">prepare_natal_input</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config</span> <span class="o">=</span> <span class="n">ChartConfig</span><span class="p">(</span><span class="n">HouseSystem</span><span class="o">.</span><span class="n">WHOLE_SIGN</span><span class="p">,</span> <span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">SUN</span><span class="p">,),</span> <span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">source_chart</span><span class="p">(</span><span class="n">year</span><span class="p">):</span>
+<span class="gp">... </span>  <span class="n">record</span> <span class="o">=</span> <span class="n">BirthRecord</span><span class="p">(</span><span class="n">date</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">17</span><span class="p">),</span> <span class="n">time</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span> <span class="n">FixedOffset</span><span class="p">(</span><span class="n">timedelta</span><span class="p">(</span><span class="mi">0</span><span class="p">)),</span>
+<span class="gp">... </span>    <span class="n">Location</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">source</span><span class="o">=</span><span class="p">{</span><span class="s2">"record"</span><span class="p">:</span> <span class="s2">"synthetic"</span><span class="p">,</span> <span class="s2">"year"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">year</span><span class="p">)})</span>
+<span class="gp">... </span>  <span class="k">return</span> <span class="n">natal_chart</span><span class="p">(</span><span class="n">prepare_natal_input</span><span class="p">(</span><span class="n">record</span><span class="p">),</span> <span class="n">config</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">chart_left</span><span class="p">,</span> <span class="n">chart_right</span> <span class="o">=</span> <span class="n">source_chart</span><span class="p">(</span><span class="mi">2003</span><span class="p">),</span> <span class="n">source_chart</span><span class="p">(</span><span class="mi">2004</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rules</span> <span class="o">=</span> <span class="p">[</span><span class="n">AspectRule</span><span class="p">(</span><span class="n">MajorAspect</span><span class="o">.</span><span class="n">CONJUNCTION</span><span class="p">,</span> <span class="mi">3</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">cross_chart_aspects</span><span class="p">(</span><span class="n">chart_left</span><span class="o">=</span><span class="n">chart_left</span><span class="p">,</span> <span class="n">chart_right</span><span class="o">=</span><span class="n">chart_right</span><span class="p">,</span> <span class="n">rules</span><span class="o">=</span><span class="n">rules</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[(</span><span class="n">h</span><span class="o">.</span><span class="n">left_object</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">h</span><span class="o">.</span><span class="n">right_object</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">h</span><span class="o">.</span><span class="n">aspect</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">hits</span><span class="p">]</span>
+<span class="go">[('sun', 'sun', 'conjunction')]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span><span class="o">.</span><span class="n">chart_left</span> <span class="ow">is</span> <span class="n">chart_left</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">chart_right</span> <span class="ow">is</span> <span class="n">chart_right</span>
+<span class="go">(True, True)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span><span class="o">.</span><span class="n">chart_left</span><span class="o">.</span><span class="n">resolved</span><span class="o">.</span><span class="n">utc</span><span class="o">.</span><span class="n">year</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">chart_right</span><span class="o">.</span><span class="n">resolved</span><span class="o">.</span><span class="n">utc</span><span class="o">.</span><span class="n">year</span>
+<span class="go">(2003, 2004)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hit</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">hits</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">abs</span><span class="p">(</span><span class="n">hit</span><span class="o">.</span><span class="n">deviation_deg</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">hit</span><span class="o">.</span><span class="n">orb_limit_deg</span> <span class="o">==</span> <span class="mi">3</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>Both complete charts remain available as <code class="docutils literal notranslate"><span class="pre">result.chart_left</span></code> and <code class="docutils literal notranslate"><span class="pre">result.chart_right</span></code>,
+including original/resolved birth inputs, positions, requested/effective choices
+and provenance. <code class="docutils literal notranslate"><span class="pre">rules</span></code> and <code class="docutils literal notranslate"><span class="pre">combination</span></code> record the fresh comparison request;
+neither chart’s natal rules or participants are inherited.</p>
+</section>
+<section id="choose-pairs-and-orbs">
+<h2>Choose pairs and orbs<a class="headerlink" href="#choose-pairs-and-orbs" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">left_objects</span></code> and <code class="docutils literal notranslate"><span class="pre">right_objects</span></code> select each side independently. <code class="docutils literal notranslate"><span class="pre">None</span></code> selects
+all positions on that side, even if its natal aspects used a smaller subset.
+Selections follow source position order, not the order of the selection argument.
+Every selected left object is paired with every selected right object. This
+includes same-named objects and every selected node identity on one side with
+every selected node identity on the other. The same chart can occupy both roles.
+These are project geometry choices, not traditional interpretations.
+The <a class="reference internal" href="aspects.html#choose-the-objects"><span class="std std-ref">single-chart node exclusion</span></a> remains unchanged.</p>
+<p>Object-orb overrides use the existing <code class="docutils literal notranslate"><span class="pre">Body</span></code> or <code class="docutils literal notranslate"><span class="pre">LunarNode</span></code> identity on either
+side. A Sun override applies to both Suns; there is no left-Sun/right-Sun override
+mechanism. An override must name a selected object from at least one side.
+Choose an <code class="docutils literal notranslate"><span class="pre">OrbCombination</span></code> exactly when a rule has overrides; without overrides,
+leave <code class="docutils literal notranslate"><span class="pre">combination=None</span></code>. The <a class="reference internal" href="aspects.html#combine-orbs-when-objects-differ"><span class="std std-ref">three combination rules</span></a>
+and inclusive limits are the same arithmetic as for a natal pair.</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">own_sun</span> <span class="o">=</span> <span class="p">[</span><span class="n">AspectRule</span><span class="p">(</span><span class="n">MajorAspect</span><span class="o">.</span><span class="n">CONJUNCTION</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">[</span><span class="n">ObjectOrb</span><span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">SUN</span><span class="p">,</span> <span class="mi">5</span><span class="p">)])]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">adjusted</span> <span class="o">=</span> <span class="n">cross_chart_aspects</span><span class="p">(</span><span class="n">chart_left</span><span class="p">,</span> <span class="n">chart_right</span><span class="p">,</span> <span class="n">own_sun</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">combination</span><span class="o">=</span><span class="n">OrbCombination</span><span class="o">.</span><span class="n">MEAN_OF_ORBS</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">adjusted</span><span class="o">.</span><span class="n">hits</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">orb_limit_deg</span>
+<span class="go">5.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cross_chart_aspects</span><span class="p">(</span><span class="n">chart_left</span><span class="p">,</span> <span class="n">chart_right</span><span class="p">,</span> <span class="n">rules</span><span class="p">,</span> <span class="n">left_objects</span><span class="o">=</span><span class="p">[])</span><span class="o">.</span><span class="n">hits</span>
+<span class="go">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cross_chart_aspects</span><span class="p">(</span><span class="n">chart_left</span><span class="p">,</span> <span class="n">chart_right</span><span class="p">,</span> <span class="p">())</span><span class="o">.</span><span class="n">rules</span>
+<span class="go">()</span>
+</pre></div>
+</div>
+<p>Empty selections, empty rules and no matches all yield empty hits; their recorded
+selections/rules distinguish them. These requests raise <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> even with no
+pairs: duplicate participants within one side’s selection, unavailable participants,
+duplicate aspect identities, unused override identities, a combination given
+without overrides, or overrides without a combination.
+Caller-owned sequences are copied into immutable tuples.</p>
+</section>
+<section id="read-static-geometry">
+<h2>Read static geometry<a class="headerlink" href="#read-static-geometry" title="Link to this heading">¶</a></h2>
+<p>Each hit has <code class="docutils literal notranslate"><span class="pre">left_object</span></code>, <code class="docutils literal notranslate"><span class="pre">right_object</span></code>, <code class="docutils literal notranslate"><span class="pre">aspect</span></code>, <code class="docutils literal notranslate"><span class="pre">branch_deg</span></code>,
+<code class="docutils literal notranslate"><span class="pre">deviation_deg</span></code> and <code class="docutils literal notranslate"><span class="pre">orb_limit_deg</span></code>. The <a class="reference internal" href="aspects.html#read-the-branch-and-the-deviation"><span class="std std-ref">branch/deviation definitions</span></a>
+apply unchanged, in degrees. Every matching branch is returned, ordered by left
+position, right position, ascending aspect angle, then negative before positive
+branch. Broad orbs may admit several aspects or both branches; no nearest-only
+selection or display rounding is applied.</p>
+<p>There is no motion field, including no applying/separating label. Rates at two
+birth instants do not describe a shared time evolution. Zero deviation still
+identifies exact static geometry, without predicting a later event.</p>
+<p>The sources must use matching zodiac, center and position-frame conventions;
+a mismatch raises <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>. Current public constructors admit only one such
+convention: tropical/geocentric positions on the true ecliptic
+and equinox of each chart’s own date. Different dates therefore use different
+equinox references: a hit compares the stored longitudes, not the angle between
+two positions at one moment. There is no common-epoch conversion.
+Different dates, locations, house systems, models and software labels are retained
+and do not by themselves cause rejection. Construction recomputes all hits from
+the sources, selections and rules and rejects any difference. It does not
+authenticate the supplied astronomical values or provenance labels.</p>
+<p>Composite/Davison charts, house overlays, transit searches and interpretation
+remain outside this API. It provides no separate text formatter.</p>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">celestial-astrology</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../README.html">celestial-astrology</a></li>
+<li class="toctree-l2"><a class="reference internal" href="birth.html">Birth records and modern time resolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html">Requested chart configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chart.html">Natal charts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aspects.html">Aspects</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Static cross-chart aspects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="records.html">Chart results and text</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference.html">Public API reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html">Repository structure and calculation boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="knowledge.html">Knowledge organization and bilingual documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="catalog.html">Knowledge catalog reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="releases.html">Release notes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="releasing.html">Release procedure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html">Contributing</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../zh-CN/index.html">文档入口</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Documentation</a><ul>
+      <li>Previous: <a href="aspects.html" title="previous chapter">Aspects</a></li>
+      <li>Next: <a href="records.html" title="next chapter">Chart results and text</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 9.1.0</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../../_sources/docs/en/cross_aspects.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

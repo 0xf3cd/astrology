@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>静态双盘交叉相位 &#8212; celestial-astrology 0.2.0 documentation / 文档</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
+    <script src="../../_static/documentation_options.js?v=938c9ccc"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/zh-CN/cross_aspects.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="命盘结果与文本显示" href="records.html" />
+    <link rel="prev" title="相位" href="aspects.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="id1">
+<h1>静态双盘交叉相位<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h1>
+<p><a class="reference internal" href="../en/cross_aspects.html"><span class="std std-doc">English</span></a> · <a class="reference internal" href="index.html"><span class="std std-doc">文档</span></a> · <a class="reference internal" href="reference.html"><span class="std std-doc">API</span></a></p>
+<p><code class="docutils literal notranslate"><span class="pre">cross_chart_aspects</span></code> 比较两张已有的内存 <code class="docutils literal notranslate"><span class="pre">NatalChart</span></code> 结果。左盘太阳与右盘太阳仍是不同端点，
+不必重命名对象或合并命盘。比较给定结果不执行天文计算、时区解析、版本查询或 I/O。</p>
+<p>此 API 自 0.2.0 起提供。目前该版本仍在开发中，安装见<a class="reference internal" href="../../README.zh-CN.html#id2"><span class="std std-ref">源码安装说明</span></a>。</p>
+<section id="id2">
+<h2>比较两份合成出生记录<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<p>先计算源盘。它们的本命相位规则可以为空；比较时显式给出另一组规则。</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">date</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">astrology</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">AspectRule</span><span class="p">,</span> <span class="n">BirthRecord</span><span class="p">,</span> <span class="n">Body</span><span class="p">,</span> <span class="n">ChartConfig</span><span class="p">,</span> <span class="n">FixedOffset</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">HouseSystem</span><span class="p">,</span> <span class="n">Location</span><span class="p">,</span> <span class="n">MajorAspect</span><span class="p">,</span> <span class="n">ObjectOrb</span><span class="p">,</span> <span class="n">OrbCombination</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">cross_chart_aspects</span><span class="p">,</span> <span class="n">natal_chart</span><span class="p">,</span> <span class="n">prepare_natal_input</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config</span> <span class="o">=</span> <span class="n">ChartConfig</span><span class="p">(</span><span class="n">HouseSystem</span><span class="o">.</span><span class="n">WHOLE_SIGN</span><span class="p">,</span> <span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">SUN</span><span class="p">,),</span> <span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">source_chart</span><span class="p">(</span><span class="n">year</span><span class="p">):</span>
+<span class="gp">... </span>  <span class="n">record</span> <span class="o">=</span> <span class="n">BirthRecord</span><span class="p">(</span><span class="n">date</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">17</span><span class="p">),</span> <span class="n">time</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span> <span class="n">FixedOffset</span><span class="p">(</span><span class="n">timedelta</span><span class="p">(</span><span class="mi">0</span><span class="p">)),</span>
+<span class="gp">... </span>    <span class="n">Location</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">source</span><span class="o">=</span><span class="p">{</span><span class="s2">"record"</span><span class="p">:</span> <span class="s2">"synthetic"</span><span class="p">,</span> <span class="s2">"year"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">year</span><span class="p">)})</span>
+<span class="gp">... </span>  <span class="k">return</span> <span class="n">natal_chart</span><span class="p">(</span><span class="n">prepare_natal_input</span><span class="p">(</span><span class="n">record</span><span class="p">),</span> <span class="n">config</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">chart_left</span><span class="p">,</span> <span class="n">chart_right</span> <span class="o">=</span> <span class="n">source_chart</span><span class="p">(</span><span class="mi">2003</span><span class="p">),</span> <span class="n">source_chart</span><span class="p">(</span><span class="mi">2004</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rules</span> <span class="o">=</span> <span class="p">[</span><span class="n">AspectRule</span><span class="p">(</span><span class="n">MajorAspect</span><span class="o">.</span><span class="n">CONJUNCTION</span><span class="p">,</span> <span class="mi">3</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">cross_chart_aspects</span><span class="p">(</span><span class="n">chart_left</span><span class="o">=</span><span class="n">chart_left</span><span class="p">,</span> <span class="n">chart_right</span><span class="o">=</span><span class="n">chart_right</span><span class="p">,</span> <span class="n">rules</span><span class="o">=</span><span class="n">rules</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[(</span><span class="n">h</span><span class="o">.</span><span class="n">left_object</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">h</span><span class="o">.</span><span class="n">right_object</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">h</span><span class="o">.</span><span class="n">aspect</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">hits</span><span class="p">]</span>
+<span class="go">[('sun', 'sun', 'conjunction')]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span><span class="o">.</span><span class="n">chart_left</span> <span class="ow">is</span> <span class="n">chart_left</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">chart_right</span> <span class="ow">is</span> <span class="n">chart_right</span>
+<span class="go">(True, True)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span><span class="o">.</span><span class="n">chart_left</span><span class="o">.</span><span class="n">resolved</span><span class="o">.</span><span class="n">utc</span><span class="o">.</span><span class="n">year</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">chart_right</span><span class="o">.</span><span class="n">resolved</span><span class="o">.</span><span class="n">utc</span><span class="o">.</span><span class="n">year</span>
+<span class="go">(2003, 2004)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hit</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">hits</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">abs</span><span class="p">(</span><span class="n">hit</span><span class="o">.</span><span class="n">deviation_deg</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">hit</span><span class="o">.</span><span class="n">orb_limit_deg</span> <span class="o">==</span> <span class="mi">3</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">result.chart_left</span></code> 与 <code class="docutils literal notranslate"><span class="pre">result.chart_right</span></code> 保留两张完整源盘，包括原始／已解析出生输入、位置、
+请求／实际配置及来源。<code class="docutils literal notranslate"><span class="pre">rules</span></code> 和 <code class="docutils literal notranslate"><span class="pre">combination</span></code> 保存本次比较请求；不继承任一盘的本命规则或参与对象。</p>
+</section>
+<section id="id3">
+<h2>选择配对与容许度<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">left_objects</span></code> 与 <code class="docutils literal notranslate"><span class="pre">right_objects</span></code> 分别选择两侧对象。<code class="docutils literal notranslate"><span class="pre">None</span></code> 选该侧全部位置，即使其本命相位只用了
+较小的子集。参与者按源盘的位置顺序排列，不按选择参数的顺序排列。
+每个所选左对象都与每个所选右对象配对，包括同名对象，以及左侧每个所选交点标识与右侧每个所选交点标识的配对。
+也允许同一张盘占两个角色。这些是项目的几何选择，不是传统解读。
+<a class="reference internal" href="aspects.html#id6"><span class="std std-ref">单盘交点排除规则</span></a>保持不变。</p>
+<p>对象容许度覆盖仍以 <code class="docutils literal notranslate"><span class="pre">Body</span></code> 或 <code class="docutils literal notranslate"><span class="pre">LunarNode</span></code> 标识作用于两侧。太阳覆盖同时作用于两颗太阳，不提供
+左太阳／右太阳分别设值的机制。覆盖必须指向至少一侧的所选对象。
+只要某条规则有覆盖，就必须选择 <code class="docutils literal notranslate"><span class="pre">OrbCombination</span></code>；没有覆盖时，<code class="docutils literal notranslate"><span class="pre">combination</span></code> 须为 <code class="docutils literal notranslate"><span class="pre">None</span></code>。
+<a class="reference internal" href="aspects.html#id5"><span class="std std-ref">三种合成方式</span></a>和包含等号的上限，沿用本命配对的算术。</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">own_sun</span> <span class="o">=</span> <span class="p">[</span><span class="n">AspectRule</span><span class="p">(</span><span class="n">MajorAspect</span><span class="o">.</span><span class="n">CONJUNCTION</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">[</span><span class="n">ObjectOrb</span><span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">SUN</span><span class="p">,</span> <span class="mi">5</span><span class="p">)])]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">adjusted</span> <span class="o">=</span> <span class="n">cross_chart_aspects</span><span class="p">(</span><span class="n">chart_left</span><span class="p">,</span> <span class="n">chart_right</span><span class="p">,</span> <span class="n">own_sun</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">combination</span><span class="o">=</span><span class="n">OrbCombination</span><span class="o">.</span><span class="n">MEAN_OF_ORBS</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">adjusted</span><span class="o">.</span><span class="n">hits</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">orb_limit_deg</span>
+<span class="go">5.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cross_chart_aspects</span><span class="p">(</span><span class="n">chart_left</span><span class="p">,</span> <span class="n">chart_right</span><span class="p">,</span> <span class="n">rules</span><span class="p">,</span> <span class="n">left_objects</span><span class="o">=</span><span class="p">[])</span><span class="o">.</span><span class="n">hits</span>
+<span class="go">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cross_chart_aspects</span><span class="p">(</span><span class="n">chart_left</span><span class="p">,</span> <span class="n">chart_right</span><span class="p">,</span> <span class="p">())</span><span class="o">.</span><span class="n">rules</span>
+<span class="go">()</span>
+</pre></div>
+</div>
+<p>空选择、空规则和没有匹配都会得到空命中，可从结果里的选择与规则区分。
+以下请求即使没有配对也会抛出 <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>：同一侧选择里重复的参与对象、源盘没有的对象、重复相位标识、
+指向未选对象的覆盖、无覆盖却给合成方式，以及有覆盖却未给合成方式。
+调用方序列会复制为不可变元组。</p>
+</section>
+<section id="id4">
+<h2>读取静态几何<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h2>
+<p>每条命中包含 <code class="docutils literal notranslate"><span class="pre">left_object</span></code>、<code class="docutils literal notranslate"><span class="pre">right_object</span></code>、<code class="docutils literal notranslate"><span class="pre">aspect</span></code>、<code class="docutils literal notranslate"><span class="pre">branch_deg</span></code>、<code class="docutils literal notranslate"><span class="pre">deviation_deg</span></code> 与
+<code class="docutils literal notranslate"><span class="pre">orb_limit_deg</span></code>。<a class="reference internal" href="aspects.html#id3"><span class="std std-ref">分支与偏差的定义</span></a>不变，单位为度。
+返回所有匹配分支，按左位置、右位置、相位角升序及负分支在前排序。宽容许度可能让同一配对符合多个相位
+或两个分支；不会只留最近的一个，也不按显示精度舍入后再判断。</p>
+<p>不设运动字段，也不标入相／离相。两次出生时刻的速率不能描述共同的时间演化。
+偏差为零仍表示静态几何恰好精确，不预测之后的事件。</p>
+<p>源盘须使用相同的黄道、中心及位置坐标约定，不一致时抛出 <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>。当前公开构造器只接纳一种约定：
+热带地心位置，以各盘自身日期的真黄道和
+真春分点为基准。因此，不同日期的春分点基准不同：命中比较的是存储的黄经值，不是两个位置在同一时刻的夹角。
+不转换共同历元。
+不同日期、地点、宫制、模型及软件标签均保留，不因此自动拒绝。
+构造时按来源、选择和规则重算全部命中，拒绝任何差异，不认证所提供天文值或来源标签是否真实。</p>
+<p>Composite／Davison、宫位叠加、行运搜索及解读不属于此 API；不提供独立文本格式化入口。</p>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">celestial-astrology</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../en/index.html">Documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">文档入口</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../README.zh-CN.html">celestial-astrology</a></li>
+<li class="toctree-l2"><a class="reference internal" href="birth.html">出生记录与现代时刻解析</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html">排盘请求配置</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chart.html">本命盘</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aspects.html">相位</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">静态双盘交叉相位</a></li>
+<li class="toctree-l2"><a class="reference internal" href="records.html">命盘结果与文本显示</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference.html">公开 API 参考</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html">仓库结构与计算边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="knowledge.html">知识组织与双语文档</a></li>
+<li class="toctree-l2"><a class="reference internal" href="catalog.html">知识目录参考</a></li>
+<li class="toctree-l2"><a class="reference internal" href="releases.html">发行说明</a></li>
+<li class="toctree-l2"><a class="reference internal" href="releasing.html">发行流程</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html">参与开发</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">文档入口</a><ul>
+      <li>Previous: <a href="aspects.html" title="previous chapter">相位</a></li>
+      <li>Next: <a href="records.html" title="next chapter">命盘结果与文本显示</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 9.1.0</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../../_sources/docs/zh-CN/cross_aspects.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

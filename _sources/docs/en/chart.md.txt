@@ -56,8 +56,8 @@ values. The adapter fixes the ΔT model; it is not a caller request, and the
 result names it anyway.
 
 The result also keeps the actual input in `chart.resolved` and the astrology
-package version in `chart.provenance.astrology_version`. See the [record guide](records.md)
-for storage, restoration, replay and bilingual text output.
+package version in `chart.provenance.astrology_version`. See the [result guide](records.md)
+for structured results and bilingual text output.
 
 ```{doctest}
 >>> chart.effective.delta_t_model
@@ -245,7 +245,7 @@ can and cannot detect.
 
 Separate complete-chart cases compare against Swiss states, rates and all twelve
 cusps, with independent derived placements/aspects. Their conventions, tolerances
-and limits are in the [record guide](records.md#verification-and-limits).
+and limits are in the [result guide](records.md#verification-and-limits).
 
 ## Limits
 

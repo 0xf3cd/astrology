@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Repository structure and calculation boundaries &#8212; celestial-astrology 0.1.0 documentation / 文档</title>
+    <title>Repository structure and calculation boundaries &#8212; celestial-astrology 0.2.0 documentation / 文档</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
-    <script src="../../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../../_static/documentation_options.js?v=938c9ccc"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/en/architecture.html" />
@@ -38,9 +38,10 @@
 <h1>Repository structure and calculation boundaries<a class="headerlink" href="#repository-structure-and-calculation-boundaries" title="Link to this heading">¶</a></h1>
 <p><a class="reference internal" href="../zh-CN/architecture.html"><span class="std std-doc">简体中文</span></a> · <a class="reference internal" href="../../README.html"><span class="std std-doc">Project</span></a> · <a class="reference internal" href="knowledge.html"><span class="std std-doc">Knowledge</span></a></p>
 <p>Birth records, modern time resolution, requested configuration, the tropical
-natal chart, major aspects, chart records/text and independent knowledge are implemented; their
+natal chart, major aspects, text output and independent knowledge are implemented; their
 usage and constraints are in the <a class="reference internal" href="birth.html"><span class="std std-doc">birth</span></a>, <a class="reference internal" href="configuration.html"><span class="std std-doc">configuration</span></a>,
-<a class="reference internal" href="chart.html"><span class="std std-doc">chart</span></a>, <a class="reference internal" href="aspects.html"><span class="std std-doc">aspect</span></a>, <a class="reference internal" href="records.html"><span class="std std-doc">record</span></a> and <a class="reference internal" href="knowledge.html"><span class="std std-doc">knowledge</span></a> guides.
+<a class="reference internal" href="chart.html"><span class="std std-doc">chart</span></a>, <a class="reference internal" href="aspects.html"><span class="std std-doc">aspect</span></a>, <a class="reference internal" href="cross_aspects.html"><span class="std std-doc">cross-chart</span></a>, <a class="reference internal" href="records.html"><span class="std std-doc">result</span></a>
+and <a class="reference internal" href="knowledge.html"><span class="std std-doc">knowledge</span></a> guides.
 The current chart is
 a reproducible modern tropical, geocentric natal chart, with independent access
 to its underlying knowledge.</p>
@@ -56,8 +57,8 @@ arrives; a name in this map does not require an empty package or an extra layer.
   houses.py         House-placement rules over supplied geometry
   aspects.py        Aspect definitions, orbs, and local motion
   chart.py          Composition and immutable chart results
-  serialization.py  Versioned records and restoration
-  text.py           Stored-result tables with supplied vocabulary
+  cross_aspects.py  Static comparison of supplied charts, retaining both sources
+  text.py           Result tables with supplied vocabulary
   knowledge/        Concepts, sources, entries, and independent queries
 tests/              Domain tests and installed-consumer tests
 docs/en/            English guides and explanations
@@ -68,6 +69,9 @@ docs/zh-CN/         Matching Chinese guides and explanations
 the success contract of a complete chart; it does not become the owner of every
 shared definition. Common values move to a shared module only when actual users
 need them. Package imports and knowledge queries must not initialize celestial.</p>
+<p><code class="docutils literal notranslate"><span class="pre">cross_aspects.py</span></code> composes existing chart results without astronomy. Shared
+angular/orb arithmetic remains in <code class="docutils literal notranslate"><span class="pre">aspects.py</span></code>; single-chart pair eligibility
+and local motion stay with <code class="docutils literal notranslate"><span class="pre">find_aspects</span></code>, separate from static cross pairing.</p>
 <p>Knowledge and calculation remain connected by stable identifiers, described in
 <a class="reference internal" href="knowledge.html"><span class="std std-doc">Knowledge organization</span></a>. Additional UI applications can consume
 the result later without moving calculation into a frontend.</p>
@@ -137,11 +141,10 @@ fallbacks.</p>
 <p>Retain input and resolved configuration, actual models and versions, TT/UT1
 values, raw astronomy, and derived results. Defaults must resolve to named
 choices before being recorded.</p>
-<p>Stored-result restoration preserves a record without native astronomy; constructor
-checks verify pure derived-value consistency, not the claimed astronomical origin.
-Recomputation evaluates the recorded UTC and request after version/model checks,
-without re-resolving timezones. Schema v1 and these distinct compatibility rules
-are described in the <a class="reference internal" href="records.html"><span class="std std-doc">record guide</span></a>.</p>
+<p>Results remain in memory; constructor checks verify pure derived-value consistency,
+not the claimed astronomical origin. A new natal calculation uses resolved UTC
+and the requested configuration without re-resolving timezones. Structured results,
+provenance and text output are described in the <a class="reference internal" href="records.html"><span class="std std-doc">result guide</span></a>.</p>
 <p>Numerical agreement with celestial checks composition. Independent cases check
 the complete result under matched conventions. Tests must exercise timezone
 ambiguities, wrap, cusp ownership, rounding carry, retrograde motion, exact
@@ -150,7 +153,7 @@ aspects, and undefined house geometry.</p>
 <section id="delivery-order">
 <h2>Delivery order<a class="headerlink" href="#delivery-order" title="Link to this heading">¶</a></h2>
 <p>Birth/configuration values, the independent knowledge catalog, the tropical
-natal chart, major aspects, versioned records and text output are implemented,
+natal chart, major aspects and text output are implemented,
 with bilingual documentation and installed-package verification.</p>
 <p>The <a class="reference external" href="https://github.com/0xf3cd/astrology/milestone/1">v0.1.0 milestone</a> owns task
 status. The source layout can evolve as these concrete implementations reveal
@@ -191,7 +194,8 @@ shared needs; a general backend/plugin framework is not a prerequisite.</p>
 <li class="toctree-l2"><a class="reference internal" href="configuration.html">Requested chart configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="chart.html">Natal charts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="aspects.html">Aspects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="records.html">Save, restore, replay and inspect a chart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cross_aspects.html">Static cross-chart aspects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="records.html">Chart results and text</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference.html">Public API reference</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Repository structure and calculation boundaries</a></li>
 <li class="toctree-l2"><a class="reference internal" href="knowledge.html">Knowledge organization and bilingual documentation</a></li>

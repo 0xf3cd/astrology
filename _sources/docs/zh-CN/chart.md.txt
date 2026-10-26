@@ -64,7 +64,7 @@
 ```
 
 结果还在 `chart.resolved` 中保留实际输入，在 `chart.provenance.astrology_version` 中记录
-astrology 包版本。保存、恢复、重算及双语文本输出见[记录指南](records.md)。
+astrology 包版本。结构化结果与双语文本输出见[结果指南](records.md)。
 
 `position_frame` 说明这些值是瞬时真黄道、真春分点上的地心视位置。
 `ut1_derivation` 说明 UT1 由民用 UTC 经 ΔT 模型推得，不是观测的 DUT1。
@@ -224,7 +224,7 @@ Meeus 第 47 章公式，闰秒关系 `JDE(TT) - JD(UTC)` 精确成立。各条�
 哪些缺陷见[参与开发](contributing.md#正确性)。
 
 另有完整盘例与 Swiss 的位置、速率及全部十二宫头比较，归属及相位由独立算术推导。
-其约定、容差和限度见[记录指南](records.md#验证与限度)。
+其约定、容差和限度见[结果指南](records.md#验证与限度)。
 
 ## 限度
 

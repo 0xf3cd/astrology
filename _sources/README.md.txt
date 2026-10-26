@@ -8,12 +8,18 @@ keeps astrological rules, their sources, and their variants in this repository.
 
 The package provides immutable [birth records and modern time
 resolution](https://0xf3cd.github.io/astrology/docs/en/birth.html), [requested chart configuration](https://0xf3cd.github.io/astrology/docs/en/configuration.html),
-[tropical natal chart calculation](https://0xf3cd.github.io/astrology/docs/en/chart.html), [chart records and text output](https://0xf3cd.github.io/astrology/docs/en/records.html), an independent
+[tropical natal chart calculation](https://0xf3cd.github.io/astrology/docs/en/chart.html), [chart results and text output](https://0xf3cd.github.io/astrology/docs/en/records.html), an independent
 [knowledge catalog](https://0xf3cd.github.io/astrology/docs/en/knowledge.html), quality checks, and bilingual
-[API documentation](https://0xf3cd.github.io/astrology/docs/en/reference.html). The astronomy library is imported only
-when calculation or replay is requested, so importing the package or querying knowledge never
-initializes it.
+[API documentation](https://0xf3cd.github.io/astrology/docs/en/reference.html).
 See [Contributing](https://0xf3cd.github.io/astrology/docs/en/contributing.html) to run the checks.
+
+New in 0.2.0 (in development):
+
+- [Static cross-chart aspects](https://0xf3cd.github.io/astrology/docs/en/cross_aspects.html)
+  between two natal charts, retaining both source charts and distinct left/right
+  objects, without applying/separating labels.
+- `ashmand_sign_group(Sign.ARIES)` queries the twelve signs' four groups in
+  Ashmand's 1822 edition. See [the source and lookup example](https://0xf3cd.github.io/astrology/docs/en/knowledge.html#ashmand-1822-sign-groups).
 
 Installation follows the astronomy dependency: celestial-calendar 0.8.0 publishes
 wheels for Linux x86_64 and aarch64, macOS 14+ arm64 and Windows amd64, and no source
@@ -27,18 +33,23 @@ Do not install the unrelated PyPI project named `astrology`.
 
 Use **Python 3.11–3.14** on one of the platforms listed above.
 
+This checkout prepares 0.2.0. To try the candidate now,
+[install from source](https://0xf3cd.github.io/astrology/README.html#install-from-source).
+After 0.2.0 is published on PyPI, use the commands below.
+The examples show output from 0.2.0.
+
 Linux/macOS (replace `python3.14` with your supported Python version):
 
 ```sh
 python3.14 -m venv .venv
-.venv/bin/python -m pip install "celestial-astrology==0.1.0"
+.venv/bin/python -m pip install "celestial-astrology==0.2.0"
 ```
 
 Windows PowerShell:
 
 ```powershell
 py -3.14 -m venv .venv
-.venv\Scripts\python.exe -m pip install "celestial-astrology==0.1.0"
+.venv\Scripts\python.exe -m pip install "celestial-astrology==0.2.0"
 ```
 
 Runtime dependencies remain exactly pinned to `celestial-calendar==0.8.0` and
@@ -110,7 +121,7 @@ for placement in chart.placements:
 Output:
 
 ```text
-0.1.0
+0.2.0
 2000-01-01T12:00:00+00:00
 sun: capricorn
 moon: scorpio
@@ -119,14 +130,13 @@ moon: scorpio
 Unknown time or missing location is rejected, not replaced with noon or an inferred
 place. Undefined requested house geometry raises `ChartDomainError` without a
 fallback. See the [chart guide](https://0xf3cd.github.io/astrology/docs/en/chart.html)
-for admitted domains, and the [record guide](https://0xf3cd.github.io/astrology/docs/en/records.html)
-for save/restore/recompute and bilingual text tables.
+for admitted domains, and the [result guide](https://0xf3cd.github.io/astrology/docs/en/records.html)
+for structured results and bilingual text tables.
 
 ## First knowledge lookup
 
 Save this separate script as `first_knowledge.py` and run it with the same
-virtual-environment Python. It reads the packaged catalog without a chart or
-native astronomy initialization; installation still has the platform limits above.
+virtual-environment Python. This example finds the Sun by name and alias:
 
 ```python
 from astrology import load_catalog
@@ -160,12 +170,13 @@ time and location:
   requested geometry is undefined.
 - Derive signs, two-dimensional house placement (longitude only, without object latitude), and the five major
   aspects with configurable orbs and local applying/separating status.
-- Return immutable structured results, a text table, and a versioned serialization
-  that retains inputs, configuration, astronomical values, and model identities.
+- Return immutable structured results and a text table, retaining inputs,
+  configuration, astronomical values and model identities in memory.
 
-Positions, axes, cusps, signs, house placement, aspects, text output and versioned
-records are implemented. Restoration preserves stored results without native
-astronomy; replay explicitly checks available versions and models.
+Positions, axes, cusps, signs, house placement, aspects and text output are
+implemented. Chart persistence is removed in the current source; see the
+[release notes](https://0xf3cd.github.io/astrology/docs/en/releases.html) for the
+difference from the published v0.1.0 API.
 
 See the [v0.1.0 milestone](https://github.com/0xf3cd/astrology/milestone/1) for
 delivery tasks and acceptance criteria.
@@ -175,11 +186,6 @@ delivery tasks and acceptance criteria.
 - [Repository structure and calculation boundaries](https://0xf3cd.github.io/astrology/docs/en/architecture.html)
 - [Knowledge organization and bilingual documentation](https://0xf3cd.github.io/astrology/docs/en/knowledge.html)
 - [Development and review conventions](https://0xf3cd.github.io/astrology/docs/en/contributing.html)
-
-Knowledge browsing is a first-release goal in its own right: readers should be
-able to find a concept, its rule variants, and its sources without creating a
-chart or loading the native astronomy library. Source status, applicability, and
-display eligibility are recorded separately.
 
 Project guides and public reference documentation are provided in Chinese and
 English. Both languages refer to the same identifiers, executable rules, and

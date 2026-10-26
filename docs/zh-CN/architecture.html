@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>仓库结构与计算边界 &#8212; celestial-astrology 0.1.0 documentation / 文档</title>
+    <title>仓库结构与计算边界 &#8212; celestial-astrology 0.2.0 documentation / 文档</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
-    <script src="../../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../../_static/documentation_options.js?v=938c9ccc"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/zh-CN/architecture.html" />
@@ -37,9 +37,9 @@
   <section id="id1">
 <h1>仓库结构与计算边界<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h1>
 <p><a class="reference internal" href="../en/architecture.html"><span class="std std-doc">English</span></a> · <a class="reference internal" href="../../README.zh-CN.html"><span class="std std-doc">项目入口</span></a> · <a class="reference internal" href="knowledge.html"><span class="std std-doc">知识组织</span></a></p>
-<p>出生记录、现代时刻解析、请求配置、热带本命盘、主要相位、命盘记录与文本及独立知识已实现，用法和约束见<a class="reference internal" href="birth.html"><span class="std std-doc">出生</span></a>、
+<p>出生记录、现代时刻解析、请求配置、热带本命盘、主要相位、文本及独立知识已实现，用法和约束见<a class="reference internal" href="birth.html"><span class="std std-doc">出生</span></a>、
 <a class="reference internal" href="configuration.html"><span class="std std-doc">配置</span></a>、<a class="reference internal" href="chart.html"><span class="std std-doc">排盘</span></a>、<a class="reference internal" href="aspects.html"><span class="std std-doc">相位</span></a>、
-<a class="reference internal" href="records.html"><span class="std std-doc">记录</span></a>及<a class="reference internal" href="knowledge.html"><span class="std std-doc">知识</span></a>指南。
+<a class="reference internal" href="records.html"><span class="std std-doc">结果</span></a>及<a class="reference internal" href="knowledge.html"><span class="std std-doc">知识</span></a>指南；另可<a class="reference internal" href="cross_aspects.html"><span class="std std-doc">静态比较两张源盘的交叉相位</span></a>。
 当前命盘是可复现的现代热带黄道、地心本命盘，
 并能独立查阅排盘所依据的知识。</p>
 <section id="id2">
@@ -53,8 +53,8 @@
   houses.py         基于给定宫位几何的落宫规则
   aspects.py        相位定义、容许度与局部运动
   chart.py          组合与不可变命盘结果
-  serialization.py  带版本的记录与恢复
-  text.py           用传入词汇显示存储结果表格
+  cross_aspects.py  静态比较给定命盘，保留双侧来源
+  text.py           用传入词汇显示结果表格
   knowledge/        概念、来源、条目及独立查询
 tests/              领域测试与真实安装消费测试
 docs/en/            英文指南与说明
@@ -63,6 +63,8 @@ docs/zh-CN/         对应的中文指南与说明
 </div>
 <p>可执行定义归各自领域模块。<code class="docutils literal notranslate"><span class="pre">chart.py</span></code> 负责组合及完整命盘的成功条件，不收容所有共享定义。
 有真实共同使用方时才提取共享值模块。包导入与知识查询不得初始化 celestial。</p>
+<p><code class="docutils literal notranslate"><span class="pre">cross_aspects.py</span></code> 组合已有命盘结果，不调用天文库。共享角度／容许度算术仍归 <code class="docutils literal notranslate"><span class="pre">aspects.py</span></code>；
+单盘配对准入及局部运动仍由 <code class="docutils literal notranslate"><span class="pre">find_aspects</span></code> 负责，与静态双盘配对分开。</p>
 <p>知识与计算通过稳定标识关联，见<a class="reference internal" href="knowledge.html"><span class="std std-doc">知识组织</span></a>。后续界面应用消费已有结果，
 不必把计算搬到前端。</p>
 </section>
@@ -117,15 +119,15 @@ Equal 和 Whole Sign 同样保留上游对四轴无定义情形的限制，不�
 <h2>可复现性<a class="headerlink" href="#id6" title="Link to this heading">¶</a></h2>
 <p>保存原始输入、已解析配置、实际模型与版本、TT／UT1、天文原值及派生结果。
 默认配置先解析成具名选择，再进入记录。</p>
-<p>恢复保存存储值，不调用原生天文库；构造检查核对纯推导结果的一致性，不认证所称的天文来源。
-重算在检查版本和模型后，按记录中的 UTC 与请求再次求值，不重新解析时区。
-结构版本 v1 及两种不同的兼容规则见<a class="reference internal" href="records.html"><span class="std std-doc">记录指南</span></a>。</p>
+<p>结果保留在内存中；构造检查核对纯推导结果的一致性，不认证所称的天文来源。
+再次排盘使用已解析 UTC 与请求配置，不重新解析时区。
+结构化结果、来源及文本输出见<a class="reference internal" href="records.html"><span class="std std-doc">结果指南</span></a>。</p>
 <p>与 celestial 一致检验组合；同口径独立盘例检验完整结果。测试覆盖时区歧义、角度回绕、宫头归属、
 显示进位、逆行、精确相位与宫位无定义情形。</p>
 </section>
 <section id="id7">
 <h2>交付顺序<a class="headerlink" href="#id7" title="Link to this heading">¶</a></h2>
-<p>出生／配置值、独立知识目录、热带本命盘、主要相位、带版本记录及文本输出已实现，
+<p>出生／配置值、独立知识目录、热带本命盘、主要相位及文本输出已实现，
 并配有双语文档与安装包验收。</p>
 <p>任务状态归 <a class="reference external" href="https://github.com/0xf3cd/astrology/milestone/1">v0.1.0 milestone</a>。
 包结构随实际实现中出现的共用关系调整，不以通用后端／插件框架为前置。</p>
@@ -166,7 +168,8 @@ Equal 和 Whole Sign 同样保留上游对四轴无定义情形的限制，不�
 <li class="toctree-l2"><a class="reference internal" href="configuration.html">排盘请求配置</a></li>
 <li class="toctree-l2"><a class="reference internal" href="chart.html">本命盘</a></li>
 <li class="toctree-l2"><a class="reference internal" href="aspects.html">相位</a></li>
-<li class="toctree-l2"><a class="reference internal" href="records.html">保存、恢复、重算和查看命盘</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cross_aspects.html">静态双盘交叉相位</a></li>
+<li class="toctree-l2"><a class="reference internal" href="records.html">命盘结果与文本显示</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference.html">公开 API 参考</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">仓库结构与计算边界</a></li>
 <li class="toctree-l2"><a class="reference internal" href="knowledge.html">知识组织与双语文档</a></li>

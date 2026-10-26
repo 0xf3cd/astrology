@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Contributing &#8212; celestial-astrology 0.1.0 documentation / 文档</title>
+    <title>Contributing &#8212; celestial-astrology 0.2.0 documentation / 文档</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
-    <script src="../../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../../_static/documentation_options.js?v=938c9ccc"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/en/contributing.html" />
@@ -70,8 +70,8 @@ also run there and import the extracted package sources. The check then validate
 the API/catalog pages, generated search index and query code, and doctest results.</p>
 <p>The installed consumer exercises birth,
 timezone provenance and configuration outside the checkout; its complete-chart,
-restoration, replay and text checks are described in the
-<a class="reference internal" href="records.html#verification-and-limits"><span class="std std-ref">record guide</span></a>. A separate knowledge-only
+raw-result comparison and text checks are described in the
+<a class="reference internal" href="records.html#verification-and-limits"><span class="std std-ref">result guide</span></a>. A separate knowledge-only
 consumer lists, looks up, filters and resolves citations without time/native
 initialization. Both use isolated imports in normal and optimized modes; wheel
 and sdist checks require the actual corpus resources.</p>
@@ -92,7 +92,7 @@ is not sufficient. Do not merge this branch.</p>
 <p>Tool versions are locked in <code class="docutils literal notranslate"><span class="pre">uv.lock</span></code>. Sphinx 8.2.3 serves Python 3.11; Sphinx
 9.1.0 serves newer Python versions. Coverage is reported to locate gaps; it
 cannot certify the astronomy values, which the reference cases do. Tests exercise
-birth/time, chart/configuration, record and text contracts as well as development checks. Add domain
+birth/time, chart/configuration, result and text contracts as well as development checks. Add domain
 tests with each feature.</p>
 <p>For local formatting, run <code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">run</span> <span class="pre">ruff</span> <span class="pre">format</span> <span class="pre">.</span></code>. A failed command stops the
 check run; fix its cause and rerun. Dependency changes must update the lock and
@@ -116,20 +116,20 @@ environments outside <code class="docutils literal notranslate"><span class="pre
 inputs, while sibling directories are not. Warnings in these document sources still
 fail the strict build.</p>
 <p>Install this development package from the checkout using <code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">sync</span></code> above. Its
-distribution name/version is <code class="docutils literal notranslate"><span class="pre">celestial-astrology</span></code> / <code class="docutils literal notranslate"><span class="pre">0.1.0</span></code>; the Python import
+distribution name/version is <code class="docutils literal notranslate"><span class="pre">celestial-astrology</span></code> / <code class="docutils literal notranslate"><span class="pre">0.2.0</span></code>; the Python import
 remains <code class="docutils literal notranslate"><span class="pre">astrology</span></code>. The unrelated
 PyPI project <code class="docutils literal notranslate"><span class="pre">astrology</span></code> is not this library. Confirm the installed identity:</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">importlib.metadata</span><span class="w"> </span><span class="kn">import</span> <span class="n">version</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">version</span><span class="p">(</span><span class="s2">"celestial-astrology"</span><span class="p">)</span>
-<span class="go">'0.1.0'</span>
+<span class="go">'0.2.0'</span>
 </pre></div>
 </div>
 <p>The checks execute both READMEs against an isolated wheel install, compare their
 documented output, inspect the wheel’s actual Markdown links, and resolve both
-language paths against the built site. They also hide each distribution’s metadata
-separately in a disposable install. With metadata hidden they verify unchanged restoration,
-<code class="docutils literal notranslate"><span class="pre">ChartReplayError</span></code> on replay, and <code class="docutils literal notranslate"><span class="pre">PackageNotFoundError</span></code> on direct calculation when project
-metadata is missing. Both Python modes run before the metadata is restored.</p>
+language paths against the built site. They also hide <code class="docutils literal notranslate"><span class="pre">celestial-astrology</span></code> metadata
+in a disposable install. Import and knowledge remain usable; direct calculation
+raises <code class="docutils literal notranslate"><span class="pre">PackageNotFoundError</span></code> naming that distribution. Both Python modes run
+before the metadata is restored.</p>
 <p>For manual Pages delivery, build from a clean committed checkout and set
 <code class="docutils literal notranslate"><span class="pre">ASTROLOGY_DOCS_SOURCE_SHA</span></code> to its full lowercase commit SHA. The root page then
 renders that source archive and its install command; an ordinary local build is
@@ -146,7 +146,7 @@ intersphinx inventory require network access.</p>
 <p>Use immutable values for inputs, configuration, rules, and results. A frozen
 dataclass still permits mutations inside a list or dictionary: store immutable
 members or copy and isolate mutable input at the boundary. A caller changing its
-input after construction must not change a stored chart.</p>
+input after construction must not change the chart result.</p>
 <p>Prefer ordinary functions with explicit arguments and return values. Keep file
 access, native initialization, network calls, and caches visible at their owning
 boundary. Importing the package or reading knowledge must not calculate a chart.</p>
@@ -164,8 +164,8 @@ silent substitutions, and factories whose return type depends on hidden state.</
 time ambiguity, coordinate wrap, exact endpoints, missing information, and
 unsupported combinations. Public validation must still run under <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-O</span></code>.</p>
 <p>Record the source, model/version, time scale, coordinate convention, configuration,
-units, and tolerance with numerical fixtures. A round trip tests preservation;
-recomputation tests execution; an independent source tests agreement. Shared
+units, and tolerance with numerical fixtures. Source/install comparisons test
+packaging agreement; an independent source tests numerical agreement. Shared
 formulas or copied datasets can make apparently independent checks agree on the
 same mistake. Explain why a reference can detect the defect being tested.</p>
 <p>Use synthetic examples or sources that can be redistributed. Keep astronomical
@@ -243,8 +243,17 @@ and the style page gives parameters, not the aspect list of a chart.</p>
 <p>The separate Swiss complete-chart fixture adds independent rates and all house
 cusps, plus separately derived placements, aspects and motion for four synthetic
 instants. All five aspect identities occur. Its case-specific tolerances and source
-limits are documented in the <a class="reference internal" href="records.html#verification-and-limits"><span class="std std-ref">record guide</span></a>.
-The stored development record tests replay separately; it is not external evidence.</p>
+limits are documented in the <a class="reference internal" href="records.html#verification-and-limits"><span class="std std-ref">result guide</span></a>.
+The project-calculated numeric regression samples are not external evidence.
+Keep their original numbers and extraction provenance when changing pure rules
+or dependencies. Current provenance and numerical regression are distinct:
+a version-only change must not prevent numerical comparison. A changed model
+needs an explicit comparison policy.</p>
+<p>Demonstrate that a regression test accepts valid input and rejects the defect it
+targets. A version-label change alone must pass numerical regression; an internally
+valid numerical change beyond tolerance must fail at the numerical assertion.
+Record the changed input or implementation, actual exit code and failure location
+in the PR. A constructor or import failure does not demonstrate a numerical check.</p>
 </section>
 <section id="knowledge-and-documentation">
 <h2>Knowledge and documentation<a class="headerlink" href="#knowledge-and-documentation" title="Link to this heading">¶</a></h2>
@@ -336,7 +345,8 @@ incomplete evidence; verification of this repository’s merge policy is tracked
 <li class="toctree-l2"><a class="reference internal" href="configuration.html">Requested chart configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="chart.html">Natal charts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="aspects.html">Aspects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="records.html">Save, restore, replay and inspect a chart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cross_aspects.html">Static cross-chart aspects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="records.html">Chart results and text</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference.html">Public API reference</a></li>
 <li class="toctree-l2"><a class="reference internal" href="architecture.html">Repository structure and calculation boundaries</a></li>
 <li class="toctree-l2"><a class="reference internal" href="knowledge.html">Knowledge organization and bilingual documentation</a></li>

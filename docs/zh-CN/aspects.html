@@ -5,17 +5,17 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>相位 &#8212; celestial-astrology 0.1.0 documentation / 文档</title>
+    <title>相位 &#8212; celestial-astrology 0.2.0 documentation / 文档</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
-    <script src="../../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../../_static/documentation_options.js?v=938c9ccc"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/zh-CN/aspects.html" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="保存、恢复、重算和查看命盘" href="records.html" />
+    <link rel="next" title="静态双盘交叉相位" href="cross_aspects.html" />
     <link rel="prev" title="本命盘" href="chart.html" />
    
   <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
@@ -40,6 +40,7 @@
 <p><code class="docutils literal notranslate"><span class="pre">find_aspects</span></code> 根据两个对象在同一时刻的黄经和速率，判断它们是否构成五种主要相位。
 每条结果给出用来对照的精确角度、带符号的角度偏差、容许度上限和当前的运动状态。
 容许度全部由调用方给出，没有默认值。<a class="reference internal" href="chart.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">natal_chart</span></code></span></a> 对请求里的相位调用同一个函数。</p>
+<p>比较两张给定命盘时，使用<a class="reference internal" href="cross_aspects.html"><span class="std std-doc">静态交叉相位</span></a>，保留左右归属，不设运动字段。</p>
 <section id="id2">
 <h2>用普通数值判断相位<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">find_aspects</span></code> 不需要命盘，也不调用天文库。传入带黄经（度）和速率（度/日）的对象，再传入
@@ -158,7 +159,7 @@
 </section>
 <section id="id6">
 <h2>选择参与的对象<a class="headerlink" href="#id6" title="Link to this heading">¶</a></h2>
-<p>两个月交点之间不构成相位。四个交点标识只是同一对交点的两种定义和两个方向，所以升交点和降交点
+<p>在此单盘判断中，两个月交点之间不构成相位。四个交点标识只是同一对交点的两种定义和两个方向，所以升交点和降交点
 永远正好相对。月交点可以与天体构成相位。</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">nodes</span> <span class="o">=</span> <span class="p">[</span>
 <span class="gp">... </span>  <span class="n">AspectObject</span><span class="p">(</span><span class="n">LunarNode</span><span class="o">.</span><span class="n">MEAN_ASCENDING</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.05</span><span class="p">),</span>
@@ -225,7 +226,7 @@
 <li><p>运动状态只描述当前时刻，不预测之后会不会达到精确相位，也不表示相位的含义或强度。</p></li>
 <li><p>本库不提供默认容许度。知识目录记录的是本项目的规则，不代表任何流派的容许度选择。</p></li>
 </ul>
-<p>保存、恢复、重算及文本输出见<a class="reference internal" href="records.html"><span class="std std-doc">记录指南</span></a>。</p>
+<p>结构化结果与文本输出见<a class="reference internal" href="records.html"><span class="std std-doc">结果指南</span></a>。</p>
 </section>
 </section>
 
@@ -263,7 +264,8 @@
 <li class="toctree-l2"><a class="reference internal" href="configuration.html">排盘请求配置</a></li>
 <li class="toctree-l2"><a class="reference internal" href="chart.html">本命盘</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">相位</a></li>
-<li class="toctree-l2"><a class="reference internal" href="records.html">保存、恢复、重算和查看命盘</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cross_aspects.html">静态双盘交叉相位</a></li>
+<li class="toctree-l2"><a class="reference internal" href="records.html">命盘结果与文本显示</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference.html">公开 API 参考</a></li>
 <li class="toctree-l2"><a class="reference internal" href="architecture.html">仓库结构与计算边界</a></li>
 <li class="toctree-l2"><a class="reference internal" href="knowledge.html">知识组织与双语文档</a></li>
@@ -281,7 +283,7 @@
   <li><a href="../index.html">Documentation overview</a><ul>
   <li><a href="index.html">文档入口</a><ul>
       <li>Previous: <a href="chart.html" title="previous chapter">本命盘</a></li>
-      <li>Next: <a href="records.html" title="next chapter">保存、恢复、重算和查看命盘</a></li>
+      <li>Next: <a href="cross_aspects.html" title="next chapter">静态双盘交叉相位</a></li>
   </ul></li>
   </ul></li>
 </ul>

@@ -2,6 +2,30 @@
 
 [English](../en/releases.md) · [文档](index.md) · [发行流程](releasing.md)
 
+## 下一版：v0.2.0（未发布）
+
+### 静态双盘交叉相位
+
+`cross_chart_aspects` 用显式规则比较两张内存本命盘结果。`CrossAspectHit` 记录静态几何并区分左右端点，
+`CrossChartAspects` 保留双侧完整来源及比较请求。允许同名对象和交点间跨盘配对，
+不设运动字段，也不转换共同历元。见[双盘指南](cross_aspects.md)。
+
+### Ashmand 1822 年版星座分组
+
+`ashmand_sign_group` 将已有 `Sign` 归入一个 `AshmandSignGroup`：至点、分点、固定或双体星座。
+十二星座的完整分组表、历史命名说明、原文摘录和中文译文见{ref}`知识指南 <ashmand-sign-groups-zh-cn>`。
+
+### 不兼容变化：撤回命盘持久化
+
+下一版删除 `dumps_chart`、`loads_chart`、`recompute_chart`、`ChartRecordError`、
+`ChartReplayError` 及 `astrology.serialization` 模块。命盘保存格式与历史记录兼容政策一并撤回，
+不提供替代格式或兼容壳，包不再读取已保存的命盘 JSON。应用若仍需旧 API，可保留已发布的
+v0.1.0 环境；其标签和制品不变。
+
+用 `natal_chart` 计算，直接使用内存中的不可变 `NatalChart`，用 `format_chart` 显示。
+原始／已解析出生输入、请求／实际配置、天文原值、领域校验和计算来源保留。
+这次删除不改变天文计算、时区政策或依赖钉版。
+
 ## 0.1.0
 
 首版提供现代热带黄道、地心本命盘，以及可独立浏览的中英文知识目录。
@@ -20,7 +44,7 @@
 - 不排盘、不初始化原生天文库的概念、具名规则变体、别名和引用查询。
   来源核验、前提状态、展示资格与命盘适用性分别记录；原引文、译文及本项目撰写的说明各自注明出处。
 
-[排盘](chart.md)、[相位](aspects.md)、[记录](records.md)及[知识](knowledge.md)指南定义本项目采用的约定和收录的语料范围。
+[排盘](chart.md)、[相位](aspects.md)、[v0.1.0 记录](https://github.com/0xf3cd/astrology/blob/6b3293fae94b2f61e89a1d95778464f307c0d373/docs/zh-CN/records.md)及[知识](knowledge.md)指南定义本项目采用的约定和收录的语料范围。
 
 ### 安装与兼容
 
@@ -35,7 +59,7 @@ astrology wheel 的 `any` 平台标签不取消这项限制；仅查知识也需
 schema v1 的恢复不加载天文库，原样保留存储值和来源，包括历史 `0.0.0` 记录。
 重算要求已安装的 astrology／celestial 版本及记录中的模型精确匹配。
 能恢复历史记录，不表示能在 `0.1.0` 下重算；版本或模型不匹配会抛出 `ChartReplayError`。
-详见[记录兼容说明](records.md)。
+详见 [v0.1.0 记录指南](https://github.com/0xf3cd/astrology/blob/6b3293fae94b2f61e89a1d95778464f307c0d373/docs/zh-CN/records.md)。
 
 ### 验证与限制
 

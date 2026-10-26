@@ -8,9 +8,13 @@
 
 本包提供不可变的[出生记录与现代时刻解析](https://0xf3cd.github.io/astrology/docs/zh-CN/birth.html)、
 [排盘请求配置](https://0xf3cd.github.io/astrology/docs/zh-CN/configuration.html)、[热带本命盘计算](https://0xf3cd.github.io/astrology/docs/zh-CN/chart.html)、
-[命盘记录与文本输出](https://0xf3cd.github.io/astrology/docs/zh-CN/records.html)、独立[知识目录](https://0xf3cd.github.io/astrology/docs/zh-CN/knowledge.html)、质量检查和双语 [API 文档](https://0xf3cd.github.io/astrology/docs/zh-CN/reference.html)。
-天文库只在请求排盘或重算时导入，导入本包或查询知识都不会初始化它。
+[命盘结果与文本输出](https://0xf3cd.github.io/astrology/docs/zh-CN/records.html)、独立[知识目录](https://0xf3cd.github.io/astrology/docs/zh-CN/knowledge.html)、质量检查和双语 [API 文档](https://0xf3cd.github.io/astrology/docs/zh-CN/reference.html)。
 运行检查见[参与开发](https://0xf3cd.github.io/astrology/docs/zh-CN/contributing.html)。
+
+0.2.0（开发中）新增：
+
+- 两张本命盘之间的[静态交叉相位](https://0xf3cd.github.io/astrology/docs/zh-CN/cross_aspects.html)，保留两张源盘并区分左右对象，不标入相／离相。
+- 用 `ashmand_sign_group(Sign.ARIES)` 查询十二星座在 Ashmand 1822 年版中的四组归属。见[来源及查询示例](https://0xf3cd.github.io/astrology/docs/zh-CN/knowledge.html#ashmand-sign-groups-zh-cn)。
 
 安装随天文依赖而定：celestial-calendar 0.8.0 只发布 Linux x86_64 与 aarch64、
 macOS 14+ arm64、Windows amd64 的轮子，没有源码分发包。其他平台无法安装本包，
@@ -23,22 +27,27 @@ macOS 14+ arm64、Windows amd64 的轮子，没有源码分发包。其他平台
 
 请在上述支持的平台使用 **Python 3.11–3.14**。
 
+当前源码准备 0.2.0。试用候选版请[从源码安装](https://0xf3cd.github.io/astrology/README.zh-CN.html#install-from-source-zh-cn)。
+0.2.0 发布到 PyPI 后，再使用下面的命令。示例输出对应 0.2.0。
+
 Linux/macOS（可把 `python3.14` 换成其他受支持的 Python 版本）：
 
 ```sh
 python3.14 -m venv .venv
-.venv/bin/python -m pip install "celestial-astrology==0.1.0"
+.venv/bin/python -m pip install "celestial-astrology==0.2.0"
 ```
 
 Windows PowerShell：
 
 ```powershell
 py -3.14 -m venv .venv
-.venv\Scripts\python.exe -m pip install "celestial-astrology==0.1.0"
+.venv\Scripts\python.exe -m pip install "celestial-astrology==0.2.0"
 ```
 
 运行依赖仍精确固定为 `celestial-calendar==0.8.0` 和 `tzdata==2026.5`，
 可能与要求其他版本的应用发生依赖冲突。详见[发行说明](https://0xf3cd.github.io/astrology/docs/zh-CN/releases.html)。
+
+<a id="install-from-source-zh-cn"></a>
 
 ## 从源码安装
 
@@ -102,7 +111,7 @@ for placement in chart.placements:
 输出：
 
 ```text
-0.1.0
+0.2.0
 2000-01-01T12:00:00+00:00
 sun: capricorn
 moon: scorpio
@@ -111,12 +120,12 @@ moon: scorpio
 时间未知或缺少地点时会明确拒绝，不补正午或推测地点；请求的宫几何无定义时抛出
 `ChartDomainError`，不改用另一宫制。
 [排盘指南](https://0xf3cd.github.io/astrology/docs/zh-CN/chart.html)说明支持范围，
-[记录指南](https://0xf3cd.github.io/astrology/docs/zh-CN/records.html)说明存取、重算与双语文本表格。
+[结果指南](https://0xf3cd.github.io/astrology/docs/zh-CN/records.html)说明结构化结果与双语文本表格。
 
 ## 第一次查询知识
 
 把这份独立脚本保存为 `first_knowledge.py`，用同一个虚拟环境的 Python 运行。
-它读取包内目录，不排盘，也不初始化原生天文库；安装仍受上述平台限制。
+下面按名称和别名查找太阳：
 
 ```python
 from astrology import load_catalog
@@ -145,10 +154,10 @@ body.sun
 - 计算太阳、月亮、八颗行星及明确选择的月交点。
 - 支持 Whole Sign（整宫制）、Equal（等宫制）、Placidus；请求的几何无定义时显式失败。
 - 计算星座、二维黄经落宫（只用黄经，不用对象黄纬）、五大相位，以及可配置容许度和局部入相／离相状态。
-- 输出不可变结构、文本表格与带版本的序列化，保留输入、配置、天文原值和模型身份。
+- 输出不可变结构及文本表格，在内存中保留输入、配置、天文原值和模型身份。
 
-位置、四轴、宫头、星座、落宫、相位、文本输出及带版本的记录已实现。
-恢复保留存储值，不调用原生天文库；重算则显式检查版本和模型是否可用。
+位置、四轴、宫头、星座、落宫、相位及文本输出已实现。当前源码已撤回命盘持久化；
+与已发布 v0.1.0 API 的差异见[发行说明](https://0xf3cd.github.io/astrology/docs/zh-CN/releases.html)。
 
 交付任务与验收见 [v0.1.0 milestone](https://github.com/0xf3cd/astrology/milestone/1)。
 
@@ -157,9 +166,6 @@ body.sun
 - [仓库结构与计算边界](https://0xf3cd.github.io/astrology/docs/zh-CN/architecture.html)
 - [知识组织与双语文档](https://0xf3cd.github.io/astrology/docs/zh-CN/knowledge.html)
 - [开发与审阅约定](https://0xf3cd.github.io/astrology/docs/zh-CN/contributing.html)
-
-首版也要支持独立查知识：无需先排盘或加载原生天文库，就能找到概念、规则变体和出处。
-来源状态、适用前提和展示资格分别记录。
 
 项目指南与公开参考文档提供中英文。两种语言引用同一组标识、可执行规则和来源记录。
 引文保留原文语言，译文单独标明。

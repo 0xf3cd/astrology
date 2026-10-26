@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Knowledge catalog reference &#8212; celestial-astrology 0.1.0 documentation / 文档</title>
+    <title>Knowledge catalog reference &#8212; celestial-astrology 0.2.0 documentation / 文档</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
-    <script src="../../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../../_static/documentation_options.js?v=938c9ccc"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/en/catalog.html" />
@@ -40,13 +40,14 @@
 <p>This catalog is generated at documentation build time from the packaged
 records. All admitted concepts, variants, editions and entries appear below.
 Configuration links identify implemented <strong>request values</strong>, not astronomical
-algorithms. The historical variant has no executable implementation.</p>
+algorithms. The Ashmand 1822 table reads the executable sign-group definition;
+its historical evidence and limits remain distinct from chart applicability.</p>
 <p>The <a class="reference internal" href="knowledge.html"><span class="std std-doc">knowledge guide</span></a> explains queries, source scope, translation
 revisions and search limits. Original excerpts, project translations and authored
 statements are labeled separately. Retrieval never establishes chart applicability.
 The guide explains the <a class="reference internal" href="knowledge.html#status-has-several-dimensions"><span class="std std-ref">source, prerequisite, output and chart states</span></a>
 and <a class="reference internal" href="knowledge.html#translation-revisions-and-search"><span class="std std-ref">translation revisions</span></a> shown below.</p>
-<p><code class="docutils literal notranslate"><span class="pre">code=0.1.0</span></code> · <code class="docutils literal notranslate"><span class="pre">corpus=2026.10.21.1</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">code=0.2.0</span></code> · <code class="docutils literal notranslate"><span class="pre">corpus=2026.10.25.10</span></code></p>
 <section id="body-sun-sun">
 <span id="catalog-en-body-sun"></span><h2>body.sun · Sun<a class="headerlink" href="#body-sun-sun" title="Link to this heading">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">kind=body</span></code></p>
@@ -334,6 +335,34 @@ and <a class="reference internal" href="knowledge.html#translation-revisions-and
 <p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.config.MajorAspect.OPPOSITION</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">opposition</span></code></p>
 <p>Exact angle / 精确角度：180°</p>
 </section>
+<section id="sign-group-ashmand1822-tropical-tropical-signs">
+<span id="catalog-en-sign-group-ashmand1822-tropical"></span><h2>sign_group.ashmand1822.tropical · Tropical signs<a class="headerlink" href="#sign-group-ashmand1822-tropical-tropical-signs" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=sign_group</span></code></p>
+<p>The solstitial group in Ashmand 1822. Tropical here names this group, not the whole tropical zodiac. Membership is defined by astrology.zodiac.ashmand_sign_group.</p>
+<p>English names / 英文名称：Tropical signs</p>
+<p>Chinese names / 中文名称：至点星座</p>
+</section>
+<section id="sign-group-ashmand1822-equinoctial-equinoctial-signs">
+<span id="catalog-en-sign-group-ashmand1822-equinoctial"></span><h2>sign_group.ashmand1822.equinoctial · Equinoctial signs<a class="headerlink" href="#sign-group-ashmand1822-equinoctial-equinoctial-signs" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=sign_group</span></code></p>
+<p>The equinoctial group in Ashmand 1822. The source’s equal-day/night rationale is historical, not an observed daylight guarantee. Membership is defined by astrology.zodiac.ashmand_sign_group.</p>
+<p>English names / 英文名称：Equinoctial signs</p>
+<p>Chinese names / 中文名称：分点星座</p>
+</section>
+<section id="sign-group-ashmand1822-fixed-fixed-signs">
+<span id="catalog-en-sign-group-ashmand1822-fixed"></span><h2>sign_group.ashmand1822.fixed · Fixed signs<a class="headerlink" href="#sign-group-ashmand1822-fixed-fixed-signs" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=sign_group</span></code></p>
+<p>The group immediately following the tropical and equinoctial signs in zodiac order in Ashmand 1822. The expanded membership is derived from that ordering, not a verbatim list. Membership is defined by astrology.zodiac.ashmand_sign_group.</p>
+<p>English names / 英文名称：Fixed signs</p>
+<p>Chinese names / 中文名称：固定星座</p>
+</section>
+<section id="sign-group-ashmand1822-bicorporeal-bicorporeal-signs">
+<span id="catalog-en-sign-group-ashmand1822-bicorporeal"></span><h2>sign_group.ashmand1822.bicorporeal · Bicorporeal signs<a class="headerlink" href="#sign-group-ashmand1822-bicorporeal-bicorporeal-signs" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">kind=sign_group</span></code></p>
+<p>The group immediately following the fixed signs in zodiac order in Ashmand 1822. The expanded membership is derived from that ordering. The label supplies no temperament score or interpretation. Membership is defined by astrology.zodiac.ashmand_sign_group.</p>
+<p>English names / 英文名称：Bicorporeal signs</p>
+<p>Chinese names / 中文名称：双体星座</p>
+</section>
 <section id="rule-house-whole-sign-whole-sign">
 <span id="catalog-en-rule-house-whole-sign"></span><h2>rule.house.whole_sign · Whole Sign<a class="headerlink" href="#rule-house-whole-sign-whole-sign" title="Link to this heading">¶</a></h2>
 <p>The chart adapter selects celestial-calendar’s WHOLE_SIGN geometry explicitly, then assigns longitudes to its supplied cusps using rule.project.cusp_ownership. The Ascendant need not coincide with the first cusp.</p>
@@ -423,7 +452,7 @@ and <a class="reference internal" href="knowledge.html#translation-revisions-and
 <span id="catalog-en-rule-project-tropical-sign-sectors"></span><h2>rule.project.tropical_sign_sectors · Tropical sign sectors<a class="headerlink" href="#rule-project-tropical-sign-sectors-tropical-sign-sectors" title="Link to this heading">¶</a></h2>
 <p>The tropical zodiac divides ecliptic longitude into twelve half-open 30-degree sectors; a longitude exactly on a sector boundary belongs to the higher sign.</p>
 <p>Project convention for the tropical zodiac; it is not a claim about the constellations or about historical sign division.</p>
-<p>Applies to tropical longitudes only. The sidereal zodiac and the historical groupings in this catalog are not implemented.</p>
+<p>Applies to tropical longitudes only; the sidereal zodiac is not implemented. Historical grouping over Sign values is separate in rule.ptolemy_ashmand.sign_groups.</p>
 <p>Concepts / 概念：<a class="reference internal" href="#catalog-en-sign-aries"><span class="std std-ref">sign.aries</span></a>, <a class="reference internal" href="#catalog-en-sign-taurus"><span class="std std-ref">sign.taurus</span></a>, <a class="reference internal" href="#catalog-en-sign-gemini"><span class="std std-ref">sign.gemini</span></a>, <a class="reference internal" href="#catalog-en-sign-cancer"><span class="std std-ref">sign.cancer</span></a>, <a class="reference internal" href="#catalog-en-sign-leo"><span class="std std-ref">sign.leo</span></a>, <a class="reference internal" href="#catalog-en-sign-virgo"><span class="std std-ref">sign.virgo</span></a>, <a class="reference internal" href="#catalog-en-sign-libra"><span class="std std-ref">sign.libra</span></a>, <a class="reference internal" href="#catalog-en-sign-scorpio"><span class="std std-ref">sign.scorpio</span></a>, <a class="reference internal" href="#catalog-en-sign-sagittarius"><span class="std std-ref">sign.sagittarius</span></a>, <a class="reference internal" href="#catalog-en-sign-capricorn"><span class="std std-ref">sign.capricorn</span></a>, <a class="reference internal" href="#catalog-en-sign-aquarius"><span class="std std-ref">sign.aquarius</span></a>, <a class="reference internal" href="#catalog-en-sign-pisces"><span class="std std-ref">sign.pisces</span></a></p>
 </section>
 <section id="rule-project-cusp-ownership-cusp-ownership-and-wrap">
@@ -437,8 +466,60 @@ and <a class="reference internal" href="knowledge.html#translation-revisions-and
 <span id="catalog-en-rule-ptolemy-ashmand-equinoctial-signs"></span><h2>rule.ptolemy_ashmand.equinoctial_signs · Equinoctial signs in Ashmand’s Ptolemy<a class="headerlink" href="#rule-ptolemy-ashmand-equinoctial-signs-equinoctial-signs-in-ashmand-s-ptolemy" title="Link to this heading">¶</a></h2>
 <p>This edition calls Aries and Libra equinoctial signs, with the rationale preserved in the cited sentence.</p>
 <p>Ptolemy through the paraphrase attributed to Proclus, Ashmand’s 1822 English translation; single-source historical record.</p>
-<p>Non-executable. The historical equal-day/night explanation is not a guarantee about observed daylight. It defines neither modern sign classification nor a house system or a chart interpretation.</p>
+<p>This record preserves the historical sentence; executable membership is in rule.ptolemy_ashmand.sign_groups. The equal-day/night explanation is not a guarantee about observed daylight and supplies no house system or chart interpretation.</p>
 <p>Concepts / 概念：<a class="reference internal" href="#catalog-en-sign-aries"><span class="std std-ref">sign.aries</span></a>, <a class="reference internal" href="#catalog-en-sign-libra"><span class="std std-ref">sign.libra</span></a></p>
+</section>
+<section id="rule-ptolemy-ashmand-sign-groups-ashmand-1822-sign-groups">
+<span id="catalog-en-rule-ptolemy-ashmand-sign-groups"></span><h2>rule.ptolemy_ashmand.sign_groups · Ashmand 1822 sign groups<a class="headerlink" href="#rule-ptolemy-ashmand-sign-groups-ashmand-1822-sign-groups" title="Link to this heading">¶</a></h2>
+<p>astrology.zodiac.ashmand_sign_group maps each Sign to one AshmandSignGroup. The source explicitly names the tropical and equinoctial pairs; fixed signs immediately follow those signs in zodiac order, and bicorporeal signs immediately follow the fixed signs. The reference table reads that executable definition.</p>
+<p>Ptolemy through the paraphrase attributed to Proclus, Ashmand’s 1822 English translation; one historical source, not a consensus across traditions.</p>
+<p>The expanded twelve-sign table is project-derived, not a verbatim list. Tropical denotes only the solstitial group here. No physical-season guarantee, chart matching, score or interpretation is supplied.</p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-en-sign-aries"><span class="std std-ref">sign.aries</span></a>, <a class="reference internal" href="#catalog-en-sign-taurus"><span class="std std-ref">sign.taurus</span></a>, <a class="reference internal" href="#catalog-en-sign-gemini"><span class="std std-ref">sign.gemini</span></a>, <a class="reference internal" href="#catalog-en-sign-cancer"><span class="std std-ref">sign.cancer</span></a>, <a class="reference internal" href="#catalog-en-sign-leo"><span class="std std-ref">sign.leo</span></a>, <a class="reference internal" href="#catalog-en-sign-virgo"><span class="std std-ref">sign.virgo</span></a>, <a class="reference internal" href="#catalog-en-sign-libra"><span class="std std-ref">sign.libra</span></a>, <a class="reference internal" href="#catalog-en-sign-scorpio"><span class="std std-ref">sign.scorpio</span></a>, <a class="reference internal" href="#catalog-en-sign-sagittarius"><span class="std std-ref">sign.sagittarius</span></a>, <a class="reference internal" href="#catalog-en-sign-capricorn"><span class="std std-ref">sign.capricorn</span></a>, <a class="reference internal" href="#catalog-en-sign-aquarius"><span class="std std-ref">sign.aquarius</span></a>, <a class="reference internal" href="#catalog-en-sign-pisces"><span class="std std-ref">sign.pisces</span></a>, <a class="reference internal" href="#catalog-en-sign-group-ashmand1822-tropical"><span class="std std-ref">sign_group.ashmand1822.tropical</span></a>, <a class="reference internal" href="#catalog-en-sign-group-ashmand1822-equinoctial"><span class="std std-ref">sign_group.ashmand1822.equinoctial</span></a>, <a class="reference internal" href="#catalog-en-sign-group-ashmand1822-fixed"><span class="std std-ref">sign_group.ashmand1822.fixed</span></a>, <a class="reference internal" href="#catalog-en-sign-group-ashmand1822-bicorporeal"><span class="std std-ref">sign_group.ashmand1822.bicorporeal</span></a></p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Sign</p></th>
+<th class="head"><p>Group</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference internal" href="#catalog-en-sign-aries"><span class="std std-ref">Aries</span></a></p></td>
+<td><p><a class="reference internal" href="#catalog-en-sign-group-ashmand1822-equinoctial"><span class="std std-ref">Equinoctial signs</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#catalog-en-sign-taurus"><span class="std std-ref">Taurus</span></a></p></td>
+<td><p><a class="reference internal" href="#catalog-en-sign-group-ashmand1822-fixed"><span class="std std-ref">Fixed signs</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#catalog-en-sign-gemini"><span class="std std-ref">Gemini</span></a></p></td>
+<td><p><a class="reference internal" href="#catalog-en-sign-group-ashmand1822-bicorporeal"><span class="std std-ref">Bicorporeal signs</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#catalog-en-sign-cancer"><span class="std std-ref">Cancer</span></a></p></td>
+<td><p><a class="reference internal" href="#catalog-en-sign-group-ashmand1822-tropical"><span class="std std-ref">Tropical signs</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#catalog-en-sign-leo"><span class="std std-ref">Leo</span></a></p></td>
+<td><p><a class="reference internal" href="#catalog-en-sign-group-ashmand1822-fixed"><span class="std std-ref">Fixed signs</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#catalog-en-sign-virgo"><span class="std std-ref">Virgo</span></a></p></td>
+<td><p><a class="reference internal" href="#catalog-en-sign-group-ashmand1822-bicorporeal"><span class="std std-ref">Bicorporeal signs</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#catalog-en-sign-libra"><span class="std std-ref">Libra</span></a></p></td>
+<td><p><a class="reference internal" href="#catalog-en-sign-group-ashmand1822-equinoctial"><span class="std std-ref">Equinoctial signs</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#catalog-en-sign-scorpio"><span class="std std-ref">Scorpio</span></a></p></td>
+<td><p><a class="reference internal" href="#catalog-en-sign-group-ashmand1822-fixed"><span class="std std-ref">Fixed signs</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#catalog-en-sign-sagittarius"><span class="std std-ref">Sagittarius</span></a></p></td>
+<td><p><a class="reference internal" href="#catalog-en-sign-group-ashmand1822-bicorporeal"><span class="std std-ref">Bicorporeal signs</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#catalog-en-sign-capricorn"><span class="std std-ref">Capricorn</span></a></p></td>
+<td><p><a class="reference internal" href="#catalog-en-sign-group-ashmand1822-tropical"><span class="std std-ref">Tropical signs</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#catalog-en-sign-aquarius"><span class="std std-ref">Aquarius</span></a></p></td>
+<td><p><a class="reference internal" href="#catalog-en-sign-group-ashmand1822-fixed"><span class="std std-ref">Fixed signs</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#catalog-en-sign-pisces"><span class="std std-ref">Pisces</span></a></p></td>
+<td><p><a class="reference internal" href="#catalog-en-sign-group-ashmand1822-bicorporeal"><span class="std std-ref">Bicorporeal signs</span></a></p></td>
+</tr>
+</tbody>
+</table>
 </section>
 <section id="rule-project-aspect-deviation-aspect-deviation-and-branch">
 <span id="catalog-en-rule-project-aspect-deviation"></span><h2>rule.project.aspect_deviation · Aspect deviation and branch<a class="headerlink" href="#rule-project-aspect-deviation-aspect-deviation-and-branch" title="Link to this heading">¶</a></h2>
@@ -449,16 +530,16 @@ and <a class="reference internal" href="knowledge.html#translation-revisions-and
 </section>
 <section id="rule-project-aspect-motion-applying-and-separating-status">
 <span id="catalog-en-rule-project-aspect-motion"></span><h2>rule.project.aspect_motion · Applying and separating status<a class="headerlink" href="#rule-project-aspect-motion-applying-and-separating-status" title="Link to this heading">¶</a></h2>
-<p>The relative longitude rate is the second object’s rate minus the first’s. Away from a deviation of 180 degrees, opposite signs of the relative rate and deviation mean applying; matching signs mean separating. Zero deviation is exact. Zero relative rate with nonzero deviation is stationary: the objects have no relative motion, but either planet may still be changing longitude. A missing rate is indeterminate. At a deviation of 180 degrees with nonzero relative motion, the absolute wrapped deviation has no two-sided derivative and the status is indeterminate. Floats are compared directly, without a tolerance.</p>
+<p>For positions and rates at one shared instant, the relative longitude rate is the second object’s rate minus the first’s. Away from a deviation of 180 degrees, opposite signs of the relative rate and deviation mean applying; matching signs mean separating. Zero deviation is exact. Zero relative rate with nonzero deviation is stationary: the objects have no relative motion, but either planet may still be changing longitude. A missing rate is indeterminate. At a deviation of 180 degrees with nonzero relative motion, the absolute wrapped deviation has no two-sided derivative and the status is indeterminate. Floats are compared directly, without a tolerance.</p>
 <p>Project definition; no tradition is claimed.</p>
 <p>Describes this instant only. It does not predict whether an aspect will become exact; either object may change direction before that happens.</p>
 <p>Concepts / 概念：<a class="reference internal" href="#catalog-en-aspect-conjunction"><span class="std std-ref">aspect.conjunction</span></a>, <a class="reference internal" href="#catalog-en-aspect-sextile"><span class="std std-ref">aspect.sextile</span></a>, <a class="reference internal" href="#catalog-en-aspect-square"><span class="std std-ref">aspect.square</span></a>, <a class="reference internal" href="#catalog-en-aspect-trine"><span class="std std-ref">aspect.trine</span></a>, <a class="reference internal" href="#catalog-en-aspect-opposition"><span class="std std-ref">aspect.opposition</span></a></p>
 </section>
 <section id="rule-project-aspect-participation-objects-that-take-part-in-aspects">
 <span id="catalog-en-rule-project-aspect-participation"></span><h2>rule.project.aspect_participation · Objects that take part in aspects<a class="headerlink" href="#rule-project-aspect-participation-objects-that-take-part-in-aspects" title="Link to this heading">¶</a></h2>
-<p>Aspects are judged among the requested objects, or among a chosen subset of them. Two lunar nodes never form an aspect with each other: the four node identities are one pair of nodes under two definitions and two directions. A node may form an aspect with a body. Axes are not objects of a chart request and take no part.</p>
+<p>In single-chart evaluation, aspects are judged among the requested objects, or among a chosen subset of them. Two lunar nodes never form an aspect with each other: the four node identities are one pair of nodes under two definitions and two directions. A node may form an aspect with a body. Axes are not objects of a chart request and take no part.</p>
 <p>Project convention; it is not attributed to a tradition.</p>
-<p>The exclusion of aspects between nodes is a project convention. A convention that draws no aspects for a node at all is expressed by leaving the node out of the chosen subset.</p>
+<p>The exclusion of aspects between nodes in single-chart evaluation is a project convention. A convention that draws no aspects for a node at all is expressed by leaving the node out of the chosen subset.</p>
 <p>Concepts / 概念：<a class="reference internal" href="#catalog-en-aspect-conjunction"><span class="std std-ref">aspect.conjunction</span></a>, <a class="reference internal" href="#catalog-en-aspect-sextile"><span class="std std-ref">aspect.sextile</span></a>, <a class="reference internal" href="#catalog-en-aspect-square"><span class="std std-ref">aspect.square</span></a>, <a class="reference internal" href="#catalog-en-aspect-trine"><span class="std std-ref">aspect.trine</span></a>, <a class="reference internal" href="#catalog-en-aspect-opposition"><span class="std std-ref">aspect.opposition</span></a></p>
 </section>
 <section id="rule-project-orb-either-within-own-orb-either-object-s-own-orb">
@@ -481,6 +562,31 @@ and <a class="reference internal" href="knowledge.html#translation-revisions-and
 <p>Project definition; no tradition is claimed.</p>
 <p>Needed exactly when an aspect rule gives per-object orbs. The catalog supplies no default orb.</p>
 <p>Concepts / 概念：<a class="reference internal" href="#catalog-en-aspect-conjunction"><span class="std std-ref">aspect.conjunction</span></a>, <a class="reference internal" href="#catalog-en-aspect-sextile"><span class="std std-ref">aspect.sextile</span></a>, <a class="reference internal" href="#catalog-en-aspect-square"><span class="std std-ref">aspect.square</span></a>, <a class="reference internal" href="#catalog-en-aspect-trine"><span class="std std-ref">aspect.trine</span></a>, <a class="reference internal" href="#catalog-en-aspect-opposition"><span class="std std-ref">aspect.opposition</span></a></p>
+</section>
+<section id="rule-project-cross-aspect-evaluation-static-cross-chart-aspect-evaluation">
+<span id="catalog-en-rule-project-cross-aspect-evaluation"></span><h2>rule.project.cross_aspect_evaluation · Static cross-chart aspect evaluation<a class="headerlink" href="#rule-project-cross-aspect-evaluation-static-cross-chart-aspect-evaluation" title="Link to this heading">¶</a></h2>
+<p>Pair each selected left position with each selected right position, preserving both source charts. An omitted selection means all positions on that side, independently of natal participants. Same-named objects and all named node-node pairs are allowed, including the same chart in both roles. Use caller-supplied aspect rules and identity-keyed object orbs, never either chart’s natal rules. Retain every matching oriented branch, signed deviation and inclusive orb limit; no motion status is assigned.</p>
+<p>Project geometry policy; no tradition or interpretation is claimed.</p>
+<p>Compare matching tropical/geocentric own-date position conventions directly, without common-epoch conversion or a simultaneous spatial-angle claim. Rates at different birth instants do not establish shared evolution. No default orb, interpretation, house overlay or composite construction is supplied.</p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-en-aspect-conjunction"><span class="std std-ref">aspect.conjunction</span></a>, <a class="reference internal" href="#catalog-en-aspect-sextile"><span class="std std-ref">aspect.sextile</span></a>, <a class="reference internal" href="#catalog-en-aspect-square"><span class="std std-ref">aspect.square</span></a>, <a class="reference internal" href="#catalog-en-aspect-trine"><span class="std std-ref">aspect.trine</span></a>, <a class="reference internal" href="#catalog-en-aspect-opposition"><span class="std std-ref">aspect.opposition</span></a></p>
+</section>
+<section id="source-astrology-sign-groups-c92ac82-astrology-ashmand-sign-group-implementation">
+<span id="catalog-en-source-astrology-sign-groups-c92ac82"></span><h2>source.astrology.sign_groups.c92ac82 · astrology Ashmand sign-group implementation<a class="headerlink" href="#source-astrology-sign-groups-c92ac82-astrology-ashmand-sign-group-implementation" title="Link to this heading">¶</a></h2>
+<p>astrology contributors. src/astrology/zodiac.py and tests/test_zodiac.py at c92ac826c3065fc9e4a2cc949cf87c64c79c0c63. <code class="docutils literal notranslate"><span class="pre">language=en</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">source_verification=verified</span></code></p>
+<p><a class="reference external" href="https://github.com/0xf3cd/astrology/tree/c92ac826c3065fc9e4a2cc949cf87c64c79c0c63"><code class="docutils literal notranslate"><span class="pre">https://github.com/0xf3cd/astrology/tree/c92ac826c3065fc9e4a2cc949cf87c64c79c0c63</span></code></a></p>
+<p>Project-authored expansion of the source’s explicit pairs and ordering relations, with membership and type-boundary tests. The historical definition remains attributed to source.ptolemy.ashmand1822.</p>
+<p>Project-authored code, translations and explanations under the repository MIT license.</p>
+<p>Supports the immutable sign-group definition, pure lookup and source-derived test expectations at this fixed commit. This is project implementation evidence, not independent historical corroboration, a physical-season model or a chart interpretation.</p>
+</section>
+<section id="source-astrology-cross-aspects-0d7122a-astrology-static-cross-chart-implementation">
+<span id="catalog-en-source-astrology-cross-aspects-0d7122a"></span><h2>source.astrology.cross_aspects.0d7122a · astrology static cross-chart implementation<a class="headerlink" href="#source-astrology-cross-aspects-0d7122a-astrology-static-cross-chart-implementation" title="Link to this heading">¶</a></h2>
+<p>astrology contributors. src/astrology/cross_aspects.py, shared aspects.py arithmetic and tests at 0d7122a7f7ef86ecc5798c9ea12668c68bb4a516. <code class="docutils literal notranslate"><span class="pre">language=en</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">source_verification=verified</span></code></p>
+<p><a class="reference external" href="https://github.com/0xf3cd/astrology/tree/0d7122a7f7ef86ecc5798c9ea12668c68bb4a516"><code class="docutils literal notranslate"><span class="pre">https://github.com/0xf3cd/astrology/tree/0d7122a7f7ef86ecc5798c9ea12668c68bb4a516</span></code></a></p>
+<p>Project-authored static cross-chart composition and hand-worked synthetic tests, separate from source.astrology.chart.fc845fa, the single-chart implementation source.</p>
+<p>Project-authored text under the repository MIT license.</p>
+<p>Supports the cross pairing, explicit orb selection, static geometry and provenance retention at this fixed commit. It is not independent astronomical corroboration and establishes no traditional interpretation or accuracy bound.</p>
 </section>
 <section id="source-astrology-chart-fc845fa-astrology-chart-implementation">
 <span id="catalog-en-source-astrology-chart-fc845fa"></span><h2>source.astrology.chart.fc845fa · astrology chart implementation<a class="headerlink" href="#source-astrology-chart-fc845fa-astrology-chart-implementation" title="Link to this heading">¶</a></h2>
@@ -506,8 +612,8 @@ and <a class="reference internal" href="knowledge.html#translation-revisions-and
 <p><code class="docutils literal notranslate"><span class="pre">source_verification=verified</span></code></p>
 <p><a class="reference external" href="https://commons.wikimedia.org/w/index.php?title=File:Ptolemy%27s_Tetrabiblos_or_Quadripartite_(1822).pdf&amp;oldid=1078168290"><code class="docutils literal notranslate"><span class="pre">https://commons.wikimedia.org/w/index.php?title=File:Ptolemy%27s_Tetrabiblos_or_Quadripartite_(1822).pdf&amp;oldid=1078168290</span></code></a></p>
 <p>Direct transcription of printed pp. 34–35 (PDF pages 72–73), Google Books scan hosted on Wikimedia Commons. Download SHA-256: 8ab3073b2200ba85b3dd812acc0b2edd2d2757f196cc641de42e9a46293189cb. Line wraps, split-word hyphenation and punctuation spacing normalized; wording retained. Plain-text transcription does not encode typographic emphasis. Not the 1900 reprint or a modern web transcription. Edition corroboration: https://wdl.warburg.sas.ac.uk/object-wdl-awa-aaan . Mirrors/catalogs are not independent rule authors.</p>
-<p>Underlying 1822 text: Commons file revision 1078168290 records public-domain status in its country of origin, life-plus-70-or-shorter jurisdictions and the USA (template PD-old-70-1923, with a displayed Public Domain Mark 1.0 notice). No worldwide rights guarantee. Only a short manually transcribed passage is included; scan images, watermarks and site prose are not redistributed. Project Chinese translation and authored explanations are MIT.</p>
-<p>One historical sign-grouping statement in Book I, chapter XIV, not an empirical claim, independent multi-source consensus or applicable chart conclusion.</p>
+<p>Underlying 1822 text: Commons file revision 1078168290 records public-domain status in its country of origin, life-plus-70-or-shorter jurisdictions and the USA (template PD-old-70-1923, with a displayed Public Domain Mark 1.0 notice). No worldwide rights guarantee. Only bounded manually transcribed passages are included; scan images, watermarks and site prose are not redistributed. Project Chinese translation and authored explanations are MIT.</p>
+<p>The four sign groups in Book I, chapter XIV: the explicitly named tropical/equinoctial pairs and the ordering relations defining fixed/bicorporeal membership. Includes a complete equinoctial sentence and bounded definition excerpts, with fragment boundaries recorded in each locator. The expanded twelve-sign table is project-derived. This is not an empirical claim, independent multi-source consensus or applicable chart conclusion.</p>
 </section>
 <section id="entry-body-requests-statement">
 <span id="catalog-en-entry-body-requests"></span><h2>entry.body_requests · Statement / 陈述<a class="headerlink" href="#entry-body-requests-statement" title="Link to this heading">¶</a></h2>
@@ -580,7 +686,7 @@ and <a class="reference internal" href="knowledge.html#translation-revisions-and
 </section>
 <section id="entry-aspect-evaluation-statement">
 <span id="catalog-en-entry-aspect-evaluation"></span><h2>entry.aspect_evaluation · Statement / 陈述<a class="headerlink" href="#entry-aspect-evaluation-statement" title="Link to this heading">¶</a></h2>
-<p>Major aspects are judged from ecliptic longitudes and an explicit orb, with the oriented branch and a local applying or separating status kept in the result.</p>
+<p>Single-chart major aspects are judged from ecliptic longitudes and an explicit orb, with the oriented branch and a local applying or separating status kept in the result.</p>
 <p><code class="docutils literal notranslate"><span class="pre">prerequisites=complete</span></code> · <code class="docutils literal notranslate"><span class="pre">output=reference_only</span></code> · <code class="docutils literal notranslate"><span class="pre">chart=not_assessed</span></code></p>
 <p>Concepts / 概念：<a class="reference internal" href="#catalog-en-aspect-conjunction"><span class="std std-ref">aspect.conjunction</span></a>, <a class="reference internal" href="#catalog-en-aspect-sextile"><span class="std std-ref">aspect.sextile</span></a>, <a class="reference internal" href="#catalog-en-aspect-square"><span class="std std-ref">aspect.square</span></a>, <a class="reference internal" href="#catalog-en-aspect-trine"><span class="std std-ref">aspect.trine</span></a>, <a class="reference internal" href="#catalog-en-aspect-opposition"><span class="std std-ref">aspect.opposition</span></a></p>
 <p>Variants / 变体：<a class="reference internal" href="#catalog-en-rule-project-aspect-deviation"><span class="std std-ref">rule.project.aspect_deviation</span></a>, <a class="reference internal" href="#catalog-en-rule-project-aspect-motion"><span class="std std-ref">rule.project.aspect_motion</span></a>, <a class="reference internal" href="#catalog-en-rule-project-aspect-participation"><span class="std std-ref">rule.project.aspect_participation</span></a>, <a class="reference internal" href="#catalog-en-rule-project-orb-either-within-own-orb"><span class="std std-ref">rule.project.orb_either_within_own_orb</span></a>, <a class="reference internal" href="#catalog-en-rule-project-orb-both-within-own-orb"><span class="std std-ref">rule.project.orb_both_within_own_orb</span></a>, <a class="reference internal" href="#catalog-en-rule-project-orb-mean-of-orbs"><span class="std std-ref">rule.project.orb_mean_of_orbs</span></a></p>
@@ -589,22 +695,38 @@ and <a class="reference internal" href="knowledge.html#translation-revisions-and
 <li><p>The caller supplies every orb; this entry gives none.</p></li>
 <li><p>Per-object orbs need a chosen combination rule.</p></li>
 </ul>
-<p>Exceptions / 例外：Two lunar nodes never form an aspect with each other.</p>
+<p>Exceptions / 例外：Two lunar nodes never form an aspect with each other in this single-chart evaluation.</p>
 <p>Limits / 限度：This entry is a project definition, not an independent corroboration or a traditional rule. It supplies no default orb, strength or interpretation, and a retrieval never assesses a chart.</p>
 <p><a class="reference internal" href="#catalog-en-source-astrology-chart-fc845fa"><span class="std std-ref">source.astrology.chart.fc845fa</span></a>: astrology 0.0.0 / src/astrology/aspects.py at the recorded commit</p>
+</section>
+<section id="entry-cross-aspect-evaluation-statement">
+<span id="catalog-en-entry-cross-aspect-evaluation"></span><h2>entry.cross_aspect_evaluation · Statement / 陈述<a class="headerlink" href="#entry-cross-aspect-evaluation-statement" title="Link to this heading">¶</a></h2>
+<p>Static major cross aspects compare two supplied natal results with distinct left/right endpoints and preserve both complete sources, without a motion field.</p>
+<p><code class="docutils literal notranslate"><span class="pre">prerequisites=complete</span></code> · <code class="docutils literal notranslate"><span class="pre">output=reference_only</span></code> · <code class="docutils literal notranslate"><span class="pre">chart=not_assessed</span></code></p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-en-aspect-conjunction"><span class="std std-ref">aspect.conjunction</span></a>, <a class="reference internal" href="#catalog-en-aspect-sextile"><span class="std std-ref">aspect.sextile</span></a>, <a class="reference internal" href="#catalog-en-aspect-square"><span class="std std-ref">aspect.square</span></a>, <a class="reference internal" href="#catalog-en-aspect-trine"><span class="std std-ref">aspect.trine</span></a>, <a class="reference internal" href="#catalog-en-aspect-opposition"><span class="std std-ref">aspect.opposition</span></a></p>
+<p>Variants / 变体：<a class="reference internal" href="#catalog-en-rule-project-cross-aspect-evaluation"><span class="std std-ref">rule.project.cross_aspect_evaluation</span></a>, <a class="reference internal" href="#catalog-en-rule-project-aspect-deviation"><span class="std std-ref">rule.project.aspect_deviation</span></a>, <a class="reference internal" href="#catalog-en-rule-project-orb-either-within-own-orb"><span class="std std-ref">rule.project.orb_either_within_own_orb</span></a>, <a class="reference internal" href="#catalog-en-rule-project-orb-both-within-own-orb"><span class="std std-ref">rule.project.orb_both_within_own_orb</span></a>, <a class="reference internal" href="#catalog-en-rule-project-orb-mean-of-orbs"><span class="std std-ref">rule.project.orb_mean_of_orbs</span></a></p>
+<p>Prerequisites / 前提：</p>
+<ul class="simple">
+<li><p>Two supplied immutable natal results with matching zodiac, center and position-frame conventions, plus explicit caller-supplied aspect rules.</p></li>
+<li><p>An orb combination is required exactly when object overrides exist; overrides may name only selected identities from either side.</p></li>
+</ul>
+<p>Exceptions / 例外：Same-named objects, node-node cross pairs, the same chart in both roles, empty selections and empty rules are admitted. The single-chart node exclusion does not apply.</p>
+<p>Limits / 限度：Project-defined geometry, not independent corroboration or traditional interpretation. Own-date longitudes are not transformed to a common epoch. No native astronomy or time resolution is needed for comparison; catalog retrieval itself never evaluates charts.</p>
+<p><a class="reference internal" href="#catalog-en-source-astrology-cross-aspects-0d7122a"><span class="std std-ref">source.astrology.cross_aspects.0d7122a</span></a>: src/astrology/cross_aspects.py; src/astrology/aspects.py shared geometry; tests/test_cross_aspects.py at 0d7122a7f7ef86ecc5798c9ea12668c68bb4a516</p>
 </section>
 <section id="entry-sign-vocabulary-statement">
 <span id="catalog-en-entry-sign-vocabulary"></span><h2>entry.sign_vocabulary · Statement / 陈述<a class="headerlink" href="#entry-sign-vocabulary-statement" title="Link to this heading">¶</a></h2>
 <p>Aries and Libra appear in the cited historical equinoctial-sign grouping; this catalog keeps sign names separate from calculation.</p>
 <p><code class="docutils literal notranslate"><span class="pre">prerequisites=complete</span></code> · <code class="docutils literal notranslate"><span class="pre">output=reference_only</span></code> · <code class="docutils literal notranslate"><span class="pre">chart=not_assessed</span></code></p>
 <p>Concepts / 概念：<a class="reference internal" href="#catalog-en-sign-aries"><span class="std std-ref">sign.aries</span></a>, <a class="reference internal" href="#catalog-en-sign-libra"><span class="std std-ref">sign.libra</span></a></p>
-<p>Variants / 变体：<a class="reference internal" href="#catalog-en-rule-ptolemy-ashmand-equinoctial-signs"><span class="std std-ref">rule.ptolemy_ashmand.equinoctial_signs</span></a>, <a class="reference internal" href="#catalog-en-rule-project-tropical-sign-sectors"><span class="std std-ref">rule.project.tropical_sign_sectors</span></a></p>
+<p>Variants / 变体：<a class="reference internal" href="#catalog-en-rule-ptolemy-ashmand-equinoctial-signs"><span class="std std-ref">rule.ptolemy_ashmand.equinoctial_signs</span></a>, <a class="reference internal" href="#catalog-en-rule-project-tropical-sign-sectors"><span class="std std-ref">rule.project.tropical_sign_sectors</span></a>, <a class="reference internal" href="#catalog-en-rule-ptolemy-ashmand-sign-groups"><span class="std std-ref">rule.ptolemy_ashmand.sign_groups</span></a></p>
 <p>Prerequisites / 前提：</p>
 <p>No prerequisites recorded / 未记录前提</p>
 <p>Exceptions / 例外：The source is a named historical edition, not a universal definition across traditions.</p>
-<p>Limits / 限度：The remaining sign names are vocabulary only; the 30-degree sector boundaries and the executable classification are a project convention in the chart implementation, not a claim from the cited edition.</p>
+<p>Limits / 限度：All twelve signs have a historical group in rule.ptolemy_ashmand.sign_groups. Longitude-sector boundaries remain a separate project convention, not a claim from the cited edition.</p>
 <p><a class="reference internal" href="#catalog-en-source-ptolemy-ashmand1822"><span class="std std-ref">source.ptolemy.ashmand1822</span></a>: Book I, chapter XIV, printed pp. 34–35; PDF pages 72–73</p>
 <p><a class="reference internal" href="#catalog-en-source-astrology-chart-fc845fa"><span class="std std-ref">source.astrology.chart.fc845fa</span></a>: astrology 0.0.0 / src/astrology/zodiac.py at the recorded commit</p>
+<p><a class="reference internal" href="#catalog-en-source-astrology-sign-groups-c92ac82"><span class="std std-ref">source.astrology.sign_groups.c92ac82</span></a>: src/astrology/zodiac.py: AshmandSignGroup and ashmand_sign_group; tests/test_zodiac.py at c92ac826c3065fc9e4a2cc949cf87c64c79c0c63</p>
 </section>
 <section id="entry-equinoctial-example-statement">
 <span id="catalog-en-entry-equinoctial-example"></span><h2>entry.equinoctial_example · Statement / 陈述<a class="headerlink" href="#entry-equinoctial-example-statement" title="Link to this heading">¶</a></h2>
@@ -617,7 +739,7 @@ and <a class="reference internal" href="knowledge.html#translation-revisions-and
 <li><p>A chart-level use would need an explicit zodiac convention, computed position and a separately specified use of this historical grouping; these are not evaluated here.</p></li>
 </ul>
 <p>Exceptions / 例外：The historical rationale about equal day and night is preserved, not endorsed as an observed daylight guarantee.</p>
-<p>Limits / 限度：Single-source, reference-only, non-executable example. Missing prerequisites remain unresolved; computing one condition cannot turn retrieval into full applicability.</p>
+<p>Limits / 限度：Single-source, reference-only example with no implemented chart-level use. Pure sign-group lookup is available separately; its result cannot resolve the missing prerequisites or turn retrieval into full applicability.</p>
 <p><a class="reference internal" href="#catalog-en-source-ptolemy-ashmand1822"><span class="std std-ref">source.ptolemy.ashmand1822</span></a>: Book I, chapter XIV, printed pp. 34–35; PDF pages 72–73; complete equinoctial-sign sentence</p>
 <p>Original excerpt (English) / 原文引述（英文）：</p>
 <blockquote>
@@ -627,6 +749,48 @@ and <a class="reference internal" href="knowledge.html#translation-revisions-and
 <blockquote>
 <div><p>分点星座也有两个：白羊座，春分之后的第一个；天秤座，秋分之后的第一个。它们如此命名，是因为太阳位于二者任一的起点时，使昼与夜等长。</p>
 </div></blockquote>
+</section>
+<section id="entry-ashmand-sign-groups-statement">
+<span id="catalog-en-entry-ashmand-sign-groups"></span><h2>entry.ashmand_sign_groups · Statement / 陈述<a class="headerlink" href="#entry-ashmand-sign-groups-statement" title="Link to this heading">¶</a></h2>
+<p>The twelve Sign values each belong to one of Ashmand 1822’s four groups. astrology.zodiac.ashmand_sign_group computes that membership without evaluating a chart.</p>
+<p><code class="docutils literal notranslate"><span class="pre">prerequisites=complete</span></code> · <code class="docutils literal notranslate"><span class="pre">output=reference_only</span></code> · <code class="docutils literal notranslate"><span class="pre">chart=not_assessed</span></code></p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-en-sign-aries"><span class="std std-ref">sign.aries</span></a>, <a class="reference internal" href="#catalog-en-sign-taurus"><span class="std std-ref">sign.taurus</span></a>, <a class="reference internal" href="#catalog-en-sign-gemini"><span class="std std-ref">sign.gemini</span></a>, <a class="reference internal" href="#catalog-en-sign-cancer"><span class="std std-ref">sign.cancer</span></a>, <a class="reference internal" href="#catalog-en-sign-leo"><span class="std std-ref">sign.leo</span></a>, <a class="reference internal" href="#catalog-en-sign-virgo"><span class="std std-ref">sign.virgo</span></a>, <a class="reference internal" href="#catalog-en-sign-libra"><span class="std std-ref">sign.libra</span></a>, <a class="reference internal" href="#catalog-en-sign-scorpio"><span class="std std-ref">sign.scorpio</span></a>, <a class="reference internal" href="#catalog-en-sign-sagittarius"><span class="std std-ref">sign.sagittarius</span></a>, <a class="reference internal" href="#catalog-en-sign-capricorn"><span class="std std-ref">sign.capricorn</span></a>, <a class="reference internal" href="#catalog-en-sign-aquarius"><span class="std std-ref">sign.aquarius</span></a>, <a class="reference internal" href="#catalog-en-sign-pisces"><span class="std std-ref">sign.pisces</span></a>, <a class="reference internal" href="#catalog-en-sign-group-ashmand1822-tropical"><span class="std std-ref">sign_group.ashmand1822.tropical</span></a>, <a class="reference internal" href="#catalog-en-sign-group-ashmand1822-equinoctial"><span class="std std-ref">sign_group.ashmand1822.equinoctial</span></a>, <a class="reference internal" href="#catalog-en-sign-group-ashmand1822-fixed"><span class="std std-ref">sign_group.ashmand1822.fixed</span></a>, <a class="reference internal" href="#catalog-en-sign-group-ashmand1822-bicorporeal"><span class="std std-ref">sign_group.ashmand1822.bicorporeal</span></a></p>
+<p>Variants / 变体：<a class="reference internal" href="#catalog-en-rule-ptolemy-ashmand-sign-groups"><span class="std std-ref">rule.ptolemy_ashmand.sign_groups</span></a></p>
+<p>Prerequisites / 前提：</p>
+<ul class="simple">
+<li><p>Supply an existing Sign value; no position, birth data or native astronomy is needed for this lookup.</p></li>
+</ul>
+<p>Exceptions / 例外：The explicitly named pairs and immediately following signs define one historical classification. The expanded table is project-derived, not a verbatim twelve-sign list.</p>
+<p>Limits / 限度：Single historical source. Group names do not imply an observed season, equal daylight, temperament score or interpretation. Retrieval and pure membership lookup do not assess chart applicability; the older equinoctial example keeps its unresolved prerequisites.</p>
+<p><a class="reference internal" href="#catalog-en-source-ptolemy-ashmand1822"><span class="std std-ref">source.ptolemy.ashmand1822</span></a>: Book I, chapter XIV, printed p. 34 / PDF p. 72; complete first sentence of the tropical definition</p>
+<p>Original excerpt (English) / 原文引述（英文）：</p>
+<blockquote>
+<div><p>The tropical signs are two: viz. the first thirty degrees after the summer solstice, which compose the sign of Cancer; and the first thirty degrees after the winter solstice, composing the sign of Capricorn.</p>
+</div></blockquote>
+<p>Chinese translation / 中文译文: <code class="docutils literal notranslate"><span class="pre">current</span></code>, revision=1; astrology contributors (project Chinese translation of Ashmand’s English)</p>
+<blockquote>
+<div><p>至点星座有两个：夏至之后的最初三十度构成巨蟹座；冬至之后的最初三十度构成摩羯座。</p>
+</div></blockquote>
+<p><a class="reference internal" href="#catalog-en-source-ptolemy-ashmand1822"><span class="std std-ref">source.ptolemy.ashmand1822</span></a>: Book I, chapter XIV, printed pp. 34–35 / PDF pp. 72–73; equinoctial definition, complete sentence preserved in entry.equinoctial_example</p>
+<p><a class="reference internal" href="#catalog-en-source-ptolemy-ashmand1822"><span class="std std-ref">source.ptolemy.ashmand1822</span></a>: Book I, chapter XIV, printed p. 35 / PDF p. 73; fixed definition, sentence fragment ending at fixed; following explanation not reproduced</p>
+<p>Original excerpt (English) / 原文引述（英文）：</p>
+<blockquote>
+<div><p>Those signs, which severally follow immediately after the two tropical and the two equinoctial signs, are termed fixed</p>
+</div></blockquote>
+<p>Chinese translation / 中文译文: <code class="docutils literal notranslate"><span class="pre">current</span></code>, revision=1; astrology contributors (project Chinese translation of Ashmand’s English)</p>
+<blockquote>
+<div><p>分别紧接在两个至点星座和两个分点星座之后的那些星座，称为固定星座</p>
+</div></blockquote>
+<p><a class="reference internal" href="#catalog-en-source-ptolemy-ashmand1822"><span class="std std-ref">source.ptolemy.ashmand1822</span></a>: Book I, chapter XIV, printed p. 35 / PDF p. 73; bicorporeal definition, opening clause through the semicolon; following seasonal explanation not reproduced</p>
+<p>Original excerpt (English) / 原文引述（英文）：</p>
+<blockquote>
+<div><p>The bicorporeal signs severally follow the fixed signs;</p>
+</div></blockquote>
+<p>Chinese translation / 中文译文: <code class="docutils literal notranslate"><span class="pre">current</span></code>, revision=2; astrology contributors (project Chinese translation of Ashmand’s English)</p>
+<blockquote>
+<div><p>双体星座分别位于固定星座之后；</p>
+</div></blockquote>
+<p><a class="reference internal" href="#catalog-en-source-astrology-sign-groups-c92ac82"><span class="std std-ref">source.astrology.sign_groups.c92ac82</span></a>: src/astrology/zodiac.py: AshmandSignGroup and ashmand_sign_group; tests/test_zodiac.py at c92ac826c3065fc9e4a2cc949cf87c64c79c0c63</p>
 </section>
 </section>
 
@@ -663,7 +827,8 @@ and <a class="reference internal" href="knowledge.html#translation-revisions-and
 <li class="toctree-l2"><a class="reference internal" href="configuration.html">Requested chart configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="chart.html">Natal charts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="aspects.html">Aspects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="records.html">Save, restore, replay and inspect a chart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cross_aspects.html">Static cross-chart aspects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="records.html">Chart results and text</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference.html">Public API reference</a></li>
 <li class="toctree-l2"><a class="reference internal" href="architecture.html">Repository structure and calculation boundaries</a></li>
 <li class="toctree-l2"><a class="reference internal" href="knowledge.html">Knowledge organization and bilingual documentation</a></li>

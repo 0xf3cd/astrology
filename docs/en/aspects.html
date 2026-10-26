@@ -5,17 +5,17 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Aspects &#8212; celestial-astrology 0.1.0 documentation / 文档</title>
+    <title>Aspects &#8212; celestial-astrology 0.2.0 documentation / 文档</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
-    <script src="../../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../../_static/documentation_options.js?v=938c9ccc"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/en/aspects.html" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Save, restore, replay and inspect a chart" href="records.html" />
+    <link rel="next" title="Static cross-chart aspects" href="cross_aspects.html" />
     <link rel="prev" title="Natal charts" href="chart.html" />
    
   <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
@@ -42,6 +42,8 @@ longitudes and rates at the same instant. Each result gives the exact angle used
 for comparison, the signed deviation from it, the orb limit and the current motion status. The caller
 supplies every orb; there is no default. <a class="reference internal" href="chart.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">natal_chart</span></code></span></a> calls the same
 function to calculate the requested aspects.</p>
+<p>For static comparison of two supplied charts, use <a class="reference internal" href="cross_aspects.html"><span class="std std-doc">cross-chart aspects</span></a>.
+That API keeps left/right ownership and has no motion field.</p>
 <section id="judge-aspects-from-plain-values">
 <h2>Judge aspects from plain values<a class="headerlink" href="#judge-aspects-from-plain-values" title="Link to this heading">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">find_aspects</span></code> needs no chart and does not call the astronomy library. Give it objects with a longitude in
@@ -171,7 +173,7 @@ accepts it without changing the result. Each hit records the limit it used.</p>
 </section>
 <section id="choose-the-objects">
 <h2>Choose the objects<a class="headerlink" href="#choose-the-objects" title="Link to this heading">¶</a></h2>
-<p>Two lunar nodes never form an aspect with each other. The four node identities are
+<p>In this single-chart evaluation, two lunar nodes never form an aspect with each other. The four node identities are
 one pair of nodes under two definitions and two directions, so the ascending and
 descending nodes are always exactly opposite. A node can form an aspect with a body.</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">nodes</span> <span class="o">=</span> <span class="p">[</span>
@@ -253,7 +255,7 @@ aspect will become exact, or describe its meaning or strength.</p></li>
 <li><p>The library supplies no default orb. The corpus describes the evaluation as a
 project definition; it makes no claim about any tradition’s orbs.</p></li>
 </ul>
-<p>See the <a class="reference internal" href="records.html"><span class="std std-doc">record guide</span></a> for saving, restoring, replaying and text output.</p>
+<p>See the <a class="reference internal" href="records.html"><span class="std std-doc">result guide</span></a> for structured results and text output.</p>
 </section>
 </section>
 
@@ -290,7 +292,8 @@ project definition; it makes no claim about any tradition’s orbs.</p></li>
 <li class="toctree-l2"><a class="reference internal" href="configuration.html">Requested chart configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="chart.html">Natal charts</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Aspects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="records.html">Save, restore, replay and inspect a chart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cross_aspects.html">Static cross-chart aspects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="records.html">Chart results and text</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference.html">Public API reference</a></li>
 <li class="toctree-l2"><a class="reference internal" href="architecture.html">Repository structure and calculation boundaries</a></li>
 <li class="toctree-l2"><a class="reference internal" href="knowledge.html">Knowledge organization and bilingual documentation</a></li>
@@ -309,7 +312,7 @@ project definition; it makes no claim about any tradition’s orbs.</p></li>
   <li><a href="../index.html">Documentation overview</a><ul>
   <li><a href="index.html">Documentation</a><ul>
       <li>Previous: <a href="chart.html" title="previous chapter">Natal charts</a></li>
-      <li>Next: <a href="records.html" title="next chapter">Save, restore, replay and inspect a chart</a></li>
+      <li>Next: <a href="cross_aspects.html" title="next chapter">Static cross-chart aspects</a></li>
   </ul></li>
   </ul></li>
 </ul>
