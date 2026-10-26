@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "celestial-astrology"
-version = "0.1.0"
+version = "0.2.0"
 description = "Reproducible Western astrology charts and sourced knowledge"
 readme = "README.md"
 requires-python = ">=3.11,<3.15"

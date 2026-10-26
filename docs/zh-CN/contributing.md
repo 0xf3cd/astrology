@@ -72,14 +72,14 @@ Python 分词单测不能证明浏览器行为。
 Sphinx 只发现根目录的两个 README 和 `docs/` 下的源文档。虚拟环境应放在 `docs/` 之外：
 该目录内任意位置的源文档都是文档输入，与它同级的目录则不是。上述源文档中的警告仍会使严格构建失败。
 
-按上面的 `uv sync` 从本仓安装开发包，分发名／版本为 `celestial-astrology`／`0.1.0`，
+按上面的 `uv sync` 从本仓安装开发包，分发名／版本为 `celestial-astrology`／`0.2.0`，
 Python 导入名仍为 `astrology`。PyPI 的 `astrology` 是另一个无关项目，
 不是本库。可检查已安装的身份：
 
 ```{doctest}
 >>> from importlib.metadata import version
 >>> version("celestial-astrology")
-'0.1.0'
+'0.2.0'
 ```
 
 检查会在隔离的 wheel 安装环境中执行两份 README，比较文档中的输出，检查 wheel 实际保存的

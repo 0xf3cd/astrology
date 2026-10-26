@@ -1,4 +1,4 @@
-"""Publication-neutral installation and snapshot text. 不依赖发布状态的安装及快照说明。"""
+"""Candidate installation context and neutral snapshot labels. 候选安装语境与中性的快照标签。"""
 
 import shutil
 import tomllib
@@ -21,11 +21,7 @@ UNITS = (
 )
 OLD_SENTENCES = (
   "This checkout prepares version `0.1.0`, which is not yet published on PyPI.",
-  "This candidate has not been published on PyPI.",
-  "These are source-install instructions, not a claim that the candidate can be\ninstalled from the package index.",
   "当前源码准备版本 `0.1.0`，尚未发布到 PyPI；",
-  "此候选尚未发布到 PyPI；",
-  "这些命令从源码安装，不表示候选包已可从包索引安装。",
   "is labeled as development documentation.",
   "并明确标为开发文档。",
 )
@@ -36,13 +32,40 @@ def _contract(root: Path) -> None:
   for unit in UNITS:
     text = " ".join((root / unit).read_text(encoding="utf-8").split())
     assert not any(" ".join(sentence.split()) in text for sentence in OLD_SENTENCES), unit
-    assert "not yet published" not in text and "has not been published" not in text, unit
-    assert "尚未发布" not in text, unit
   command = f'pip install "{project["name"]}=={project["version"]}"'
-  for name in ("README.md", "README.zh-CN.md"):
+  for name, heading, guard, source_link in (
+    (
+      "README.md",
+      "Install a release",
+      f"After {project['version']} is published on PyPI",
+      "https://0xf3cd.github.io/astrology/README.html#install-from-source",
+    ),
+    (
+      "README.zh-CN.md",
+      "安装发行版",
+      f"{project['version']} 发布到 PyPI 后",
+      "https://0xf3cd.github.io/astrology/README.zh-CN.html#install-from-source-zh-cn",
+    ),
+  ):
     text = (root / name).read_text(encoding="utf-8")
-    assert f".venv/bin/python -m {command}" in text
-    assert f".venv\\Scripts\\python.exe -m {command}" in text
+    assert f"\n## {heading}\n" in text, name
+    installation = text.split(f"\n## {heading}\n", 1)[1].split("\n## ", 1)[0]
+    assert guard in installation, name
+    for python in (".venv/bin/python", ".venv\\Scripts\\python.exe"):
+      index_command = f"{python} -m {command}"
+      assert index_command in installation, name
+      context = installation[: installation.index(index_command)]
+      assert guard in context and f"]({source_link})" in context, name
+    normalized = " ".join(text.split()).casefold()
+    assert not any(
+      claim.casefold() in normalized
+      for claim in (
+        f"install the published v{project['version']}",
+        f"install the published {project['version']}",
+        f"以下命令安装已发布的 v{project['version']}",
+        f"以下命令安装已发布的 {project['version']}",
+      )
+    ), name
     assert "`astrology`" in text
   for name in ("docs/index.md", "docs/_templates/site_index.html"):
     text = (root / name).read_text(encoding="utf-8")
@@ -101,8 +124,10 @@ def test_neutral_labels_are_required(documents: Path, unit: str) -> None:
 
 @pytest.mark.parametrize("unit", ["README.md", "README.zh-CN.md"])
 @pytest.mark.parametrize("next_version", [False, True])
+@pytest.mark.parametrize("python", [".venv/bin/python", ".venv\\Scripts\\python.exe"])
+@pytest.mark.parametrize("defect", ["name", "version", "unpinned"])
 def test_readme_install_mutation_tracks_fixture_version(
-  documents: Path, unit: str, next_version: bool
+  documents: Path, unit: str, next_version: bool, python: str, defect: str
 ) -> None:
   project_path = documents / "pyproject.toml"
   project = tomllib.loads(project_path.read_text(encoding="utf-8"))["project"]
@@ -117,17 +142,117 @@ def test_readme_install_mutation_tracks_fixture_version(
     for name in ("README.md", "README.zh-CN.md"):
       path = documents / name
       text = path.read_text(encoding="utf-8")
-      pinned = f"{project['name']}=={current}"
-      assert pinned in text
-      path.write_text(text.replace(pinned, f"{project['name']}=={future}"), encoding="utf-8")
+      assert f"{project['name']}=={current}" in text
+      path.write_text(text.replace(current, future), encoding="utf-8")
   _contract(documents)
   project = tomllib.loads(project_path.read_text(encoding="utf-8"))["project"]
-  command = f'pip install "{project["name"]}=={project["version"]}"'
+  command = f'{python} -m pip install "{project["name"]}=={project["version"]}"'
   path = documents / unit
   text = path.read_text(encoding="utf-8")
   assert command in text
-  changed = text.replace(command, 'pip install "astrology"')
+  if defect == "name":
+    replacement = f'{python} -m pip install "astrology"'
+  elif defect == "version":
+    replacement = f'{python} -m pip install "{project["name"]}==0.0.0"'
+  else:
+    replacement = f'{python} -m pip install "{project["name"]}"'
+  changed = text.replace(command, replacement)
   assert changed != text and command not in changed
   path.write_text(changed, encoding="utf-8")
   with pytest.raises(AssertionError):
     _contract(documents)
+
+
+@pytest.mark.parametrize("unit", ["README.md", "README.zh-CN.md"])
+@pytest.mark.parametrize(
+  "defect",
+  [
+    "missing_guard",
+    "guard_after_first_command",
+    "guard_after_both_commands",
+    "guard_in_source_section",
+    "wrong_guard_version",
+    "unversioned_guard",
+    "missing_source_link",
+    "already_published",
+    "already_published_outside_release_section",
+  ],
+)
+def test_candidate_installation_context_rejects_misleading_edits(
+  documents: Path, unit: str, defect: str
+) -> None:
+  _contract(documents)
+  project = tomllib.loads((documents / "pyproject.toml").read_text(encoding="utf-8"))["project"]
+  version = project["version"]
+  english = unit == "README.md"
+  guard = f"After {version} is published on PyPI" if english else f"{version} 发布到 PyPI 后"
+  path = documents / unit
+  text = path.read_text(encoding="utf-8")
+  assert text.count(guard) == 1
+  if defect == "missing_guard":
+    changed = text.replace(guard, "")
+  elif defect in ("guard_after_first_command", "guard_after_both_commands"):
+    python = (
+      ".venv/bin/python" if defect == "guard_after_first_command" else ".venv\\Scripts\\python.exe"
+    )
+    command = f'{python} -m pip install "{project["name"]}=={version}"'
+    changed = text.replace(guard, "").replace(command, command + "\n" + guard)
+  elif defect == "guard_in_source_section":
+    heading = "## Install from source" if english else "## 从源码安装"
+    changed = text.replace(guard, "").replace(heading, heading + "\n" + guard)
+  elif defect == "wrong_guard_version":
+    changed = text.replace(guard, guard.replace(version, "0.0.0"))
+  elif defect == "unversioned_guard":
+    changed = text.replace(guard, "After publication on PyPI" if english else "发布到 PyPI 后")
+  elif defect == "missing_source_link":
+    link = (
+      "https://0xf3cd.github.io/astrology/README.html#install-from-source"
+      if english
+      else "https://0xf3cd.github.io/astrology/README.zh-CN.html#install-from-source-zh-cn"
+    )
+    assert link in text
+    changed = text.replace(link, "")
+  else:
+    claim = (
+      f"The commands below install the published v{version}."
+      if english
+      else f"以下命令安装已发布的 {version}。"
+    )
+    if defect == "already_published":
+      changed = text.replace(guard, claim + "\n" + guard)
+    else:
+      heading = "## Install from source" if english else "## 从源码安装"
+      assert text.count(heading) == 1
+      changed = text.replace(heading, heading + "\n" + claim)
+  assert changed != text
+  path.write_text(changed, encoding="utf-8")
+  with pytest.raises(AssertionError):
+    _contract(documents)
+
+
+@pytest.mark.parametrize("unit", ["README.md", "README.zh-CN.md"])
+@pytest.mark.parametrize(
+  "sentence",
+  [
+    "This candidate has not been published on PyPI.",
+    "These are source-install instructions, not a claim that the candidate can be installed from the package index.",
+    "此候选尚未发布到 PyPI；",
+    "这些命令从源码安装，不表示候选包已可从包索引安装。",
+  ],
+)
+def test_truthful_candidate_wording_is_allowed(documents: Path, unit: str, sentence: str) -> None:
+  path = documents / unit
+  with path.open("a", encoding="utf-8") as stream:
+    stream.write("\n" + sentence + "\n")
+  _contract(documents)
+
+
+@pytest.mark.parametrize("unit", ["README.md", "README.zh-CN.md"])
+def test_historical_published_release_wording_is_allowed(documents: Path, unit: str) -> None:
+  sentence = (
+    "Install the published v0.1.0." if unit == "README.md" else "以下命令安装已发布的 v0.1.0。"
+  )
+  path = documents / unit
+  with path.open("a", encoding="utf-8") as stream:
+    stream.write("\n" + sentence + "\n")
+  _contract(documents)
