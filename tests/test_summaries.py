@@ -31,7 +31,7 @@ from astrology import (
   sign_distribution,
 )
 from astrology.knowledge import ConceptKind, LocalizedText
-from astrology.knowledge.records import CONFIGURATION_TYPES
+from astrology.knowledge.records import CONFIGURATION_TYPES, Language
 from tools import installed_check
 from tools.catalog_docs import check_catalog_data, render_catalog
 from tools.installed_check import _cross_source
@@ -102,6 +102,17 @@ def test_explicit_subset_keeps_chart_order_and_does_not_mutate(source_chart: Nat
   }
   assert result.modality_counts == {Modality.CARDINAL: 2, Modality.FIXED: 0, Modality.MUTABLE: 0}
   assert result.element_proportions[Element.FIRE] == 0.5
+  assert result.element_proportions == {
+    Element.FIRE: 0.5,
+    Element.EARTH: 0.0,
+    Element.AIR: 0.0,
+    Element.WATER: 0.5,
+  }
+  assert result.modality_proportions == {
+    Modality.CARDINAL: 1.0,
+    Modality.FIXED: 0.0,
+    Modality.MUTABLE: 0.0,
+  }
   assert sum(result.modality_proportions.values()) == 1
   assert repr(source_chart) == before
   assert chart_sign_distribution(source_chart, objects=source_chart.requested.objects).total == 4
@@ -224,6 +235,30 @@ def test_names_catalog_statuses_and_generated_tables(source_chart: NatalChart) -
   text = format_lunar_phase(near, catalog)
   assert "New Moon Type" in text and "44.99999999999999" in text
   assert "新月型" in format_lunar_phase(near, catalog, language="zh-CN")
+
+
+@pytest.mark.parametrize("angle", [0, 180])
+@pytest.mark.parametrize(
+  "language,direction_line",
+  [("en", "Angular direction: turning"), ("zh-CN", "角度方向: 转折点")],
+)
+def test_turning_phase_text(angle: float, language: Language, direction_line: str) -> None:
+  text = format_lunar_phase(lunar_phase(0, angle), load_catalog(), language=language)
+  assert direction_line in text.splitlines()
+
+
+@pytest.mark.parametrize(
+  "language,name",
+  [("en", "Mean ascending lunar node"), ("zh-CN", "平均升交点")],
+)
+def test_lunar_node_distribution_text(
+  source_chart: NatalChart, language: Language, name: str
+) -> None:
+  result = chart_sign_distribution(source_chart, objects=(LunarNode.MEAN_ASCENDING,))
+  text = format_sign_distribution(result, load_catalog(), language=language)
+  assert result.objects == (LunarNode.MEAN_ASCENDING,)
+  assert f"{name} [mean_ascending_node]" in text
+  assert "1/1 | 100.00%" in text
 
 
 @pytest.mark.parametrize("formatter", [format_lunar_phase, format_sign_distribution])

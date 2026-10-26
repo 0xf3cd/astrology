@@ -194,9 +194,9 @@ actual weather or daylight.
 
 These output concepts have their own kinds and stable IDs: `element.*`,
 `modality.*`, `lunation_type.rudhyar1950.*`, without request-configuration links.
-See the [queries, statistics and lunar phase guide](summaries.md). The source records
-distinguish the inspected Astrodienst snapshot and Rudhyar transcription from
-original print editions. Classifications carry no personality interpretation;
+See the [queries, statistics and lunar phase guide](summaries.md). The inspected
+sources are an Astrodienst webpage snapshot and Rudhyar's online transcription;
+Rudhyar's magazine original was not inspected. Classifications carry no personality interpretation;
 generated tables read the owning executable definitions.
 
 ## Translation revisions and search

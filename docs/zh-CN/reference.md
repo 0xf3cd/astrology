@@ -90,7 +90,7 @@
 
 ## 星座分布与月相
 
-显式人口、来源约定及错误行为见[摘要指南](summaries.md)。
+显式选定对象的统计、来源约定及错误行为见[摘要指南](summaries.md)。
 
 ```{eval-rst}
 .. automodule:: astrology.lunar_phase

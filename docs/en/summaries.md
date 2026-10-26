@@ -63,6 +63,10 @@ Their fixed sets agree; modern mutable agrees with Ashmand's bicorporeal set;
 Ashmand's tropical/equinoctial pairs together form the cardinal set. Membership
 agreement does not merge names or historical definitions.
 
+Both `FIXED` members have the string value `"fixed"` and compare and hash equal
+as `StrEnum` members. To keep both in one mapping, use `(type(member), member.value)`
+keys or their distinct qualified catalog IDs.
+
 ## Classify a supplied Sun/Moon pair
 
 ```{doctest}

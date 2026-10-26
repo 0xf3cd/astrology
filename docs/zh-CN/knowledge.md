@@ -160,7 +160,7 @@ True
 
 这些输出概念有各自的类别及稳定标识：`element.*`、`modality.*`、
 `lunation_type.rudhyar1950.*`，不链接请求配置。用法见[查询、统计及月相指南](summaries.md)。
-来源记录区分已核的 Astrodienst 快照、Rudhyar 转录及印刷原件。分类不作性格解读；
+已核的来源是 Astrodienst 网页快照和 Rudhyar 在线转录，未核 Rudhyar 的杂志原件。分类不作性格解读；
 生成表读取各领域的可执行定义。
 
 ## 译文修订与搜索
