@@ -11,6 +11,8 @@
 [命盘结果与文本输出](https://0xf3cd.github.io/astrology/docs/zh-CN/records.html)、独立[知识目录](https://0xf3cd.github.io/astrology/docs/zh-CN/knowledge.html)、质量检查和双语 [API 文档](https://0xf3cd.github.io/astrology/docs/zh-CN/reference.html)。
 运行检查见[参与开发](https://0xf3cd.github.io/astrology/docs/zh-CN/contributing.html)。
 
+当前源码另为 0.3.0 增加[元素／模式分布与出生月相](https://0xf3cd.github.io/astrology/docs/zh-CN/summaries.html)，尚不在已发布的 0.2.0 包中。
+
 0.2.0（开发中）新增：
 
 - 两张本命盘之间的[静态交叉相位](https://0xf3cd.github.io/astrology/docs/zh-CN/cross_aspects.html)，保留两张源盘并区分左右对象，不标入相／离相。

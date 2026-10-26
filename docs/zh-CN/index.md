@@ -16,6 +16,7 @@ configuration
 chart
 aspects
 cross_aspects
+summaries
 records
 reference
 architecture

@@ -613,12 +613,17 @@ def test_installed_knowledge_defects(consumer: Path, defect: str) -> None:
   example = next(row for row in data["entries"] if row["identifier"] == "entry.equinoctial_example")
   source = next(row for row in data["sources"] if row["identifier"] == "source.ptolemy.ashmand1822")
   if defect == "body_link":
-    data["entries"][0]["concept_ids"] = ["body.moon"]
+    next(row for row in data["entries"] if row["identifier"] == "entry.body_requests")[
+      "concept_ids"
+    ] = ["body.moon"]
   elif defect == "rule_link":
-    data["variants"][0]["configuration"] = {"enum": "Body", "member": "SUN"}
-    data["variants"][0]["concept_ids"] = ["body.sun"]
+    rule = next(row for row in data["variants"] if row["identifier"] == "rule.house.whole_sign")
+    rule["configuration"] = {"enum": "Body", "member": "SUN"}
+    rule["concept_ids"] = ["body.sun"]
   elif defect == "alias":
-    data["concepts"][0]["en_aliases"] = ["different"]
+    next(row for row in data["concepts"] if row["identifier"] == "body.sun")["en_aliases"] = [
+      "different"
+    ]
   elif defect == "translation":
     del example["citations"][0]["excerpt"]["zh"]
   elif defect == "source_condition":

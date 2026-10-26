@@ -1,6 +1,6 @@
-"""Tropical sign sectors and Ashmand's historical sign groups, without astronomy.
+"""Tropical signs, elements, modalities and Ashmand's groups, without astronomy.
 
-热带黄道星座区间与 Ashmand 的历史星座分组，不涉及天文计算。
+热带黄道星座、元素、模式与 Ashmand 分组，不涉及天文计算。
 """
 
 from __future__ import annotations
@@ -45,6 +45,90 @@ class AshmandSignGroup(StrEnum):
   EQUINOCTIAL = "equinoctial"
   FIXED = "fixed"
   BICORPOREAL = "bicorporeal"
+
+
+class Element(StrEnum):
+  """The four elements used to classify signs. 用于星座分类的四元素。"""
+
+  FIRE = "fire"
+  EARTH = "earth"
+  AIR = "air"
+  WATER = "water"
+
+
+class Modality(StrEnum):
+  """Modern three-way sign classification, distinct from Ashmand's four groups.
+
+  现代星座三模式分类，与 Ashmand 的四分组身份不同。
+  """
+
+  CARDINAL = "cardinal"
+  FIXED = "fixed"
+  MUTABLE = "mutable"
+
+
+_ELEMENT_RULE_ID = "rule.zodiac.elements"
+_MODALITY_RULE_ID = "rule.zodiac.modalities"
+_ELEMENTS = MappingProxyType(
+  {
+    Sign.ARIES: Element.FIRE,
+    Sign.TAURUS: Element.EARTH,
+    Sign.GEMINI: Element.AIR,
+    Sign.CANCER: Element.WATER,
+    Sign.LEO: Element.FIRE,
+    Sign.VIRGO: Element.EARTH,
+    Sign.LIBRA: Element.AIR,
+    Sign.SCORPIO: Element.WATER,
+    Sign.SAGITTARIUS: Element.FIRE,
+    Sign.CAPRICORN: Element.EARTH,
+    Sign.AQUARIUS: Element.AIR,
+    Sign.PISCES: Element.WATER,
+  }
+)
+_MODALITIES = MappingProxyType(
+  {
+    Sign.ARIES: Modality.CARDINAL,
+    Sign.TAURUS: Modality.FIXED,
+    Sign.GEMINI: Modality.MUTABLE,
+    Sign.CANCER: Modality.CARDINAL,
+    Sign.LEO: Modality.FIXED,
+    Sign.VIRGO: Modality.MUTABLE,
+    Sign.LIBRA: Modality.CARDINAL,
+    Sign.SCORPIO: Modality.FIXED,
+    Sign.SAGITTARIUS: Modality.MUTABLE,
+    Sign.CAPRICORN: Modality.CARDINAL,
+    Sign.AQUARIUS: Modality.FIXED,
+    Sign.PISCES: Modality.MUTABLE,
+  }
+)
+
+
+def element_of(sign: Sign) -> Element:
+  """Return the sign's element under rule.zodiac.elements; accept only Sign members.
+
+  Source: Astrodienst, The four Elements and the Signs (see the catalog).
+  Strings and other enums raise TypeError. No chart or astronomy is needed.
+
+  按 rule.zodiac.elements 返回星座元素，只接受 Sign 成员。来源为 Astrodienst 的
+  The four Elements and the Signs，书目见目录。字符串和其他枚举抛出 TypeError；不需命盘或天文计算。
+  """
+  if type(sign) is not Sign:
+    raise TypeError("sign must be a Sign")
+  return _ELEMENTS[sign]
+
+
+def modality_of(sign: Sign) -> Modality:
+  """Return the sign's modality under rule.zodiac.modalities; accept only Sign members.
+
+  Source: Astrodienst, The four Elements and the Signs (see the catalog).
+  Strings and other enums raise TypeError. This does not return an Ashmand group.
+
+  按 rule.zodiac.modalities 返回星座模式，只接受 Sign 成员。来源为 Astrodienst 的
+  The four Elements and the Signs，书目见目录。字符串和其他枚举抛出 TypeError；结果不是 Ashmand 分组。
+  """
+  if type(sign) is not Sign:
+    raise TypeError("sign must be a Sign")
+  return _MODALITIES[sign]
 
 
 _ASHMAND_GROUPS = MappingProxyType(

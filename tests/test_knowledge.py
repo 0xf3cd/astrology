@@ -69,6 +69,8 @@ def test_query_contracts(catalog: Catalog) -> None:
   assert len(catalog.list_concepts(kind=ConceptKind.SIGN)) == 12
   sign_rules = catalog.list_variants(concept_id="sign.taurus")
   assert [rule.identifier for rule in sign_rules] == [
+    "rule.zodiac.elements",
+    "rule.zodiac.modalities",
     "rule.project.tropical_sign_sectors",
     "rule.ptolemy_ashmand.sign_groups",
   ]
@@ -80,12 +82,16 @@ def test_query_contracts(catalog: Catalog) -> None:
   assert len(catalog.list_variants()) == len(catalog.variants)
   assert catalog.filter_entries() == tuple(catalog.entries)
   assert [entry.identifier for entry in catalog.filter_entries(concept_id="sign.aries")] == [
+    "entry.sign_elements",
+    "entry.sign_modalities",
     "entry.sign_vocabulary",
     "entry.equinoctial_example",
     "entry.ashmand_sign_groups",
   ]
-  assert catalog.filter_entries(source_id="source.ptolemy.ashmand1822") == catalog.filter_entries(
-    concept_id="sign.aries"
+  assert catalog.filter_entries(source_id="source.ptolemy.ashmand1822") == tuple(
+    entry
+    for entry in catalog.filter_entries(concept_id="sign.aries")
+    if any(c.source_id == "source.ptolemy.ashmand1822" for c in entry.citations)
   )
   assert catalog.filter_entries(output_eligibility=OutputEligibility.ELIGIBLE) == ()
   assert catalog.filter_entries(output_eligibility=OutputEligibility.REFERENCE_ONLY) == tuple(
@@ -103,6 +109,9 @@ def test_query_contracts(catalog: Catalog) -> None:
     "entry.house_requests",
     "entry.node_directions",
     "entry.sign_vocabulary",
+    "entry.sign_elements",
+    "entry.sign_modalities",
+    "entry.lunation_types",
   }
   assert all(
     entry.prerequisite_status is PrerequisiteStatus.UNRESOLVED
@@ -248,7 +257,7 @@ def test_duplicate_ids(catalog: Catalog, group: str) -> None:
 def test_conflicting_aliases_and_equal_display_names(
   catalog: Catalog, language: str, reverse: bool
 ) -> None:
-  first = catalog.concepts[0]
+  first = catalog.concept("body.sun")
   second = replace(first, identifier="body.other", configuration=None)
   field = f"{language}_aliases"
   first_alias: dict[str, Any] = {field: ["shared"]}
@@ -594,8 +603,14 @@ def test_retained_rule_ids_and_order(catalog: Catalog) -> None:
     ("rule.aspect.trine", MajorAspect.TRINE),
     ("rule.aspect.opposition", MajorAspect.OPPOSITION),
   )
-  assert [(v.identifier, v.configuration) for v in catalog.variants[:10]] == list(expected)
-  assert [v.identifier for v in catalog.variants[10:]] == [
+  retained = tuple(
+    v
+    for v in catalog.variants
+    if v.identifier
+    not in ("rule.zodiac.elements", "rule.zodiac.modalities", "rule.lunation.rudhyar1950")
+  )
+  assert [(v.identifier, v.configuration) for v in retained[:10]] == list(expected)
+  assert [v.identifier for v in retained[10:]] == [
     "rule.project.tropical_sign_sectors",
     "rule.project.cusp_ownership",
     "rule.ptolemy_ashmand.equinoctial_signs",

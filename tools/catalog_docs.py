@@ -13,7 +13,18 @@ from astrology.aspects import aspect_angle
 from astrology.config import HouseSystem, LunarNode, MajorAspect, NodeDefinition
 from astrology.knowledge import Catalog, Concept, ConceptKind, LocalizedText, TranslationStatus
 from astrology.knowledge.records import CONFIGURATION_TYPES, ConfigurationIdentity, Language
-from astrology.zodiac import AshmandSignGroup, Sign, ashmand_sign_group
+from astrology.lunar_phase import _INTERVALS, _RULE_ID
+from astrology.zodiac import (
+  _ELEMENT_RULE_ID,
+  _MODALITY_RULE_ID,
+  AshmandSignGroup,
+  Element,
+  Modality,
+  Sign,
+  ashmand_sign_group,
+  element_of,
+  modality_of,
+)
 
 ASHMAND_RULE_ID = "rule.ptolemy_ashmand.sign_groups"
 
@@ -79,6 +90,28 @@ def check_catalog_data(catalog: Catalog) -> None:
     or entry.rule_ids != (ASHMAND_RULE_ID,)
   ):
     raise ValueError("Ashmand rule and entry must link the twelve signs and four groups")
+  for kind, prefix, members, rule_id, entry_id in (
+    (ConceptKind.ELEMENT, "element", tuple(Element), _ELEMENT_RULE_ID, "entry.sign_elements"),
+    (ConceptKind.MODALITY, "modality", tuple(Modality), _MODALITY_RULE_ID, "entry.sign_modalities"),
+    (
+      ConceptKind.LUNATION_TYPE,
+      "lunation_type.rudhyar1950",
+      tuple(phase for phase, _, _ in _INTERVALS),
+      _RULE_ID,
+      "entry.lunation_types",
+    ),
+  ):
+    ids = {f"{prefix}.{member.value}" for member in members}
+    if {c.identifier for c in catalog.list_concepts(kind=kind)} != ids:
+      raise ValueError(f"Catalog must cover exactly the {kind.value} identities")
+    linked = ids if kind is ConceptKind.LUNATION_TYPE else ids | {f"sign.{s.value}" for s in Sign}
+    rule, entry = catalog.variant(rule_id), catalog.entry(entry_id)
+    if (
+      set(rule.concept_ids) != linked
+      or set(entry.concept_ids) != linked
+      or entry.rule_ids != (rule_id,)
+    ):
+      raise ValueError(f"Incomplete {kind.value} rule or entry linkage")
   for path, text in localized_texts(catalog):
     for language in get_args(Language):
       if text.status(language) is not TranslationStatus.CURRENT:
@@ -166,6 +199,32 @@ def render_catalog(catalog: Catalog, language: Language, code_version: str) -> s
         sign_link = f"{{ref}}`{text(sign_concept.name)} <{catalog_anchor(sign_concept.identifier, language)}>`"
         group_link = f"{{ref}}`{text(group_concept.name)} <{catalog_anchor(group_concept.identifier, language)}>`"
         lines.append(f"| {sign_link} | {group_link} |")
+      lines.append("")
+    if variant.identifier in (_ELEMENT_RULE_ID, _MODALITY_RULE_ID):
+      prefix = "element" if variant.identifier == _ELEMENT_RULE_ID else "modality"
+      label = (
+        ("Element" if prefix == "element" else "Modality")
+        if language == "en"
+        else ("元素" if prefix == "element" else "模式")
+      )
+      lines.extend([f"| {'Sign' if language == 'en' else '星座'} | {label} |", "|---|---|"])
+      for sign in Sign:
+        member = element_of(sign) if prefix == "element" else modality_of(sign)
+        concept = catalog.concept(f"{prefix}.{member.value}")
+        lines.append(
+          f"| {text(catalog.concept(f'sign.{sign.value}').name)} | {text(concept.name)} |"
+        )
+      lines.append("")
+    if variant.identifier == _RULE_ID:
+      lines.extend(
+        [
+          "| Type | Moon minus Sun (degrees) |" if language == "en" else "| 类型 | 月减日（度） |",
+          "|---|---|",
+        ]
+      )
+      for phase, lower, upper in _INTERVALS:
+        concept = catalog.concept(f"lunation_type.rudhyar1950.{phase.value}")
+        lines.append(f"| {text(concept.name)} | [{lower}, {upper}) |")
       lines.append("")
   for source in catalog.sources:
     heading(source.identifier, source.title)

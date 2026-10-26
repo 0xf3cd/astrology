@@ -41,14 +41,14 @@ See the [complete result and text example](records.md).
 
 ```{eval-rst}
 .. automodule:: astrology.text
-   :members: format_chart
+   :members: format_chart, format_sign_distribution, format_lunar_phase
 ```
 
 ## Zodiac classification
 
 ```{eval-rst}
 .. automodule:: astrology.zodiac
-   :members: Sign, AshmandSignGroup, ashmand_sign_group, sign_of, sign_degree, truncate_display
+   :members: Sign, AshmandSignGroup, Element, Modality, ashmand_sign_group, element_of, modality_of, sign_of, sign_degree, truncate_display
    :undoc-members:
    :member-order: bysource
 ```
@@ -78,6 +78,24 @@ See the [two-chart example and static contract](cross_aspects.md).
 ```{eval-rst}
 .. automodule:: astrology.cross_aspects
    :members: CrossAspectHit, CrossChartAspects, cross_chart_aspects
+   :undoc-members:
+   :member-order: bysource
+```
+
+## Sign distributions and lunar phase
+
+See the [summary guide](summaries.md) for explicit populations, source conventions and errors.
+
+```{eval-rst}
+.. automodule:: astrology.lunar_phase
+   :members: LunationType, LunarPhaseResult, lunar_phase
+   :undoc-members:
+   :member-order: bysource
+```
+
+```{eval-rst}
+.. automodule:: astrology.summaries
+   :members: SignDistribution, sign_distribution, chart_sign_distribution, natal_lunar_phase
    :undoc-members:
    :member-order: bysource
 ```

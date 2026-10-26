@@ -48,20 +48,31 @@ def test_all_localized_fields_and_configuration_coverage() -> None:
   check_catalog_data(catalog)
   assert any("excerpt" in path for path, _ in localized_texts(catalog))
   with pytest.raises(ValueError, match="configuration identity"):
-    check_catalog_data(replace(catalog, concepts=catalog.concepts[1:], variants=(), entries=()))
+    check_catalog_data(
+      replace(
+        catalog,
+        concepts=tuple(c for c in catalog.concepts if c.identifier != "body.sun"),
+        variants=(),
+        entries=(),
+      )
+    )
 
 
 @pytest.mark.parametrize("stale", [False, True])
 @pytest.mark.parametrize("language", ["en", "zh-CN"])
 def test_translation_gap_is_visible_and_not_complete(stale: bool, language: Language) -> None:
   catalog = load_catalog()
-  name = replace(catalog.concepts[0].name, revision=2) if stale else LocalizedText("Sun")
-  concept = replace(catalog.concepts[0], name=name)
-  changed = replace(catalog, concepts=(concept, *catalog.concepts[1:]))
+  original = catalog.concept("body.sun")
+  name = replace(original.name, revision=2) if stale else LocalizedText("Sun")
+  concept = replace(original, name=name)
+  changed = replace(
+    catalog, concepts=tuple(concept if c is original else c for c in catalog.concepts)
+  )
   with pytest.raises(ValueError, match="Required translation"):
     check_catalog_data(changed)
   rendered = render_catalog(changed, language, "0.0.0")
-  names = next(line for line in rendered.splitlines() if line.startswith("Chinese names"))
+  section = rendered.split(f"({catalog_anchor('body.sun', language)})=", 1)[1].split("\n## ", 2)[1]
+  names = next(line for line in section.splitlines() if line.startswith("Chinese names"))
   assert ("[stale] 太阳" if stale else "[missing]") in names
 
 
@@ -95,7 +106,11 @@ def test_generation_covers_every_record(language: Language) -> None:
       f"| {{ref}}`{sign_concept.name.text(language)} <{catalog_anchor(sign_concept.identifier, language)}>`"
       f" | {{ref}}`{group_concept.name.text(language)} <{catalog_anchor(group_concept.identifier, language)}>` |"
     )
-  assert [line for line in rendered.splitlines() if line.startswith("|")] == expected_rows
+  section = rendered.split(f"({catalog_anchor('rule.ptolemy_ashmand.sign_groups', language)})=", 1)[
+    1
+  ]
+  section = section.split("\n## ", 2)[1]
+  assert [line for line in section.splitlines() if line.startswith("|")] == expected_rows
 
 
 @pytest.mark.parametrize("language", ["en", "zh-CN"])
@@ -417,7 +432,9 @@ def test_rule_configuration_coverage_is_independent_of_concepts(defect: str) -> 
       )
     )
   else:
-    variants[0] = replace(first, concept_ids=("house.equal",), configuration=HouseSystem.EQUAL)
+    variants[variants.index(first)] = replace(
+      first, concept_ids=("house.equal",), configuration=HouseSystem.EQUAL
+    )
   changed = replace(catalog, variants=variants, entries=())
   with pytest.raises(ValueError, match="rule-bearing configuration"):
     check_catalog_data(changed)
