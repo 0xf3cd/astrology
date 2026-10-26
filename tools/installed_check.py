@@ -25,6 +25,8 @@ MODULES = (
   "knowledge",
   "knowledge.catalog",
   "knowledge.records",
+  "lunar_phase",
+  "summaries",
   "text",
   "zodiac",
 )
@@ -249,6 +251,66 @@ def _check_cross_chart(expected_observations: Path | None = None) -> None:
   ) != expected_observations.read_text(encoding="utf-8"):
     raise ValueError("Installed cross aspects differ from the development entry point")
   _check_native_isolation()
+
+
+def _check_summaries() -> None:
+  """Exercise pure and composed summaries with independent synthetic expectations.
+
+  用独立的合成期望核验纯查询及命盘组合摘要。
+  """
+  catalog = astrology.load_catalog()
+  chart = _cross_source(2000, "summary", ((astrology.Body.MOON, 100), (astrology.Body.SUN, 10)))
+  result = astrology.chart_sign_distribution(
+    chart, objects=(astrology.Body.SUN, astrology.Body.MOON)
+  )
+  if (
+    result.objects != (astrology.Body.MOON, astrology.Body.SUN)
+    or result.total != 2
+    or result.element_counts
+    != {
+      astrology.Element.FIRE: 1,
+      astrology.Element.EARTH: 0,
+      astrology.Element.AIR: 0,
+      astrology.Element.WATER: 1,
+    }
+    or result.modality_counts[astrology.Modality.CARDINAL] != 2
+    or result.element_proportions[astrology.Element.FIRE] != 0.5
+    or result.modality_proportions[astrology.Modality.CARDINAL] != 1
+    or astrology.sign_distribution(chart.placements) != result
+    or astrology.element_of(astrology.Sign.ARIES) is not astrology.Element.FIRE
+    or astrology.modality_of(astrology.Sign.CANCER) is not astrology.Modality.CARDINAL
+  ):
+    raise ValueError("Installed sign summary differs from hand-worked population")
+  phase = astrology.natal_lunar_phase(chart)
+  if (
+    phase != astrology.lunar_phase(sun_longitude_deg=10, moon_longitude_deg=100)
+    or phase.elongation_deg != 90
+    or phase.phase is not astrology.LunationType.FIRST_QUARTER
+    or phase.direction != "waxing"
+    or phase.rule_id != "rule.lunation.rudhyar1950"
+  ):
+    raise ValueError("Installed lunar phase differs from hand-worked arc")
+  for language, object_name, phase_name in (
+    ("en", "Sun [sun]", "First Quarter Type"),
+    ("zh-CN", "太阳 [sun]", "上弦月型"),
+  ):
+    selected: Literal["en", "zh-CN"] = language  # type: ignore[assignment]
+    text = astrology.format_sign_distribution(result, catalog, language=selected)
+    if object_name not in text or "1/2 | 50.00%" not in text:
+      raise ValueError("Installed distribution text is incomplete")
+    if phase_name not in astrology.format_lunar_phase(phase, catalog, language=selected):
+      raise ValueError("Installed phase text is incomplete")
+  for call in (
+    lambda: astrology.chart_sign_distribution(chart, objects=()),
+    lambda: astrology.chart_sign_distribution(chart, objects=(astrology.Body.PLUTO,)),
+    lambda: astrology.lunar_phase(True, 0),
+  ):
+    try:
+      call()
+    except (TypeError, ValueError):
+      pass
+    else:
+      raise ValueError("Installed summary accepted an invalid input")
 
 
 def _check_native_isolation() -> None:
@@ -532,11 +594,13 @@ def main(
   _check_native_isolation()
   _check_knowledge(expected_corpus_version)
   if knowledge_only:
+    _check_summaries()
     if any(name.startswith(("tzdata", "zoneinfo", "celestial", "ctypes")) for name in sys.modules):
       raise ValueError("Knowledge-only consumer loaded time or native machinery")
     print(f"Installed knowledge corpus; optimized={sys.flags.optimize}")
     return
   _check_birth_and_configuration()
+  _check_summaries()
   _check_native_isolation()
   _check_cross_chart(expected_cross_observations)
   _check_natal_chart(expected_observations)

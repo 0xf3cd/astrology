@@ -54,6 +54,8 @@ PACKAGE_FILES = (
   "astrology/config.py",
   "astrology/cross_aspects.py",
   "astrology/houses.py",
+  "astrology/lunar_phase.py",
+  "astrology/summaries.py",
   "astrology/text.py",
   "astrology/zodiac.py",
   "astrology/knowledge/__init__.py",
@@ -187,6 +189,7 @@ def check_examples(report: str) -> None:
       "chart",
       "aspects",
       "cross_aspects",
+      "summaries",
       "records",
       "knowledge",
     ):

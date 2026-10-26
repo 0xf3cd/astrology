@@ -27,7 +27,7 @@ True
 >>> catalog.filter_entries(concept_id="body.sun")[0].identifier
 'entry.body_requests'
 >>> len(catalog.filter_sources(verification=SourceVerification.VERIFIED))
-5
+7
 >>> bool(catalog.version)
 True
 ```
@@ -189,6 +189,15 @@ credited Chinese translations and project explanations separately, with the
 extent of each excerpt recorded in its citation. This classification follows
 Ashmand's edition; it does not establish agreement across traditions or predict
 actual weather or daylight.
+
+## Elements, modalities and lunation types
+
+These output concepts have their own kinds and stable IDs: `element.*`,
+`modality.*`, `lunation_type.rudhyar1950.*`, without request-configuration links.
+See the [queries, statistics and lunar phase guide](summaries.md). The inspected
+sources are an Astrodienst webpage snapshot and Rudhyar's online transcription;
+Rudhyar's magazine original was not inspected. Classifications carry no personality interpretation;
+generated tables read the owning executable definitions.
 
 ## Translation revisions and search
 

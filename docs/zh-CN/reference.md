@@ -42,7 +42,7 @@
 
 ```{eval-rst}
 .. automodule:: astrology.text
-   :members: format_chart
+   :members: format_chart, format_sign_distribution, format_lunar_phase
    :no-index:
 ```
 
@@ -50,7 +50,7 @@
 
 ```{eval-rst}
 .. automodule:: astrology.zodiac
-   :members: Sign, AshmandSignGroup, ashmand_sign_group, sign_of, sign_degree, truncate_display
+   :members: Sign, AshmandSignGroup, Element, Modality, ashmand_sign_group, element_of, modality_of, sign_of, sign_degree, truncate_display
    :undoc-members:
    :member-order: bysource
    :no-index:
@@ -83,6 +83,26 @@
 ```{eval-rst}
 .. automodule:: astrology.cross_aspects
    :members: CrossAspectHit, CrossChartAspects, cross_chart_aspects
+   :undoc-members:
+   :member-order: bysource
+   :no-index:
+```
+
+## 星座分布与月相
+
+显式选定对象的统计、来源约定及错误行为见[摘要指南](summaries.md)。
+
+```{eval-rst}
+.. automodule:: astrology.lunar_phase
+   :members: LunationType, LunarPhaseResult, lunar_phase
+   :undoc-members:
+   :member-order: bysource
+   :no-index:
+```
+
+```{eval-rst}
+.. automodule:: astrology.summaries
+   :members: SignDistribution, sign_distribution, chart_sign_distribution, natal_lunar_phase
    :undoc-members:
    :member-order: bysource
    :no-index:

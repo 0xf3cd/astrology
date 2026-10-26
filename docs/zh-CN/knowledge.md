@@ -25,7 +25,7 @@ True
 >>> catalog.filter_entries(concept_id="body.sun")[0].identifier
 'entry.body_requests'
 >>> len(catalog.filter_sources(verification=SourceVerification.VERIFIED))
-5
+7
 >>> bool(catalog.version)
 True
 ```
@@ -155,6 +155,13 @@ True
 原文见第一卷第 XIV 章、印刷页 34–35（PDF 第 72–73 页），记录在 `source.ptolemy.ashmand1822` 中。
 目录中的英文摘录、署名中文译文和项目说明分别标明，引用也注明了摘录范围。
 这里依据的是 Ashmand 的这一版本，不能据此认为各流派都采用相同分类，也不能用组名预测实际天气或日照。
+
+## 元素、模式与月相类型
+
+这些输出概念有各自的类别及稳定标识：`element.*`、`modality.*`、
+`lunation_type.rudhyar1950.*`，不链接请求配置。用法见[查询、统计及月相指南](summaries.md)。
+已核的来源是 Astrodienst 网页快照和 Rudhyar 在线转录，未核 Rudhyar 的杂志原件。分类不作性格解读；
+生成表读取各领域的可执行定义。
 
 ## 译文修订与搜索
 

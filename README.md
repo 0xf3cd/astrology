@@ -13,6 +13,9 @@ resolution](https://0xf3cd.github.io/astrology/docs/en/birth.html), [requested c
 [API documentation](https://0xf3cd.github.io/astrology/docs/en/reference.html).
 See [Contributing](https://0xf3cd.github.io/astrology/docs/en/contributing.html) to run the checks.
 
+The current source also adds [element/modality distributions and natal lunar
+phase](https://0xf3cd.github.io/astrology/docs/en/summaries.html), planned for 0.3.0.
+
 New in 0.2.0 (in development):
 
 - [Static cross-chart aspects](https://0xf3cd.github.io/astrology/docs/en/cross_aspects.html)

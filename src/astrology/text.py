@@ -11,10 +11,18 @@ from astrology.aspects import AspectMotion
 from astrology.birth import Location
 from astrology.chart import NatalChart
 from astrology.config import Body, HouseSystem, LunarNode, MajorAspect
-from astrology.knowledge import Catalog, TranslationStatus
+from astrology.knowledge import Catalog, Concept, TranslationStatus
 from astrology.knowledge.catalog import _sign_concept
 from astrology.knowledge.records import _LANGUAGES, Language
-from astrology.zodiac import Sign, _whole_arcseconds, sign_of
+from astrology.lunar_phase import LunarPhaseResult
+from astrology.summaries import SignDistribution
+from astrology.zodiac import (
+  _ELEMENT_RULE_ID,
+  _MODALITY_RULE_ID,
+  Sign,
+  _whole_arcseconds,
+  sign_of,
+)
 
 _HEADINGS = {
   "en": {
@@ -88,6 +96,36 @@ _MOTIONS = {
     AspectMotion.INDETERMINATE: "无法确定",
   },
 }
+_SUMMARY_LABELS = {
+  "en": {
+    "distribution": "Sign distribution (equal counts)",
+    "objects": "Counted objects",
+    "total": "Total / denominator",
+    "columns": "Category | Count / total | Proportion",
+    "phase": "Lunar phase type",
+    "angle": "Moon minus Sun (longitude, degrees)",
+    "direction": "Angular direction",
+    "waxing": "waxing",
+    "waning": "waning",
+    "turning": "turning",
+    "rule": "Rule",
+    "phase_limit": "A type covers an interval, not an exact event; no illuminated fraction is calculated.",
+  },
+  "zh-CN": {
+    "distribution": "星座分布（等权计数）",
+    "objects": "计数对象",
+    "total": "总数 / 分母",
+    "columns": "类别 | 计数 / 总数 | 比例",
+    "phase": "月相类型",
+    "angle": "月亮减太阳（黄经，度）",
+    "direction": "角度方向",
+    "waxing": "盈",
+    "waning": "亏",
+    "turning": "转折点",
+    "rule": "规则",
+    "phase_limit": "每型覆盖一段区间，不表示精确事件；不计算照亮比例。",
+  },
+}
 
 
 def _dms(arcseconds: int) -> str:
@@ -126,6 +164,10 @@ def _name(
     if len(matches) != 1:
       raise ValueError(f"Expected one catalog concept for {identity.value}")
     concept = matches[0]
+  return _current_name(concept, language)
+
+
+def _current_name(concept: Concept, language: Language) -> str:
   if concept.name.status(language) is not TranslationStatus.CURRENT:
     raise ValueError(f"Missing or stale {language} name for {concept.identifier}")
   name = concept.name.text(language)
@@ -261,3 +303,69 @@ def format_chart(chart: NatalChart, catalog: Catalog, *, language: Language = "e
     ]
   )
   return "\n".join(lines)
+
+
+def format_sign_distribution(
+  result: SignDistribution, catalog: Catalog, *, language: Language = "en"
+) -> str:
+  """Render counted identities, denominator and all category counts using the supplied catalog.
+
+  Proportions display as percentages with two decimal places; exact count/total
+  remains visible. No I/O or astronomy. Invalid result/catalog types raise
+  TypeError, invalid language or missing/stale names ValueError (missing IDs
+  raise KeyError). Supplied names are escaped as in format_chart.
+
+  用给定目录显示计数对象、分母和各类计数。比例显示为两位小数的百分比，同时保留精确的
+  计数 / 总数。不执行 I/O 或天文计算。结果或目录类型错误抛出 TypeError，语言非法或
+  名称缺失或过期抛出 ValueError（标识缺失抛出 KeyError）。名称按 format_chart 的规则转义。
+  """
+  if type(result) is not SignDistribution or type(catalog) is not Catalog:
+    raise TypeError("result and catalog must be SignDistribution and Catalog values")
+  if type(language) is not str or language not in _LANGUAGES:
+    raise ValueError("language must be en or zh-CN")
+  labels = _SUMMARY_LABELS[language]
+  objects = ", ".join(
+    f"{_name(identity, catalog, language)} [{identity.value}]" for identity in result.objects
+  )
+  lines = [
+    labels["distribution"],
+    f"{labels['objects']}: {objects}",
+    f"{labels['total']}: {result.total}",
+    f"{labels['rule']}: {_ELEMENT_RULE_ID}, {_MODALITY_RULE_ID}",
+    labels["columns"],
+  ]
+  for prefix, counts in (("element", result.element_counts), ("modality", result.modality_counts)):
+    for identity, count in counts.items():
+      name = _current_name(catalog.concept(f"{prefix}.{identity.value}"), language)
+      lines.append(f"{name} | {count}/{result.total} | {count / result.total:.2%}")
+  return "\n".join(lines)
+
+
+def format_lunar_phase(
+  result: LunarPhaseResult, catalog: Catalog, *, language: Language = "en"
+) -> str:
+  """Render the type and untruncated numerical angle using the supplied bilingual catalog.
+
+  repr-style degree output preserves the stored float; direction and type never
+  come from display rounding. No I/O or astronomy. Type, language and name errors
+  follow format_sign_distribution; supplied names are escaped as in format_chart.
+
+  用给定双语目录显示类型及未经截断的数值角度。度数按 repr 形式保留存储的浮点值；方向和类型
+  不由显示舍入决定。不执行 I/O 或天文计算。类型、语言和名称错误沿用 format_sign_distribution，
+  名称按 format_chart 的规则转义。
+  """
+  if type(result) is not LunarPhaseResult or type(catalog) is not Catalog:
+    raise TypeError("result and catalog must be LunarPhaseResult and Catalog values")
+  if type(language) is not str or language not in _LANGUAGES:
+    raise ValueError("language must be en or zh-CN")
+  labels = _SUMMARY_LABELS[language]
+  name = _current_name(catalog.concept(f"lunation_type.rudhyar1950.{result.phase.value}"), language)
+  return "\n".join(
+    (
+      f"{labels['phase']}: {name}",
+      f"{labels['angle']}: {result.elongation_deg!r}",
+      f"{labels['direction']}: {labels[result.direction]}",
+      f"{labels['rule']}: {result.rule_id}",
+      labels["phase_limit"],
+    )
+  )
