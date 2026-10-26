@@ -1,4 +1,4 @@
-"""Explicit populations, sourced classifications and bilingual summaries. 显式人口、来源分类和双语摘要。"""
+"""Explicit populations, sourced classifications and bilingual summaries. 显式对象集合、来源分类和双语摘要。"""
 
 import math
 import subprocess
