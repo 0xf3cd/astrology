@@ -69,12 +69,15 @@ def test_query_contracts(catalog: Catalog) -> None:
   assert len(catalog.list_concepts(kind=ConceptKind.SIGN)) == 12
   sign_rules = catalog.list_variants(concept_id="sign.taurus")
   assert [rule.identifier for rule in sign_rules] == [
+    "rule.lilly1647.essential_dignities",
     "rule.zodiac.elements",
     "rule.zodiac.modalities",
     "rule.project.tropical_sign_sectors",
     "rule.ptolemy_ashmand.sign_groups",
   ]
-  assert catalog.list_variants(concept_id="body.sun") == ()
+  assert [v.identifier for v in catalog.list_variants(concept_id="body.sun")] == [
+    "rule.lilly1647.essential_dignities"
+  ]
   vocabulary = catalog.entry("entry.sign_vocabulary")
   assert "rule.ptolemy_ashmand.sign_groups" in vocabulary.rule_ids
   assert "source.astrology.sign_groups.c92ac82" in {c.source_id for c in vocabulary.citations}
@@ -87,6 +90,7 @@ def test_query_contracts(catalog: Catalog) -> None:
     "entry.sign_vocabulary",
     "entry.equinoctial_example",
     "entry.ashmand_sign_groups",
+    "entry.essential_dignities",
   ]
   assert catalog.filter_entries(source_id="source.ptolemy.ashmand1822") == tuple(
     entry
@@ -112,6 +116,7 @@ def test_query_contracts(catalog: Catalog) -> None:
     "entry.sign_elements",
     "entry.sign_modalities",
     "entry.lunation_types",
+    "entry.essential_dignities",
   }
   assert all(
     entry.prerequisite_status is PrerequisiteStatus.UNRESOLVED
@@ -305,7 +310,9 @@ def test_invalid_variant_links(catalog: Catalog) -> None:
   with pytest.raises(ValueError, match="Dangling"):
     replace(catalog, variants=(replace(catalog.variants[0], concept_ids=("absent.id",)),))
   with pytest.raises(ValueError, match="no linked concept"):
-    replace(catalog, variants=(replace(catalog.variants[0], configuration=Body.MOON),))
+    replace(
+      catalog, variants=(replace(catalog.variant("rule.zodiac.elements"), configuration=Body.MOON),)
+    )
 
 
 @pytest.mark.parametrize(
@@ -583,7 +590,12 @@ def test_retired_identity_variants_keep_their_concepts(catalog: Catalog, identif
   concept = catalog.concept(concept_id)
   assert concept.configuration is not None
   assert catalog.lookup(concept.name.en) == (concept,)
-  assert catalog.list_variants(concept_id=concept_id) == ()
+  assert tuple(v.identifier for v in catalog.list_variants(concept_id=concept_id)) == (
+    ("rule.lilly1647.essential_dignities",)
+    if concept.configuration
+    in (Body.SUN, Body.MOON, Body.MERCURY, Body.VENUS, Body.MARS, Body.JUPITER, Body.SATURN)
+    else ()
+  )
   assert catalog.filter_entries(concept_id=concept_id)[0].rule_ids == ()
   entry = catalog.filter_entries(concept_id=concept_id)[0]
   with pytest.raises(ValueError, match="Dangling"):
@@ -607,7 +619,12 @@ def test_retained_rule_ids_and_order(catalog: Catalog) -> None:
     v
     for v in catalog.variants
     if v.identifier
-    not in ("rule.zodiac.elements", "rule.zodiac.modalities", "rule.lunation.rudhyar1950")
+    not in (
+      "rule.zodiac.elements",
+      "rule.zodiac.modalities",
+      "rule.lunation.rudhyar1950",
+      "rule.lilly1647.essential_dignities",
+    )
   )
   assert [(v.identifier, v.configuration) for v in retained[:10]] == list(expected)
   assert [v.identifier for v in retained[10:]] == [

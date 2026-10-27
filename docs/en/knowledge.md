@@ -22,12 +22,12 @@ True
 12
 >>> catalog.concept("body.sun").configuration.name
 'SUN'
->>> catalog.list_variants(concept_id="body.sun")
-()
+>>> [rule.identifier for rule in catalog.list_variants(concept_id="body.sun")]
+['rule.lilly1647.essential_dignities']
 >>> catalog.filter_entries(concept_id="body.sun")[0].identifier
 'entry.body_requests'
 >>> len(catalog.filter_sources(verification=SourceVerification.VERIFIED))
-7
+8
 >>> bool(catalog.version)
 True
 ```
@@ -35,8 +35,8 @@ True
 Several names can identify one concept: `Sun`, `Sol` and `日轮` all refer to
 `body.sun`. A rule variant records a particular definition, such as a house
 system or lunar-node algorithm. Body names and ascending/descending node directions
-do not get separate rules, so `list_variants(concept_id="body.sun")` returns `()`.
-The Sun's names and related entries remain available; see [rule-ID changes](#pre-release-rule-id-changes)
+do not get identity-only rules. The Sun now links to the sourced dignity rule,
+which carries assignments rather than repeating its name. See [rule-ID changes](#pre-release-rule-id-changes)
 for the old identifiers.
 
 You can also look up the rules for [cross-chart aspect comparison](cross_aspects.md).
@@ -79,13 +79,15 @@ The catalog currently includes:
   and calculates single-chart and cross-chart aspects.
 - The four sign groups in Ashmand's 1822 edition, with bibliographic records,
   excerpts and Chinese translations.
+- [Lilly's 1647 seven-planet rulership and four essential statuses](dignities.md),
+  with short primary-scan excerpts and a generated sign table.
 
 Configuration entries link to the enum members the program uses; rule descriptions
 link to their implementations. House systems, node definitions and aspect angles
 have separate explanations of the chosen definitions and their limits. Reference
 pages take exact aspect angles directly from the calculation code and check the
-angles in explanatory text against it. The catalog supplies no default orbs,
-dignity or interpretation rules.
+angles in explanatory text against it. The catalog supplies no default orbs or
+interpretation rules. Dignity assignments belong to `astrology.dignities`.
 
 For example, inspect the equinoctial-sign entry's source, excerpt, translation
 and status:
@@ -273,7 +275,8 @@ rule.node.meeus_five_term_true_descending
 ```
 
 `variant()` raises `KeyError` for these IDs; there is no alias or conversion to a
-concept. `list_variants()` for their concepts returns `()`. Use `concept()`,
+concept. Their removal did not prohibit later substantive rules: the seven
+classical bodies now link to Lilly's dignity rule. Use `concept()`,
 `lookup()` or `filter_entries()` to retrieve the preserved identity information.
 The three `rule.house.*`, two `rule.node_definition.*`, five `rule.aspect.*` and
 nine original authored rule IDs remain. Their relative order is unchanged:

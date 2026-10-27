@@ -11,7 +11,8 @@
 [命盘结果与文本输出](https://0xf3cd.github.io/astrology/docs/zh-CN/records.html)、独立[知识目录](https://0xf3cd.github.io/astrology/docs/zh-CN/knowledge.html)、质量检查和双语 [API 文档](https://0xf3cd.github.io/astrology/docs/zh-CN/reference.html)。
 运行检查见[参与开发](https://0xf3cd.github.io/astrology/docs/zh-CN/contributing.html)。
 
-当前源码另增[元素／模式分布与出生月相](https://0xf3cd.github.io/astrology/docs/zh-CN/summaries.html)，计划随 0.3.0 交付。
+当前源码另增[元素／模式分布与出生月相](https://0xf3cd.github.io/astrology/docs/zh-CN/summaries.html)，
+以及[传统守护与四种本质状态](https://0xf3cd.github.io/astrology/docs/zh-CN/dignities.html)，计划随 0.3.0 交付。
 
 0.2.0（开发中）新增：
 

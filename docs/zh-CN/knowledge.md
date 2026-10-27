@@ -20,19 +20,19 @@ True
 12
 >>> catalog.concept("body.sun").configuration.name
 'SUN'
->>> catalog.list_variants(concept_id="body.sun")
-()
+>>> [rule.identifier for rule in catalog.list_variants(concept_id="body.sun")]
+['rule.lilly1647.essential_dignities']
 >>> catalog.filter_entries(concept_id="body.sun")[0].identifier
 'entry.body_requests'
 >>> len(catalog.filter_sources(verification=SourceVerification.VERIFIED))
-7
+8
 >>> bool(catalog.version)
 True
 ```
 
 同一个概念可以有多个名称，但只有一个标识。例如，`Sun`、`Sol` 和“日轮”都指向 `body.sun`。
-规则变体则记录某套具体定义，例如采用哪种宫制或月交点算法。天体名称和升降交点方向本身不另建规则，
-所以 `list_variants(concept_id="body.sun")` 返回 `()`；仍可查询太阳的名称和相关条目。
+规则变体则记录某套具体定义，例如采用哪种宫制或月交点算法。天体名称和升降交点方向本身不另建规则。
+太阳现在链接有来源依据的尊贵规则，其中含具体归属，不是重复太阳名称。
 旧标识的处理见[规则标识变更](#首发前的规则标识变更)。
 
 也可以查询[双盘相位比较](cross_aspects.md)采用的规则。
@@ -68,11 +68,12 @@ True
 - 排盘时可选的天体、宫制、月交点定义和相位，以及它们的中英文名称。
 - 本项目如何划分十二星座、判断落宫，以及计算单盘和双盘相位。
 - Ashmand 1822 年版中的四组星座分类，以及相关书目、摘录和中文译文。
+- [Lilly 1647年版七政守护及四种本质状态](dignities.md)，含原扫描本短引文及生成的星座表。
 
 配置项链接到程序实际使用的枚举成员；规则说明链接到对应的实现。
 宫制、月交点定义和相位角各有说明，写明采用哪种定义及其限制。
 参考页中的精确相位角直接取自计算代码，并核对说明文字中的角度。
-目录不提供默认容许度、尊贵或解读规则。
+目录不提供默认容许度或解读规则；尊贵归属由`astrology.dignities`定义。
 
 例如，下面查看分点星座条目的出处、原文和译文，以及条目的状态：
 
@@ -224,7 +225,7 @@ rule.node.meeus_five_term_true_descending
 ```
 
 `variant()` 遇到这些标识会抛出 `KeyError`，不提供别名或隐式转换为概念。
-按对应概念调用 `list_variants()` 会返回 `()`；保留的身份信息可用 `concept()`、`lookup()`
+移除纯身份规则不限制后续增加有实质内容的规则：七政现在关联Lilly尊贵规则。保留的身份信息可用 `concept()`、`lookup()`
 或 `filter_entries()` 查询。三条 `rule.house.*`、两条 `rule.node_definition.*`、五条
 `rule.aspect.*` 以及原有九条显式规则标识均保留，相对顺序不变：十条带配置链接的规则在前，
 原有九条显式规则在后。该修订当时含 19 条变体，概念、来源和条目数量仍为 36、3 和 8。

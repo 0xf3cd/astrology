@@ -11,7 +11,13 @@ import pytest
 
 from astrology.knowledge import ConceptKind, Entry, LocalizedText, Source, load_catalog
 from astrology.knowledge.records import Language
-from tools.catalog_docs import catalog_anchor, check_catalog_data, localized_texts, render_catalog
+from tools.catalog_docs import (
+  catalog_anchor,
+  check_catalog_data,
+  dignity_rows,
+  localized_texts,
+  render_catalog,
+)
 from tools.check import check_catalog_html
 from tools.docs_search import JS_SPLITTER, BilingualSearch, check_search_html, read_search_index
 
@@ -175,6 +181,16 @@ def catalog_html(tmp_path: Path) -> Path:
           + html.escape("\n".join(content))
           + source_link
           + (
+            "<table>"
+            + "".join(
+              "<tr>" + "".join(f"<td>{html.escape(cell)}</td>" for cell in row) + "</tr>"
+              for row in dignity_rows(catalog, language)
+            )
+            + "</table>"
+            if record.identifier == "rule.lilly1647.essential_dignities"
+            else ""
+          )
+          + (
             "<table><tr><th>"
             + ("Sign</th><th>Group" if language == "en" else "星座</th><th>分组")
             + "</th></tr>"
@@ -201,6 +217,32 @@ def catalog_html(tmp_path: Path) -> Path:
 
 def test_complete_catalog_html(catalog_html: Path) -> None:
   check_catalog_html(catalog_html)
+
+
+@pytest.mark.parametrize("language", ["en", "zh-CN"])
+@pytest.mark.parametrize("defect", ["missing", "wrong", "detached", "duplicate"])
+def test_dignity_rendered_rows_reject_defects(
+  catalog_html: Path, language: Language, defect: str
+) -> None:
+  page = catalog_html / "docs" / language / "catalog.html"
+  text = page.read_text(encoding="utf-8")
+  cells = (
+    ("Virgo", "Mercury", "Mercury", "Jupiter", "Venus")
+    if language == "en"
+    else ("处女座", "水星", "水星", "木星", "金星")
+  )
+  row = "<tr>" + "".join(f"<td>{cell}</td>" for cell in cells) + "</tr>"
+  assert text.count(row) == 1
+  changed = (
+    ""
+    if defect in ("missing", "detached")
+    else (row + row if defect == "duplicate" else row.replace(cells[2], "wrong"))
+  )
+  if defect == "detached":
+    text = text.replace("</html>", row + "</html>")
+  page.write_text(text.replace(row, changed, 1), encoding="utf-8")
+  with pytest.raises(ValueError, match="dignity rows"):
+    check_catalog_html(catalog_html)
 
 
 @pytest.mark.parametrize("language", ["en", "zh-CN"])

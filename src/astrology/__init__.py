@@ -49,16 +49,24 @@ from astrology.config import (
   OrbCombination,
 )
 from astrology.cross_aspects import CrossAspectHit, CrossChartAspects, cross_chart_aspects
+from astrology.dignities import DignityStatus, essential_dignities, sign_ruler
 from astrology.houses import house_of
 from astrology.knowledge import Catalog, load_catalog
 from astrology.lunar_phase import LunarPhaseResult, LunationType, lunar_phase
 from astrology.summaries import (
+  HouseRuler,
+  HouseRulers,
   SignDistribution,
   chart_sign_distribution,
   natal_lunar_phase,
   sign_distribution,
 )
-from astrology.text import format_chart, format_lunar_phase, format_sign_distribution
+from astrology.text import (
+  format_chart,
+  format_house_rulers,
+  format_lunar_phase,
+  format_sign_distribution,
+)
 from astrology.zodiac import (
   AshmandSignGroup,
   Element,
@@ -89,11 +97,14 @@ __all__ = [
   "ChartTimes",
   "CrossAspectHit",
   "CrossChartAspects",
+  "DignityStatus",
   "EclipticPosition",
   "EffectiveConfiguration",
   "Element",
   "FixedOffset",
   "HistoricalTimeError",
+  "HouseRuler",
+  "HouseRulers",
   "HouseSystem",
   "IanaTimezone",
   "Location",
@@ -118,8 +129,10 @@ __all__ = [
   "chart_sign_distribution",
   "cross_chart_aspects",
   "element_of",
+  "essential_dignities",
   "find_aspects",
   "format_chart",
+  "format_house_rulers",
   "format_lunar_phase",
   "format_sign_distribution",
   "house_of",
@@ -133,5 +146,6 @@ __all__ = [
   "sign_degree",
   "sign_distribution",
   "sign_of",
+  "sign_ruler",
   "truncate_display",
 ]

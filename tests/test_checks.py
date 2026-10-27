@@ -38,6 +38,7 @@ _EXAMPLE_PAGES = (
   "aspects",
   "cross_aspects",
   "summaries",
+  "dignities",
   "records",
   "knowledge",
 )

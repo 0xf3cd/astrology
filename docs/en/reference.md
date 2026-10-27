@@ -41,7 +41,7 @@ See the [complete result and text example](records.md).
 
 ```{eval-rst}
 .. automodule:: astrology.text
-   :members: format_chart, format_sign_distribution, format_lunar_phase
+   :members: format_chart, format_sign_distribution, format_lunar_phase, format_house_rulers
 ```
 
 ## Zodiac classification
@@ -95,7 +95,18 @@ See the [summary guide](summaries.md) for explicit populations, source conventio
 
 ```{eval-rst}
 .. automodule:: astrology.summaries
-   :members: SignDistribution, sign_distribution, chart_sign_distribution, natal_lunar_phase
+   :members: SignDistribution, sign_distribution, chart_sign_distribution, natal_lunar_phase, HouseRuler, HouseRulers
+   :undoc-members:
+   :member-order: bysource
+```
+
+## Traditional rulership and dignities
+
+See [the dignity guide](dignities.md) for the named source, simultaneous statuses and missing placements.
+
+```{eval-rst}
+.. automodule:: astrology.dignities
+   :members: DignityStatus, sign_ruler, essential_dignities
    :undoc-members:
    :member-order: bysource
 ```

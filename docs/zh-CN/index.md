@@ -17,6 +17,7 @@ chart
 aspects
 cross_aspects
 summaries
+dignities
 records
 reference
 architecture

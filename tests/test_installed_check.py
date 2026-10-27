@@ -658,6 +658,48 @@ def test_installed_ashmand_knowledge_defects(consumer: Path, defect: str) -> Non
     installed_check._check_knowledge()
 
 
+@pytest.mark.parametrize(
+  "defect",
+  [
+    "entry_link",
+    "rule_link",
+    "source_status",
+    "source_link",
+    "output",
+    "prerequisites",
+    "status_kind",
+  ],
+)
+def test_installed_dignity_knowledge_defects(consumer: Path, defect: str) -> None:
+  path = consumer / "knowledge/catalog.json"
+  data = json.loads(path.read_text(encoding="utf-8"))
+  entry = next(e for e in data["entries"] if e["identifier"] == "entry.essential_dignities")
+  if defect == "entry_link":
+    entry["rule_ids"] = []
+  elif defect == "rule_link":
+    rule = next(
+      v for v in data["variants"] if v["identifier"] == "rule.lilly1647.essential_dignities"
+    )
+    rule["concept_ids"] = rule["concept_ids"][:-1]
+  elif defect == "source_status":
+    source = next(
+      s for s in data["sources"] if s["identifier"] == "source.lilly.christian-astrology-1647"
+    )
+    source["verification"] = "unverified"
+  elif defect == "source_link":
+    entry["citations"][0]["source_id"] = "source.rudhyar.lunation-birthday"
+  elif defect == "output":
+    entry["output_eligibility"] = "eligible"
+  elif defect == "prerequisites":
+    entry["prerequisite_status"] = "unresolved"
+  else:
+    concept = next(c for c in data["concepts"] if c["identifier"] == "dignity_status.fall")
+    concept["kind"] = "element"
+  path.write_text(json.dumps(data), encoding="utf-8")
+  with pytest.raises(ValueError, match="Installed dignity knowledge"):
+    installed_check._check_dignities()
+
+
 def test_installed_ashmand_lookup_defect_is_rejected(
   consumer: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
