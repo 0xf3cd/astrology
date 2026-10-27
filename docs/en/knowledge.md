@@ -35,7 +35,7 @@ True
 Several names can identify one concept: `Sun`, `Sol` and `日轮` all refer to
 `body.sun`. A rule variant records a particular definition, such as a house
 system or lunar-node algorithm. Body names and ascending/descending node directions
-do not get identity-only rules. The Sun now links to the sourced dignity rule,
+do not get identity-only rules. The Sun links to the sourced dignity rule,
 which carries assignments rather than repeating its name. See [rule-ID changes](#pre-release-rule-id-changes)
 for the old identifiers.
 

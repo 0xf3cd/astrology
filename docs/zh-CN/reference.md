@@ -88,9 +88,10 @@
    :no-index:
 ```
 
-## 星座分布与月相
+## 命盘摘要与月相
 
 显式选定对象的统计、来源约定及错误行为见[摘要指南](summaries.md)。
+宫主星记录见[尊贵指南](dignities.md)。
 
 ```{eval-rst}
 .. automodule:: astrology.lunar_phase

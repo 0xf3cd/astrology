@@ -66,9 +66,10 @@ House | Cusp sign | Ruler | Ruler placement | Statuses
 True
 ```
 
-`HouseRulers` retains only the supplied `NatalChart`. Each `houses` access derives
-twelve equal records in house order, using **actual cusp longitudes**, not ASC or
-MC as replacements for the first or tenth cusp. Repeated cusp signs remain separate
+`HouseRulers` retains only the supplied `NatalChart`. Each `houses` access builds
+twelve new records in house order; repeated accesses return equal tuples.
+It uses **actual cusp longitudes**, not ASC or MC as replacements for the first
+or tenth cusp. Repeated cusp signs remain separate
 records. The requested house system and raw astronomy are unchanged. No ruler is
 recalculated or added to the chart; present placements are the original objects.
 
@@ -76,7 +77,7 @@ recalculated or added to the chart; present placements are the original objects.
 An available placement with `statuses=()` was assessed and matched none of the
 four. The formatter distinguishes these states and prints every simultaneous
 status. It displays the ruler's sign, unrounded degree within sign and numbered
-house; statuses use the sign, never rounded text.
+house. Status assessment uses the sign alone, not the displayed degree.
 
 ### Construct an individual record
 
@@ -95,14 +96,15 @@ cannot be supplied separately. A wrong field type raises `TypeError`, including
 a boolean house number. A house outside 1–12 or a placement identifying a different
 ruler raises `ValueError`. A low-level record does not authenticate chart origin
 or bind a cusp sign to a house number; `HouseRulers(chart)` performs that composition.
-It rejects a non-`NatalChart` with `TypeError` and accepts no separate leaf tuple.
+It rejects a non-`NatalChart` with `TypeError` and accepts no separate tuple of house records.
 Runtime checks also run under `python -O`.
 
 `format_house_rulers` requires a supplied `Catalog` and current names in `en` or
 `zh-CN`. Invalid result/catalog types raise `TypeError`, invalid languages and
-missing/stale names `ValueError`. Missing sign/status IDs raise `KeyError`;
-missing or duplicate configuration-linked name records raise `ValueError`. Table delimiters
-and nonprinting characters in names are escaped. Formatting performs no resource I/O;
+missing/stale names `ValueError`. Missing sign/status IDs raise `KeyError`.
+If the catalog has no unique concept for a ruler or house system, formatting raises
+`ValueError`. Table delimiters and nonprinting characters in names are escaped.
+Formatting performs no resource I/O;
 pure queries and chart composition do not initialize native astronomy.
 
 ## Source and limits

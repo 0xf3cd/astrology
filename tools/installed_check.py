@@ -397,6 +397,13 @@ def _check_dignities() -> None:
     text = astrology.format_house_rulers(result, catalog, language=selected)
     if len(text.splitlines()) != 16 or any(label not in text for label in labels):
       raise ValueError("Installed house-ruler text is incomplete")
+    expected_row = (
+      "1 | Aries | Mars | Capricorn 10.0° / House 10 | Exaltation"
+      if language == "en"
+      else "1 | 白羊座 | 火星 | 摩羯座 10.0° / 宫位 10 | 擢升"
+    )
+    if text.splitlines()[4] != expected_row:
+      raise ValueError("Installed house-ruler placement text differs from the supplied placement")
   for call, error in (
     (lambda: astrology.sign_ruler("aries"), TypeError),  # type: ignore[arg-type]
     (lambda: astrology.essential_dignities(astrology.Body.PLUTO, astrology.Sign.ARIES), ValueError),

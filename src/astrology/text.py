@@ -398,7 +398,7 @@ def format_house_rulers(result: HouseRulers, catalog: Catalog, *, language: Lang
   Type, language and name errors follow format_sign_distribution; no I/O.
 
   显示十二宫主星、可用落点及全部命中状态，区分落点未计算与四项均未命中。
-  类型、语言及名称错误沿用format_sign_distribution；不执行I/O。
+  类型、语言及名称错误沿用 format_sign_distribution；不执行 I/O。
   """
   if type(result) is not HouseRulers or type(catalog) is not Catalog:
     raise TypeError("result and catalog must be HouseRulers and Catalog values")

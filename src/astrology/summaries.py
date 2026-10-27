@@ -146,8 +146,8 @@ class HouseRuler:
   Wrong types raise TypeError; a house outside 1..12 or a mismatched placement
   identity raises ValueError. This low-level record does not authenticate a chart.
 
-  一宫的宫头星座及传统宫主星落点；未计算落点时为None。类型错误抛出TypeError，宫号不在
-  1..12或落点身份不符时抛出ValueError。本低层记录不核实命盘来源。
+  单个宫位的宫头星座及传统宫主星落点；未计算落点时为 None。类型错误抛出 TypeError，宫号不在
+  1..12 或落点身份不符时抛出 ValueError。本低层记录不核实命盘来源。
   """
 
   house: int
@@ -176,7 +176,7 @@ class HouseRuler:
   def statuses(self) -> tuple[DignityStatus, ...] | None:
     """Return all statuses, () for no match, or None for an unavailable placement.
 
-    返回全部状态；()表示无命中，None表示落点未计算。
+    返回全部状态；() 表示无命中，None 表示落点未计算。
     """
     if self.placement is None:
       return None
@@ -188,12 +188,12 @@ class HouseRulers:
   """Derive twelve house-ruler records from one retained NatalChart, without astronomy.
 
   Use actual cusps, not axes; keep repeated signs and missing ruler placements.
-  A non-NatalChart raises TypeError. Each houses access returns equal fresh records;
+  A non-NatalChart raises TypeError. Repeated houses accesses return new records that compare equal;
   existing placements and the source chart are retained by identity.
 
-  从保留的NatalChart推导十二宫主星记录，不调用天文库。使用实际宫头，不以轴代替；保留重复
-  星座及缺失的宫主星落点。非NatalChart输入抛出TypeError。每次读取houses会生成相等的新记录，
-  已有落点及源盘保留原对象。
+  从保留的 NatalChart 推导十二宫主星记录，不调用天文库。使用实际宫头，不以轴代替；保留重复
+  星座及缺失的宫主星落点。非 NatalChart 输入抛出 TypeError。两次读取 houses 所得元组相等，
+  但其中的记录不是同一批对象；已有落点及源盘保留原对象。
   """
 
   chart: NatalChart

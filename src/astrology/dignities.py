@@ -53,7 +53,7 @@ class DignityStatus(StrEnum):
 def sign_ruler(sign: Sign) -> Body:
   """Return the sign's ruler in Lilly's seven-planet set; a non-Sign raises TypeError.
 
-  返回Lilly七政规则中的星座守护星；非Sign输入抛出TypeError。
+  返回 Lilly 七政规则中的星座守护星；非 Sign 输入抛出 TypeError。
   """
   if type(sign) is not Sign:
     raise TypeError("sign must be a Sign")
@@ -66,8 +66,8 @@ def essential_dignities(body: Body, sign: Sign) -> tuple[DignityStatus, ...]:
   Wrong enum types raise TypeError; an outer-planet Body raises ValueError.
   Assess the whole sign, not exaltation-degree proximity. See the dignity guide.
 
-  按入庙、擢升、失势、落陷顺序返回全部命中，无命中则为()。枚举类型错误抛出TypeError，
-  外行星Body抛出ValueError。判断整个星座，不看离擢升度数多近；详见尊贵指南。
+  按入庙、擢升、失势、落陷顺序返回全部命中，无命中则为 ()。枚举类型错误抛出 TypeError，
+  外行星 Body 抛出 ValueError。判断整个星座，不看离擢升度数多近；详见尊贵指南。
   """
   if type(body) is not Body or type(sign) is not Sign:
     raise TypeError("body and sign must use Body and Sign")

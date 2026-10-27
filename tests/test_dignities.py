@@ -285,6 +285,11 @@ def test_text_preserves_missing_empty_and_every_status(
     assert line.startswith(f"{record.house} | ")
     assert catalog.concept(f"sign.{record.cusp_sign.value}").name.text(language) in line  # type: ignore[operator]
   assert "0.0°" in text
+  assert text.splitlines()[4] == (
+    "1 | Aries | Mars | Capricorn 10.0° / House 10 | Exaltation"
+    if language == "en"
+    else "1 | 白羊座 | 火星 | 摩羯座 10.0° / 宫位 10 | 擢升"
+  )
 
 
 def test_formatter_errors_and_caller_vocabulary(ruler_chart: NatalChart) -> None:

@@ -82,9 +82,10 @@ See the [two-chart example and static contract](cross_aspects.md).
    :member-order: bysource
 ```
 
-## Sign distributions and lunar phase
+## Chart summaries and lunar phase
 
 See the [summary guide](summaries.md) for explicit populations, source conventions and errors.
+The [dignity guide](dignities.md) covers the house-ruler records.
 
 ```{eval-rst}
 .. automodule:: astrology.lunar_phase
