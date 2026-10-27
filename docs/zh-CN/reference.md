@@ -42,7 +42,7 @@
 
 ```{eval-rst}
 .. automodule:: astrology.text
-   :members: format_chart, format_sign_distribution, format_lunar_phase
+   :members: format_chart, format_sign_distribution, format_lunar_phase, format_house_rulers
    :no-index:
 ```
 
@@ -88,9 +88,10 @@
    :no-index:
 ```
 
-## 星座分布与月相
+## 命盘摘要与月相
 
 显式选定对象的统计、来源约定及错误行为见[摘要指南](summaries.md)。
+宫主星记录见[尊贵指南](dignities.md)。
 
 ```{eval-rst}
 .. automodule:: astrology.lunar_phase
@@ -102,7 +103,19 @@
 
 ```{eval-rst}
 .. automodule:: astrology.summaries
-   :members: SignDistribution, sign_distribution, chart_sign_distribution, natal_lunar_phase
+   :members: SignDistribution, sign_distribution, chart_sign_distribution, natal_lunar_phase, HouseRuler, HouseRulers
+   :undoc-members:
+   :member-order: bysource
+   :no-index:
+```
+
+## 传统守护与本质尊贵
+
+具名来源、同时命中和缺失落点见[尊贵指南](dignities.md)。
+
+```{eval-rst}
+.. automodule:: astrology.dignities
+   :members: DignityStatus, sign_ruler, essential_dignities
    :undoc-members:
    :member-order: bysource
    :no-index:

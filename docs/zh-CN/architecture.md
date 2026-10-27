@@ -23,6 +23,7 @@ src/astrology/
   chart.py          组合与不可变命盘结果
   cross_aspects.py  静态比较给定命盘，保留双侧来源
   lunar_phase.py    有向日月弧及具名月相类型
+  dignities.py      传统星座守护及入庙、擢升、失势、落陷判断
   summaries.py      显式选定对象的统计及给定命盘摘要
   text.py           用传入词汇显示结果表格
   knowledge/        概念、来源、条目及独立查询

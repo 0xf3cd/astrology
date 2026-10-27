@@ -29,6 +29,7 @@ from markdown_it import MarkdownIt
 
 import astrology
 from astrology import knowledge
+from astrology.dignities import _RULE_ID as _DIGNITY_RULE_ID
 from astrology.knowledge import Concept, Entry, RuleVariant, Source, load_catalog
 from astrology.knowledge.records import Language
 from tools.catalog_docs import (
@@ -37,6 +38,7 @@ from tools.catalog_docs import (
   catalog_anchor,
   check_catalog_data,
   configuration_reference,
+  dignity_rows,
   localized_texts,
 )
 from tools.docs_search import check_search_html
@@ -53,6 +55,7 @@ PACKAGE_FILES = (
   "astrology/chart.py",
   "astrology/config.py",
   "astrology/cross_aspects.py",
+  "astrology/dignities.py",
   "astrology/houses.py",
   "astrology/lunar_phase.py",
   "astrology/summaries.py",
@@ -190,6 +193,7 @@ def check_examples(report: str) -> None:
       "aspects",
       "cross_aspects",
       "summaries",
+      "dignities",
       "records",
       "knowledge",
     ):
@@ -512,6 +516,10 @@ def check_catalog_html(directory: Path) -> None:
       raise ValueError(
         f"Rendered Ashmand sign-group rows differ from the executable rule: {language}"
       )
+    expected_dignities = [(content(" ".join(row)), ()) for row in dignity_rows(catalog, language)]
+    rows = parser.rows.get(catalog_anchor(_DIGNITY_RULE_ID, language), [])
+    if [(content(text), links) for text, links in rows] != expected_dignities:
+      raise ValueError(f"Rendered dignity rows differ from the executable rule: {language}")
     for target in parser.links:
       if target.startswith("#catalog-") and target[1:] not in parser.records:
         raise ValueError(f"Dangling rendered catalog link: {target}")

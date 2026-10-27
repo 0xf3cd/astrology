@@ -15,7 +15,7 @@ from astrology.knowledge import Catalog, Concept, TranslationStatus
 from astrology.knowledge.catalog import _sign_concept
 from astrology.knowledge.records import _LANGUAGES, Language
 from astrology.lunar_phase import LunarPhaseResult
-from astrology.summaries import SignDistribution
+from astrology.summaries import HouseRulers, SignDistribution
 from astrology.zodiac import (
   _ELEMENT_RULE_ID,
   _MODALITY_RULE_ID,
@@ -124,6 +124,26 @@ _SUMMARY_LABELS = {
     "turning": "转折点",
     "rule": "规则",
     "phase_limit": "每型覆盖一段区间，不表示精确事件；不计算照亮比例。",
+  },
+}
+_RULER_LABELS = {
+  "en": {
+    "title": "House rulers (Lilly 1647)",
+    "system": "House system",
+    "rule": "Rule",
+    "house": "House",
+    "columns": "House | Cusp sign | Ruler | Ruler placement | Statuses",
+    "missing": "Not calculated",
+    "empty": "None of these four",
+  },
+  "zh-CN": {
+    "title": "宫主星（Lilly 1647）",
+    "system": "宫制",
+    "rule": "规则",
+    "house": "宫位",
+    "columns": "宫位 | 宫头星座 | 宫主星 | 宫主星落点 | 状态",
+    "missing": "未计算",
+    "empty": "这四项均未命中",
   },
 }
 
@@ -369,3 +389,47 @@ def format_lunar_phase(
       labels["phase_limit"],
     )
   )
+
+
+def format_house_rulers(result: HouseRulers, catalog: Catalog, *, language: Language = "en") -> str:
+  """Show all twelve rulers, available placements and every assessed status.
+
+  Distinguish uncalculated placements from no match among the four statuses.
+  Type, language and name errors follow format_sign_distribution; no I/O.
+
+  显示十二宫主星、可用落点及全部命中状态，区分落点未计算与四项均未命中。
+  类型、语言及名称错误沿用 format_sign_distribution；不执行 I/O。
+  """
+  if type(result) is not HouseRulers or type(catalog) is not Catalog:
+    raise TypeError("result and catalog must be HouseRulers and Catalog values")
+  if type(language) is not str or language not in _LANGUAGES:
+    raise ValueError("language must be en or zh-CN")
+  labels = _RULER_LABELS[language]
+  lines = [
+    labels["title"],
+    f"{labels['system']}: {_name(result.chart.houses.system, catalog, language)}",
+    f"{labels['rule']}: {result.rule_id}",
+    labels["columns"],
+  ]
+  for record in result.houses:
+    placement = record.placement
+    statuses = record.statuses
+    if placement is None:
+      position_text = status_text = labels["missing"]
+    else:
+      position_text = (
+        f"{_name(placement.sign, catalog, language)} {placement.sign_degree_deg!r}° / "
+        f"{labels['house']} {placement.house}"
+      )
+      status_text = (
+        ", ".join(
+          _current_name(catalog.concept(f"dignity_status.{status.value}"), language)
+          for status in statuses or ()
+        )
+        or labels["empty"]
+      )
+    lines.append(
+      f"{record.house} | {_name(record.cusp_sign, catalog, language)} | "
+      f"{_name(record.ruler, catalog, language)} | {position_text} | {status_text}"
+    )
+  return "\n".join(lines)

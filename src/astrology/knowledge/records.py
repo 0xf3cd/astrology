@@ -70,6 +70,7 @@ class ConceptKind(StrEnum):
   ELEMENT = "element"
   MODALITY = "modality"
   LUNATION_TYPE = "lunation_type"
+  DIGNITY_STATUS = "dignity_status"
   HOUSE_SYSTEM = "house_system"
   NODE_DEFINITION = "node_definition"
   LUNAR_NODE = "lunar_node"

@@ -11,8 +11,10 @@ from types import MappingProxyType
 
 from astrology.chart import NatalChart, Placement
 from astrology.config import Body, LunarNode
+from astrology.dignities import _RULE_ID as _DIGNITY_RULE_ID
+from astrology.dignities import DignityStatus, essential_dignities, sign_ruler
 from astrology.lunar_phase import LunarPhaseResult, lunar_phase
-from astrology.zodiac import Element, Modality, element_of, modality_of
+from astrology.zodiac import Element, Modality, Sign, element_of, modality_of, sign_of
 
 
 @dataclass(frozen=True, slots=True)
@@ -135,3 +137,84 @@ def natal_lunar_phase(chart: NatalChart) -> LunarPhaseResult:
   if missing:
     raise ValueError(f"Objects unavailable in chart: {', '.join(missing)}")
   return lunar_phase(positions[Body.SUN], positions[Body.MOON])
+
+
+@dataclass(frozen=True, slots=True)
+class HouseRuler:
+  """One house's cusp sign and its traditional ruler's placement, or None if unavailable.
+
+  Wrong types raise TypeError; a house outside 1..12 or a mismatched placement
+  identity raises ValueError. This low-level record does not authenticate a chart.
+
+  单个宫位的宫头星座及传统宫主星落点；未计算落点时为 None。类型错误抛出 TypeError，宫号不在
+  1..12 或落点身份不符时抛出 ValueError。本低层记录不核实命盘来源。
+  """
+
+  house: int
+  cusp_sign: Sign
+  placement: Placement | None
+
+  def __post_init__(self) -> None:
+    if type(self.house) is not int:
+      raise TypeError("house must be an integer, not bool")
+    if not 1 <= self.house <= 12:
+      raise ValueError("house must be in [1, 12]")
+    if type(self.cusp_sign) is not Sign:
+      raise TypeError("cusp_sign must be a Sign")
+    if self.placement is not None:
+      if type(self.placement) is not Placement:
+        raise TypeError("placement must be a Placement or None")
+      if self.placement.identity is not self.ruler:
+        raise ValueError("placement identity must match the cusp sign's ruler")
+
+  @property
+  def ruler(self) -> Body:
+    """Return the ruler derived from the cusp sign. 返回从宫头星座推出的宫主星。"""
+    return sign_ruler(self.cusp_sign)
+
+  @property
+  def statuses(self) -> tuple[DignityStatus, ...] | None:
+    """Return all statuses, () for no match, or None for an unavailable placement.
+
+    返回全部状态；() 表示无命中，None 表示落点未计算。
+    """
+    if self.placement is None:
+      return None
+    return essential_dignities(self.ruler, self.placement.sign)
+
+
+@dataclass(frozen=True, slots=True)
+class HouseRulers:
+  """Derive twelve house-ruler records from one retained NatalChart, without astronomy.
+
+  Use actual cusps, not axes; keep repeated signs and missing ruler placements.
+  A non-NatalChart raises TypeError. Repeated houses accesses return new records that compare equal;
+  existing placements and the source chart are retained by identity.
+
+  从保留的 NatalChart 推导十二宫主星记录，不调用天文库。使用实际宫头，不以轴代替；保留重复
+  星座及缺失的宫主星落点。非 NatalChart 输入抛出 TypeError。两次读取 houses 所得元组相等，
+  但其中的记录不是同一批对象；已有落点及源盘保留原对象。
+  """
+
+  chart: NatalChart
+
+  def __post_init__(self) -> None:
+    if type(self.chart) is not NatalChart:
+      raise TypeError("chart must be a NatalChart")
+
+  @property
+  def houses(self) -> tuple[HouseRuler, ...]:
+    """Return twelve records in cusp order, retaining available placements.
+
+    按宫头顺序返回十二条记录，保留可用的原落点。
+    """
+    placements = {p.identity: p for p in self.chart.placements}
+    return tuple(
+      HouseRuler(house, sign_of(cusp), placements.get(sign_ruler(sign_of(cusp))))
+      for house, cusp in enumerate(self.chart.houses.cusps_deg, start=1)
+    )
+
+  @property
+  def rule_id(self) -> str:
+    """Return the named rulership/dignity rule. 返回具名的守护及尊贵规则。"""
+    return _DIGNITY_RULE_ID

@@ -11,7 +11,13 @@ from pathlib import Path
 from typing import Literal
 
 import astrology
-from astrology.knowledge import Catalog, OutputEligibility, PrerequisiteStatus, SourceVerification
+from astrology.knowledge import (
+  Catalog,
+  ConceptKind,
+  OutputEligibility,
+  PrerequisiteStatus,
+  SourceVerification,
+)
 
 MODULES = (
   "_distribution",
@@ -21,6 +27,7 @@ MODULES = (
   "chart",
   "config",
   "cross_aspects",
+  "dignities",
   "houses",
   "knowledge",
   "knowledge.catalog",
@@ -313,6 +320,104 @@ def _check_summaries() -> None:
       raise ValueError("Installed summary accepted an invalid input")
 
 
+def _check_dignities() -> None:
+  """Check installed rulership, simultaneous/empty/missing statuses and text.
+
+  核验安装包的守护、并存、空及缺失状态与文本。
+  """
+  sun, mercury, mars = astrology.Body.SUN, astrology.Body.MERCURY, astrology.Body.MARS
+  chart = _cross_source(2000, "rulers", ((mercury, 150), (sun, 30), (mars, 280)))
+  result = astrology.HouseRulers(chart)
+  status = astrology.DignityStatus
+  expected_rulers = (
+    mars,
+    astrology.Body.VENUS,
+    mercury,
+    astrology.Body.MOON,
+    sun,
+    mercury,
+    astrology.Body.VENUS,
+    mars,
+    astrology.Body.JUPITER,
+    astrology.Body.SATURN,
+    astrology.Body.SATURN,
+    astrology.Body.JUPITER,
+  )
+  if (
+    tuple(astrology.sign_ruler(sign) for sign in astrology.Sign) != expected_rulers
+    or astrology.essential_dignities(mercury, astrology.Sign.VIRGO)
+    != (status.DOMICILE, status.EXALTATION)
+    or astrology.essential_dignities(mercury, astrology.Sign.PISCES)
+    != (status.DETRIMENT, status.FALL)
+    or astrology.essential_dignities(sun, astrology.Sign.TAURUS) != ()
+  ):
+    raise ValueError("Installed dignity queries differ from sourced sign expectations")
+  if (
+    result.chart is not chart
+    or result.rule_id != "rule.lilly1647.essential_dignities"
+    or tuple(r.house for r in result.houses) != tuple(range(1, 13))
+    or tuple(r.ruler for r in result.houses) != expected_rulers
+    or result.houses[5].placement is not chart.placements[0]
+    or result.houses[5].statuses != (status.DOMICILE, status.EXALTATION)
+    or result.houses[4].statuses != ()
+    or result.houses[9].placement is not None
+    or result.houses[9].statuses is not None
+  ):
+    raise ValueError("Installed house rulers lost source, placements or status distinctions")
+  catalog = astrology.load_catalog()
+  entry = catalog.entry("entry.essential_dignities")
+  variant = catalog.variant(result.rule_id)
+  source = catalog.source("source.lilly.christian-astrology-1647")
+  status_concepts = catalog.list_concepts(kind=ConceptKind.DIGNITY_STATUS)
+  status_ids = {f"dignity_status.{s.value}" for s in status}
+  linked = (
+    status_ids
+    | {f"sign.{s.value}" for s in astrology.Sign}
+    | {f"body.{b.value}" for b in expected_rulers}
+  )
+  if (
+    entry.rule_ids != (result.rule_id,)
+    or set(entry.concept_ids) != linked
+    or set(variant.concept_ids) != linked
+    or variant.configuration is not None
+    or {c.identifier for c in status_concepts} != status_ids
+    or any(c.configuration is not None for c in status_concepts)
+    or entry.prerequisite_status.value != "complete"
+    or entry.output_eligibility.value != "reference_only"
+    or entry.chart_applicability != "not_assessed"
+    or source.verification.value != "verified"
+    or {c.source_id for c in entry.citations} != {source.identifier}
+  ):
+    raise ValueError("Installed dignity knowledge lost rule/source links or reference status")
+  for language, labels in (
+    ("en", ("Domicile, Exaltation", "None of these four", "Not calculated")),
+    ("zh-CN", ("入庙, 擢升", "这四项均未命中", "未计算")),
+  ):
+    selected: Literal["en", "zh-CN"] = language  # type: ignore[assignment]
+    text = astrology.format_house_rulers(result, catalog, language=selected)
+    if len(text.splitlines()) != 16 or any(label not in text for label in labels):
+      raise ValueError("Installed house-ruler text is incomplete")
+    expected_row = (
+      "1 | Aries | Mars | Capricorn 10.0° / House 10 | Exaltation"
+      if language == "en"
+      else "1 | 白羊座 | 火星 | 摩羯座 10.0° / 宫位 10 | 擢升"
+    )
+    if text.splitlines()[4] != expected_row:
+      raise ValueError("Installed house-ruler placement text differs from the supplied placement")
+  for call, error in (
+    (lambda: astrology.sign_ruler("aries"), TypeError),  # type: ignore[arg-type]
+    (lambda: astrology.essential_dignities(astrology.Body.PLUTO, astrology.Sign.ARIES), ValueError),
+    (lambda: astrology.HouseRuler(True, astrology.Sign.ARIES, None), TypeError),
+    (lambda: astrology.HouseRulers(None), TypeError),  # type: ignore[arg-type]
+  ):
+    try:
+      call()
+    except error:
+      pass
+    else:
+      raise ValueError("Installed dignity checks accepted an invalid input")
+
+
 def _check_native_isolation() -> None:
   if any(
     name in ("celestial_calendar", "astrology.celestial") or name.startswith("celestial_calendar.")
@@ -338,7 +443,8 @@ def _check_knowledge(expected_corpus_version: str | None = None) -> None:
     not catalog.list_concepts()
     or catalog.concept("body.sun").configuration is not astrology.Body.SUN
     or "body.sun" not in catalog.entry("entry.body_requests").concept_ids
-    or catalog.list_variants(concept_id="body.sun") != ()
+    or tuple(v.identifier for v in catalog.list_variants(concept_id="body.sun"))
+    != ("rule.lilly1647.essential_dignities",)
   ):
     raise ValueError("Installed knowledge listing is empty")
   if (
@@ -595,12 +701,14 @@ def main(
   _check_knowledge(expected_corpus_version)
   if knowledge_only:
     _check_summaries()
+    _check_dignities()
     if any(name.startswith(("tzdata", "zoneinfo", "celestial", "ctypes")) for name in sys.modules):
       raise ValueError("Knowledge-only consumer loaded time or native machinery")
     print(f"Installed knowledge corpus; optimized={sys.flags.optimize}")
     return
   _check_birth_and_configuration()
   _check_summaries()
+  _check_dignities()
   _check_native_isolation()
   _check_cross_chart(expected_cross_observations)
   _check_natal_chart(expected_observations)

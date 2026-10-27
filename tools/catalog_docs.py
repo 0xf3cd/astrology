@@ -11,6 +11,8 @@ from typing import get_args
 
 from astrology.aspects import aspect_angle
 from astrology.config import HouseSystem, LunarNode, MajorAspect, NodeDefinition
+from astrology.dignities import _DOMICILES, DignityStatus, essential_dignities, sign_ruler
+from astrology.dignities import _RULE_ID as _DIGNITY_RULE_ID
 from astrology.knowledge import Catalog, Concept, ConceptKind, LocalizedText, TranslationStatus
 from astrology.knowledge.records import CONFIGURATION_TYPES, ConfigurationIdentity, Language
 from astrology.lunar_phase import _INTERVALS, _RULE_ID
@@ -116,6 +118,46 @@ def check_catalog_data(catalog: Catalog) -> None:
     for language in get_args(Language):
       if text.status(language) is not TranslationStatus.CURRENT:
         raise ValueError(f"Required translation {language} is {text.status(language)}: {path}")
+  statuses = catalog.list_concepts(kind=ConceptKind.DIGNITY_STATUS)
+  ids = {f"dignity_status.{status.value}" for status in DignityStatus}
+  if {c.identifier for c in statuses} != ids or any(c.configuration is not None for c in statuses):
+    raise ValueError("Catalog must cover exactly the configuration-free dignity identities")
+  linked = ids | {f"sign.{s.value}" for s in Sign} | {f"body.{b.value}" for b in _DOMICILES}
+  rule, entry = catalog.variant(_DIGNITY_RULE_ID), catalog.entry("entry.essential_dignities")
+  if (
+    set(rule.concept_ids) != linked
+    or set(entry.concept_ids) != linked
+    or entry.rule_ids != (_DIGNITY_RULE_ID,)
+    or rule.configuration is not None
+  ):
+    raise ValueError("Incomplete dignity rule or entry linkage")
+
+
+def dignity_rows(catalog: Catalog, language: Language) -> Iterator[tuple[str, ...]]:
+  """Read sign/status rows from the owning queries. 从所属查询读取星座和状态表行。"""
+  labels = tuple(
+    str(catalog.concept(f"dignity_status.{status.value}").name.text(language))
+    for status in DignityStatus
+  )
+  yield (
+    "Sign" if language == "en" else "星座",
+    labels[0] + (" / ruler" if language == "en" else "/守护星"),
+    *labels[1:],
+  )
+  for sign in Sign:
+    yield (
+      str(catalog.concept(f"sign.{sign.value}").name.text(language)),
+      str(catalog.concept(f"body.{sign_ruler(sign).value}").name.text(language)),
+      *(
+        ", ".join(
+          str(catalog.concept(f"body.{body.value}").name.text(language))
+          for body in _DOMICILES
+          if status in essential_dignities(body, sign)
+        )
+        or "—"
+        for status in (DignityStatus.EXALTATION, DignityStatus.DETRIMENT, DignityStatus.FALL)
+      ),
+    )
 
 
 def catalog_anchor(identifier: str, language: Language = "en") -> str:
@@ -225,6 +267,11 @@ def render_catalog(catalog: Catalog, language: Language, code_version: str) -> s
       for phase, lower, upper in _INTERVALS:
         concept = catalog.concept(f"lunation_type.rudhyar1950.{phase.value}")
         lines.append(f"| {text(concept.name)} | [{lower}, {upper}) |")
+      lines.append("")
+    if variant.identifier == _DIGNITY_RULE_ID:
+      rows = iter(dignity_rows(catalog, language))
+      lines.extend(["| " + " | ".join(next(rows)) + " |", "|---|---|---|---|---|"])
+      lines.extend("| " + " | ".join(row) + " |" for row in rows)
       lines.append("")
   for source in catalog.sources:
     heading(source.identifier, source.title)
