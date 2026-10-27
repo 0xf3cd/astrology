@@ -1,6 +1,7 @@
-"""Lilly's 1647 seven-planet sign rulers and four essential statuses.
+"""William Lilly's 1647 sign rulers and four statuses for seven classical planets.
 
-Lilly 1647 年版的七政星座守护及四种本质状态。
+威廉·利利（William Lilly）1647 年版的星座守护及入庙、擢升、失势、落陷判断，
+适用于太阳、月亮、水星、金星、火星、木星和土星。
 """
 
 from __future__ import annotations
@@ -53,7 +54,7 @@ class DignityStatus(StrEnum):
 def sign_ruler(sign: Sign) -> Body:
   """Return the sign's ruler in Lilly's seven-planet set; a non-Sign raises TypeError.
 
-  返回 Lilly 七政规则中的星座守护星；非 Sign 输入抛出 TypeError。
+  按 Lilly 的传统星座守护表返回守护星；非 Sign 输入抛出 TypeError。
   """
   if type(sign) is not Sign:
     raise TypeError("sign must be a Sign")

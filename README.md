@@ -15,7 +15,7 @@ See [Contributing](https://0xf3cd.github.io/astrology/docs/en/contributing.html)
 
 The current source also adds [element/modality distributions and natal lunar
 phase](https://0xf3cd.github.io/astrology/docs/en/summaries.html), and
-[traditional rulers and four essential statuses](https://0xf3cd.github.io/astrology/docs/en/dignities.html),
+[traditional sign rulers and four statuses](https://0xf3cd.github.io/astrology/docs/en/dignities.html),
 planned for 0.3.0.
 
 New in 0.2.0 (in development):

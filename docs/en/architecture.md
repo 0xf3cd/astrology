@@ -27,7 +27,7 @@ src/astrology/
   chart.py          Composition and immutable chart results
   cross_aspects.py  Static comparison of supplied charts, retaining both sources
   lunar_phase.py    Oriented solar/lunar arc and named lunation types
-  dignities.py      Named seven-planet rulership and four essential statuses
+  dignities.py      Traditional sign rulers and domicile/exaltation/detriment/fall
   summaries.py      Explicit-population statistics and supplied-chart summaries
   text.py           Result tables with supplied vocabulary
   knowledge/        Concepts, sources, entries, and independent queries

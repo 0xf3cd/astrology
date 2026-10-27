@@ -79,8 +79,9 @@ The catalog currently includes:
   and calculates single-chart and cross-chart aspects.
 - The four sign groups in Ashmand's 1822 edition, with bibliographic records,
   excerpts and Chinese translations.
-- [Lilly's 1647 seven-planet rulership and four essential statuses](dignities.md),
-  with short primary-scan excerpts and a generated sign table.
+- [Traditional sign rulers and four statuses](dignities.md) from William Lilly's
+  *Christian Astrology* (1647), with short primary-scan excerpts and a generated
+  sign table.
 
 Configuration entries link to the enum members the program uses; rule descriptions
 link to their implementations. House systems, node definitions and aspect angles
@@ -276,7 +277,8 @@ rule.node.meeus_five_term_true_descending
 
 `variant()` raises `KeyError` for these IDs; there is no alias or conversion to a
 concept. Their removal did not prohibit later substantive rules: the seven
-classical bodies now link to Lilly's dignity rule. Use `concept()`,
+classical bodies now link to the dignity and debility rules recorded in Lilly's
+*Christian Astrology* (1647). Use `concept()`,
 `lookup()` or `filter_entries()` to retrieve the preserved identity information.
 The three `rule.house.*`, two `rule.node_definition.*`, five `rule.aspect.*` and
 nine original authored rule IDs remain. Their relative order is unchanged:

@@ -1,10 +1,19 @@
-# Traditional rulers and four essential statuses
+# Traditional sign rulers and four statuses
 
 [简体中文](../zh-CN/dignities.md) · [API](reference.md) · [Knowledge](knowledge.md)
 
 These source-checkout APIs are planned for 0.3.0 and are not in the published
-0.2.0 package. They use one named seven-planet set: William Lilly's *Christian
-Astrology* (London, 1647), `rule.lilly1647.essential_dignities`.
+0.2.0 package. They use the rules recorded in William Lilly's *Christian
+Astrology* (London, 1647), for Sun, Moon, Mercury, Venus, Mars, Jupiter and Saturn,
+the seven classical planets in traditional astrology.
+
+The assessments belong to traditional essential dignities and debilities. This
+API assesses only four sign-level statuses: domicile, exaltation, detriment and
+fall.
+
+`rule.lilly1647.essential_dignities` identifies this fixed rule set in the
+implementation, `HouseRulers.rule_id` and the knowledge catalog. It does not load
+or select rules dynamically.
 
 ## Query a sign without a chart
 
@@ -30,8 +39,7 @@ An empty tuple means **none of these four**. It does not establish peregrine
 status, since other dignities are not assessed. Strings, nodes and unrelated enums
 raise `TypeError`; use exact `Body` and `Sign` members. Valid outer-planet bodies
 (`URANUS`, `NEPTUNE`, `PLUTO`) raise `ValueError` naming the unsupported body,
-rather than returning an empty assessment. The seven supported bodies are Sun,
-Moon, Mercury, Venus, Mars, Jupiter and Saturn. Scorpio uses Mars, Aquarius Saturn
+rather than returning an empty assessment. Scorpio uses Mars, Aquarius Saturn
 and Pisces Jupiter; there is no modern co-ruler substitution.
 
 ## Follow the rulers in an existing chart

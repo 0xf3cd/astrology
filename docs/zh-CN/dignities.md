@@ -1,10 +1,16 @@
-# 传统守护与四种本质状态
+# 传统星座守护与四种状态
 
 [English](../en/dignities.md) · [API](reference.md) · [知识](knowledge.md)
 
-这些源码接口计划随 0.3.0 交付，已发布的 0.2.0 包尚不包含。采用一个具名七政规则集：
-William Lilly 的《Christian Astrology》（伦敦，1647），规则标识为
-`rule.lilly1647.essential_dignities`。
+这些源码接口计划随 0.3.0 交付，已发布的 0.2.0 包尚不包含。采用 William Lilly（威廉·利利）的
+《Christian Astrology》（伦敦，1647）所载规则，适用于太阳、月亮、水星、金星、火星、木星和土星。
+这七颗星体在传统占星中称为 seven classical planets。
+
+这些判断属于传统占星的本质尊贵与弱势（essential dignities and debilities）。本接口仅判断
+入庙（domicile）、擢升（exaltation）、失势（detriment）、落陷（fall）四种星座级状态。
+
+`rule.lilly1647.essential_dignities` 是这套固定规则的标识，用于对应代码实现、
+`HouseRulers.rule_id` 和知识目录记录，不负责动态加载或选择规则。
 
 ## 离盘查询星座
 
@@ -28,7 +34,7 @@ True
 空元组表示**这四项均未命中**，不等于游离，因为其他尊贵尚未判断。
 字符串、交点及无关枚举抛出 `TypeError`；应传入确切的 `Body` 和 `Sign` 成员。
 有效的外行星枚举（`URANUS`、`NEPTUNE`、`PLUTO`）抛出点明该对象的 `ValueError`，
-不会返回空状态冒充已判断。支持的七政为太阳、月亮、水星、金星、火星、木星、土星。
+不会返回空状态冒充已判断。
 天蝎由火星守护，水瓶由土星守护，双鱼由木星守护，不替换为现代共守护星。
 
 ## 跟随已有命盘的宫主星
@@ -100,7 +106,7 @@ True
 {ref}`来源记录 <catalog-zh-cn-source-lilly-christian-astrology-1647>`定位已核的 Wellcome 扫描本、
 1647 年出版页、图像摘要及 Public Domain Mark 声明。第一卷第 VIII–XIV 章给出行星归属，
 第 XVIII 章及印刷页 102、104–105 说明擢升覆盖整个星座和相对星座关系。
-行星章节直接列出六政失势，土星失势由其入庙星座及所述关系推出。
+行星章节直接列出其中六颗星体的失势，土星失势由其入庙星座及所述关系推出。
 生成表由项目按这些归属展开，不是逐格转录整张印刷表。
 
 三段简短英文引文与署名中文译文、项目解释分别呈现。定位信息写明截取边界；
