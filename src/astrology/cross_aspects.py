@@ -183,7 +183,7 @@ def cross_chart_aspects(
   None selects all bodies/nodes on that side and no axes, independently of natal participants;
   explicit selections may include any of its stored axes, even if absent from natal
   aspects. Read the actual axis fields, never cusps or synthesized opposite axes.
-  an empty selection or rule sequence is valid. Same identities, node-node pairs
+  An empty selection or rule sequence is valid. Same identities, node-node pairs
   and the same chart in both roles are allowed. Rules are explicit and never
   inherited. Object-orb overrides apply by identity on either side and may name
   only selected objects; a combination is required exactly when overrides exist.
