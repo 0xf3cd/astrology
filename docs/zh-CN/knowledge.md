@@ -25,7 +25,7 @@ True
 >>> catalog.filter_entries(concept_id="body.sun")[0].identifier
 'entry.body_requests'
 >>> len(catalog.filter_sources(verification=SourceVerification.VERIFIED))
-8
+9
 >>> bool(catalog.version)
 True
 ```
@@ -65,7 +65,7 @@ True
 
 目录目前包括：
 
-- 排盘时可选的天体、宫制、月交点定义和相位，以及它们的中英文名称。
+- 排盘时可选的天体、四轴、宫制、月交点定义和相位，以及它们的中英文名称。
 - 本项目如何划分十二星座、判断落宫，以及计算单盘和双盘相位。
 - Ashmand 1822 年版中的四组星座分类，以及相关书目、摘录和中文译文。
 - [传统星座守护与四种状态](dignities.md)：依据 William Lilly（威廉·利利）的
@@ -122,6 +122,24 @@ True
 ```
 
 内置条目均仅供参考。当前包不判断某张命盘是否符合条目，也不存储这种判断所需的命盘证据。
+
+## 四轴的独立词汇
+
+`axis.ascendant`、`axis.midheaven`、`axis.descendant` 和 `axis.imum_coeli` 是绑定到 `Axis`
+的不同概念，不是天体、交点或宫头的别名。仅供参考的 `entry.axis_aspects` 说明项目的显式选择、
+配对及缺速率政策，并引用固定修订的实现。原天体和交点来源仍保留原修订，不倒记为四轴扩展的证据。
+
+```{doctest}
+>>> from astrology import Axis
+>>> catalog.concept("axis.ascendant").configuration is Axis.ASCENDANT
+True
+>>> axes = catalog.entry("entry.axis_aspects")
+>>> axes.prerequisite_status.value, axes.output_eligibility.value, axes.chart_applicability
+('complete', 'reference_only', 'not_assessed')
+```
+
+这些查询不需要命盘或原生天文库。计算几何时，见{ref}`本命显式选择 <axis-aspects-zh-cn>`及
+{ref}`双盘各侧独立选择 <cross-axis-aspects-zh-cn>`。
 
 (ashmand-sign-groups-zh-cn)=
 ## Ashmand 1822 年版星座分组

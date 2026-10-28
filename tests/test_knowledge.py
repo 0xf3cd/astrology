@@ -106,6 +106,7 @@ def test_query_contracts(catalog: Catalog) -> None:
     for entry in catalog.filter_entries(prerequisite_status=PrerequisiteStatus.COMPLETE)
   } == {
     "entry.aspect_evaluation",
+    "entry.axis_aspects",
     "entry.ashmand_sign_groups",
     "entry.aspect_requests",
     "entry.cross_aspect_evaluation",

@@ -1,5 +1,5 @@
 {
-  "version": "2026.10.28.1",
+  "version": "2026.10.28.2",
   "text_defaults": {"revision": 1, "zh_revision": 1, "translation_credit": "astrology contributors"},
   "concepts": [
     {"identifier": "axis.ascendant", "kind": "axis", "name": {"en": "Ascendant", "zh": "上升点"}, "en_aliases": ["ASC"], "zh_aliases": ["上升"], "description": {"en": "The chart's stored Ascendant longitude, distinct from its first house cusp. Explicitly selectable for aspects; not a native-output body or node.", "zh": "命盘保存的上升点黄经，与第一宫头区分。可显式选择参与相位，不是天文输出的天体或交点。"}, "configuration": {"enum": "Axis", "member": "ASCENDANT"}},
@@ -165,6 +165,18 @@
       "verification": "verified",
       "url": "https://www.khaldea.com/rudhyar/astroarticles/lunationbirthday_4.php"
     },
+    {
+      "identifier": "source.astrology.axis_aspects.4cb15cc",
+      "title": "astrology axis-aspect implementation",
+      "author": "astrology contributors",
+      "edition": "src/astrology/objects.py, chart.py, cross_aspects.py and tests/test_axis_aspects.py at 4cb15cc2f63a67ba804c04840f255ffff1209382",
+      "language": "en",
+      "lineage": {"en": "Project-authored identities, explicit selection and composition from stored axis fields, with hand-worked synthetic expectations. Earlier body/node aspect sources remain pinned to their original revisions.", "zh": "项目自写的身份、显式选择及已存轴字段组合，附手算合成期望。原天体和交点相位来源仍固定在各自原修订。"},
+      "rights": {"en": "Project-authored code, translations and explanations under the repository MIT license.", "zh": "项目自写代码、翻译及说明采用本仓 MIT 许可证。"},
+      "scope": {"en": "Supports the axis selection, ordering, stored-field geometry, pairing and missing-rate policies at this fixed commit. This is implementation evidence, not independent astronomical corroboration, a traditional orb prescription or chart interpretation.", "zh": "支持此固定提交中的选四轴、排序、已存字段几何、配对及缺速率政策。这是实现证据，不是独立的天文互证、传统容许度规定或命盘解读。"},
+      "verification": "verified",
+      "url": "https://github.com/0xf3cd/astrology/tree/4cb15cc2f63a67ba804c04840f255ffff1209382"
+    },
     {"identifier": "source.astrology.sign_groups.c92ac82", "title": "astrology Ashmand sign-group implementation", "author": "astrology contributors", "edition": "src/astrology/zodiac.py and tests/test_zodiac.py at c92ac826c3065fc9e4a2cc949cf87c64c79c0c63", "language": "en", "lineage": {"en": "Project-authored expansion of the source's explicit pairs and ordering relations, with membership and type-boundary tests. The historical definition remains attributed to source.ptolemy.ashmand1822.", "zh": "项目按原文直接点名的两对星座及先后关系展开成员，附成员归属与类型边界测试。历史定义仍归于 source.ptolemy.ashmand1822。"}, "rights": {"en": "Project-authored code, translations and explanations under the repository MIT license.", "zh": "项目自写代码、翻译及说明采用本仓 MIT 许可证。"}, "scope": {"en": "Supports the immutable sign-group definition, pure lookup and source-derived test expectations at this fixed commit. This is project implementation evidence, not independent historical corroboration, a physical-season model or a chart interpretation.", "zh": "支持此固定提交中的不可变星座分组定义、纯查询及按来源推导的测试期望。这是项目实现证据，不是独立历史互证、实际季节模型或命盘解读。"}, "verification": "verified", "url": "https://github.com/0xf3cd/astrology/tree/c92ac826c3065fc9e4a2cc949cf87c64c79c0c63"},
     {"identifier": "source.astrology.cross_aspects.0d7122a", "title": "astrology static cross-chart implementation", "author": "astrology contributors", "edition": "src/astrology/cross_aspects.py, shared aspects.py arithmetic and tests at 0d7122a7f7ef86ecc5798c9ea12668c68bb4a516", "language": "en", "lineage": {"en": "Project-authored static cross-chart composition and hand-worked synthetic tests, separate from source.astrology.chart.fc845fa, the single-chart implementation source.", "zh": "项目自写的静态双盘组合与手算合成测试，与单盘实现来源 source.astrology.chart.fc845fa 分开。", "revision": 3, "zh_revision": 3}, "rights": {"en": "Project-authored text under the repository MIT license.", "zh": "项目自写文本，采用本仓 MIT 许可证。"}, "scope": {"en": "Supports the cross pairing, explicit orb selection, static geometry and provenance retention at this fixed commit. It is not independent astronomical corroboration and establishes no traditional interpretation or accuracy bound.", "zh": "支持此固定提交中的双盘配对、显式容许度选择、静态几何及来源保留；不是独立的天文互证，不确立传统解读或精度界。"}, "verification": "verified", "url": "https://github.com/0xf3cd/astrology/tree/0d7122a7f7ef86ecc5798c9ea12668c68bb4a516"},
     {"identifier": "source.astrology.chart.fc845fa", "title": "astrology chart implementation", "author": "astrology contributors", "edition": "Development package 0.0.0; src/astrology/ and tests/test_reference.py at fc845fa1aa786f7e1eda7b4d901e70e9a505add5", "language": "en", "lineage": {"en": "Project-authored adapter, sign sectors, supplied-cusp placement, aspect classification and node comparison tests. These are not independent astronomical or traditional corroboration.", "zh": "项目自写的适配层、星座区间、给定宫头的落宫判断、相位分类及交点对拍测试；不是独立的天文或传统互证。", "revision": 4, "zh_revision": 4}, "rights": {"en": "Project-authored text under the repository MIT license.", "zh": "项目自写文本，采用本仓 MIT 许可证。"}, "scope": {"en": "Supports the executable sign, placement, adapter and aspect rules at this fixed commit, plus the existence of its node comparison test. It does not verify printed Meeus formulas, error bounds, historical definitions or interpretations.", "zh": "支持此固定提交中的可执行星座、落宫、适配层和相位规则，以及该版本中交点对拍测试的存在；不表示核验了 Meeus 印刷公式、误差界、历史定义或解释。", "revision": 3, "zh_revision": 3}, "verification": "verified", "url": "https://github.com/0xf3cd/astrology/tree/fc845fa1aa786f7e1eda7b4d901e70e9a505add5"},
@@ -258,6 +270,18 @@
       "prerequisites": [{"en": "Supply an exact Sign and, for status assessment, a supported Body. HouseRulers requires a supplied NatalChart; existing placements are reused and absent ruler placements remain absent.", "zh": "提供确切的 Sign 枚举；判断状态时另需受支持的 Body。HouseRulers 要求给定 NatalChart，复用已有落点，将未计算的宫主星落点保留为缺失。"}],
       "exceptions": {"en": "Wrong types and unsupported outer planets are rejected explicitly; supported no-match is an empty tuple. An uncalculated ruler placement is None, not no-match. Four-status emptiness is not a peregrine judgment.", "zh": "错误类型及未支持的外行星明确报错；支持对象无命中时返回空元组。宫主星落点未计算时为 None，不表示无命中。四项为空不构成游离判断。"},
       "limits": {"en": "One named historical set. No reception, aggregate strength, modern rulership or interpretation. The source's day/night house labels and other dignities are not conditions on these four queries. Catalog retrieval never evaluates chart applicability.", "zh": "仅限一个具名历史规则集。不提供互容、综合强度、现代守护或解读。原文的昼夜庙标签及其他尊贵不是这四项查询的附加条件。目录检索从不判断命盘适用性。"},
+      "prerequisite_status": "complete",
+      "output_eligibility": "reference_only"
+    },
+    {
+      "identifier": "entry.axis_aspects",
+      "statement": {"en": "Stored chart axes have distinct identities and participate in natal or static cross-chart aspects only when explicitly selected. Chart composition reads the corresponding axis fields, not house cusps or synthesized opposite axes.", "zh": "已存四轴各有不同身份，只有显式选择后才参与本命或静态双盘相位。命盘组合读取对应轴字段，不读取宫头或合成对轴。"},
+      "concept_ids": ["axis.ascendant", "axis.midheaven", "axis.descendant", "axis.imum_coeli"],
+      "rule_ids": ["rule.project.aspect_participation", "rule.project.aspect_deviation", "rule.project.aspect_motion", "rule.project.cross_aspect_evaluation"],
+      "citations": [{"source_id": "source.astrology.axis_aspects.4cb15cc", "locator": "objects.Axis; config.ChartConfig.aspect_participants; chart._AXIS_FIELDS and _aspect_positions; cross_aspects._selection and _hits; tests/test_axis_aspects.py at the recorded commit"}],
+      "prerequisites": [{"en": "Supply explicit participants and aspect rules with caller-selected orbs. Chart composition requires stored axis geometry; cross-chart sources retain their own axis fields.", "zh": "显式提供参与者及带调用方所选容许度的相位规则。命盘组合要求已有轴几何；双盘来源各自保留自己的轴字段。"}],
+      "exceptions": {"en": "Axis-axis and opposite-axis pairs are admitted without folding identities. The natal node-node exclusion remains specific to lunar nodes; static cross-chart pairs have no motion field.", "zh": "允许轴间及对轴配对，不折叠身份。本命交点互配排除仍只针对月交点；静态双盘配对不设运动字段。"},
+      "limits": {"en": "A project policy, not a universal traditional rule or astronomical authentication. Chart composition supplies no axis rate, so non-exact axis hits are indeterminate; zero deviation still gives exact. Scalar callers may supply a meaningful finite rate. Axes have no native-output target, physical distance, raw position or statistical placement. Catalog retrieval never evaluates chart applicability.", "zh": "这是项目政策，不是跨传统通用规则，也不认证天文来源。命盘组合不提供轴速率，因此非精确轴命中为不确定；偏差恰为零时仍为精确。标量调用方可给出有意义的有限速率。四轴没有天文输出目标、物理距离、原始位置或统计落点。目录检索从不判断命盘适用性。"},
       "prerequisite_status": "complete",
       "output_eligibility": "reference_only"
     }
