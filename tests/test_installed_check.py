@@ -534,6 +534,23 @@ def test_cross_consumer_rejects_a_missing_hand_worked_pair(monkeypatch: pytest.M
     installed_check._check_cross_chart()
 
 
+def test_axis_consumer_rejects_incorrect_cross_geometry(monkeypatch: pytest.MonkeyPatch) -> None:
+  original = astrology.cross_chart_aspects
+
+  def incorrect(*args: object, **kwargs: object) -> astrology.CrossChartAspects:
+    result = original(*args, **kwargs)  # type: ignore[arg-type]
+    return cast(
+      astrology.CrossChartAspects,
+      SimpleNamespace(
+        hits=(replace(result.hits[0], deviation_deg=0),), left_objects=result.left_objects
+      ),
+    )
+
+  monkeypatch.setattr(astrology, "cross_chart_aspects", incorrect)
+  with pytest.raises(ValueError, match="wrong source or field"):
+    installed_check._check_axes()
+
+
 def test_cross_consumer_rejects_native_initialization(monkeypatch: pytest.MonkeyPatch) -> None:
   original = installed_check.acceptance_cross_aspects
 

@@ -14,13 +14,11 @@ resolution](https://0xf3cd.github.io/astrology/docs/en/birth.html), [requested c
 See [Contributing](https://0xf3cd.github.io/astrology/docs/en/contributing.html) to run the checks.
 
 The current source also adds [element/modality distributions and natal lunar
-phase](https://0xf3cd.github.io/astrology/docs/en/summaries.html), and
+phase](https://0xf3cd.github.io/astrology/docs/en/summaries.html),
 [traditional sign rulers and four statuses](https://0xf3cd.github.io/astrology/docs/en/dignities.html),
-planned for 0.3.0.
-
-It also supports [explicit axis aspects](https://0xf3cd.github.io/astrology/docs/en/aspects.html#select-axes-explicitly)
-in natal and static cross-chart queries. Axes are selected separately from
-native body/node outputs; requests without selected axes keep their behavior.
+and [explicit axis aspects](https://0xf3cd.github.io/astrology/docs/en/aspects.html#select-axes-explicitly)
+in natal and static cross-chart queries, planned for 0.3.0. Axes participate only
+when selected; requests without selected axes keep their behavior.
 
 New in 0.2.0 (in development):
 

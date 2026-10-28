@@ -122,7 +122,7 @@ mean_of_orbs [8.0]
 
 请求里的 `aspect_objects` 从所请求的天体或交点中选择参与者，也可显式加入四轴；不写时，所有请求的
 天体和交点都参与，不加入四轴。被请求但不在 `aspect_objects` 里的交点仍有位置，只是不参与任何相位。
-所选轴可与天体、交点或另一不同轴配对。
+所选轴可与天体、交点或另一轴配对。
 
 ## 本命盘里的相位
 
@@ -165,7 +165,7 @@ moon saturn trine -2.34 separating
 
 `Axis.ASCENDANT`、`MIDHEAVEN`、`DESCENDANT` 和 `IMUM_COELI` 是不同的命盘身份。
 命盘组合直接读取 `ChartHouses` 对应的已存黄经字段，不用宫头代替，也不从另一轴合成对轴。
-在整宫制中，上升点与中天不必是第一、第十宫头：
+在整宫制中，上升点与中天不必是第一、第十宫头。
 
 ```{doctest}
 >>> from astrology import Axis

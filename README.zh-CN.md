@@ -11,11 +11,10 @@
 [命盘结果与文本输出](https://0xf3cd.github.io/astrology/docs/zh-CN/records.html)、独立[知识目录](https://0xf3cd.github.io/astrology/docs/zh-CN/knowledge.html)、质量检查和双语 [API 文档](https://0xf3cd.github.io/astrology/docs/zh-CN/reference.html)。
 运行检查见[参与开发](https://0xf3cd.github.io/astrology/docs/zh-CN/contributing.html)。
 
-当前源码另增[元素／模式分布与出生月相](https://0xf3cd.github.io/astrology/docs/zh-CN/summaries.html)，
-以及[传统星座守护与四种状态](https://0xf3cd.github.io/astrology/docs/zh-CN/dignities.html)，计划随 0.3.0 交付。
-
-本命及静态双盘查询也支持[显式选四轴参与相位](https://0xf3cd.github.io/astrology/docs/zh-CN/aspects.html#axis-aspects-zh-cn)。
-四轴与天文输出的天体、交点分开选择；不选轴的请求保持原行为。
+当前源码另增[元素／模式分布与出生月相](https://0xf3cd.github.io/astrology/docs/zh-CN/summaries.html)、
+[传统星座守护与四种状态](https://0xf3cd.github.io/astrology/docs/zh-CN/dignities.html)，
+以及本命及静态双盘查询的[显式选四轴参与相位](https://0xf3cd.github.io/astrology/docs/zh-CN/aspects.html#axis-aspects-zh-cn)，
+计划随 0.3.0 交付。四轴只有被选择后才参与相位；不选轴的请求保持原行为。
 
 0.2.0（开发中）新增：
 

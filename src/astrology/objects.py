@@ -54,7 +54,10 @@ class LunarNode(StrEnum):
 class Axis(StrEnum):
   """Stored chart axes, distinct from bodies, nodes and house cusps.
 
+  Iteration defines the ASC/MC/DSC/IC append order for selected aspect axes.
+
   命盘保存的四轴身份，与天体、交点及宫头区分。
+  枚举迭代顺序决定所选相位轴按上升、中天、下降、天底顺序追加。
   """
 
   ASCENDANT = "ascendant"

@@ -109,8 +109,8 @@ selections fail under normal Python and `python -O`.
 
 Requested bodies/nodes keep their original order; selected axes follow in
 ASC/MC/DSC/IC order, independently of the selection argument's order. Axes can
-also be the only aspect participants, but the native-output request still needs
-at least one body/node. See [axis geometry and pairing](aspects.md#select-axes-explicitly).
+also be the only aspect participants, but `objects` must still contain at least
+one body/node. See [axis geometry and pairing](aspects.md#select-axes-explicitly).
 
 The defining enums and API contracts are generated in the [reference](reference.md).
 Actual astronomy models, versions, time scales, and effective calculation

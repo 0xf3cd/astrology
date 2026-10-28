@@ -448,13 +448,20 @@ def test_axis_vocabulary_and_lazy_supplied_catalog_names(axis: Axis, language: L
   assert catalog.lookup(concept.name.text(language) or "")[0] is concept
   stripped = replace(
     catalog,
-    concepts=tuple(c for c in catalog.concepts if c is not concept),
+    concepts=tuple(c for c in catalog.concepts if c.kind is not ConceptKind.AXIS),
     variants=(),
     entries=(),
   )
   with pytest.raises(ValueError, match="configuration identity"):
     check_catalog_data(stripped)
-  assert format_chart(_source(), stripped, language=language)
+  body_source = _selected_chart(_source(), _config((Body.SUN,)), ())
+  body_text = format_chart(body_source, stripped, language=language)
+  body_row = (
+    "Effective aspect objects (requested object order): Sun"
+    if language == "en"
+    else "实际参与相位的对象（按请求对象顺序）: 太阳"
+  )
+  assert body_row in body_text.splitlines()
   source = _selected_chart(_source(), _config((axis,)), ())
   with pytest.raises(ValueError, match="catalog concept"):
     format_chart(source, stripped, language=language)
@@ -464,6 +471,12 @@ def test_axis_vocabulary_and_lazy_supplied_catalog_names(axis: Axis, language: L
   )
   text = format_chart(source, supplied, language=language)
   assert ("Caller axis" if language == "en" else "调用方轴名") in text
+  axis_row = (
+    "Effective aspect objects (bodies/nodes, then ASC/MC/DSC/IC): Caller axis"
+    if language == "en"
+    else "实际参与相位的对象（天体和交点之后按上升、中天、下降、天底顺序）: 调用方轴名"
+  )
+  assert axis_row in text.splitlines()
   stale = replace(
     changed, name=replace(changed.name, en="Revised", zh="旧译", revision=2, zh_revision=1)
   )

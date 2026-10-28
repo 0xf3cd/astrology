@@ -138,7 +138,7 @@ descending nodes are always exactly opposite. A node can form an aspect with a b
 In a chart request, `aspect_objects` selects requested bodies/nodes and may explicitly
 add axes. Left out, all requested bodies/nodes take part, without axes. A node that is
 requested but left out of `aspect_objects` still has its position and takes part in
-no aspect. A selected axis can pair with a body, node or distinct axis.
+no aspect. A selected axis can pair with a body, node or another axis.
 
 ## Aspects in a natal chart
 
@@ -182,9 +182,9 @@ moon saturn trine -2.34 separating
 ## Select axes explicitly
 
 `Axis.ASCENDANT`, `MIDHEAVEN`, `DESCENDANT` and `IMUM_COELI` are distinct chart
-identities. In native composition their longitudes come from the corresponding
+identities. In chart composition their longitudes come from the corresponding
 stored `ChartHouses` fields, never from house cusps or a synthesized opposite axis.
-This matters in Whole Sign, where ASC/MC need not be first/tenth cusps:
+This matters in Whole Sign, where ASC/MC need not be first/tenth cusps.
 
 ```{doctest}
 >>> from astrology import Axis
