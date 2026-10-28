@@ -53,7 +53,7 @@
 
 ```{eval-rst}
 .. automodule:: astrology.text
-   :members: format_chart, format_sign_distribution, format_lunar_phase, format_house_rulers
+   :members: format_chart, format_sign_distribution, format_lunar_phase, format_house_rulers, format_house_overlays, format_cross_aspects
    :no-index:
 ```
 
@@ -94,6 +94,18 @@
 ```{eval-rst}
 .. automodule:: astrology.cross_aspects
    :members: CrossAspectHit, CrossChartAspects, cross_chart_aspects
+   :undoc-members:
+   :member-order: bysource
+   :no-index:
+```
+
+## 双盘落宫
+
+见[双向落宫与文本示例](cross_aspects.md)。
+
+```{eval-rst}
+.. automodule:: astrology.house_overlays
+   :members: HouseOverlay, CrossChartHouseOverlays, cross_chart_house_overlays
    :undoc-members:
    :member-order: bysource
    :no-index:

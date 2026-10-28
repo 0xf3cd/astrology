@@ -1,5 +1,6 @@
 """Verify the installed package in isolation. 隔离验证已安装的包。"""
 
+import builtins
 import json
 import sys
 from dataclasses import replace
@@ -29,6 +30,7 @@ MODULES = (
   "config",
   "cross_aspects",
   "dignities",
+  "house_overlays",
   "houses",
   "knowledge",
   "knowledge.catalog",
@@ -121,6 +123,8 @@ def _cross_source(
   coordinates: tuple[tuple[astrology.Body | astrology.LunarNode, float], ...],
   *,
   axes: tuple[float, float, float, float] = (0, 270, 180, 90),
+  house_system: astrology.HouseSystem = astrology.HouseSystem.WHOLE_SIGN,
+  cusps_deg: tuple[float, ...] | None = None,
 ) -> astrology.NatalChart:
   """Construct a pure synthetic source, not a calculated astronomical reference.
 
@@ -136,11 +140,11 @@ def _cross_source(
   resolved = astrology.ResolvedBirth(
     record, datetime(year, 1, 1, tzinfo=UTC), timedelta(0), None, None, None, None
   )
-  config = astrology.ChartConfig(
-    astrology.HouseSystem.WHOLE_SIGN, tuple(identity for identity, _ in coordinates), ()
-  )
+  config = astrology.ChartConfig(house_system, tuple(identity for identity, _ in coordinates), ())
   houses = astrology.ChartHouses(
-    config.house_system, *axes, tuple(float(n) for n in range(0, 360, 30))
+    config.house_system,
+    *axes,
+    tuple(float(n) for n in range(0, 360, 30)) if cusps_deg is None else cusps_deg,
   )
   positions = tuple(
     astrology.EclipticPosition(
@@ -173,6 +177,28 @@ def _cross_source(
       for p in positions
     ),
     (),
+  )
+
+
+def acceptance_house_overlays() -> astrology.CrossChartHouseOverlays:
+  """Compose a synthetic bidirectional case with unequal source systems and stored axes.
+
+  组合一个合成双向用例，源盘宫制不同，并显式选择已存四轴。
+  """
+  sun, venus, node = astrology.Body.SUN, astrology.Body.VENUS, astrology.LunarNode.MEAN_ASCENDING
+  left = _cross_source(
+    2000, "left", ((sun, 15), (venus, 210), (node, 359)), axes=(22, 111, 204, 291)
+  )
+  right = _cross_source(
+    2001,
+    "right",
+    ((sun, 345), (venus, 0), (node, 45)),
+    axes=(15, 105, 195, 285),
+    house_system=astrology.HouseSystem.EQUAL,
+    cusps_deg=tuple(float(n) for n in range(15, 360, 30)),
+  )
+  return astrology.cross_chart_house_overlays(
+    left, right, left_objects=(*left.requested.objects, *astrology.Axis)
   )
 
 
@@ -242,9 +268,43 @@ def cross_observations(result: astrology.CrossChartAspects) -> str:
   return json.dumps(values, sort_keys=True, allow_nan=False)
 
 
+def comparison_observations(
+  aspects: astrology.CrossChartAspects,
+  overlays: astrology.CrossChartHouseOverlays,
+  catalog: Catalog,
+) -> str:
+  """Capture both comparison results and bilingual text from supplied inputs.
+
+  从给定输入取得两种比较结果及双语文本的检查值。
+  """
+  languages: tuple[Literal["en", "zh-CN"], ...] = ("en", "zh-CN")
+  values = {
+    "aspects": json.loads(cross_observations(aspects)),
+    "overlays": {
+      "chart_left": json.loads(chart_observations(overlays.chart_left)),
+      "chart_right": json.loads(chart_observations(overlays.chart_right)),
+      "left_objects": [identity.value for identity in overlays.left_objects],
+      "right_objects": [identity.value for identity in overlays.right_objects],
+      "placements": [
+        [p.object_owner, p.house_owner, p.identity.value, p.house] for p in overlays.placements
+      ],
+    },
+    "text": {
+      language: {
+        "aspects": astrology.format_cross_aspects(aspects, catalog, language=language),
+        "overlays": astrology.format_house_overlays(overlays, catalog, language=language),
+      }
+      for language in languages
+    },
+  }
+  return json.dumps(values, sort_keys=True, allow_nan=False)
+
+
 def _check_cross_chart(expected_observations: Path | None = None) -> None:
   _check_native_isolation()
   result = acceptance_cross_aspects()
+  overlays = acceptance_house_overlays()
+  catalog = astrology.load_catalog()
   node = astrology.LunarNode.MEAN_ASCENDING
   sun, moon = astrology.Body.SUN, astrology.Body.MOON
   expected = [
@@ -259,10 +319,73 @@ def _check_cross_chart(expected_observations: Path | None = None) -> None:
     for h in result.hits
   ] != expected:
     raise ValueError("Installed cross aspects differ from hand-worked geometry")
-  if expected_observations is not None and cross_observations(
-    result
-  ) != expected_observations.read_text(encoding="utf-8"):
-    raise ValueError("Installed cross aspects differ from the development entry point")
+  expected_placements = [
+    ("left", "right", sun, 1),
+    ("left", "right", astrology.Body.VENUS, 7),
+    ("left", "right", node, 12),
+    ("left", "right", astrology.Axis.ASCENDANT, 1),
+    ("left", "right", astrology.Axis.MIDHEAVEN, 4),
+    ("left", "right", astrology.Axis.DESCENDANT, 7),
+    ("left", "right", astrology.Axis.IMUM_COELI, 10),
+    ("right", "left", sun, 12),
+    ("right", "left", astrology.Body.VENUS, 1),
+    ("right", "left", node, 2),
+  ]
+  if [
+    (p.object_owner, p.house_owner, p.identity, p.house) for p in overlays.placements
+  ] != expected_placements:
+    raise ValueError("Installed house overlays differ from hand-worked geometry")
+  original_import = builtins.__import__
+
+  def guarded(name: str, *args: Any, **kwargs: Any) -> Any:
+    if name == "astrology.celestial" or name.startswith(
+      ("celestial_calendar", "tzdata", "zoneinfo")
+    ):
+      raise ValueError("Supplied comparison attempted to initialize astronomy or time data")
+    return original_import(name, *args, **kwargs)
+
+  builtins.__import__ = guarded
+  try:
+    if (
+      astrology.cross_chart_house_overlays(
+        overlays.chart_left,
+        overlays.chart_right,
+        left_objects=overlays.left_objects,
+        right_objects=overlays.right_objects,
+      )
+      != overlays
+    ):
+      raise ValueError("Installed supplied overlay calculation changed")
+    if (
+      astrology.cross_chart_aspects(
+        result.chart_left,
+        result.chart_right,
+        result.rules,
+        left_objects=result.left_objects,
+        right_objects=result.right_objects,
+        combination=result.combination,
+      )
+      != result
+    ):
+      raise ValueError("Installed supplied cross-aspect calculation changed")
+    observed = comparison_observations(result, overlays, catalog)
+  finally:
+    builtins.__import__ = original_import
+  texts = json.loads(observed)["text"]
+  for language, required in (
+    ("en", "Left | Venus [venus] | Right | 7"),
+    ("zh-CN", "左盘 | 金星 [venus] | 右盘 | 7"),
+  ):
+    output = texts[language]
+    if required not in output["overlays"].splitlines():
+      raise ValueError("Installed overlay text lost ownership or placement")
+    aspect_rows = [line for line in output["aspects"].splitlines() if "] |" in line]
+    if len(aspect_rows) != len(expected):
+      raise ValueError("Installed cross-aspect text lost static hits")
+  if expected_observations is not None and observed != expected_observations.read_text(
+    encoding="utf-8"
+  ):
+    raise ValueError("Installed comparison observations differ from the development entry point")
   _check_native_isolation()
 
 
@@ -789,12 +912,13 @@ def main(
   None skips corpus comparison. CLI: CODE_VERSION CORPUS_VERSION [--knowledge-only]
   [--expected-observations PATH] [--expected-cross-observations PATH]. Optional
   check-run files hold exact source observations, including raw numbers, input,
-  configuration and provenance for natal and cross results separately.
+  configuration and provenance for natal and comparison results, plus bilingual
+  comparison text.
 
   检查安装包身份、API 及隔离，并比较传入的语料版本。None 跳过语料版本比较。
   CLI 参数顺序：CODE_VERSION CORPUS_VERSION [--knowledge-only] [--expected-observations PATH]。
   另可给 --expected-cross-observations PATH。可选的本次检查文件分别保存本命及双盘的源码
-  精确检查值，包括原始数值、输入、配置和来源。
+  精确检查值，包括原始数值、输入、配置和来源，以及双语比较文本。
   """
   metadata = distribution("celestial-astrology")
   for module in (astrology, *(import_module("astrology." + name) for name in MODULES)):

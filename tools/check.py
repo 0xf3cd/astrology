@@ -56,6 +56,7 @@ PACKAGE_FILES = (
   "astrology/config.py",
   "astrology/cross_aspects.py",
   "astrology/dignities.py",
+  "astrology/house_overlays.py",
   "astrology/houses.py",
   "astrology/lunar_phase.py",
   "astrology/objects.py",
@@ -685,19 +686,24 @@ def check_installed_wheel(source: Path, wheel: Path, version: str, directory: Pa
   from tools.installed_check import (
     acceptance_chart,
     acceptance_cross_aspects,
+    acceptance_house_overlays,
     chart_observations,
-    cross_observations,
+    comparison_observations,
   )
 
   environment = directory / "consumer"
   run(("uv", "venv", "--python", sys.executable, str(environment)), cwd=directory)
   python = environment / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
   run(("uv", "pip", "install", "--python", str(python), str(wheel)), cwd=directory)
-  corpus_version = load_catalog().version
+  catalog = load_catalog()
+  corpus_version = catalog.version
   observations = directory / "expected-observations.json"
   observations.write_text(chart_observations(acceptance_chart()), encoding="utf-8")
   cross_values = directory / "expected-cross-observations.json"
-  cross_values.write_text(cross_observations(acceptance_cross_aspects()), encoding="utf-8")
+  cross_values.write_text(
+    comparison_observations(acceptance_cross_aspects(), acceptance_house_overlays(), catalog),
+    encoding="utf-8",
+  )
   script = source / "tools/installed_check.py"
   for mode in ((), ("-O",)):
     run(

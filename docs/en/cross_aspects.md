@@ -1,14 +1,16 @@
-# Static cross-chart aspects
+# Cross-chart aspects and house overlays
 
 [简体中文](../zh-CN/cross_aspects.md) · [Documentation](index.md) · [API](reference.md)
 
-`cross_chart_aspects` compares two existing in-memory `NatalChart` results.
+Use `cross_chart_aspects` for static major aspects between two existing
+`NatalChart` results, or `cross_chart_house_overlays` to place each side's objects
+in the other chart's houses.
 A Sun in the left chart and a Sun in the right chart remain separate endpoints;
-no renaming or chart merging is needed. Comparing supplied results performs no
-astronomy, timezone resolution, version lookup or I/O.
+no renaming or chart merging is needed.
 
-This API is available from 0.2.0, which is still in development. Use the
-[source installation instructions](../../README.md#install-from-source).
+Static cross-chart aspects are available from 0.2.0. House overlays and comparison
+text are 0.3.0 additions still in development; use the
+[source installation instructions](../../README.md#install-from-source) for them.
 
 ## Compare two synthetic birth records
 
@@ -43,6 +45,40 @@ Both complete charts remain available as `result.chart_left` and `result.chart_r
 including original/resolved birth inputs, positions, requested/effective choices
 and provenance. `rules` and `combination` record the fresh comparison request;
 neither chart's natal rules or participants are inherited.
+
+## Find houses in the other chart
+
+Each overlay names the object owner and the house owner. The two Suns below are
+kept separate even though both happen to fall in house 1 of the receiving chart.
+
+```{doctest}
+>>> from astrology import cross_chart_house_overlays
+>>> overlays = cross_chart_house_overlays(chart_left, chart_right)
+>>> [(p.object_owner, p.identity.value, p.house_owner, p.house) for p in overlays.placements]
+[('left', 'sun', 'right', 1), ('right', 'sun', 'left', 1)]
+>>> overlays.chart_left is chart_left, overlays.chart_right is chart_right
+(True, True)
+>>> one_way = cross_chart_house_overlays(chart_left, chart_right,
+...   left_objects=(Body.SUN,), right_objects=())
+>>> [(p.object_owner, p.house_owner) for p in one_way.placements]
+[('left', 'right')]
+```
+
+Selections independently control which objects each side contributes. An empty
+selection cancels only that direction: the chart's cusps remain available to
+receive the other side's objects. `None` selects its bodies/nodes without axes.
+Explicit selections may include any stored `Axis`, just as in the
+[axis example below](#select-axes-on-each-side). Body/node source order is followed
+by ASC/MC/DSC/IC; the result lists left objects in right houses, then the reverse.
+Duplicate or unavailable identities raise `ValueError`; non-object values or
+non-sequence requests raise `TypeError`, even when the other selection is empty.
+
+The object owner's stored longitude is compared with the house owner's actual
+cusps. Houses use half-open intervals `[cusp, next cusp)`, wrapping at 0/360 degrees;
+an exact cusp belongs to the house starting there. Each source's house system is
+retained, without changing either chart. Swapping sources swaps the roles; the
+same chart can also occupy both. `CrossChartHouseOverlays` recomputes all
+placements at construction and rejects missing, changed or reordered rows.
 
 ## Choose pairs and orbs
 
@@ -103,6 +139,41 @@ False
 No native calculation is performed by this comparison, and axes do not acquire
 distance or motion fields. See [natal axis selection](aspects.md#select-axes-explicitly).
 
+## Render comparison text
+
+Load a catalog explicitly and pass it to either formatter. Use `language="zh-CN"`
+for Chinese; English is the default.
+
+```{doctest}
+>>> from astrology import format_house_overlays, format_cross_aspects, load_catalog
+>>> catalog = load_catalog()
+>>> print(format_house_overlays(overlays, catalog))  # doctest: +ELLIPSIS
+Cross-chart house overlays
+...
+Object owner | Object | House owner | House
+Left | Sun [sun] | Right | 1
+Right | Sun [sun] | Left | 1
+>>> print(format_cross_aspects(result, catalog))  # doctest: +ELLIPSIS
+Static cross-chart aspects
+...
+Left object | Right object | Aspect | Branch | Deviation | Orb limit
+Sun [sun] | Sun [sun] | Conjunction | 0°00'00" | ... | 3°00'00"
+...
+Aspect rule / base orb / object overrides: Conjunction / 3°00'00" / None
+...
+```
+
+Both tables show each source's house system, coordinate convention, times,
+model/version labels and effective selection. Static text retains every matching
+branch, including multiple matches for one pair, plus explicit base orbs, object
+overrides, the combination and each hit's effective inclusive limit. It assigns
+no motion label. Empty results still display their selections and rules.
+Angles follow the [whole-arcsecond display rule](records.md#display-does-not-change-classification);
+truncation does not change membership or discard rows. Required names must have
+current translations in the supplied catalog; missing, stale or ambiguous names
+raise `ValueError` rather than falling back to another language. The tables escape
+nonprinting characters and table delimiters; they are not lossless chart records.
+
 ## Read static geometry
 
 Each hit has `left_object`, `right_object`, `aspect`, `branch_deg`,
@@ -116,7 +187,9 @@ There is no motion field, including no applying/separating label. Rates at two
 birth instants do not describe a shared time evolution. Zero deviation still
 identifies exact static geometry, without predicting a later event.
 
-The sources must use matching zodiac, center and position-frame conventions;
+## Source compatibility and calculation boundaries
+
+Both comparisons require matching zodiac, center and position-frame conventions;
 a mismatch raises `ValueError`. Current public constructors admit only one such
 convention: tropical/geocentric positions on the true ecliptic
 and equinox of each chart's own date. Different dates therefore use different
@@ -127,5 +200,11 @@ and do not by themselves cause rejection. Construction recomputes all hits from
 the sources, selections and rules and rejects any difference. It does not
 authenticate the supplied astronomical values or provenance labels.
 
-Composite/Davison charts, house overlays, transit searches and interpretation
-remain outside this API. It provides no separate text formatter.
+House overlays likewise use each object's stored own-date longitude against the
+receiving chart's cusps, without common-epoch conversion or three-dimensional
+placement. Both operations validate their requests even when output is empty.
+Neither performs astronomy, timezone resolution, version lookup or resource I/O;
+formatting uses the catalog supplied by the caller.
+
+Composite/Davison charts, transit searches and interpretation remain outside
+these operations.

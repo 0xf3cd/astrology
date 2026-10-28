@@ -457,8 +457,10 @@ def test_consumer_installs_only_retained_wheel_and_keeps_all_acceptance_modes(
     "tools.installed_check.chart_observations", lambda _chart: "runner-local-source-result"
   )
   monkeypatch.setattr("tools.installed_check.acceptance_cross_aspects", lambda: None)
+  monkeypatch.setattr("tools.installed_check.acceptance_house_overlays", lambda: None)
   monkeypatch.setattr(
-    "tools.installed_check.cross_observations", lambda _result: "runner-local-cross-result"
+    "tools.installed_check.comparison_observations",
+    lambda _aspects, _overlays, _catalog: "runner-local-cross-result",
   )
   monkeypatch.setattr(
     checker, "check_readme_examples", lambda root, python, work, mode: readmes.append(mode)

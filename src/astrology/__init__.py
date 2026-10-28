@@ -50,6 +50,11 @@ from astrology.config import (
 )
 from astrology.cross_aspects import CrossAspectHit, CrossChartAspects, cross_chart_aspects
 from astrology.dignities import DignityStatus, essential_dignities, sign_ruler
+from astrology.house_overlays import (
+  CrossChartHouseOverlays,
+  HouseOverlay,
+  cross_chart_house_overlays,
+)
 from astrology.houses import house_of
 from astrology.knowledge import Catalog, load_catalog
 from astrology.lunar_phase import LunarPhaseResult, LunationType, lunar_phase
@@ -64,6 +69,8 @@ from astrology.summaries import (
 )
 from astrology.text import (
   format_chart,
+  format_cross_aspects,
+  format_house_overlays,
   format_house_rulers,
   format_lunar_phase,
   format_sign_distribution,
@@ -99,12 +106,14 @@ __all__ = [
   "ChartTimes",
   "CrossAspectHit",
   "CrossChartAspects",
+  "CrossChartHouseOverlays",
   "DignityStatus",
   "EclipticPosition",
   "EffectiveConfiguration",
   "Element",
   "FixedOffset",
   "HistoricalTimeError",
+  "HouseOverlay",
   "HouseRuler",
   "HouseRulers",
   "HouseSystem",
@@ -130,10 +139,13 @@ __all__ = [
   "aspect_angle",
   "chart_sign_distribution",
   "cross_chart_aspects",
+  "cross_chart_house_overlays",
   "element_of",
   "essential_dignities",
   "find_aspects",
   "format_chart",
+  "format_cross_aspects",
+  "format_house_overlays",
   "format_house_rulers",
   "format_lunar_phase",
   "format_sign_distribution",

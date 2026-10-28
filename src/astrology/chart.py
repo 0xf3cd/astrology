@@ -333,20 +333,66 @@ def _placements(
   )
 
 
+def _require_comparable_sources(chart_left: NatalChart, chart_right: NatalChart) -> None:
+  """Check the coordinate conventions of two supplied charts.
+
+  校验两张给定命盘的位置坐标约定。
+  """
+  if type(chart_left) is not NatalChart or type(chart_right) is not NatalChart:
+    raise TypeError("chart_left and chart_right must be NatalChart values")
+  if (
+    chart_left.requested.zodiac != chart_right.requested.zodiac
+    or chart_left.requested.center != chart_right.requested.center
+    or chart_left.provenance.position_frame != chart_right.provenance.position_frame
+  ):
+    raise ValueError("Cross charts must use matching zodiac, center and position frame")
+
+
+def _selection_for_chart(
+  chart: NatalChart, objects: Sequence[ChartObject], name: str
+) -> tuple[ChartObject, ...]:
+  """Validate a comparison selection and order it by stored positions, then axes.
+
+  校验比较所用的对象选择，按已存位置及四轴的顺序排列。
+  """
+  if not isinstance(objects, Sequence) or isinstance(objects, (str, bytes)):
+    raise TypeError(f"{name} must be a sequence of Body, LunarNode or Axis values")
+  selected = tuple(objects)
+  if any(not _is_chart_object(value) for value in selected):
+    raise TypeError(f"{name} must contain Body, LunarNode or Axis values")
+  if len(set(selected)) != len(selected):
+    raise ValueError(f"{name} must not contain duplicate identities")
+  available: tuple[ChartObject, ...] = (*[position.identity for position in chart.positions], *Axis)
+  if not set(selected) <= set(available):
+    raise ValueError(f"{name} must name only objects available in its source chart")
+  return tuple(identity for identity in available if identity in selected)
+
+
+def _selected_longitudes(
+  positions: Sequence[EclipticPosition], houses: ChartHouses, participants: Sequence[ChartObject]
+) -> tuple[tuple[ChartObject, float], ...]:
+  """Read selected stored longitudes; axes follow bodies/nodes in their enum order.
+
+  读取选中的已存黄经；四轴按枚举顺序排在天体和交点之后。
+  """
+  return (
+    *[
+      (position.identity, position.longitude_deg)
+      for position in positions
+      if position.identity in participants
+    ],
+    *[(axis, getattr(houses, _AXIS_FIELDS[axis])) for axis in Axis if axis in participants],
+  )
+
+
 def _aspect_positions(
   positions: Sequence[EclipticPosition], houses: ChartHouses, participants: Sequence[ChartObject]
 ) -> tuple[AspectObject, ...]:
-  astronomical = tuple(
-    AspectObject(position.identity, position.longitude_deg, position.longitude_rate_deg_per_tt_day)
-    for position in positions
-    if position.identity in participants
+  rates = {position.identity: position.longitude_rate_deg_per_tt_day for position in positions}
+  return tuple(
+    AspectObject(identity, longitude, None if isinstance(identity, Axis) else rates[identity])
+    for identity, longitude in _selected_longitudes(positions, houses, participants)
   )
-  axes = tuple(
-    AspectObject(axis, getattr(houses, _AXIS_FIELDS[axis]), None)
-    for axis in Axis
-    if axis in participants
-  )
-  return (*astronomical, *axes)
 
 
 def _aspects(

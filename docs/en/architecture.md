@@ -27,6 +27,7 @@ src/astrology/
   aspects.py        Aspect definitions, orbs, and local motion
   chart.py          Composition and immutable chart results
   cross_aspects.py  Static comparison of supplied charts, retaining both sources
+  house_overlays.py Directional house placement between supplied charts
   lunar_phase.py    Oriented solar/lunar arc and named lunation types
   dignities.py      Traditional sign rulers and domicile/exaltation/detriment/fall
   summaries.py      Explicit-population statistics and supplied-chart summaries
@@ -45,9 +46,13 @@ need them. Package imports and knowledge queries must not initialize celestial.
 `cross_aspects.py` composes existing chart results without astronomy. Shared
 angular/orb arithmetic remains in `aspects.py`; single-chart pair eligibility
 and local motion stay with `find_aspects`, separate from static cross pairing.
-`objects.py` owns the narrow body/node and broader aspect identity families.
+`house_overlays.py` composes directional placements using the receiving chart's
+cusps and the existing `house_of` rule.
+`objects.py` owns the narrow body/node and broader chart-object families used by
+aspects and overlays.
 The adapter retains target bindings, text retains supplied-catalog naming, and
-`chart.py` extracts selected stored axis positions for both compositions.
+`chart.py` supplies selected stored longitudes to natal aspects, static cross
+aspects and house overlays. It also checks comparison source conventions and selections.
 
 Knowledge and calculation remain connected by stable identifiers, described in
 [Knowledge organization](knowledge.md). Additional UI applications can consume

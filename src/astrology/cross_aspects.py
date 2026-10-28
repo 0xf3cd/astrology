@@ -9,9 +9,14 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 
 from astrology.aspects import _geometry_values, _pair_geometry, aspect_angle
-from astrology.chart import NatalChart, _aspect_positions
+from astrology.chart import (
+  NatalChart,
+  _aspect_positions,
+  _require_comparable_sources,
+  _selection_for_chart,
+)
 from astrology.config import AspectRule, MajorAspect, OrbCombination
-from astrology.objects import Axis, ChartObject, _is_chart_object
+from astrology.objects import ChartObject, _is_chart_object
 
 
 @dataclass(frozen=True, slots=True)
@@ -70,9 +75,9 @@ class CrossChartAspects:
   hits: tuple[CrossAspectHit, ...]
 
   def __post_init__(self) -> None:
-    _sources(self.chart_left, self.chart_right)
-    left_objects = _selection(self.chart_left, self.left_objects, "left_objects")
-    right_objects = _selection(self.chart_right, self.right_objects, "right_objects")
+    _require_comparable_sources(self.chart_left, self.chart_right)
+    left_objects = _selection_for_chart(self.chart_left, self.left_objects, "left_objects")
+    right_objects = _selection_for_chart(self.chart_right, self.right_objects, "right_objects")
     rules = _rules(self.rules, self.combination, (*left_objects, *right_objects))
     if not isinstance(self.hits, Sequence) or isinstance(self.hits, (str, bytes)):
       raise TypeError("hits must be a sequence of CrossAspectHit values")
@@ -90,33 +95,6 @@ class CrossChartAspects:
       self.chart_left, self.chart_right, left_objects, right_objects, rules, self.combination
     ):
       raise ValueError("Cross hits differ from complete pure derivation")
-
-
-def _sources(chart_left: NatalChart, chart_right: NatalChart) -> None:
-  if type(chart_left) is not NatalChart or type(chart_right) is not NatalChart:
-    raise TypeError("chart_left and chart_right must be NatalChart values")
-  if (
-    chart_left.requested.zodiac != chart_right.requested.zodiac
-    or chart_left.requested.center != chart_right.requested.center
-    or chart_left.provenance.position_frame != chart_right.provenance.position_frame
-  ):
-    raise ValueError("Cross charts must use matching zodiac, center and position frame")
-
-
-def _selection(
-  chart: NatalChart, objects: Sequence[ChartObject], name: str
-) -> tuple[ChartObject, ...]:
-  if not isinstance(objects, Sequence) or isinstance(objects, (str, bytes)):
-    raise TypeError(f"{name} must be a sequence of Body, LunarNode or Axis values")
-  selected = tuple(objects)
-  if any(not _is_chart_object(value) for value in selected):
-    raise TypeError(f"{name} must contain Body, LunarNode or Axis values")
-  if len(set(selected)) != len(selected):
-    raise ValueError(f"{name} must not contain duplicate identities")
-  available: tuple[ChartObject, ...] = (*[position.identity for position in chart.positions], *Axis)
-  if not set(selected) <= set(available):
-    raise ValueError(f"{name} must name only objects available in its source chart")
-  return tuple(identity for identity in available if identity in selected)
 
 
 def _rules(
@@ -210,13 +188,13 @@ def cross_chart_aspects(
   不转换共同历元，也不声称是同时刻的空间角。保留不同日期、地点、宫制、模型和版本标签，
   不因此自动拒绝。不执行 I/O、时刻解析、版本查询或原生天文；源盘保持不变。
   """
-  _sources(chart_left, chart_right)
-  selected_left = _selection(
+  _require_comparable_sources(chart_left, chart_right)
+  selected_left = _selection_for_chart(
     chart_left,
     chart_left.requested.objects if left_objects is None else left_objects,
     "left_objects",
   )
-  selected_right = _selection(
+  selected_right = _selection_for_chart(
     chart_right,
     chart_right.requested.objects if right_objects is None else right_objects,
     "right_objects",

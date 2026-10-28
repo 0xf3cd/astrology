@@ -52,7 +52,7 @@ See the [complete result and text example](records.md).
 
 ```{eval-rst}
 .. automodule:: astrology.text
-   :members: format_chart, format_sign_distribution, format_lunar_phase, format_house_rulers
+   :members: format_chart, format_sign_distribution, format_lunar_phase, format_house_rulers, format_house_overlays, format_cross_aspects
 ```
 
 ## Zodiac classification
@@ -89,6 +89,17 @@ See the [two-chart example and static contract](cross_aspects.md).
 ```{eval-rst}
 .. automodule:: astrology.cross_aspects
    :members: CrossAspectHit, CrossChartAspects, cross_chart_aspects
+   :undoc-members:
+   :member-order: bysource
+```
+
+## Cross-chart house overlays
+
+See [directional placements and text](cross_aspects.md#find-houses-in-the-other-chart).
+
+```{eval-rst}
+.. automodule:: astrology.house_overlays
+   :members: HouseOverlay, CrossChartHouseOverlays, cross_chart_house_overlays
    :undoc-members:
    :member-order: bysource
 ```
