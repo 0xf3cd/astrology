@@ -49,7 +49,7 @@
 
 ## 命盘文本
 
-见[完整结果与文本例子](records.md)。
+本命盘见[完整结果与文本例子](records.md)，两张盘的格式化入口见[输出比较文本](cross_aspects.md#输出比较文本)。
 
 ```{eval-rst}
 .. automodule:: astrology.text
@@ -101,7 +101,7 @@
 
 ## 双盘落宫
 
-见[双向落宫与文本示例](cross_aspects.md)。
+见[双向落宫](cross_aspects.md#查询对象落入另一张盘的哪一宫)及[比较文本示例](cross_aspects.md#输出比较文本)。
 
 ```{eval-rst}
 .. automodule:: astrology.house_overlays

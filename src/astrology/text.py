@@ -158,7 +158,9 @@ _COMPARISON_LABELS = {
     "aspects": "Static cross-chart aspects",
     "left": "Left",
     "right": "Right",
-    "objects": "Selected objects",
+    "left_objects": "Left selected objects",
+    "right_objects": "Right selected objects",
+    "empty_objects": "No objects",
     "sources": "Side | House system | Zodiac / center | Position frame | JD(UT1) / JDE(TT) | Delta-T model | astrology / celestial-calendar versions",
     "overlay_columns": "Object owner | Object | House owner | House",
     "aspect_columns": "Left object | Right object | Aspect | Branch | Deviation | Orb limit",
@@ -170,7 +172,9 @@ _COMPARISON_LABELS = {
     "aspects": "静态双盘相位",
     "left": "左盘",
     "right": "右盘",
-    "objects": "所选对象",
+    "left_objects": "左盘所选对象",
+    "right_objects": "右盘所选对象",
+    "empty_objects": "无",
     "sources": "所属盘 | 宫制 | 黄道 / 中心 | 位置坐标约定 | JD(UT1) / JDE(TT) | ΔT 模型 | astrology / celestial-calendar 版本",
     "overlay_columns": "对象所属盘 | 对象 | 宫位所属盘 | 宫号",
     "aspect_columns": "左盘对象 | 右盘对象 | 相位 | 分支 | 偏差 | 容许度上限",
@@ -485,7 +489,6 @@ def _comparison_sources(
   result: CrossChartAspects | CrossChartHouseOverlays, catalog: Catalog, language: Language
 ) -> list[str]:
   labels = _COMPARISON_LABELS[language]
-  none = _HEADINGS[language]["none"]
   lines = [labels["sources"]]
   for side, chart in (("left", result.chart_left), ("right", result.chart_right)):
     lines.append(
@@ -499,7 +502,7 @@ def _comparison_sources(
     names = ", ".join(
       f"{_name(identity, catalog, language)} [{identity.value}]" for identity in objects
     )
-    lines.append(f"{labels[side]} {labels['objects']}: {names or none}")
+    lines.append(f"{labels[f'{side}_objects']}: {names or labels['empty_objects']}")
   return lines
 
 

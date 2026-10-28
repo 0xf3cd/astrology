@@ -68,7 +68,8 @@ separate composition rule and its fixed implementation source:
 ('complete', 'reference_only', 'not_assessed')
 ```
 
-This project rule keeps the object owner distinct from the receiving house owner,
+`rule.project.cross_house_overlays` uses the shared `rule.project.cusp_ownership`
+interval rule. The composition keeps the object owner distinct from the receiving house owner,
 with independent selections and retained source house systems. Its code citation
 documents the implementation, not astronomical authentication or relationship
 interpretation. Looking it up does not calculate placements or assess a chart.

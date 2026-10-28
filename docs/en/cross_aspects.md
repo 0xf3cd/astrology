@@ -196,8 +196,9 @@ and equinox of each chart's own date. Different dates therefore use different
 equinox references: a hit compares the stored longitudes, not the angle between
 two positions at one moment. There is no common-epoch conversion.
 Different dates, locations, house systems, models and software labels are retained
-and do not by themselves cause rejection. Construction recomputes all hits from
-the sources, selections and rules and rejects any difference. It does not
+and do not by themselves cause rejection. Cross-aspect result construction recomputes
+all hits from the sources, selections and rules; overlay construction recomputes
+all placements from the sources and selections. Both reject any difference and do not
 authenticate the supplied astronomical values or provenance labels.
 
 House overlays likewise use each object's stored own-date longitude against the

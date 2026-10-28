@@ -15,7 +15,7 @@ from astrology.chart import (
   _selected_longitudes,
   _selection_for_chart,
 )
-from astrology.houses import house_of
+from astrology.houses import _require_house_number, house_of
 from astrology.objects import ChartObject, _is_chart_object
 
 
@@ -47,10 +47,7 @@ class HouseOverlay:
       raise ValueError("Object owner and house owner must be opposite sides")
     if not _is_chart_object(self.identity):
       raise TypeError("identity must be a Body, LunarNode or Axis value")
-    if type(self.house) is not int:
-      raise TypeError("house must be an integer, not bool")
-    if not 1 <= self.house <= 12:
-      raise ValueError("house must be in [1, 12]")
+    _require_house_number(self.house)
 
 
 @dataclass(frozen=True, slots=True)

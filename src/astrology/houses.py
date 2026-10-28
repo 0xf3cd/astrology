@@ -14,6 +14,13 @@ _HOUSES = 12
 _FULL_TURN = 360.0
 
 
+def _require_house_number(house: int) -> None:
+  if type(house) is not int:
+    raise TypeError("house must be an integer, not bool")
+  if not 1 <= house <= _HOUSES:
+    raise ValueError("house must be in [1, 12]")
+
+
 def _cusps(cusps_deg: Sequence[float]) -> tuple[float, ...]:
   """Validate twelve finite cyclically ordered cusps in [0, 360).
 

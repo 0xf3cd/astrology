@@ -1,6 +1,6 @@
-"""Composition of a modern tropical natal chart from resolved input and configuration.
+"""Immutable natal results, shared chart access and modern tropical chart composition.
 
-把已解析的输入和请求的配置组合成现代热带本命盘。
+不可变本命盘结果、共用命盘访问，以及现代热带本命盘的组合。
 """
 
 from __future__ import annotations
@@ -14,7 +14,7 @@ from astrology._validation import finite_number
 from astrology.aspects import AspectHit, AspectObject, find_aspects
 from astrology.birth import MissingBirthDataError, ResolvedBirth
 from astrology.config import ChartConfig, HouseSystem, OrbCombination
-from astrology.houses import _cusps, house_of
+from astrology.houses import _cusps, _require_house_number, house_of
 from astrology.objects import (
   AstronomicalObject,
   Axis,
@@ -171,10 +171,7 @@ class Placement:
     if not 0.0 <= degree < 30.0:
       raise ValueError("sign_degree_deg must be in [0, 30)")
     object.__setattr__(self, "sign_degree_deg", degree)
-    if type(self.house) is not int:
-      raise TypeError("house must be an integer, not bool")
-    if not 1 <= self.house <= 12:
-      raise ValueError("house must be in [1, 12]")
+    _require_house_number(self.house)
 
 
 @dataclass(frozen=True, slots=True)
@@ -334,9 +331,9 @@ def _placements(
 
 
 def _require_comparable_sources(chart_left: NatalChart, chart_right: NatalChart) -> None:
-  """Check the coordinate conventions of two supplied charts.
+  """Keep this boundary check even while public constructors admit one convention.
 
-  校验两张给定命盘的位置坐标约定。
+  即使公开构造器目前只接纳一种坐标约定，也保留比较入口处的校验。
   """
   if type(chart_left) is not NatalChart or type(chart_right) is not NatalChart:
     raise TypeError("chart_left and chart_right must be NatalChart values")

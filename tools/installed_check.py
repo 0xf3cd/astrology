@@ -242,33 +242,6 @@ def acceptance_cross_aspects() -> astrology.CrossChartAspects:
   )
 
 
-def cross_observations(result: astrology.CrossChartAspects) -> str:
-  """Capture full-precision cross checks and both complete sources, with no restoration path.
-
-  取得完整精度的双盘检查值及两侧完整来源，不提供恢复路径。
-  """
-  values = {
-    "chart_left": json.loads(chart_observations(result.chart_left)),
-    "chart_right": json.loads(chart_observations(result.chart_right)),
-    "left_objects": [identity.value for identity in result.left_objects],
-    "right_objects": [identity.value for identity in result.right_objects],
-    "rules": repr(result.rules),
-    "combination": result.combination,
-    "hits": [
-      [
-        h.left_object.value,
-        h.right_object.value,
-        h.aspect.value,
-        h.branch_deg,
-        h.deviation_deg,
-        h.orb_limit_deg,
-      ]
-      for h in result.hits
-    ],
-  }
-  return json.dumps(values, sort_keys=True, allow_nan=False)
-
-
 def comparison_observations(
   aspects: astrology.CrossChartAspects,
   overlays: astrology.CrossChartHouseOverlays,
@@ -280,7 +253,25 @@ def comparison_observations(
   """
   languages: tuple[Literal["en", "zh-CN"], ...] = ("en", "zh-CN")
   values = {
-    "aspects": json.loads(cross_observations(aspects)),
+    "aspects": {
+      "chart_left": json.loads(chart_observations(aspects.chart_left)),
+      "chart_right": json.loads(chart_observations(aspects.chart_right)),
+      "left_objects": [identity.value for identity in aspects.left_objects],
+      "right_objects": [identity.value for identity in aspects.right_objects],
+      "rules": repr(aspects.rules),
+      "combination": aspects.combination,
+      "hits": [
+        [
+          h.left_object.value,
+          h.right_object.value,
+          h.aspect.value,
+          h.branch_deg,
+          h.deviation_deg,
+          h.orb_limit_deg,
+        ]
+        for h in aspects.hits
+      ],
+    },
     "overlays": {
       "chart_left": json.loads(chart_observations(overlays.chart_left)),
       "chart_right": json.loads(chart_observations(overlays.chart_right)),

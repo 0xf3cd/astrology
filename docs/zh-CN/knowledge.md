@@ -61,7 +61,8 @@ True
 ('complete', 'reference_only', 'not_assessed')
 ```
 
-此项目规则区分对象所属盘与接收它的宫位所属盘，两侧独立选择对象，保留各自源盘的宫制。
+`rule.project.cross_house_overlays` 复用 `rule.project.cusp_ownership` 的宫头区间规则。
+此组合区分对象所属盘与接收它的宫位所属盘，两侧独立选择对象，保留各自源盘的宫制。
 代码引用记录的是实现，不认证天文来源，也不提供关系解读。检索不会计算落宫或判断某张命盘。
 
 ### 返回值与错误

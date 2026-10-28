@@ -110,6 +110,46 @@ def test_static_text_distinguishes_rule_base_overrides_combination_and_effective
   assert "mean_of_orbs" in output
 
 
+@pytest.mark.parametrize("kind", ["overlays", "aspects"])
+@pytest.mark.parametrize("language", ["en", "zh-CN"])
+@pytest.mark.parametrize(
+  "left_empty,right_empty", [(False, False), (True, False), (False, True), (True, True)]
+)
+def test_effective_selection_lines_keep_each_side_and_empty_meaning(
+  kind: str, language: Language, left_empty: bool, right_empty: bool
+) -> None:
+  left = _cross_source(2000, "left", ((Body.SUN, 0), (Body.VENUS, 215)))
+  right = _cross_source(2001, "right", ((Body.MOON, 10), (Body.VENUS, 60)))
+  selected_left = () if left_empty else (Body.VENUS, Body.SUN)
+  selected_right = () if right_empty else (Body.MOON,)
+  if kind == "overlays":
+    output = format_house_overlays(
+      cross_chart_house_overlays(
+        left, right, left_objects=selected_left, right_objects=selected_right
+      ),
+      load_catalog(),
+      language=language,
+    )
+  else:
+    output = format_cross_aspects(
+      cross_chart_aspects(
+        left, right, (), left_objects=selected_left, right_objects=selected_right
+      ),
+      load_catalog(),
+      language=language,
+    )
+  if language == "en":
+    expected_left = "Left selected objects: " + (
+      "No objects" if left_empty else "Sun [sun], Venus [venus]"
+    )
+    expected_right = "Right selected objects: " + ("No objects" if right_empty else "Moon [moon]")
+  else:
+    expected_left = "左盘所选对象: " + ("无" if left_empty else "太阳 [sun], 金星 [venus]")
+    expected_right = "右盘所选对象: " + ("无" if right_empty else "月亮 [moon]")
+  lines = output.splitlines()
+  assert lines.count(expected_left) == lines.count(expected_right) == 1
+
+
 def test_zero_display_deviation_does_not_remove_a_static_row() -> None:
   left = _cross_source(2000, "left", ((Body.SUN, 0),))
   right = _cross_source(2001, "right", ((Body.SUN, 0.0001),))
