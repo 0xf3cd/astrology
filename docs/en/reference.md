@@ -19,9 +19,20 @@ See [birth inputs](birth.md), [requested configuration](configuration.md),
 
 ## Requested configuration
 
+Object identities live in `astrology.objects`; existing imports of `Body`,
+`LunarNode` and `NodeDefinition` from `astrology.config` remain aliases to the
+same enum classes. `Axis` is also available from `astrology`.
+
+```{eval-rst}
+.. automodule:: astrology.objects
+   :members: Body, NodeDefinition, LunarNode, Axis, AstronomicalObject, ChartObject
+   :undoc-members:
+   :member-order: bysource
+```
+
 ```{eval-rst}
 .. automodule:: astrology.config
-   :members: HouseSystem, Body, NodeDefinition, LunarNode, MajorAspect, OrbCombination, ObjectOrb, AspectRule, ChartConfig
+   :members: HouseSystem, MajorAspect, OrbCombination, ObjectOrb, AspectRule, ChartConfig
    :undoc-members:
    :member-order: bysource
 ```

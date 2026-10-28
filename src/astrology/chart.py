@@ -13,8 +13,16 @@ from astrology._distribution import installed_version
 from astrology._validation import finite_number
 from astrology.aspects import AspectHit, AspectObject, find_aspects
 from astrology.birth import MissingBirthDataError, ResolvedBirth
-from astrology.config import Body, ChartConfig, HouseSystem, LunarNode, OrbCombination
+from astrology.config import ChartConfig, HouseSystem, OrbCombination
 from astrology.houses import _cusps, house_of
+from astrology.objects import (
+  AstronomicalObject,
+  Axis,
+  ChartObject,
+  LunarNode,
+  _is_astronomical_object,
+  _is_chart_object,
+)
 from astrology.zodiac import Sign, _longitude, sign_degree, sign_of
 
 _Evaluation = Literal["fixed_fourteen_object_joint_snapshot"]
@@ -24,6 +32,13 @@ _UT1Derivation = Literal["delta_t_model_from_civil_utc"]
 _EVALUATION: Final[_Evaluation] = get_args(_Evaluation)[0]
 _POSITION_FRAME: Final[_PositionFrame] = get_args(_PositionFrame)[0]
 _UT1_DERIVATION: Final[_UT1Derivation] = get_args(_UT1Derivation)[0]
+
+_AXIS_FIELDS: dict[Axis, str] = {
+  Axis.ASCENDANT: "ascendant_deg",
+  Axis.MIDHEAVEN: "midheaven_deg",
+  Axis.DESCENDANT: "descendant_deg",
+  Axis.IMUM_COELI: "imum_coeli_deg",
+}
 
 
 class ChartDomainError(ValueError):
@@ -83,14 +98,14 @@ class EclipticPosition:
   位置与出生地点无关。
   """
 
-  identity: Body | LunarNode
+  identity: AstronomicalObject
   longitude_deg: float
   latitude_deg: float
   distance_au: float | None
   longitude_rate_deg_per_tt_day: float
 
   def __post_init__(self) -> None:
-    if not isinstance(self.identity, (Body, LunarNode)):
+    if not _is_astronomical_object(self.identity):
       raise TypeError("identity must be a Body or LunarNode")
     object.__setattr__(self, "longitude_deg", _longitude(self.longitude_deg))
     latitude = finite_number(self.latitude_deg, "latitude_deg")
@@ -144,13 +159,13 @@ class Placement:
   单个盘上对象推出的星座和落宫；度数保留未舍入的值。
   """
 
-  identity: Body | LunarNode
+  identity: AstronomicalObject
   sign: Sign
   sign_degree_deg: float
   house: int
 
   def __post_init__(self) -> None:
-    if not isinstance(self.identity, (Body, LunarNode)) or type(self.sign) is not Sign:
+    if not _is_astronomical_object(self.identity) or type(self.sign) is not Sign:
       raise TypeError("identity and sign must use their owning enum types")
     degree = finite_number(self.sign_degree_deg, "sign_degree_deg")
     if not 0.0 <= degree < 30.0:
@@ -171,21 +186,23 @@ class EffectiveConfiguration:
   evaluation that produced the positions: selecting a subset of the requested
   objects filters that output and does not narrow the evaluated domain.
   `aspect_objects` holds the objects aspects were judged among, in the order of
-  the requested objects, and is empty when no aspect rules were requested.
+  the requested bodies/nodes, then selected axes in ASC/MC/DSC/IC order. It is empty
+  when no aspect rules were requested.
   `orb_combination` repeats the requested rule, or None when no rule has
   per-object orbs.
 
   实际采用的已确定选择。请求的宫制不会在这里变成另一种宫制。`delta_t_model` 是适配层为
   这次计算固定下来的上游 ΔT 模型取值，不是调用方的请求；`evaluation` 说明位置来自哪种
   联合求值：只选一部分对象时，只是筛选输出，不缩小求值域。`aspect_objects` 是判断相位时
-  所用的对象，按请求对象的顺序排列；没有请求相位规则时为空。`orb_combination` 保存请求中的
+  所用的对象，天体和交点按请求顺序排列，所选四轴按上升、中天、下降、天底顺序追加；
+  没有请求相位规则时为空。`orb_combination` 保存请求中的
   合成规则；没有规则带按对象的容许度时为 None。
   """
 
   house_system: HouseSystem
   delta_t_model: str
   evaluation: _Evaluation
-  aspect_objects: tuple[Body | LunarNode, ...]
+  aspect_objects: tuple[ChartObject, ...]
   orb_combination: OrbCombination | None
 
   def __post_init__(self) -> None:
@@ -200,8 +217,8 @@ class EffectiveConfiguration:
     ):
       raise TypeError("aspect_objects must be a sequence")
     participants = tuple(self.aspect_objects)
-    if any(not isinstance(identity, (Body, LunarNode)) for identity in participants):
-      raise TypeError("aspect_objects must contain Body or LunarNode values")
+    if any(not _is_chart_object(identity) for identity in participants):
+      raise TypeError("aspect_objects must contain Body, LunarNode or Axis values")
     if len(set(participants)) != len(participants):
       raise ValueError("aspect_objects must not contain duplicate identities")
     object.__setattr__(self, "aspect_objects", participants)
@@ -298,7 +315,7 @@ class NatalChart:
       raise ValueError("Effective orb combination differs from the request")
     if self.placements != _placements(self.positions, self.houses):
       raise ValueError("Stored placements differ from pure derivation")
-    if self.aspects != _aspects(self.positions, self.requested):
+    if self.aspects != _aspects(self.positions, self.houses, self.requested):
       raise ValueError("Stored aspects differ from pure derivation")
 
 
@@ -316,16 +333,27 @@ def _placements(
   )
 
 
-def _aspects(positions: Sequence[EclipticPosition], config: ChartConfig) -> tuple[AspectHit, ...]:
-  participants = config.aspect_participants()
+def _aspect_positions(
+  positions: Sequence[EclipticPosition], houses: ChartHouses, participants: Sequence[ChartObject]
+) -> tuple[AspectObject, ...]:
+  astronomical = tuple(
+    AspectObject(position.identity, position.longitude_deg, position.longitude_rate_deg_per_tt_day)
+    for position in positions
+    if position.identity in participants
+  )
+  axes = tuple(
+    AspectObject(axis, getattr(houses, _AXIS_FIELDS[axis]), None)
+    for axis in Axis
+    if axis in participants
+  )
+  return (*astronomical, *axes)
+
+
+def _aspects(
+  positions: Sequence[EclipticPosition], houses: ChartHouses, config: ChartConfig
+) -> tuple[AspectHit, ...]:
   return find_aspects(
-    [
-      AspectObject(
-        position.identity, position.longitude_deg, position.longitude_rate_deg_per_tt_day
-      )
-      for position in positions
-      if position.identity in participants
-    ],
+    _aspect_positions(positions, houses, config.aspect_participants()),
     config.aspects,
     config.orb_combination,
   )
@@ -340,15 +368,19 @@ def natal_chart(resolved: ResolvedBirth, config: ChartConfig) -> NatalChart:
   A requested geometry outside the joint upstream domain raises
   `ChartDomainError` and never falls back to another house system. Requested
   aspect rules are judged among the objects of `config.aspect_objects`, or among
-  all requested objects when it is unset, from the positions and longitude rates
-  of this calculation. The distribution must be installed: missing package metadata
+  all requested bodies/nodes when it is unset. Explicitly selected axes use the
+  stored axis fields, not cusps, and have no supplied rate. Their non-exact hits
+  are INDETERMINATE; zero deviation still gives EXACT. No axis is added to raw
+  positions or placements. The distribution must be installed: missing package metadata
   raises `importlib.metadata.PackageNotFoundError` rather than inventing a version.
 
   为已解析的出生时刻计算热带地心本命盘。出生记录必须带地点；时间未知的记录在准备阶段
   就已被拒绝。天文适配层在这个函数里才导入，不在导入包时导入，所以导入 astrology 或查询
   知识都不会初始化原生天文库。请求的几何超出上游的联合求值域时，抛出
   `ChartDomainError`，不会改用别的宫制。根据这次计算的位置和黄经速率，
-  在 `config.aspect_objects` 指定的对象之间计算相位；未设置时，所有请求的对象都参与。
+  在 `config.aspect_objects` 指定的对象之间计算相位；未设置时，所有请求的天体和交点都参与。
+  显式所选四轴直接使用已存轴字段，不使用宫头，也不提供速率；其非精确命中为 INDETERMINATE，
+  偏差恰为零时仍为 EXACT。不把四轴加入原始位置或落点。
   分发包必须已安装；元数据缺失时抛出 `importlib.metadata.PackageNotFoundError`，不编造版本号。
   """
   if type(resolved) is not ResolvedBirth:
@@ -366,7 +398,7 @@ def natal_chart(resolved: ResolvedBirth, config: ChartConfig) -> NatalChart:
 
   times, positions, houses = snapshot(resolved, config)
   placements = _placements(positions, houses)
-  aspects = _aspects(positions, config)
+  aspects = _aspects(positions, houses, config)
   return NatalChart(
     resolved=resolved,
     requested=config,

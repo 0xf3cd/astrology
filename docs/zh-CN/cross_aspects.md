@@ -40,13 +40,13 @@ True
 
 ## 选择配对与容许度
 
-`left_objects` 与 `right_objects` 分别选择两侧对象。`None` 选该侧全部位置，即使其本命相位只用了
+`left_objects` 与 `right_objects` 分别选择两侧对象。`None` 选该侧全部天体和交点，不加入四轴，即使其本命相位只用了
 较小的子集。参与者按源盘的位置顺序排列，不按选择参数的顺序排列。
 每个所选左对象都与每个所选右对象配对，包括同名对象，以及左侧每个所选交点标识与右侧每个所选交点标识的配对。
 也允许同一张盘占两个角色。这些是项目的几何选择，不是传统解读。
 [单盘交点排除规则](aspects.md#选择参与的对象)保持不变。
 
-对象容许度覆盖仍以 `Body` 或 `LunarNode` 标识作用于两侧。太阳覆盖同时作用于两颗太阳，不提供
+对象容许度覆盖以 `Body`、`LunarNode` 或 `Axis` 标识作用于两侧。太阳覆盖同时作用于两颗太阳，不提供
 左太阳／右太阳分别设值的机制。覆盖必须指向至少一侧的所选对象。
 只要某条规则有覆盖，就必须选择 `OrbCombination`；没有覆盖时，`combination` 须为 `None`。
 [三种合成方式](aspects.md#对象各有容许度时怎样合成)和包含等号的上限，沿用本命配对的算术。
@@ -67,6 +67,26 @@ True
 以下请求即使没有配对也会抛出 `ValueError`：同一侧选择里重复的参与对象、源盘没有的对象、重复相位标识、
 指向未选对象的覆盖、无覆盖却给合成方式，以及有覆盖却未给合成方式。
 调用方序列会复制为不可变元组。
+
+(cross-axis-aspects-zh-cn)=
+## 分别选择两侧四轴
+
+显式的 `left_objects`／`right_objects` 可含该源盘任一已存轴，不继承其本命参与者。
+天体和交点保留源盘顺序，所选四轴按上升、中天、下降、天底顺序追加。
+各侧使用自己的实际轴字段，不使用宫头或另一张盘的轴。允许轴间、同名轴及对轴配对，不折叠身份或丢弃命中。
+与天体覆盖一样，轴容许度覆盖按身份作用于两侧。
+
+```{doctest}
+>>> from astrology import Axis
+>>> axes = cross_chart_aspects(chart_left, chart_left, rules,
+...   left_objects=(Axis.ASCENDANT,), right_objects=(Axis.ASCENDANT,))
+>>> [(h.left_object.value, h.right_object.value, h.deviation_deg) for h in axes.hits]
+[('ascendant', 'ascendant', 0.0)]
+>>> hasattr(axes.hits[0], 'motion')
+False
+```
+
+比较不执行原生天文计算，也不为四轴增加距离或运动字段。另见{ref}`本命选四轴 <axis-aspects-zh-cn>`。
 
 ## 读取静态几何
 

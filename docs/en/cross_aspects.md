@@ -47,7 +47,7 @@ neither chart's natal rules or participants are inherited.
 ## Choose pairs and orbs
 
 `left_objects` and `right_objects` select each side independently. `None` selects
-all positions on that side, even if its natal aspects used a smaller subset.
+all bodies/nodes on that side and no axes, even if its natal aspects used a smaller subset.
 Selections follow source position order, not the order of the selection argument.
 Every selected left object is paired with every selected right object. This
 includes same-named objects and every selected node identity on one side with
@@ -55,7 +55,7 @@ every selected node identity on the other. The same chart can occupy both roles.
 These are project geometry choices, not traditional interpretations.
 The [single-chart node exclusion](aspects.md#choose-the-objects) remains unchanged.
 
-Object-orb overrides use the existing `Body` or `LunarNode` identity on either
+Object-orb overrides use the `Body`, `LunarNode` or `Axis` identity on either
 side. A Sun override applies to both Suns; there is no left-Sun/right-Sun override
 mechanism. An override must name a selected object from at least one side.
 Choose an `OrbCombination` exactly when a rule has overrides; without overrides,
@@ -80,6 +80,28 @@ pairs: duplicate participants within one side's selection, unavailable participa
 duplicate aspect identities, unused override identities, a combination given
 without overrides, or overrides without a combination.
 Caller-owned sequences are copied into immutable tuples.
+
+## Select axes on each side
+
+Explicit `left_objects`/`right_objects` may include any stored axis from that
+source, independently of its natal participants. Body/node order is preserved;
+selected axes follow in ASC/MC/DSC/IC order. Each side uses its actual axis fields,
+not its cusps or the other chart's axes. Axis-axis pairs, same-named axes and
+opposite axes are admitted without folding their identities or removing hits.
+An axis override applies by identity to both sides, like a body override.
+
+```{doctest}
+>>> from astrology import Axis
+>>> axes = cross_chart_aspects(chart_left, chart_left, rules,
+...   left_objects=(Axis.ASCENDANT,), right_objects=(Axis.ASCENDANT,))
+>>> [(h.left_object.value, h.right_object.value, h.deviation_deg) for h in axes.hits]
+[('ascendant', 'ascendant', 0.0)]
+>>> hasattr(axes.hits[0], 'motion')
+False
+```
+
+No native calculation is performed by this comparison, and axes do not acquire
+distance or motion fields. See [natal axis selection](aspects.md#select-axes-explicitly).
 
 ## Read static geometry
 

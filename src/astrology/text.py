@@ -10,11 +10,12 @@ from typing import cast
 from astrology.aspects import AspectMotion
 from astrology.birth import Location
 from astrology.chart import NatalChart
-from astrology.config import Body, HouseSystem, LunarNode, MajorAspect
+from astrology.config import HouseSystem, MajorAspect
 from astrology.knowledge import Catalog, Concept, TranslationStatus
 from astrology.knowledge.catalog import _sign_concept
 from astrology.knowledge.records import _LANGUAGES, Language
 from astrology.lunar_phase import LunarPhaseResult
+from astrology.objects import Axis, ChartObject
 from astrology.summaries import HouseRulers, SignDistribution
 from astrology.zodiac import (
   _ELEMENT_RULE_ID,
@@ -42,6 +43,7 @@ _HEADINGS = {
     "houses": "Requested / effective house system",
     "requested_objects": "Requested aspect objects",
     "effective_objects": "Effective aspect objects (requested object order)",
+    "effective_axes": "Effective aspect objects (bodies/nodes, then ASC/MC/DSC/IC)",
     "all": "All requested objects (selection omitted)",
     "combination": "Orb combination (identifier)",
     "rule": "Aspect rule / base orb / object overrides",
@@ -70,6 +72,7 @@ _HEADINGS = {
     "houses": "请求 / 实际宫制",
     "requested_objects": "请求参与相位的对象",
     "effective_objects": "实际参与相位的对象（按请求对象顺序）",
+    "effective_axes": "实际参与相位的对象（天体和交点之后按上升、中天、下降、天底顺序）",
     "all": "全部请求对象（未单独指定）",
     "combination": "容许度合成规则（标识）",
     "rule": "相位规则 / 基础容许度 / 对象单独设置",
@@ -173,7 +176,7 @@ def _cell(value: str) -> str:
 
 
 def _name(
-  identity: Body | LunarNode | MajorAspect | HouseSystem | Sign,
+  identity: ChartObject | MajorAspect | HouseSystem | Sign,
   catalog: Catalog,
   language: Language,
 ) -> str:
@@ -284,6 +287,11 @@ def format_chart(chart: NatalChart, catalog: Catalog, *, language: Language = "e
     ", ".join(_name(identity, catalog, language) for identity in chart.effective.aspect_objects)
     or labels["none"]
   )
+  effective_label = labels[
+    "effective_axes"
+    if any(isinstance(value, Axis) for value in chart.effective.aspect_objects)
+    else "effective_objects"
+  ]
   lines.extend(
     [
       "",
@@ -291,7 +299,7 @@ def format_chart(chart: NatalChart, catalog: Catalog, *, language: Language = "e
       f"{labels['houses']}: {_name(requested.house_system, catalog, language)} / "
       f"{_name(chart.effective.house_system, catalog, language)}",
       f"{labels['requested_objects']}: {participants}",
-      f"{labels['effective_objects']}: {effective}",
+      f"{effective_label}: {effective}",
       f"{labels['combination']}: {requested.orb_combination or labels['none']}",
     ]
   )

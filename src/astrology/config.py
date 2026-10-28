@@ -11,6 +11,16 @@ from enum import StrEnum
 from typing import Literal
 
 from astrology._validation import finite_number
+from astrology.objects import (
+  AstronomicalObject,
+  Axis,
+  ChartObject,
+  _is_astronomical_object,
+  _is_chart_object,
+)
+from astrology.objects import Body as Body
+from astrology.objects import LunarNode as LunarNode
+from astrology.objects import NodeDefinition as NodeDefinition
 
 
 class HouseSystem(StrEnum):
@@ -22,50 +32,6 @@ class HouseSystem(StrEnum):
   WHOLE_SIGN = "whole_sign"
   EQUAL = "equal"
   PLACIDUS = "placidus"
-
-
-class Body(StrEnum):
-  """Physical natal bodies, distinct from mathematical nodes. 本命盘物理天体，与数学交点区分。"""
-
-  SUN = "sun"
-  MOON = "moon"
-  MERCURY = "mercury"
-  VENUS = "venus"
-  MARS = "mars"
-  JUPITER = "jupiter"
-  SATURN = "saturn"
-  URANUS = "uranus"
-  NEPTUNE = "neptune"
-  PLUTO = "pluto"
-
-
-class NodeDefinition(StrEnum):
-  """Named lunar-node definitions, not accuracy settings. 具名月交点定义，不是精度档位。"""
-
-  MEAN = "mean"
-  MEEUS_FIVE_TERM_TRUE = "meeus_five_term_true"
-
-
-class LunarNode(StrEnum):
-  """Mathematical nodes whose identity includes their definition and direction.
-
-  数学月交点，其标识同时包含定义与升降方向。
-  """
-
-  MEAN_ASCENDING = "mean_ascending_node"
-  MEAN_DESCENDING = "mean_descending_node"
-  MEEUS_FIVE_TERM_TRUE_ASCENDING = "meeus_five_term_true_ascending_node"
-  MEEUS_FIVE_TERM_TRUE_DESCENDING = "meeus_five_term_true_descending_node"
-
-  @property
-  def definition(self) -> NodeDefinition:
-    """Return the identity's named definition. 返回该标识对应的具名定义。"""
-    return {
-      LunarNode.MEAN_ASCENDING: NodeDefinition.MEAN,
-      LunarNode.MEAN_DESCENDING: NodeDefinition.MEAN,
-      LunarNode.MEEUS_FIVE_TERM_TRUE_ASCENDING: NodeDefinition.MEEUS_FIVE_TERM_TRUE,
-      LunarNode.MEEUS_FIVE_TERM_TRUE_DESCENDING: NodeDefinition.MEEUS_FIVE_TERM_TRUE,
-    }[self]
 
 
 class MajorAspect(StrEnum):
@@ -117,12 +83,12 @@ class ObjectOrb:
   为某个对象在一条相位规则中单独设置的容许度，单位为度，必须有限且非负。
   """
 
-  identity: Body | LunarNode
+  identity: ChartObject
   orb_degrees: float
 
   def __post_init__(self) -> None:
-    if not isinstance(self.identity, (Body, LunarNode)):
-      raise TypeError("identity must be a Body or LunarNode")
+    if not _is_chart_object(self.identity):
+      raise TypeError("identity must be a Body, LunarNode or Axis")
     object.__setattr__(self, "orb_degrees", _orb(self.orb_degrees))
 
 
@@ -163,7 +129,8 @@ class ChartConfig:
 
   Select a house system, nonempty unique objects, and explicit unique aspect rules.
   An empty aspect sequence is allowed. Aspects are judged among `aspect_objects`,
-  which must be a subset of `objects`; omitted, it means all requested objects.
+  which selects requested bodies/nodes and may explicitly add stored axes. Omitted,
+  it means all requested bodies/nodes and no axes. Axes are not native outputs.
   `orb_combination` is required exactly when some rule has per-object orbs, and a
   per-object orb may name only a participating object. Only tropical/geocentric is
   admitted. No orb or house defaults, effective-model claims, computation, or
@@ -171,18 +138,19 @@ class ChartConfig:
 
   只保存排盘请求。对象和相位规则按原顺序复制为不可变元组，不受调用方后续修改列表的影响。
   必须指定宫制和至少一个对象，对象不能重复；相位规则也不能重复，但可以为空。
-  `aspect_objects` 指定参与相位的对象，必须是 `objects` 的子集；省略时所有请求的对象都参与。
+  `aspect_objects` 从请求的天体或交点中选择参与者，也可显式加入已存四轴；省略时所有请求的
+  天体或交点都参与，不加入四轴。四轴不是天文输出对象。
   只要有规则为对象单独设置容许度，就必须给出 `orb_combination`，否则不能给。
   单独设置容许度的对象必须参与相位。仅支持热带黄道和地心，不提供默认容许度或默认宫制，
   不记录实际计算模型，也不执行计算或提供替代策略。
   """
 
   house_system: HouseSystem
-  objects: Sequence[Body | LunarNode]
+  objects: Sequence[AstronomicalObject]
   aspects: Sequence[AspectRule]
   zodiac: Literal["tropical"] = "tropical"
   center: Literal["geocentric"] = "geocentric"
-  aspect_objects: Sequence[Body | LunarNode] | None = None
+  aspect_objects: Sequence[ChartObject] | None = None
   orb_combination: OrbCombination | None = None
 
   def __post_init__(self) -> None:
@@ -197,7 +165,7 @@ class ChartConfig:
     objects = tuple(self.objects)
     if not objects:
       raise ValueError("objects must not be empty")
-    if any(not isinstance(value, (Body, LunarNode)) for value in objects):
+    if any(not _is_astronomical_object(value) for value in objects):
       raise TypeError("objects must contain only Body or LunarNode values")
     if len(set(objects)) != len(objects):
       raise ValueError("objects must not contain duplicate identities")
@@ -214,16 +182,16 @@ class ChartConfig:
       if not isinstance(self.aspect_objects, Sequence) or isinstance(
         self.aspect_objects, (str, bytes)
       ):
-        raise TypeError("aspect_objects must be a sequence of Body or LunarNode values")
+        raise TypeError("aspect_objects must be a sequence of Body, LunarNode or Axis values")
       participants = tuple(self.aspect_objects)
       if not participants:
         raise ValueError("aspect_objects must not be empty")
-      if any(not isinstance(value, (Body, LunarNode)) for value in participants):
-        raise TypeError("aspect_objects must contain only Body or LunarNode values")
+      if any(not _is_chart_object(value) for value in participants):
+        raise TypeError("aspect_objects must contain only Body, LunarNode or Axis values")
       if len(set(participants)) != len(participants):
         raise ValueError("aspect_objects must not contain duplicate identities")
-      if not set(participants) <= set(objects):
-        raise ValueError("aspect_objects must be a subset of objects")
+      if any(not isinstance(value, Axis) and value not in objects for value in participants):
+        raise ValueError("Non-axis aspect_objects must be a subset of objects")
       object.__setattr__(self, "aspect_objects", participants)
     object.__setattr__(self, "objects", objects)
     object.__setattr__(self, "aspects", aspects)
@@ -239,15 +207,20 @@ class ChartConfig:
       if any(entry.identity not in participants for entry in rule.object_orbs):
         raise ValueError("object orbs may name only objects that take part in aspects")
 
-  def aspect_participants(self) -> tuple[Body | LunarNode, ...]:
-    """Return participants in requested object order, or an empty tuple without rules.
+  def aspect_participants(self) -> tuple[ChartObject, ...]:
+    """Return requested bodies/nodes in order, then selected axes in ASC/MC/DSC/IC order.
 
-    按请求对象的顺序返回参与相位的对象；没有相位规则时返回空元组。
+    No rules means no participants. 没有规则时返回空元组；天体和交点按请求顺序排列，
+    所选四轴按上升、中天、下降、天底顺序追加。
     """
     if not self.aspects:
       return ()
-    return tuple(
+    astronomical = tuple(
       identity
       for identity in self.objects
       if self.aspect_objects is None or identity in self.aspect_objects
     )
+    axes = tuple(
+      axis for axis in Axis if self.aspect_objects is not None and axis in self.aspect_objects
+    )
+    return (*astronomical, *axes)

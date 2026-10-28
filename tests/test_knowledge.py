@@ -11,7 +11,7 @@ from typing import Any
 
 import pytest
 
-from astrology import OrbCombination, aspect_angle
+from astrology import Axis, OrbCombination, aspect_angle
 from astrology.config import Body, HouseSystem, LunarNode, MajorAspect, NodeDefinition
 from astrology.knowledge import (
   Catalog,
@@ -106,6 +106,7 @@ def test_query_contracts(catalog: Catalog) -> None:
     for entry in catalog.filter_entries(prerequisite_status=PrerequisiteStatus.COMPLETE)
   } == {
     "entry.aspect_evaluation",
+    "entry.axis_aspects",
     "entry.ashmand_sign_groups",
     "entry.aspect_requests",
     "entry.cross_aspect_evaluation",
@@ -133,7 +134,7 @@ def test_query_contracts(catalog: Catalog) -> None:
 def test_complete_owning_configuration_coverage(catalog: Catalog) -> None:
   expected = {
     member
-    for enum in (Body, HouseSystem, LunarNode, MajorAspect, NodeDefinition)
+    for enum in (Body, HouseSystem, LunarNode, Axis, MajorAspect, NodeDefinition)
     for member in enum
   }
   actual = [

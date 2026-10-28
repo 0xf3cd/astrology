@@ -148,7 +148,8 @@ True
 `TypeError`; duplicates or unavailable identities raise `ValueError`. Results
 follow source-chart order, not selection order. To count all requested objects,
 explicitly pass `objects=chart.requested.objects`. No unselected body, node or axis
-is added. `natal_lunar_phase` requires Sun and Moon; missing positions raise
+is added. Axes are not placements and are rejected even when explicitly selected
+for these statistics. `natal_lunar_phase` requires Sun and Moon; missing positions raise
 `ValueError` naming absent identities, never a request to calculate them. Both
 wrappers reject non-`NatalChart` inputs with `TypeError`. Checks work under `python -O`.
 

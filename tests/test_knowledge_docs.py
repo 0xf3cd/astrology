@@ -14,6 +14,7 @@ from astrology.knowledge.records import Language
 from tools.catalog_docs import (
   catalog_anchor,
   check_catalog_data,
+  configuration_reference,
   dignity_rows,
   localized_texts,
   render_catalog,
@@ -98,7 +99,7 @@ def test_generation_covers_every_record(language: Language) -> None:
   for group in (catalog.concepts, catalog.variants, catalog.sources, catalog.entries):
     for record in group:
       assert f"({catalog_anchor(record.identifier, language)})=" in rendered
-  assert "astrology.config.Body.SUN" in rendered
+  assert "astrology.objects.Body.SUN" in rendered
   assert "source_verification=verified" in rendered
   assert "chart=not_assessed" in rendered
   assert "Original excerpt (English)" in rendered
@@ -156,7 +157,7 @@ def catalog_html(tmp_path: Path) -> Path:
       for record in group:
         content = _strings(record, language)
         if (configuration := getattr(record, "configuration", None)) is not None:
-          content.append(f"astrology.config.{type(configuration).__name__}.{configuration.name}")
+          content.append(configuration_reference(configuration))
         if hasattr(record, "kind"):
           content.append(f"kind={record.kind}")
         if isinstance(record, Source):

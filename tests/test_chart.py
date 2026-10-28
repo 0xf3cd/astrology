@@ -634,6 +634,8 @@ def test_aspects_are_judged_from_the_positions_and_rates_of_the_same_calculation
   assert chart.effective.orb_combination is None
   assert chart.effective.aspect_objects == _ALL_OBJECTS
   for hit in chart.aspects:
+    assert isinstance(hit.first, (Body, LunarNode))
+    assert isinstance(hit.second, (Body, LunarNode))
     relative = rates[hit.second] - rates[hit.first]
     if hit.motion is AspectMotion.APPLYING:
       assert hit.deviation_deg * relative < 0
@@ -652,7 +654,9 @@ def test_pairs_follow_the_requested_object_order() -> None:
   assert first
   assert len(second) == len(first)
   order: dict[Body | LunarNode, int] = {identity: index for index, identity in enumerate(backward)}
-  assert all(order[h.first] < order[h.second] for h in second)
+  for hit in second:
+    assert isinstance(hit.first, Body) and isinstance(hit.second, Body)
+    assert order[hit.first] < order[hit.second]
 
 
 def test_a_subset_of_aspect_objects_limits_the_pairs_and_is_recorded_in_chart_order() -> None:

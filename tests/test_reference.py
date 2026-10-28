@@ -609,7 +609,12 @@ def _hellenistic_hits(
     orb_combination=combination if any(rule.object_orbs for rule in chosen) else None,
   )
   chart = natal_chart(_resolved_for(case), config)
-  return {(frozenset((hit.first, hit.second)), hit.aspect) for hit in chart.aspects}
+  hits: set[AspectKey] = set()
+  for hit in chart.aspects:
+    assert isinstance(hit.first, (Body, LunarNode))
+    assert isinstance(hit.second, (Body, LunarNode))
+    hits.add((frozenset((hit.first, hit.second)), hit.aspect))
+  return hits
 
 
 def _reference_hellenistic(

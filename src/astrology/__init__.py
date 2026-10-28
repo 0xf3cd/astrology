@@ -53,6 +53,7 @@ from astrology.dignities import DignityStatus, essential_dignities, sign_ruler
 from astrology.houses import house_of
 from astrology.knowledge import Catalog, load_catalog
 from astrology.lunar_phase import LunarPhaseResult, LunationType, lunar_phase
+from astrology.objects import Axis
 from astrology.summaries import (
   HouseRuler,
   HouseRulers,
@@ -87,6 +88,7 @@ __all__ = [
   "AspectMotion",
   "AspectObject",
   "AspectRule",
+  "Axis",
   "BirthRecord",
   "Body",
   "Catalog",

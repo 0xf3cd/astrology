@@ -66,14 +66,41 @@ judged.
 The zero orb above is an explicit synthetic request value, not a library default
 or recommendation.
 
-## Give an object its own orb, and choose who takes part
+## Choose who takes part in aspects
+
+This request asks for Sun and Moon positions, with aspects only between the Sun
+and Ascendant:
+
+```{doctest}
+>>> from astrology import AspectRule, Axis, Body, ChartConfig, HouseSystem, MajorAspect
+>>> with_axes = ChartConfig(
+...   HouseSystem.WHOLE_SIGN,
+...   objects=(Body.SUN, Body.MOON),
+...   aspects=(AspectRule(MajorAspect.SEXTILE, 3),),
+...   aspect_objects=(Body.SUN, Axis.ASCENDANT),
+... )
+>>> [value.value for value in with_axes.aspect_participants()]
+['sun', 'ascendant']
+>>> [value.value for value in with_axes.objects]
+['sun', 'moon']
+```
+
+`objects` selects astronomical outputs and accepts only `Body` and `LunarNode`.
+`aspect_objects` selects participants from those bodies/nodes and may explicitly
+add axes. The Moon above still has a position, but takes part in no aspect. If
+`aspect_objects` is omitted, all requested bodies/nodes take part and no axes are added.
+
+Requested bodies/nodes keep their original order; selected axes follow in
+ASC/MC/DSC/IC order, independently of the selection argument's order. Axes can
+also be the only aspect participants, but `objects` must still contain at least
+one body/node. See [axis geometry and pairing](aspects.md#select-axes-explicitly).
+
+## Give an object its own orb
 
 Use `ObjectOrb` to set an object's orb separately; other objects use the rule's
 `orb_degrees`. If any rule uses `ObjectOrb`, you must choose `orb_combination` to
 combine the pair's orbs into one limit. Otherwise, leave `orb_combination` out.
-`aspect_objects` selects the objects to include in aspects and must be a subset
-of `objects`. If omitted, all requested objects take part. You can set a separate
-orb only for an object that takes part.
+You can set a separate orb only for a participating identity, including an axis.
 
 ```{doctest}
 >>> from astrology import LunarNode, ObjectOrb, OrbCombination

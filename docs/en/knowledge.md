@@ -27,7 +27,7 @@ True
 >>> catalog.filter_entries(concept_id="body.sun")[0].identifier
 'entry.body_requests'
 >>> len(catalog.filter_sources(verification=SourceVerification.VERIFIED))
-8
+9
 >>> bool(catalog.version)
 True
 ```
@@ -73,7 +73,7 @@ Entry filters combine all selected criteria; they never evaluate prerequisites.
 
 The catalog currently includes:
 
-- Available bodies, house systems, lunar-node definitions and aspects, with their
+- Available bodies, axes, house systems, lunar-node definitions and aspects, with their
   English and Chinese names.
 - How this project divides the zodiac into twelve signs, places objects in houses,
   and calculates single-chart and cross-chart aspects.
@@ -150,6 +150,28 @@ this dictionary or change the entry's chart-applicability status:
 
 All built-in entries are for reference. The package does not check whether a chart
 satisfies an entry or store chart evidence for that judgment.
+
+## Explicit axis vocabulary
+
+`axis.ascendant`, `axis.midheaven`, `axis.descendant` and `axis.imum_coeli` are
+separate concepts bound to `Axis`, not bodies, nodes or cusp aliases. The
+reference-only `entry.axis_aspects` states the project's explicit-selection,
+pairing and missing-rate policies and cites their fixed implementation revision.
+The earlier body/node sources keep their original revisions; they are not
+retroactively evidence for the axis extension.
+
+```{doctest}
+>>> from astrology import Axis
+>>> catalog.concept("axis.ascendant").configuration is Axis.ASCENDANT
+True
+>>> axes = catalog.entry("entry.axis_aspects")
+>>> axes.prerequisite_status.value, axes.output_eligibility.value, axes.chart_applicability
+('complete', 'reference_only', 'not_assessed')
+```
+
+These queries need no chart or native astronomy. To calculate the geometry, see
+[explicit natal selection](aspects.md#select-axes-explicitly) and
+[independent cross-side selection](cross_aspects.md#select-axes-on-each-side).
 
 ## Ashmand 1822 sign groups
 

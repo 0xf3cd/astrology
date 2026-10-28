@@ -322,9 +322,12 @@ def test_installed_consumer_calculates_a_chart(
 
   monkeypatch.setattr(astrology, "natal_chart", record)
   installed_check.main(version("celestial-astrology"))
-  assert len(calls) == 2
+  assert len(calls) == 3
   assert calls[0].house_system is astrology.HouseSystem.WHOLE_SIGN
-  assert calls[1].house_system is astrology.HouseSystem.PLACIDUS
+  assert calls[1].house_system is astrology.HouseSystem.WHOLE_SIGN
+  assert calls[1].aspect_objects == tuple(astrology.Axis)
+  assert calls[1].orb_combination is None
+  assert calls[2].house_system is astrology.HouseSystem.PLACIDUS
   assert calls[0].aspects
   assert calls[0].orb_combination is astrology.OrbCombination.MEAN_OF_ORBS
 
@@ -529,6 +532,23 @@ def test_cross_consumer_rejects_a_missing_hand_worked_pair(monkeypatch: pytest.M
   )
   with pytest.raises(ValueError, match="hand-worked geometry"):
     installed_check._check_cross_chart()
+
+
+def test_axis_consumer_rejects_incorrect_cross_geometry(monkeypatch: pytest.MonkeyPatch) -> None:
+  original = astrology.cross_chart_aspects
+
+  def incorrect(*args: object, **kwargs: object) -> astrology.CrossChartAspects:
+    result = original(*args, **kwargs)  # type: ignore[arg-type]
+    return cast(
+      astrology.CrossChartAspects,
+      SimpleNamespace(
+        hits=(replace(result.hits[0], deviation_deg=0),), left_objects=result.left_objects
+      ),
+    )
+
+  monkeypatch.setattr(astrology, "cross_chart_aspects", incorrect)
+  with pytest.raises(ValueError, match="wrong source or field"):
+    installed_check._check_axes()
 
 
 def test_cross_consumer_rejects_native_initialization(monkeypatch: pytest.MonkeyPatch) -> None:

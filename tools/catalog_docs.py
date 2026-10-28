@@ -167,7 +167,7 @@ def catalog_anchor(identifier: str, language: Language = "en") -> str:
 
 def configuration_reference(value: ConfigurationIdentity) -> str:
   """Read a request symbol from its owning enum. 从所属枚举读取请求符号。"""
-  return f"astrology.config.{type(value).__name__}.{value.name}"
+  return f"{type(value).__module__}.{type(value).__name__}.{value.name}"
 
 
 def render_catalog(catalog: Catalog, language: Language, code_version: str) -> str:

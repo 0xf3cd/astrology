@@ -120,9 +120,9 @@ mean_of_orbs [8.0]
 ()
 ```
 
-请求里的 `aspect_objects` 指定参与相位的对象，必须是所请求对象的子集；不写时，所有请求的对象
-都参与。被请求但不在 `aspect_objects` 里的交点仍有位置，只是不参与任何相位。轴线不是请求里的
-对象，没有相位。
+请求里的 `aspect_objects` 从所请求的天体或交点中选择参与者，也可显式加入四轴；不写时，所有请求的
+天体和交点都参与，不加入四轴。被请求但不在 `aspect_objects` 里的交点仍有位置，只是不参与任何相位。
+所选轴可与天体、交点或另一轴配对。
 
 ## 本命盘里的相位
 
@@ -160,6 +160,37 @@ moon saturn trine -2.34 separating
 (8, ['sun', 'moon'])
 ```
 
+(axis-aspects-zh-cn)=
+## 显式选择四轴
+
+`Axis.ASCENDANT`、`MIDHEAVEN`、`DESCENDANT` 和 `IMUM_COELI` 是不同的命盘身份。
+命盘组合直接读取 `ChartHouses` 对应的已存黄经字段，不用宫头代替，也不从另一轴合成对轴。
+在整宫制中，上升点与中天不必是第一、第十宫头。
+
+```{doctest}
+>>> from astrology import Axis
+>>> axis_request = ChartConfig(HouseSystem.WHOLE_SIGN, (Body.SUN,),
+...   (AspectRule(MajorAspect.SEXTILE, 3), AspectRule(MajorAspect.TRINE, 3)),
+...   aspect_objects=(Axis.IMUM_COELI, Body.SUN, Axis.MIDHEAVEN))
+>>> axis_chart = natal_chart(prepare_natal_input(record), axis_request)
+>>> [value.value for value in axis_chart.effective.aspect_objects]
+['sun', 'midheaven', 'imum_coeli']
+>>> [(h.second.value, h.aspect.value, round(h.deviation_deg, 2), h.motion.value)
+...  for h in axis_chart.aspects]
+[('midheaven', 'trine', 2.47, 'indeterminate'), ('imum_coeli', 'sextile', 2.47, 'indeterminate')]
+>>> [p.identity.value for p in axis_chart.positions]
+['sun']
+```
+
+命盘组合不提供轴速率，以 `None` 表示，因此涉及轴的非精确命中为 `indeterminate`；偏差恰为零时仍为
+`exact`。仍直接比较浮点数：几乎相对的已存轴值也可能得到微小的非零偏差。不补零，也不借用行星速率。
+低层 `AspectObject` 允许调用方给出有限轴速率，但须与其他对象采用相同的日作为时间单位，例如 TT 日。
+不为四轴增加物理距离、原始位置或统计对象。
+
+显式所选四轴可互相配对，包括上升／下降、中天／天底。对轴保留为不同身份，全部匹配相位及分支都返回。
+这是项目的配对政策，不是跨传统通用的容许度或解读。`ObjectOrb` 及三种合成规则同样适用于所选轴。
+{ref}`双盘 API <cross-axis-aspects-zh-cn>`分别选择两侧参与者。
+
 ## 检查结果
 
 手算的案例覆盖 0 度与 360 度处的回绕、两个分支、容许度端点、精确相位、速率相等和逆行。状态
@@ -174,7 +205,7 @@ moon saturn trine -2.34 separating
 
 ## 适用范围
 
-- 只用黄经。黄纬、赤纬、次要相位、整宫相位及与轴线的相位都不判断。
+- 只用黄经。不判断黄纬、赤纬、次要相位或整宫相位；四轴须显式选择才参与。
 - 运动状态只描述当前时刻，不预测之后会不会达到精确相位，也不表示相位的含义或强度。
 - 本库不提供默认容许度。知识目录记录的是本项目的规则，不代表任何流派的容许度选择。
 
