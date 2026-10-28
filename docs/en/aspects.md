@@ -205,7 +205,8 @@ Chart composition supplies no axis rate (`None`), so a non-exact hit involving a
 axis is `indeterminate`. Zero deviation still gives `exact`. Exactness uses the
 same direct float comparison: nearly opposite stored values can have a tiny
 nonzero deviation. Do not replace absence with zero or a planet's rate. Low-level
-`AspectObject` accepts a caller-supplied finite axis rate on the same day basis.
+`AspectObject` accepts a caller-supplied finite axis rate on the same day basis
+as the other objects (for example, the TT day).
 Axes acquire no physical distance, raw position or population-statistics entry.
 
 Explicitly selected axes can pair with each other, including ASC/DSC and MC/IC.

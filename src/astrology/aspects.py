@@ -65,10 +65,10 @@ class AspectObject:
   """One object's longitude in degrees and its rate in degrees per day, if it has one.
 
   The rate may be None where no meaningful motion exists; it is never borrowed from
-  another object. All objects must use the same day, such as the TT day.
+  another object. All rates must use the same day unit, such as the TT day.
 
   一个对象的黄经（度）及其速率（度/日，可为 None）。若无法给出有意义的速率，就用 None，
-  不借用其他对象的速率。所有对象的速率必须使用相同的日长定义，例如 TT 日。
+  不借用其他对象的速率。所有速率必须采用相同的日作为时间单位，例如 TT 日。
   """
 
   identity: ChartObject
