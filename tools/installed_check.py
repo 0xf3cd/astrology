@@ -19,6 +19,7 @@ from astrology.knowledge import (
   OutputEligibility,
   PrerequisiteStatus,
   SourceVerification,
+  TranslationStatus,
 )
 
 MODULES = (
@@ -714,6 +715,28 @@ def _check_knowledge(expected_corpus_version: str | None = None) -> None:
   excerpts = [c.excerpt for c in historical.citations if c.excerpt is not None]
   if len(excerpts) != 3 or any(text.zh is None or not text.translation_credit for text in excerpts):
     raise ValueError("Installed Ashmand definitions lost credited translations")
+  overlay = catalog.entry("entry.cross_house_overlays")
+  overlay_rule = catalog.variant("rule.project.cross_house_overlays")
+  overlay_ids = {f"house.{system.value}" for system in astrology.HouseSystem} | {
+    f"axis.{axis.value}" for axis in astrology.Axis
+  }
+  overlay_citation, overlay_source = catalog.citations(overlay.identifier)[0]
+  if (
+    overlay.rule_ids != (overlay_rule.identifier, "rule.project.cusp_ownership")
+    or set(overlay.concept_ids) != overlay_ids
+    or set(overlay_rule.concept_ids) != overlay_ids
+    or overlay_rule.configuration is not None
+    or overlay.prerequisite_status is not PrerequisiteStatus.COMPLETE
+    or overlay.output_eligibility is not OutputEligibility.REFERENCE_ONLY
+    or overlay.chart_applicability != "not_assessed"
+    or overlay_source.identifier != "source.astrology.house_overlays.f269d14"
+    or not overlay_source.url.endswith("/f269d148b8a3e58bc559e7d89be77a03aae6b289")
+    or overlay_source.verification is not SourceVerification.VERIFIED
+    or overlay_citation.excerpt is not None
+    or overlay_rule.definition.status("zh-CN") is not TranslationStatus.CURRENT
+    or overlay.statement.status("zh-CN") is not TranslationStatus.CURRENT
+  ):
+    raise ValueError("Installed overlay knowledge lost rule links, source or editorial states")
   aliases = ["isolated alias"]
   concept = replace(catalog.concepts[0], en_aliases=aliases)
   aliases.clear()

@@ -27,7 +27,7 @@ True
 >>> catalog.filter_entries(concept_id="body.sun")[0].identifier
 'entry.body_requests'
 >>> len(catalog.filter_sources(verification=SourceVerification.VERIFIED))
-9
+10
 >>> bool(catalog.version)
 True
 ```
@@ -54,6 +54,25 @@ Here, `complete` means the entry has stated its prerequisites, `reference_only`
 means it is for reference, and `not_assessed` means no chart has been checked
 against those prerequisites. These answer different questions; see [status meanings](#status-has-several-dimensions).
 
+For [house overlays](cross_aspects.md#find-houses-in-the-other-chart), retrieve the
+separate composition rule and its fixed implementation source:
+
+```{doctest}
+>>> overlay = catalog.entry("entry.cross_house_overlays")
+>>> overlay.rule_ids
+('rule.project.cross_house_overlays', 'rule.project.cusp_ownership')
+>>> citation, source = catalog.citations(overlay.identifier)[0]
+>>> source.identifier
+'source.astrology.house_overlays.f269d14'
+>>> overlay.prerequisite_status.value, overlay.output_eligibility.value, overlay.chart_applicability
+('complete', 'reference_only', 'not_assessed')
+```
+
+This project rule keeps the object owner distinct from the receiving house owner,
+with independent selections and retained source house systems. Its code citation
+documents the implementation, not astronomical authentication or relationship
+interpretation. Looking it up does not calculate placements or assess a chart.
+
 ### Return values and errors
 
 Each `load_catalog()` reads the packaged JSON file without network access or a
@@ -75,8 +94,8 @@ The catalog currently includes:
 
 - Available bodies, axes, house systems, lunar-node definitions and aspects, with their
   English and Chinese names.
-- How this project divides the zodiac into twelve signs, places objects in houses,
-  and calculates single-chart and cross-chart aspects.
+- How this project divides the zodiac into twelve signs, places objects in houses
+  (including cross-chart overlays), and calculates single-chart and cross-chart aspects.
 - The four sign groups in Ashmand's 1822 edition, with bibliographic records,
   excerpts and Chinese translations.
 - [Traditional sign rulers and four statuses](dignities.md) from William Lilly's

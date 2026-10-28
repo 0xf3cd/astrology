@@ -821,6 +821,51 @@ def test_installed_dignity_knowledge_defects(consumer: Path, defect: str) -> Non
     installed_check._check_dignities()
 
 
+@pytest.mark.parametrize(
+  "defect",
+  [
+    "entry_link",
+    "rule_link",
+    "configuration",
+    "source_link",
+    "source_status",
+    "source_url",
+    "output",
+    "prerequisites",
+    "translation",
+  ],
+)
+def test_installed_overlay_knowledge_defects(consumer: Path, defect: str) -> None:
+  path = consumer / "knowledge/catalog.json"
+  data = json.loads(path.read_text(encoding="utf-8"))
+  entry = next(e for e in data["entries"] if e["identifier"] == "entry.cross_house_overlays")
+  rule = next(v for v in data["variants"] if v["identifier"] == "rule.project.cross_house_overlays")
+  source = next(
+    s for s in data["sources"] if s["identifier"] == "source.astrology.house_overlays.f269d14"
+  )
+  if defect == "entry_link":
+    entry["rule_ids"] = ["rule.project.cusp_ownership"]
+  elif defect == "rule_link":
+    rule["concept_ids"] = rule["concept_ids"][:-1]
+  elif defect == "configuration":
+    rule["configuration"] = {"enum": "HouseSystem", "member": "EQUAL"}
+  elif defect == "source_link":
+    entry["citations"][0]["source_id"] = "source.astrology.cross_aspects.0d7122a"
+  elif defect == "source_status":
+    source["verification"] = "unverified"
+  elif defect == "source_url":
+    source["url"] = "https://github.com/0xf3cd/astrology/tree/main"
+  elif defect == "output":
+    entry["output_eligibility"] = "eligible"
+  elif defect == "prerequisites":
+    entry["prerequisite_status"] = "unresolved"
+  else:
+    rule["definition"]["revision"] = 2
+  path.write_text(json.dumps(data), encoding="utf-8")
+  with pytest.raises(ValueError, match="Installed overlay knowledge"):
+    installed_check._check_knowledge()
+
+
 def test_installed_ashmand_lookup_defect_is_rejected(
   consumer: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

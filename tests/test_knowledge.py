@@ -110,6 +110,7 @@ def test_query_contracts(catalog: Catalog) -> None:
     "entry.ashmand_sign_groups",
     "entry.aspect_requests",
     "entry.cross_aspect_evaluation",
+    "entry.cross_house_overlays",
     "entry.body_requests",
     "entry.house_requests",
     "entry.node_directions",
@@ -460,6 +461,11 @@ from astrology import AshmandSignGroup, Sign, ashmand_sign_group
 if {ashmand_sign_group(sign) for sign in Sign} != set(AshmandSignGroup):
   raise RuntimeError('historical lookup lost a group')
 first.citations('entry.ashmand_sign_groups')
+overlay = first.entry('entry.cross_house_overlays')
+if overlay.chart_applicability != 'not_assessed':
+  raise RuntimeError('overlay retrieval claimed chart applicability')
+first.citations(overlay.identifier)
+first.list_variants(concept_id='axis.ascendant')
 if any(name.startswith(('celestial', 'tzdata', 'zoneinfo', 'ctypes')) for name in sys.modules):
   raise RuntimeError('knowledge initialized time or native machinery')
 """
@@ -640,6 +646,7 @@ def test_retained_rule_ids_and_order(catalog: Catalog) -> None:
     "rule.project.orb_both_within_own_orb",
     "rule.project.orb_mean_of_orbs",
     "rule.project.cross_aspect_evaluation",
+    "rule.project.cross_house_overlays",
   ]
   for identifier, configuration in expected:
     variant = catalog.variant(identifier)
@@ -671,6 +678,42 @@ def test_cross_policy_is_independently_retrievable_without_chart_applicability(
   assert "single-chart" in catalog.variant("rule.project.aspect_participation").definition.en
   assert "单盘" in (catalog.entry("entry.aspect_evaluation").statement.zh or "")
   assert "one shared instant" in catalog.variant("rule.project.aspect_motion").definition.en
+
+
+def test_overlay_policy_has_fixed_source_and_separate_editorial_states(catalog: Catalog) -> None:
+  entry = catalog.entry("entry.cross_house_overlays")
+  rule = catalog.variant("rule.project.cross_house_overlays")
+  expected_ids = {f"house.{system.value}" for system in HouseSystem} | {
+    f"axis.{axis.value}" for axis in Axis
+  }
+  assert set(entry.concept_ids) == set(rule.concept_ids) == expected_ids
+  assert rule.configuration is None
+  assert entry.rule_ids == (rule.identifier, "rule.project.cusp_ownership")
+  assert entry in catalog.filter_entries(concept_id="axis.ascendant")
+  assert rule in catalog.list_variants(concept_id="axis.ascendant")
+  assert entry.prerequisite_status is PrerequisiteStatus.COMPLETE
+  assert entry.output_eligibility is OutputEligibility.REFERENCE_ONLY
+  assert entry.chart_applicability == "not_assessed"
+  citation, source = catalog.citations(entry.identifier)[0]
+  commit = "f269d148b8a3e58bc559e7d89be77a03aae6b289"
+  assert source.identifier == "source.astrology.house_overlays.f269d14"
+  assert source.url == f"https://github.com/0xf3cd/astrology/tree/{commit}"
+  assert commit in source.edition
+  assert entry in catalog.filter_entries(source_id=source.identifier)
+  assert source.verification is SourceVerification.VERIFIED
+  assert citation.excerpt is None
+  for name in ("house_overlays.py", "houses.house_of", "tests/test_house_overlays.py"):
+    assert name in citation.locator
+  assert "not independent astronomical corroboration" in source.scope.en
+  assert "without common-epoch conversion or three-dimensional placement" in rule.limits.en
+  aspect_limits = catalog.variant("rule.project.cross_aspect_evaluation").limits
+  assert rule.identifier in aspect_limits.en and rule.identifier in (aspect_limits.zh or "")
+  assert aspect_limits.revision == aspect_limits.zh_revision == 2
+  for axis in Axis:
+    description = catalog.concept(f"axis.{axis.value}").description
+    assert description.revision == description.zh_revision == 2
+    assert description.status("zh-CN") is TranslationStatus.CURRENT
+  assert rule.definition.status("zh-CN") is TranslationStatus.CURRENT
 
 
 def test_fixed_implementation_source_and_node_test_locator(catalog: Catalog) -> None:

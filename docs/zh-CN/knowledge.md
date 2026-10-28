@@ -25,7 +25,7 @@ True
 >>> catalog.filter_entries(concept_id="body.sun")[0].identifier
 'entry.body_requests'
 >>> len(catalog.filter_sources(verification=SourceVerification.VERIFIED))
-9
+10
 >>> bool(catalog.version)
 True
 ```
@@ -48,6 +48,22 @@ True
 这里的 `complete` 表示条目已经写清所需前提；`reference_only` 表示它仅供参考，
 `not_assessed` 表示没有判断某张命盘是否满足这些前提。三者回答不同的问题，详见[状态说明](#状态需要分开表达)。
 
+查询[双盘落宫](cross_aspects.md)时，使用独立的组合规则及其固定实现来源：
+
+```{doctest}
+>>> overlay = catalog.entry("entry.cross_house_overlays")
+>>> overlay.rule_ids
+('rule.project.cross_house_overlays', 'rule.project.cusp_ownership')
+>>> citation, source = catalog.citations(overlay.identifier)[0]
+>>> source.identifier
+'source.astrology.house_overlays.f269d14'
+>>> overlay.prerequisite_status.value, overlay.output_eligibility.value, overlay.chart_applicability
+('complete', 'reference_only', 'not_assessed')
+```
+
+此项目规则区分对象所属盘与接收它的宫位所属盘，两侧独立选择对象，保留各自源盘的宫制。
+代码引用记录的是实现，不认证天文来源，也不提供关系解读。检索不会计算落宫或判断某张命盘。
+
 ### 返回值与错误
 
 `load_catalog()` 每次都从包内 JSON 文件读取目录，不访问网络，也不使用缓存。
@@ -66,7 +82,7 @@ True
 目录目前包括：
 
 - 排盘时可选的天体、四轴、宫制、月交点定义和相位，以及它们的中英文名称。
-- 本项目如何划分十二星座、判断落宫，以及计算单盘和双盘相位。
+- 本项目如何划分十二星座、判断落宫（包括双盘落宫），以及计算单盘和双盘相位。
 - Ashmand 1822 年版中的四组星座分类，以及相关书目、摘录和中文译文。
 - [传统星座守护与四种状态](dignities.md)：依据 William Lilly（威廉·利利）的
   《Christian Astrology》（1647），含原扫描本短引文及生成的星座表。
