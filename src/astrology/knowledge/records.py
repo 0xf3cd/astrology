@@ -11,13 +11,14 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import Literal, TypeVar, get_args
 
-from astrology.config import Body, HouseSystem, LunarNode, MajorAspect, NodeDefinition
+from astrology.config import HouseSystem, MajorAspect
+from astrology.objects import Axis, Body, ChartObject, LunarNode, NodeDefinition
 
 Language = Literal["en", "zh-CN"]
 _LANGUAGES: tuple[Language, ...] = get_args(Language)
-ConfigurationIdentity = Body | HouseSystem | LunarNode | MajorAspect | NodeDefinition
+ConfigurationIdentity = ChartObject | HouseSystem | MajorAspect | NodeDefinition
 _T = TypeVar("_T")
-CONFIGURATION_TYPES = (Body, HouseSystem, LunarNode, MajorAspect, NodeDefinition)
+CONFIGURATION_TYPES: tuple[type[ConfigurationIdentity], ...] = get_args(ConfigurationIdentity)
 
 
 def _text(value: str) -> None:
@@ -74,6 +75,7 @@ class ConceptKind(StrEnum):
   HOUSE_SYSTEM = "house_system"
   NODE_DEFINITION = "node_definition"
   LUNAR_NODE = "lunar_node"
+  AXIS = "axis"
   ASPECT = "aspect"
 
 
@@ -202,6 +204,7 @@ class Concept:
       ConceptKind.HOUSE_SYSTEM: HouseSystem,
       ConceptKind.NODE_DEFINITION: NodeDefinition,
       ConceptKind.LUNAR_NODE: LunarNode,
+      ConceptKind.AXIS: Axis,
       ConceptKind.ASPECT: MajorAspect,
     }.get(self.kind)
     if self.configuration is not None and type(self.configuration) is not expected:

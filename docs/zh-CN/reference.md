@@ -18,9 +18,20 @@
 
 ## 请求配置
 
+对象身份定义在 `astrology.objects`；原来从 `astrology.config` 导入的 `Body`、
+`LunarNode` 和 `NodeDefinition` 仍是同一枚举类的别名。也可从 `astrology` 导入 `Axis`。
+
+```{eval-rst}
+.. automodule:: astrology.objects
+   :members: Body, NodeDefinition, LunarNode, Axis, AstronomicalObject, ChartObject
+   :undoc-members:
+   :member-order: bysource
+   :no-index:
+```
+
 ```{eval-rst}
 .. automodule:: astrology.config
-   :members: HouseSystem, Body, NodeDefinition, LunarNode, MajorAspect, OrbCombination, ObjectOrb, AspectRule, ChartConfig
+   :members: HouseSystem, MajorAspect, OrbCombination, ObjectOrb, AspectRule, ChartConfig
    :undoc-members:
    :member-order: bysource
    :no-index:

@@ -19,6 +19,7 @@ arrives; a name in this map does not require an empty package or an extra layer.
 ```text
 src/astrology/
   birth.py          Original records and resolved instants
+  objects.py        Body, node and axis identities; consumer-specific admission
   config.py         Requested chart and tradition choices
   celestial.py      Concrete adapter to celestial-calendar
   zodiac.py         Zodiac definitions and sign classification
@@ -44,6 +45,9 @@ need them. Package imports and knowledge queries must not initialize celestial.
 `cross_aspects.py` composes existing chart results without astronomy. Shared
 angular/orb arithmetic remains in `aspects.py`; single-chart pair eligibility
 and local motion stay with `find_aspects`, separate from static cross pairing.
+`objects.py` owns the narrow body/node and broader aspect identity families.
+The adapter retains target bindings, text retains supplied-catalog naming, and
+`chart.py` extracts selected stored axis positions for both compositions.
 
 Knowledge and calculation remain connected by stable identifiers, described in
 [Knowledge organization](knowledge.md). Additional UI applications can consume

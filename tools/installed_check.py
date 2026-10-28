@@ -4,11 +4,12 @@ import json
 import sys
 from dataclasses import replace
 from datetime import UTC, date, datetime, time, timedelta
+from functools import partial
 from importlib import import_module
 from importlib.metadata import PackageNotFoundError, distribution, version
 from importlib.resources import files
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal, cast
 
 import astrology
 from astrology.knowledge import (
@@ -33,6 +34,7 @@ MODULES = (
   "knowledge.catalog",
   "knowledge.records",
   "lunar_phase",
+  "objects",
   "summaries",
   "text",
   "zodiac",
@@ -114,7 +116,11 @@ def chart_observations(chart: astrology.NatalChart) -> str:
 
 
 def _cross_source(
-  year: int, label: str, coordinates: tuple[tuple[astrology.Body | astrology.LunarNode, float], ...]
+  year: int,
+  label: str,
+  coordinates: tuple[tuple[astrology.Body | astrology.LunarNode, float], ...],
+  *,
+  axes: tuple[float, float, float, float] = (0, 270, 180, 90),
 ) -> astrology.NatalChart:
   """Construct a pure synthetic source, not a calculated astronomical reference.
 
@@ -134,7 +140,7 @@ def _cross_source(
     astrology.HouseSystem.WHOLE_SIGN, tuple(identity for identity, _ in coordinates), ()
   )
   houses = astrology.ChartHouses(
-    config.house_system, 0, 270, 180, 90, tuple(float(n) for n in range(0, 360, 30))
+    config.house_system, *axes, tuple(float(n) for n in range(0, 360, 30))
   )
   positions = tuple(
     astrology.EclipticPosition(
@@ -258,6 +264,90 @@ def _check_cross_chart(expected_observations: Path | None = None) -> None:
   ) != expected_observations.read_text(encoding="utf-8"):
     raise ValueError("Installed cross aspects differ from the development entry point")
   _check_native_isolation()
+
+
+def _check_axes() -> None:
+  """Check all stored axis fields with independent synthetic natal/cross expectations.
+
+  用独立的合成本命和双盘期望核验全部已存轴字段。
+  """
+  axes = (10.5, 100.25, 202.75, 301.125)
+  other_axes = (50.25, 140.0, 230.5, 320.75)
+  catalog = astrology.load_catalog()
+  rule = astrology.AspectRule(astrology.MajorAspect.SEXTILE, 3)
+  for axis, longitude in zip(astrology.Axis, axes, strict=True):
+    source = _cross_source(
+      2000, "axis-left", ((astrology.Body.SUN, (longitude + 57.5) % 360),), axes=axes
+    )
+    expected = astrology.AspectHit(
+      astrology.Body.SUN,
+      axis,
+      astrology.MajorAspect.SEXTILE,
+      -60,
+      2.5,
+      3,
+      astrology.AspectMotion.INDETERMINATE,
+    )
+    config = astrology.ChartConfig(
+      source.requested.house_system,
+      source.requested.objects,
+      (rule,),
+      aspect_objects=(axis, astrology.Body.SUN),
+    )
+    natal = replace(
+      source,
+      requested=config,
+      effective=replace(source.effective, aspect_objects=(astrology.Body.SUN, axis)),
+      aspects=(expected,),
+    )
+    if natal.aspects != (expected,) or natal.positions != source.positions:
+      raise ValueError("Installed natal axis geometry differs from independent expectations")
+    right = _cross_source(
+      2001, "axis-right", ((astrology.Body.SUN, (longitude + 57.5) % 360),), axes=other_axes
+    )
+    cross = astrology.cross_chart_aspects(
+      source, right, (rule,), left_objects=(axis,), right_objects=(astrology.Body.SUN,)
+    )
+    if cross.hits != (
+      astrology.CrossAspectHit(
+        axis, astrology.Body.SUN, astrology.MajorAspect.SEXTILE, 60, -2.5, 3
+      ),
+    ):
+      raise ValueError("Installed cross axes use the wrong source or field")
+    if cross.left_objects != (axis,) or hasattr(cross.hits[0], "motion"):
+      raise ValueError("Installed cross-axis selection or static contract changed")
+    for language in ("en", "zh-CN"):
+      selected: Literal["en", "zh-CN"] = language
+      concept = catalog.concept(f"axis.{axis.value}")
+      name = concept.name.text(selected)
+      if (
+        concept.configuration is not axis
+        or name is None
+        or name not in astrology.format_chart(natal, catalog, language=selected)
+      ):
+        raise ValueError("Installed axis vocabulary or text binding is missing")
+    bad = cast(Any, axis)
+    for call in (
+      partial(astrology.ChartConfig, source.requested.house_system, (bad,), ()),
+      partial(astrology.EclipticPosition, bad, 10, 0, 1, 1),
+      partial(astrology.Placement, bad, astrology.Sign.ARIES, 10, 1),
+      partial(astrology.chart_sign_distribution, source, objects=(bad,)),
+    ):
+      try:
+        call()
+      except TypeError:
+        pass
+      else:
+        raise ValueError("Installed narrow boundary admitted an axis")
+  exact = astrology.find_aspects(
+    (
+      astrology.AspectObject(astrology.Axis.ASCENDANT, 10, None),
+      astrology.AspectObject(astrology.Axis.DESCENDANT, 190, None),
+    ),
+    (astrology.AspectRule(astrology.MajorAspect.OPPOSITION, 0),),
+  )
+  if len(exact) != 1 or exact[0].motion is not astrology.AspectMotion.EXACT:
+    raise ValueError("Installed opposite-axis exactness or pair admission changed")
 
 
 def _check_summaries() -> None:
@@ -629,6 +719,24 @@ def _check_natal_chart(expected_observations: Path | None = None) -> None:
     raise ValueError("Installed English chart output is incomplete")
   if "太阳 [sun]" not in astrology.format_chart(chart, catalog, language="zh-CN"):
     raise ValueError("Installed Chinese chart output is incomplete")
+  axis_chart = astrology.natal_chart(
+    chart.resolved,
+    replace(
+      chart.requested,
+      aspects=(astrology.AspectRule(astrology.MajorAspect.OPPOSITION, 1),),
+      aspect_objects=tuple(astrology.Axis),
+      orb_combination=None,
+    ),
+  )
+  if axis_chart.positions != chart.positions or axis_chart.effective.aspect_objects != tuple(
+    astrology.Axis
+  ):
+    raise ValueError("Installed native composition changed raw outputs or lost selected axes")
+  if {(hit.first, hit.second) for hit in axis_chart.aspects} != {
+    (astrology.Axis.ASCENDANT, astrology.Axis.DESCENDANT),
+    (astrology.Axis.MIDHEAVEN, astrology.Axis.IMUM_COELI),
+  }:
+    raise ValueError("Installed native composition lost an opposite-axis pair")
   polar = replace(
     chart.resolved, record=replace(chart.resolved.record, location=astrology.Location(75, 0))
   )
@@ -702,11 +810,13 @@ def main(
   if knowledge_only:
     _check_summaries()
     _check_dignities()
+    _check_axes()
     if any(name.startswith(("tzdata", "zoneinfo", "celestial", "ctypes")) for name in sys.modules):
       raise ValueError("Knowledge-only consumer loaded time or native machinery")
     print(f"Installed knowledge corpus; optimized={sys.flags.optimize}")
     return
   _check_birth_and_configuration()
+  _check_axes()
   _check_summaries()
   _check_dignities()
   _check_native_isolation()

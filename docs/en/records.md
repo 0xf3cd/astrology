@@ -56,7 +56,8 @@ Loading the catalog is explicit; formatting itself performs no resource I/O.
   the offset, IANA key, fold and both timezone-data versions.
 - `requested` keeps object/rule order, per-object orbs, their combination and
   the distinction between omitted (`None`) and explicit aspect participants.
-  `effective.aspect_objects` gives the actual participants in requested object order.
+  `effective.aspect_objects` gives bodies/nodes in requested order, then explicitly
+  selected axes in ASC/MC/DSC/IC order.
 - `positions` keeps unrounded longitude/latitude in degrees, physical distance
   in AU and longitude rate in degrees per TT day. Nodes have no distance (`None`).
   `times` keeps JD(UT1) and JDE(TT). Axes/cusps, placements and every aspect field
@@ -65,10 +66,14 @@ Loading the catalog is explicit; formatting itself performs no resource I/O.
   UT1 derivation; `effective` keeps the resolved Delta-T model and evaluation.
 
 Direct construction of `NatalChart` checks field types, ranges and pure derived-value consistency:
-signs, house membership and aspects must agree with the positions, cusps and rules.
+signs, house membership and aspects must agree with the positions, stored axes, cusps and rules.
 It does not authenticate the supplied timezone choice, astronomical values,
 their relationship to the claimed UTC/location or the software-version labels.
 Use `natal_chart` to calculate values from resolved input.
+
+Selected axis names in participants, orb overrides and hits come from the supplied
+catalog, just like body names. An old body/node-only request needs no axis concepts:
+the existing four axis-geometry row labels remain fixed bilingual labels.
 
 Calling `natal_chart(chart.resolved, chart.requested)` calculates a fresh result
 with the current implementation and records its provenance. It keeps the resolved

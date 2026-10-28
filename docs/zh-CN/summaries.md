@@ -126,7 +126,8 @@ True
 
 `objects` 必填且非空。`None`、字符串或错误身份类型抛出 `TypeError`，重复或不可用身份抛出
 `ValueError`。结果按源盘顺序，而非选择顺序排列。统计全部请求对象时，须显式传
-`objects=chart.requested.objects`。不加入未选天体、交点或四轴。`natal_lunar_phase` 要求日月齐备；
+`objects=chart.requested.objects`。不加入未选天体、交点或四轴。四轴不是落点，即使显式选择也不能参与这项统计。
+`natal_lunar_phase` 要求日月齐备；
 缺位置抛出 `ValueError` 并列出缺失身份，不补算。两个入口对非 `NatalChart` 输入均抛出
 `TypeError`。这些检查在 `python -O` 下同样有效。
 

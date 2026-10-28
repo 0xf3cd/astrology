@@ -18,6 +18,10 @@ phase](https://0xf3cd.github.io/astrology/docs/en/summaries.html), and
 [traditional sign rulers and four statuses](https://0xf3cd.github.io/astrology/docs/en/dignities.html),
 planned for 0.3.0.
 
+It also supports [explicit axis aspects](https://0xf3cd.github.io/astrology/docs/en/aspects.html#select-axes-explicitly)
+in natal and static cross-chart queries. Axes are selected separately from
+native body/node outputs; requests without selected axes keep their behavior.
+
 New in 0.2.0 (in development):
 
 - [Static cross-chart aspects](https://0xf3cd.github.io/astrology/docs/en/cross_aspects.html)

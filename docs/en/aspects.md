@@ -135,10 +135,10 @@ descending nodes are always exactly opposite. A node can form an aspect with a b
 ()
 ```
 
-In a chart request, `aspect_objects` names the objects that take part, as a subset of
-the requested objects. Left out, all requested objects take part. A node that is
+In a chart request, `aspect_objects` selects requested bodies/nodes and may explicitly
+add axes. Left out, all requested bodies/nodes take part, without axes. A node that is
 requested but left out of `aspect_objects` still has its position and takes part in
-no aspect. Axes are not objects of a request and have no aspects.
+no aspect. A selected axis can pair with a body, node or distinct axis.
 
 ## Aspects in a natal chart
 
@@ -179,6 +179,41 @@ moon saturn trine -2.34 separating
 (8, ['sun', 'moon'])
 ```
 
+## Select axes explicitly
+
+`Axis.ASCENDANT`, `MIDHEAVEN`, `DESCENDANT` and `IMUM_COELI` are distinct chart
+identities. In native composition their longitudes come from the corresponding
+stored `ChartHouses` fields, never from house cusps or a synthesized opposite axis.
+This matters in Whole Sign, where ASC/MC need not be first/tenth cusps:
+
+```{doctest}
+>>> from astrology import Axis
+>>> axis_request = ChartConfig(HouseSystem.WHOLE_SIGN, (Body.SUN,),
+...   (AspectRule(MajorAspect.SEXTILE, 3), AspectRule(MajorAspect.TRINE, 3)),
+...   aspect_objects=(Axis.IMUM_COELI, Body.SUN, Axis.MIDHEAVEN))
+>>> axis_chart = natal_chart(prepare_natal_input(record), axis_request)
+>>> [value.value for value in axis_chart.effective.aspect_objects]
+['sun', 'midheaven', 'imum_coeli']
+>>> [(h.second.value, h.aspect.value, round(h.deviation_deg, 2), h.motion.value)
+...  for h in axis_chart.aspects]
+[('midheaven', 'trine', 2.47, 'indeterminate'), ('imum_coeli', 'sextile', 2.47, 'indeterminate')]
+>>> [p.identity.value for p in axis_chart.positions]
+['sun']
+```
+
+Chart composition supplies no axis rate (`None`), so a non-exact hit involving an
+axis is `indeterminate`. Zero deviation still gives `exact`. Exactness uses the
+same direct float comparison: nearly opposite stored values can have a tiny
+nonzero deviation. Do not replace absence with zero or a planet's rate. Low-level
+`AspectObject` accepts a caller-supplied finite axis rate on the same day basis.
+Axes acquire no physical distance, raw position or population-statistics entry.
+
+Explicitly selected axes can pair with each other, including ASC/DSC and MC/IC.
+Opposite axes remain separate identities; all matching aspects/branches are kept.
+This is a project pairing policy, not a universal traditional orb or interpretation.
+`ObjectOrb` and all three combination rules apply to selected axes unchanged.
+The [cross-chart API](cross_aspects.md#select-axes-on-each-side) selects each side independently.
+
 ## Check the results
 
 Hand-computed cases cover the wrap at 0 and 360 degrees, both branches, the orb
@@ -201,7 +236,7 @@ records what the references can and cannot detect.
 ## Limits
 
 - Only ecliptic longitude is used. Latitude, declination, minor aspects, whole-sign
-  aspects and aspects to axes are not evaluated.
+  aspects are not evaluated. Axes take part only when explicitly selected.
 - The motion status describes this instant only. It does not predict whether an
   aspect will become exact, or describe its meaning or strength.
 - The library supplies no default orb. The corpus describes the evaluation as a

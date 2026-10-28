@@ -15,6 +15,7 @@
 ```text
 src/astrology/
   birth.py          原始出生记录与已解析时刻
+  objects.py        天体、交点及四轴身份；按使用方区分接纳范围
   config.py         请求的排盘口径与流派选择
   celestial.py      celestial-calendar 的具体适配
   zodiac.py         黄道定义与星座归属
@@ -37,6 +38,9 @@ docs/zh-CN/         对应的中文指南与说明
 
 `cross_aspects.py` 组合已有命盘结果，不调用天文库。共享角度／容许度算术仍归 `aspects.py`；
 单盘配对准入及局部运动仍由 `find_aspects` 负责，与静态双盘配对分开。
+`objects.py` 定义仅含天体和交点的类别，以及相位使用的较宽身份类别。
+适配层仍负责天文目标映射，文本层仍负责传入目录的名称查询；
+`chart.py` 为两种组合提取选中的已存轴位置。
 
 知识与计算通过稳定标识关联，见[知识组织](knowledge.md)。后续界面应用消费已有结果，
 不必把计算搬到前端。

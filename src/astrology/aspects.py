@@ -20,7 +20,8 @@ from enum import StrEnum
 from math import remainder
 
 from astrology._validation import finite_number
-from astrology.config import AspectRule, Body, LunarNode, MajorAspect, OrbCombination
+from astrology.config import AspectRule, MajorAspect, OrbCombination
+from astrology.objects import ChartObject, LunarNode, _is_chart_object
 
 _HALF_MAXIMUM = sys.float_info.max / 2.0
 
@@ -70,13 +71,13 @@ class AspectObject:
   不借用其他对象的速率。所有对象的速率必须使用相同的日长定义，例如 TT 日。
   """
 
-  identity: Body | LunarNode
+  identity: ChartObject
   longitude_deg: float
   longitude_rate_deg_per_day: float | None
 
   def __post_init__(self) -> None:
-    if not isinstance(self.identity, (Body, LunarNode)):
-      raise TypeError("identity must be a Body or LunarNode")
+    if not _is_chart_object(self.identity):
+      raise TypeError("identity must be a Body, LunarNode or Axis")
     object.__setattr__(self, "longitude_deg", finite_number(self.longitude_deg, "longitude_deg"))
     if self.longitude_rate_deg_per_day is not None:
       object.__setattr__(
@@ -103,8 +104,8 @@ class AspectHit:
   偏差反号，但 180 仍记为 180；有两个分支时，分支也反号。运动状态不变。
   """
 
-  first: Body | LunarNode
-  second: Body | LunarNode
+  first: ChartObject
+  second: ChartObject
   aspect: MajorAspect
   branch_deg: float
   deviation_deg: float
@@ -112,10 +113,8 @@ class AspectHit:
   motion: AspectMotion
 
   def __post_init__(self) -> None:
-    if not isinstance(self.first, (Body, LunarNode)) or not isinstance(
-      self.second, (Body, LunarNode)
-    ):
-      raise TypeError("Aspect endpoints must be Body or LunarNode values")
+    if not _is_chart_object(self.first) or not _is_chart_object(self.second):
+      raise TypeError("Aspect endpoints must be Body, LunarNode or Axis values")
     if self.first == self.second or (
       isinstance(self.first, LunarNode) and isinstance(self.second, LunarNode)
     ):
@@ -206,8 +205,8 @@ def _mean(first: float, second: float) -> float:
 
 def _limit(
   rule: AspectRule,
-  first: Body | LunarNode,
-  second: Body | LunarNode,
+  first: ChartObject,
+  second: ChartObject,
   combination: OrbCombination | None,
 ) -> float:
   own = {entry.identity: entry.orb_degrees for entry in rule.object_orbs}
@@ -234,9 +233,9 @@ def _motion(deviation: float, first: AspectObject, second: AspectObject) -> Aspe
 
 
 def _pair_geometry(
-  first: Body | LunarNode,
+  first: ChartObject,
   first_longitude_deg: float,
-  second: Body | LunarNode,
+  second: ChartObject,
   second_longitude_deg: float,
   ordered_rules: Sequence[AspectRule],
   combination: OrbCombination | None,
@@ -268,13 +267,15 @@ def find_aspects(
   itself included. The limit is the rule's orb, or the combination of the two objects'
   orbs when the rule has per-object orbs, which then requires `combination`. Two lunar
   nodes never form an aspect: the four identities are one pair of nodes under two
-  definitions and two directions.
+  definitions and two directions. Axes may pair with any other distinct identity,
+  including an opposite axis; their identities and all matching branches remain separate.
 
   按固定顺序返回对象两两之间符合规则的所有相位。配对按 `objects` 的顺序排列，再按相位角排序，
   同一相位的负分支排在正分支之前。容许度较宽时，同一对对象可能符合多个相位或分支，都会返回，
   不会只保留偏差最小的一个。偏差的绝对值不超过容许度上限就算符合，等于上限也算。
   上限通常是规则的容许度；规则给对象单独设置容许度时，上限由两个对象的容许度合成，
   此时必须给出 `combination`。两个月交点之间不构成相位：四个标识表示同一对交点的两种定义和两个方向。
+  四轴可与任一不同身份配对，包括其对轴；各身份及全部命中分支分别保留。
   """
   if not isinstance(objects, Sequence) or isinstance(objects, (str, bytes)):
     raise TypeError("objects must be a sequence of AspectObject values")

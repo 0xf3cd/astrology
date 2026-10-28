@@ -11,7 +11,7 @@ from typing import Any
 
 import pytest
 
-from astrology import OrbCombination, aspect_angle
+from astrology import Axis, OrbCombination, aspect_angle
 from astrology.config import Body, HouseSystem, LunarNode, MajorAspect, NodeDefinition
 from astrology.knowledge import (
   Catalog,
@@ -133,7 +133,7 @@ def test_query_contracts(catalog: Catalog) -> None:
 def test_complete_owning_configuration_coverage(catalog: Catalog) -> None:
   expected = {
     member
-    for enum in (Body, HouseSystem, LunarNode, MajorAspect, NodeDefinition)
+    for enum in (Body, HouseSystem, LunarNode, Axis, MajorAspect, NodeDefinition)
     for member in enum
   }
   actual = [

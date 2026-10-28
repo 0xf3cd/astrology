@@ -18,7 +18,8 @@ from celestial_calendar import BodyState, ChartTarget
 
 from astrology.birth import Location, MissingBirthDataError, ResolvedBirth
 from astrology.chart import ChartDomainError, ChartHouses, ChartTimes, EclipticPosition
-from astrology.config import Body, ChartConfig, HouseSystem, LunarNode
+from astrology.config import ChartConfig, HouseSystem
+from astrology.objects import AstronomicalObject, Body, LunarNode, _is_astronomical_object
 
 _BODY_TARGETS: dict[Body, ChartTarget] = {
   Body.SUN: ChartTarget.SUN,
@@ -72,8 +73,10 @@ def delta_t_model_id() -> str:
   return _DELTA_T_MODEL.value
 
 
-def _target(identity: Body | LunarNode) -> ChartTarget:
+def _target(identity: AstronomicalObject) -> ChartTarget:
   """Map a requested identity to the fixed upstream roster. 把请求的标识映射到上游固定的名册。"""
+  if not _is_astronomical_object(identity):
+    raise TypeError("Native targets require a Body or LunarNode")
   if isinstance(identity, Body):
     return _BODY_TARGETS[identity]
   return _NODE_TARGETS[identity]
@@ -108,7 +111,7 @@ def _precheck(resolved: ResolvedBirth, config: ChartConfig) -> Location:
   return location
 
 
-def _position(identity: Body | LunarNode, body: BodyState) -> EclipticPosition:
+def _position(identity: AstronomicalObject, body: BodyState) -> EclipticPosition:
   """Copy one upstream state under the requested identity. 复制上游的一个状态，标识换成请求里给的那个。"""
   return EclipticPosition(
     identity,

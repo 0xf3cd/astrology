@@ -322,9 +322,12 @@ def test_installed_consumer_calculates_a_chart(
 
   monkeypatch.setattr(astrology, "natal_chart", record)
   installed_check.main(version("celestial-astrology"))
-  assert len(calls) == 2
+  assert len(calls) == 3
   assert calls[0].house_system is astrology.HouseSystem.WHOLE_SIGN
-  assert calls[1].house_system is astrology.HouseSystem.PLACIDUS
+  assert calls[1].house_system is astrology.HouseSystem.WHOLE_SIGN
+  assert calls[1].aspect_objects == tuple(astrology.Axis)
+  assert calls[1].orb_combination is None
+  assert calls[2].house_system is astrology.HouseSystem.PLACIDUS
   assert calls[0].aspects
   assert calls[0].orb_combination is astrology.OrbCombination.MEAN_OF_ORBS
 

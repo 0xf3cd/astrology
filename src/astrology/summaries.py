@@ -10,10 +10,10 @@ from dataclasses import dataclass
 from types import MappingProxyType
 
 from astrology.chart import NatalChart, Placement
-from astrology.config import Body, LunarNode
 from astrology.dignities import _RULE_ID as _DIGNITY_RULE_ID
 from astrology.dignities import DignityStatus, essential_dignities, sign_ruler
 from astrology.lunar_phase import LunarPhaseResult, lunar_phase
+from astrology.objects import AstronomicalObject, Body, _is_astronomical_object
 from astrology.zodiac import Element, Modality, Sign, element_of, modality_of, sign_of
 
 
@@ -47,7 +47,7 @@ class SignDistribution:
     object.__setattr__(self, "placements", snapshot)
 
   @property
-  def objects(self) -> tuple[Body | LunarNode, ...]:
+  def objects(self) -> tuple[AstronomicalObject, ...]:
     """Return the counted identities in snapshot order. 返回按快照顺序排列的计数对象。"""
     return tuple(p.identity for p in self.placements)
 
@@ -94,7 +94,7 @@ def sign_distribution(placements: Sequence[Placement]) -> SignDistribution:
 
 
 def chart_sign_distribution(
-  chart: NatalChart, *, objects: Sequence[Body | LunarNode]
+  chart: NatalChart, *, objects: Sequence[AstronomicalObject]
 ) -> SignDistribution:
   """Count explicitly selected existing placements in source-chart order, without astronomy.
 
@@ -110,7 +110,7 @@ def chart_sign_distribution(
   if not isinstance(objects, Sequence) or isinstance(objects, (str, bytes)):
     raise TypeError("objects must be a sequence")
   selected = tuple(objects)
-  if any(type(identity) not in (Body, LunarNode) for identity in selected):
+  if any(not _is_astronomical_object(identity) for identity in selected):
     raise TypeError("objects must contain Body or LunarNode values")
   if not selected or len(set(selected)) != len(selected):
     raise ValueError("objects must be nonempty and contain no duplicate identities")

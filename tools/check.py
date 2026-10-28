@@ -58,6 +58,7 @@ PACKAGE_FILES = (
   "astrology/dignities.py",
   "astrology/houses.py",
   "astrology/lunar_phase.py",
+  "astrology/objects.py",
   "astrology/summaries.py",
   "astrology/text.py",
   "astrology/zodiac.py",

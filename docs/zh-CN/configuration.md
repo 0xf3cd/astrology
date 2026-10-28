@@ -59,8 +59,9 @@ Meeus 五项真交点定义的数学升降交点。定义是各交点标识的�
 
 用 `ObjectOrb` 为某个对象单独设置容许度；其他对象使用规则的 `orb_degrees`。
 只要有规则使用了 `ObjectOrb`，就必须指定 `orb_combination`，说明两个对象的容许度如何合成一个上限；
-没有规则使用时，就不能指定。`aspect_objects` 指定参与相位的对象，必须是 `objects` 的子集；
-不写时，所有请求的对象都参与。只能为参与相位的对象单独设置容许度。
+没有规则使用时，就不能指定。`aspect_objects` 从请求的天体或交点中选择参与者，也可显式加入 `Axis` 成员；
+不写时，所有请求的天体和交点都参与，不加入四轴。只能为参与相位的身份单独设置容许度，包括四轴。
+`objects` 本身仍只接纳 `Body` 和 `LunarNode`，不接纳四轴。
 
 ```{doctest}
 >>> from astrology import LunarNode, ObjectOrb, OrbCombination
@@ -82,6 +83,19 @@ ValueError: orb_combination is required when aspect rules have object orbs
 ```
 
 NaN、无穷、负容许度、布尔值、不支持的模式及不一致的选择，在普通 Python 和 `python -O` 下都会报错。
+
+```{doctest}
+>>> from astrology import Axis
+>>> with_axes = ChartConfig(HouseSystem.WHOLE_SIGN, (Body.SUN,),
+...   (AspectRule(MajorAspect.SEXTILE, 3),),
+...   aspect_objects=(Axis.IMUM_COELI, Body.SUN, Axis.MIDHEAVEN))
+>>> [value.value for value in with_axes.aspect_participants()]
+['sun', 'midheaven', 'imum_coeli']
+```
+
+天体和交点保留原请求顺序，所选四轴按上升、中天、下降、天底顺序追加，不随选择参数的顺序改变。
+相位参与者也可只选四轴，但天文输出请求仍须至少含一个天体或交点。
+几何与配对政策见{ref}`显式选择四轴 <axis-aspects-zh-cn>`。
 
 定义枚举和 API 合同见从实际定义生成的[参考页](reference.md)。实际天文模型、版本、时标和生效计算设置
 归排盘结果，本层不为凑齐元数据而虚构它们。[排盘指南](chart.md)说明请求如何变成该结果，
