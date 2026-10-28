@@ -55,13 +55,37 @@ Meeus 五项真交点定义的数学升降交点。定义是各交点标识的�
 
 上例中的零容许度是为演示手动设置的，不是库的默认值或建议值。
 
-## 给对象单独的容许度，并选择参与的对象
+## 选择参与相位的对象
+
+这个请求要求排盘返回太阳和月亮的位置，但只判断太阳与上升点的相位：
+
+```{doctest}
+>>> from astrology import AspectRule, Axis, Body, ChartConfig, HouseSystem, MajorAspect
+>>> with_axes = ChartConfig(
+...   HouseSystem.WHOLE_SIGN,
+...   objects=(Body.SUN, Body.MOON),
+...   aspects=(AspectRule(MajorAspect.SEXTILE, 3),),
+...   aspect_objects=(Body.SUN, Axis.ASCENDANT),
+... )
+>>> [value.value for value in with_axes.aspect_participants()]
+['sun', 'ascendant']
+>>> [value.value for value in with_axes.objects]
+['sun', 'moon']
+```
+
+`objects` 选择天文输出，只接纳 `Body` 和 `LunarNode`。`aspect_objects` 从这些天体或交点中
+选择相位参与者，也可显式加入四轴；月亮在上例中仍有位置，但不参与相位。不写 `aspect_objects`
+时，所有请求的天体和交点都参与，不加入四轴。
+
+天体和交点保留原请求顺序，所选四轴按上升、中天、下降、天底顺序追加，不随选择参数的顺序改变。
+相位参与者也可只选四轴，但 `objects` 仍须至少含一个天体或交点。
+几何与配对政策见{ref}`显式选择四轴 <axis-aspects-zh-cn>`。
+
+## 给对象单独的容许度
 
 用 `ObjectOrb` 为某个对象单独设置容许度；其他对象使用规则的 `orb_degrees`。
 只要有规则使用了 `ObjectOrb`，就必须指定 `orb_combination`，说明两个对象的容许度如何合成一个上限；
-没有规则使用时，就不能指定。`aspect_objects` 从请求的天体或交点中选择参与者，也可显式加入 `Axis` 成员；
-不写时，所有请求的天体和交点都参与，不加入四轴。只能为参与相位的身份单独设置容许度，包括四轴。
-`objects` 本身仍只接纳 `Body` 和 `LunarNode`，不接纳四轴。
+没有规则使用时，就不能指定。只能为参与相位的身份单独设置容许度，包括所选四轴。
 
 ```{doctest}
 >>> from astrology import LunarNode, ObjectOrb, OrbCombination
@@ -83,19 +107,6 @@ ValueError: orb_combination is required when aspect rules have object orbs
 ```
 
 NaN、无穷、负容许度、布尔值、不支持的模式及不一致的选择，在普通 Python 和 `python -O` 下都会报错。
-
-```{doctest}
->>> from astrology import Axis
->>> with_axes = ChartConfig(HouseSystem.WHOLE_SIGN, (Body.SUN,),
-...   (AspectRule(MajorAspect.SEXTILE, 3),),
-...   aspect_objects=(Axis.IMUM_COELI, Body.SUN, Axis.MIDHEAVEN))
->>> [value.value for value in with_axes.aspect_participants()]
-['sun', 'midheaven', 'imum_coeli']
-```
-
-天体和交点保留原请求顺序，所选四轴按上升、中天、下降、天底顺序追加，不随选择参数的顺序改变。
-相位参与者也可只选四轴，但 `objects` 仍须至少含一个天体或交点。
-几何与配对政策见{ref}`显式选择四轴 <axis-aspects-zh-cn>`。
 
 定义枚举和 API 合同见从实际定义生成的[参考页](reference.md)。实际天文模型、版本、时标和生效计算设置
 归排盘结果，本层不为凑齐元数据而虚构它们。[排盘指南](chart.md)说明请求如何变成该结果，

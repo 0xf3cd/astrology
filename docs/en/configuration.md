@@ -66,15 +66,41 @@ judged.
 The zero orb above is an explicit synthetic request value, not a library default
 or recommendation.
 
-## Give an object its own orb, and choose who takes part
+## Choose who takes part in aspects
+
+This request asks for Sun and Moon positions, with aspects only between the Sun
+and Ascendant:
+
+```{doctest}
+>>> from astrology import AspectRule, Axis, Body, ChartConfig, HouseSystem, MajorAspect
+>>> with_axes = ChartConfig(
+...   HouseSystem.WHOLE_SIGN,
+...   objects=(Body.SUN, Body.MOON),
+...   aspects=(AspectRule(MajorAspect.SEXTILE, 3),),
+...   aspect_objects=(Body.SUN, Axis.ASCENDANT),
+... )
+>>> [value.value for value in with_axes.aspect_participants()]
+['sun', 'ascendant']
+>>> [value.value for value in with_axes.objects]
+['sun', 'moon']
+```
+
+`objects` selects astronomical outputs and accepts only `Body` and `LunarNode`.
+`aspect_objects` selects participants from those bodies/nodes and may explicitly
+add axes. The Moon above still has a position, but takes part in no aspect. If
+`aspect_objects` is omitted, all requested bodies/nodes take part and no axes are added.
+
+Requested bodies/nodes keep their original order; selected axes follow in
+ASC/MC/DSC/IC order, independently of the selection argument's order. Axes can
+also be the only aspect participants, but `objects` must still contain at least
+one body/node. See [axis geometry and pairing](aspects.md#select-axes-explicitly).
+
+## Give an object its own orb
 
 Use `ObjectOrb` to set an object's orb separately; other objects use the rule's
 `orb_degrees`. If any rule uses `ObjectOrb`, you must choose `orb_combination` to
 combine the pair's orbs into one limit. Otherwise, leave `orb_combination` out.
-`aspect_objects` selects requested bodies/nodes and may also explicitly add `Axis`
-members. If omitted, all requested bodies/nodes take part and no axes are added.
 You can set a separate orb only for a participating identity, including an axis.
-`objects` itself still accepts only `Body` and `LunarNode`, not axes.
 
 ```{doctest}
 >>> from astrology import LunarNode, ObjectOrb, OrbCombination
@@ -97,20 +123,6 @@ ValueError: orb_combination is required when aspect rules have object orbs
 
 NaN, infinity, negative orbs, booleans, unsupported modes, and inconsistent
 selections fail under normal Python and `python -O`.
-
-```{doctest}
->>> from astrology import Axis
->>> with_axes = ChartConfig(HouseSystem.WHOLE_SIGN, (Body.SUN,),
-...   (AspectRule(MajorAspect.SEXTILE, 3),),
-...   aspect_objects=(Axis.IMUM_COELI, Body.SUN, Axis.MIDHEAVEN))
->>> [value.value for value in with_axes.aspect_participants()]
-['sun', 'midheaven', 'imum_coeli']
-```
-
-Requested bodies/nodes keep their original order; selected axes follow in
-ASC/MC/DSC/IC order, independently of the selection argument's order. Axes can
-also be the only aspect participants, but `objects` must still contain at least
-one body/node. See [axis geometry and pairing](aspects.md#select-axes-explicitly).
 
 The defining enums and API contracts are generated in the [reference](reference.md).
 Actual astronomy models, versions, time scales, and effective calculation
