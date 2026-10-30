@@ -61,6 +61,7 @@ PACKAGE_FILES = (
   "astrology/lunar_phase.py",
   "astrology/objects.py",
   "astrology/summaries.py",
+  "astrology/svg.py",
   "astrology/text.py",
   "astrology/zodiac.py",
   "astrology/knowledge/__init__.py",
@@ -196,6 +197,7 @@ def check_examples(report: str) -> None:
       "cross_aspects",
       "summaries",
       "dignities",
+      "svg",
       "records",
       "knowledge",
     ):
@@ -689,6 +691,7 @@ def check_installed_wheel(source: Path, wheel: Path, version: str, directory: Pa
     acceptance_house_overlays,
     chart_observations,
     comparison_observations,
+    svg_observations,
   )
 
   environment = directory / "consumer"
@@ -705,6 +708,8 @@ def check_installed_wheel(source: Path, wheel: Path, version: str, directory: Pa
     encoding="utf-8",
   )
   script = source / "tools/installed_check.py"
+  svg_values = directory / "expected-svg.json"
+  svg_values.write_text(svg_observations(), encoding="utf-8")
   for mode in ((), ("-O",)):
     run(
       (str(python), *mode, "-I", str(script), version, corpus_version, "--knowledge-only"),
@@ -723,6 +728,8 @@ def check_installed_wheel(source: Path, wheel: Path, version: str, directory: Pa
         str(observations),
         "--expected-cross-observations",
         str(cross_values),
+        "--expected-svg",
+        str(svg_values),
       ),
       cwd=directory,
     )

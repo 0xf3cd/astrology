@@ -39,6 +39,7 @@ _EXAMPLE_PAGES = (
   "cross_aspects",
   "summaries",
   "dignities",
+  "svg",
   "records",
   "knowledge",
 )

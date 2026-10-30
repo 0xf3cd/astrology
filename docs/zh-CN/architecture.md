@@ -28,6 +28,7 @@ src/astrology/
   dignities.py      传统星座守护及入庙、擢升、失势、落陷判断
   summaries.py      显式选定对象的统计及给定命盘摘要
   text.py           用传入词汇显示结果表格
+  svg.py            用传入词汇显示静态轮盘与矩阵
   knowledge/        概念、来源、条目及独立查询
 tests/              领域测试与真实安装消费测试
 docs/en/            英文指南与说明

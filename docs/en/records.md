@@ -7,6 +7,8 @@ values or pass it to `format_chart` with an explicit knowledge catalog. The
 package provides no chart save/restore API or storage schema; see the
 [release notes](releases.md) for the API removal.
 
+For a natal wheel or an aspect matrix, pass the same results to the [SVG renderers](svg.md).
+
 ## A complete example
 
 This synthetic record falls in the half-hour repeated when clocks move back on

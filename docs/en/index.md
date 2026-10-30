@@ -22,6 +22,7 @@ cross_aspects
 summaries
 dignities
 records
+svg
 reference
 architecture
 knowledge

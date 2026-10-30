@@ -11,6 +11,7 @@ from importlib.metadata import PackageNotFoundError, distribution, version
 from importlib.resources import files
 from pathlib import Path
 from typing import Any, Literal, cast
+from xml.etree import ElementTree as ET
 
 import astrology
 from astrology.knowledge import (
@@ -39,6 +40,7 @@ MODULES = (
   "lunar_phase",
   "objects",
   "summaries",
+  "svg",
   "text",
   "zodiac",
 )
@@ -290,6 +292,94 @@ def comparison_observations(
     },
   }
   return json.dumps(values, sort_keys=True, allow_nan=False)
+
+
+def acceptance_svg_chart() -> astrology.NatalChart:
+  """Construct a synthetic wheel with both node definitions and independent axes.
+
+  构造包含两种交点定义及独立四轴的合成轮盘。
+  """
+  from astrology.chart import _aspects
+
+  coordinates = tuple(
+    zip(
+      (*astrology.Body, *astrology.LunarNode),
+      (359.95, 0.05, 32, 64, 98, 132, 166, 203, 246, 284, 310, 130, 312, 132),
+      strict=True,
+    )
+  )
+  source = _cross_source(
+    2000,
+    "svg",
+    coordinates,
+    axes=(22, 111, 204, 291),
+    house_system=astrology.HouseSystem.PLACIDUS,
+    cusps_deg=(20, 42, 70, 110, 140, 170, 200, 222, 250, 290, 320, 350),
+  )
+  config = astrology.ChartConfig(
+    source.requested.house_system,
+    source.requested.objects,
+    tuple(
+      astrology.AspectRule(aspect, 1, (astrology.ObjectOrb(astrology.Body.SUN, 3),))
+      for aspect in astrology.MajorAspect
+    ),
+    aspect_objects=(*source.requested.objects, *astrology.Axis),
+    orb_combination=astrology.OrbCombination.MEAN_OF_ORBS,
+  )
+  return replace(
+    source,
+    requested=config,
+    effective=replace(
+      source.effective,
+      aspect_objects=config.aspect_participants(),
+      orb_combination=config.orb_combination,
+    ),
+    aspects=_aspects(source.positions, source.houses, config),
+  )
+
+
+def svg_observations() -> str:
+  """Render all three SVG outputs in both languages from pure synthetic inputs.
+
+  用纯合成输入生成三种 SVG 的中英文输出。
+  """
+  chart = acceptance_svg_chart()
+  comparison = acceptance_cross_aspects()
+  catalog = astrology.load_catalog()
+  return json.dumps(
+    {
+      language: {
+        "wheel": astrology.render_natal_wheel(chart, catalog, language=language),
+        "natal": astrology.render_natal_matrix(chart, catalog, language=language),
+        "cross": astrology.render_cross_matrix(comparison, catalog, language=language),
+      }
+      for language in ("en", "zh-CN")
+    },
+    sort_keys=True,
+    ensure_ascii=True,
+  )
+
+
+def _check_svg(expected: Path | None = None) -> None:
+  """Check SVG structure and exact source/install agreement when supplied.
+
+  检查 SVG 结构；给定源码检查值时，逐字比较安装输出。
+  """
+  observed = svg_observations()
+  values = json.loads(observed)
+  for language in ("en", "zh-CN"):
+    for kind in ("wheel", "natal", "cross"):
+      root = ET.fromstring(values[language][kind])
+      if root.tag != "{http://www.w3.org/2000/svg}svg" or root.get("role") != "img":
+        raise ValueError("Installed SVG lost its accessible root")
+      if root.get("{http://www.w3.org/XML/1998/namespace}lang") != language:
+        raise ValueError("Installed SVG lost its language")
+      positions = root.findall(".//*[@data-role='position']")
+      if kind == "wheel" and len(positions) != 18:
+        raise ValueError("Installed SVG lost stored positions or axes")
+  if expected is not None and observed != expected.read_text(encoding="utf-8"):
+    raise ValueError("Installed SVG differs from the development entry point")
+  _check_native_isolation()
 
 
 def _check_cross_chart(expected_observations: Path | None = None) -> None:
@@ -920,19 +1010,22 @@ def main(
   knowledge_only: bool = False,
   expected_observations: Path | None = None,
   expected_cross_observations: Path | None = None,
+  expected_svg: Path | None = None,
 ) -> None:
   """Check installed identity, API and isolation; compare a supplied corpus version.
 
   None skips corpus comparison. CLI: CODE_VERSION CORPUS_VERSION [--knowledge-only]
-  [--expected-observations PATH] [--expected-cross-observations PATH]. Optional
+  [--expected-observations PATH] [--expected-cross-observations PATH]
+  [--expected-svg PATH]. Optional
   check-run files hold exact source observations, including raw numbers, input,
   configuration and provenance for natal and comparison results, plus bilingual
-  comparison text.
+  comparison text. The SVG file holds all three figures in both languages.
 
   检查安装包身份、API 及隔离，并比较传入的语料版本。None 跳过语料版本比较。
   CLI 参数顺序：CODE_VERSION CORPUS_VERSION [--knowledge-only] [--expected-observations PATH]。
   另可给 --expected-cross-observations PATH。可选的本次检查文件分别保存本命及双盘的源码
-  精确检查值，包括原始数值、输入、配置和来源，以及双语比较文本。
+  精确检查值，包括原始数值、输入、配置和来源，以及双语比较文本。--expected-svg PATH
+  指定的文件保存三种图形的中英文输出。
   """
   metadata = distribution("celestial-astrology")
   for module in (astrology, *(import_module("astrology." + name) for name in MODULES)):
@@ -959,6 +1052,7 @@ def main(
   _check_dignities()
   _check_native_isolation()
   _check_cross_chart(expected_cross_observations)
+  _check_svg(expected_svg)
   _check_natal_chart(expected_observations)
   print(f"Installed celestial-astrology {metadata.version}; optimized={sys.flags.optimize}")
 
@@ -978,5 +1072,8 @@ if __name__ == "__main__":
         sys.argv[sys.argv.index("--expected-cross-observations") + 1]
       )
       if "--expected-cross-observations" in sys.argv[3:]
+      else None,
+      expected_svg=Path(sys.argv[sys.argv.index("--expected-svg") + 1])
+      if "--expected-svg" in sys.argv[3:]
       else None,
     )

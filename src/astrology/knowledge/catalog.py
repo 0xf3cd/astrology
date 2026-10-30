@@ -28,6 +28,7 @@ from astrology.knowledge.records import (
   RuleVariant,
   Source,
   SourceVerification,
+  TranslationStatus,
   _identifier,
   _language,
   _text,
@@ -256,6 +257,30 @@ class Catalog:
 
 def _sign_concept(catalog: Catalog, sign: Sign) -> Concept:
   return catalog.concept(f"sign.{sign.value}")
+
+
+def _current_name(concept: Concept, language: Language) -> str:
+  """Read a current localized name without output escaping. 读取当前名称，不做输出转义。"""
+  if concept.name.status(language) is not TranslationStatus.CURRENT:
+    raise ValueError(f"Missing or stale {language} name for {concept.identifier}")
+  name = concept.name.text(language)
+  if name is None:
+    raise ValueError(f"Missing {language} name for {concept.identifier}")
+  return name
+
+
+def _configuration_name(
+  identity: ConfigurationIdentity | Sign, catalog: Catalog, language: Language
+) -> str:
+  """Resolve a supplied identity to its current name. 按给定标识查当前名称。"""
+  if isinstance(identity, Sign):
+    concept = _sign_concept(catalog, identity)
+  else:
+    matches = [concept for concept in catalog.concepts if concept.configuration is identity]
+    if len(matches) != 1:
+      raise ValueError(f"Expected one catalog concept for {identity.value}")
+    concept = matches[0]
+  return _current_name(concept, language)
 
 
 def _config_reference(raw: Any) -> ConfigurationIdentity | None:

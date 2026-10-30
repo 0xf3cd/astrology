@@ -32,6 +32,7 @@ src/astrology/
   dignities.py      Traditional sign rulers and domicile/exaltation/detriment/fall
   summaries.py      Explicit-population statistics and supplied-chart summaries
   text.py           Result tables with supplied vocabulary
+  svg.py            Static wheels and matrices with supplied vocabulary
   knowledge/        Concepts, sources, entries, and independent queries
 tests/              Domain tests and installed-consumer tests
 docs/en/            English guides and explanations
