@@ -18,7 +18,7 @@ from astrology.knowledge import Catalog
 from astrology.knowledge.catalog import _configuration_name
 from astrology.knowledge.records import _LANGUAGES, Language
 from astrology.objects import Axis, ChartObject, LunarNode
-from astrology.zodiac import Sign
+from astrology.zodiac import Sign, _whole_arcseconds
 
 _Hit = AspectHit | CrossAspectHit
 _Coordinates = tuple[tuple[ChartObject, float], ...]
@@ -63,7 +63,7 @@ _LABELS = {
     "deviation": "deviation",
     "limit": "orb limit",
     "motion": "motion",
-    "display": "Displayed angles use six significant digits; geometry and stored hit values are not rounded.",
+    "display": "Longitudes truncate to whole arcseconds; rule orbs and cell branches use six significant digits. Geometry and full hit details keep stored values.",
     "signs": "Zodiac sectors",
     "houses": "House cusps",
   },
@@ -94,7 +94,7 @@ _LABELS = {
     "deviation": "偏差",
     "limit": "容许度上限",
     "motion": "运动",
-    "display": "显示角度取六位有效数字；几何和已存相位数值不舍入。",
+    "display": "黄经按整角秒截断；规则容许度和格内分支取六位有效数字。几何与完整相位详情保留已存数值。",
     "signs": "黄道扇区",
     "houses": "宫头",
   },
@@ -232,6 +232,12 @@ def _degree(value: float, *, signed: bool = False) -> str:
   return format(value, "+.6g" if signed else ".6g") + "°"
 
 
+def _longitude_text(value: float) -> str:
+  degrees, remainder = divmod(_whole_arcseconds(value), 3600)
+  minutes, seconds = divmod(remainder, 60)
+  return f"{degrees}°{minutes:02d}\u2032{seconds:02d}″"
+
+
 def _chart_lines(chart: NatalChart, catalog: Catalog, language: Language) -> list[str]:
   labels = _LABELS[language]
   return [
@@ -291,7 +297,7 @@ def _object_key(
     return _lines(parent, [_LABELS[language]["no_objects"]], y, width)
   for index, (identity, longitude) in enumerate(coordinates, start=1):
     name = _configuration_name(identity, catalog, language)
-    value = f"{prefix}{index} · {name} [{identity.value}] · {_degree(longitude)}"
+    value = f"{prefix}{index} · {name} [{identity.value}] · {_longitude_text(longitude)}"
     if isinstance(identity, LunarNode):
       value += (
         f" · {_LABELS[language]['definition']}: "
@@ -472,18 +478,20 @@ def _callout_positions(
 
 
 def render_natal_wheel(chart: NatalChart, catalog: Catalog, *, language: Language = "en") -> str:
-  """Return a standalone natal SVG with true anchors, displaced callouts and a full key.
+  """Return a natal SVG with true anchors, displaced callouts and object/cusp lists.
 
   Draw every stored position and all four axes; chords use chart.aspects unchanged.
-  ASC is left, longitude increases counterclockwise. Natural width is at least
-  1000 CSS pixels; the key grows in height. No I/O or astronomy is performed.
-  Wrong concrete input types raise TypeError; invalid language, missing/stale or
+  ASC is left, longitude increases counterclockwise. Natural width is 1000 CSS
+  pixels; lists grow in height. Longitude text truncates to whole arcseconds.
+  No I/O or astronomy is performed. Require exact NatalChart and Catalog types;
+  wrong types, including subclasses, raise TypeError. Invalid language, missing/stale or
   ambiguous required names and XML-invalid text raise ValueError (a missing sign
   ID raises KeyError). A local CJK font is needed for Chinese. Inputs are unchanged.
 
-  返回独立的本命盘 SVG，保留真实锚点，用避让标签和完整索引说明对象。画出全部已存位置和四轴，
-  连线直接使用 chart.aspects。上升点在左，黄经沿逆时针递增；自然宽度至少 1000 CSS 像素，
-  索引按内容增高。不执行 I/O 或天文计算。输入具体类型错误抛 TypeError；语言无效、必要名称
+  返回本命盘 SVG，保留真实锚点，提供避让标签及对象、宫头列表。画出全部已存位置和四轴，
+  连线直接使用 chart.aspects。上升点在左，黄经沿逆时针递增；自然宽度为 1000 CSS 像素，
+  列表按内容增高，黄经文字按整角秒截断。不执行 I/O 或天文计算。要求输入类型恰为 NatalChart
+  和 Catalog，不接受子类，类型错误抛 TypeError；语言无效、必要名称
   缺失、陈旧、绑定不唯一或文字不符合 XML 时抛 ValueError，缺少星座 ID 时为 KeyError。
   中文需要查看器有 CJK 字体，不修改输入。
   """
@@ -591,7 +599,7 @@ def render_natal_wheel(chart: NatalChart, catalog: Catalog, *, language: Languag
   y = _text(
     root,
     "; ".join(
-      f"{index}: {_degree(longitude)}"
+      f"{index}: {_longitude_text(longitude)}"
       for index, longitude in enumerate(chart.houses.cusps_deg, start=1)
     ),
     _MARGIN,
@@ -743,13 +751,13 @@ def render_natal_matrix(chart: NatalChart, catalog: Catalog, *, language: Langua
   Rows are first objects and columns second objects, in effective.aspect_objects
   order, including participants with no hits. Every branch is shown; descriptions
   keep full stored deviations, limits and motion. Natural dimensions grow with
-  participants, hits and keys. No I/O or astronomy occurs. Exact input types are
+  participants, hits and object lists. No I/O or astronomy occurs. Exact input types are
   required; type/name/language/XML errors and font needs follow render_natal_wheel.
 
   返回全部已存本命相位的上三角 SVG 矩阵。行是第一对象，列是第二对象，按
   effective.aspect_objects 排列，保留没有命中的参与对象。逐条显示分支，描述保留完整的
-  已存偏差、上限及运动。自然尺寸随对象、命中和索引增大。不执行 I/O 或天文计算；要求具体
-  输入类型；类型、名称、语言、XML 错误及字体要求同 render_natal_wheel。
+  已存偏差、上限及运动。自然尺寸随对象、命中和对象列表增大。不执行 I/O 或天文计算；不接受
+  输入类型的子类，类型、名称、语言、XML 错误及字体要求同 render_natal_wheel。
   """
   if type(chart) is not NatalChart:
     raise TypeError("chart must be a NatalChart")
@@ -787,15 +795,17 @@ def render_cross_matrix(
 ) -> str:
   """Return a static SVG matrix with left-chart rows and right-chart columns.
 
-  Recorded side orders, empty selections and every hit/branch are preserved.
+  Preserve recorded side orders (chart positions, then selected axes), empty
+  selections and every hit/branch, not selection-argument order.
   Descriptions retain full stored deviations/limits; no motion is inferred or
   displayed. Both source house systems and the comparison's own rules are named.
   No I/O or astronomy occurs; natural dimensions grow with contents. Exact input
   types are required. Other errors and font needs follow render_natal_wheel.
 
-  返回以左盘为行、右盘为列的静态 SVG 矩阵。保留两侧已存顺序、空选择及全部命中和分支；
+  返回以左盘为行、右盘为列的静态 SVG 矩阵。按两侧已存位置、再按所选轴的顺序排列，
+  不按选择参数的顺序排列。保留空选择及全部命中和分支；
   描述保留完整的已存偏差及上限，不推断或显示运动。说明两盘宫制和本次比较自己的规则。
-  不执行 I/O 或天文计算，自然尺寸随内容增大；要求具体输入类型，其他错误及字体要求同
+  不执行 I/O 或天文计算，自然尺寸随内容增大；不接受输入类型的子类，其他错误及字体要求同
   render_natal_wheel。
   """
   if type(comparison) is not CrossChartAspects:

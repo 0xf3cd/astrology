@@ -1,6 +1,6 @@
 # SVG wheels and aspect matrices
 
-[简体中文](../zh-CN/svg.md) · [Chart results](records.md) · [API](reference.md)
+[简体中文](../zh-CN/svg.md) · [Configuration](configuration.md) · [Cross-chart comparison](cross_aspects.md) · [Chart results](records.md) · [API](reference.md)
 
 Pass a chart and a loaded catalog to `render_natal_wheel` or `render_natal_matrix`.
 For two charts, first choose comparison rules with `cross_chart_aspects`, then
@@ -60,16 +60,23 @@ counterclockwise. It draws all stored bodies/nodes and all four actual axes,
 including objects not selected for aspects. House spokes use the actual cusps;
 MC need not be the top of the page or the tenth cusp. Labels move to numbered
 callouts with leaders; position ticks and chord endpoints keep unrounded angles.
-The key gives each identity, its longitude and each node's definition. Long sign
-names use `S1` through `S12` with a full-name key.
-House numbers that would overlap on the wheel are omitted there; the cusp key
+Choose the stored bodies/nodes with `ChartConfig.objects` when building the chart;
+the wheel always adds all four axes. The "Objects and stored longitudes" list
+gives each identity, longitude and node definition. A sign name too long for its
+sector uses `S1` through `S12`; "Zodiac sectors" then lists the abbreviated signs'
+full names. Built-in Chinese names fit, so the Chinese sample needs no such list.
+House numbers that would overlap on the wheel are omitted there; "House cusps"
 always lists all twelve house numbers and longitudes.
 
-The natal matrix follows `chart.effective.aspect_objects`. Rows are the first
-objects and columns the second objects; each pair appears once above the diagonal.
+Choose natal participants with `ChartConfig.aspect_objects`; the matrix follows
+the resulting `chart.effective.aspect_objects`. Rows are the first objects and
+columns the second objects; each pair appears once above the diagonal.
 Participants without hits remain visible. No aspect rules means no participants.
-The cross matrix follows `comparison.left_objects` in rows (`L`) and
-`right_objects` in columns (`R`); the two Suns remain separate. An empty selection
+For a cross matrix, choose each side with `cross_chart_aspects(left_objects=...,
+right_objects=...)`. Rows follow the recorded `comparison.left_objects` (`L`),
+columns `comparison.right_objects` (`R`); the two Suns remain separate. Both
+matrices use each chart's stored body/node order, then selected axes in
+ASC/MC/DSC/IC order, not the order of the selection argument. An empty selection
 leaves that side empty. Cross-chart node pairs are retained; within one natal
 chart, nodes do not pair with each other.
 
@@ -80,6 +87,11 @@ also retain motion. Static cross-chart results never infer motion. Wheel chords
 use only `chart.aspects`, and the cross matrix uses the comparison's rules, not
 the source charts' natal rules. Configuration sections name the house systems,
 coordinate identifiers, model/version labels and aspect/orb choices.
+
+Printed longitudes truncate to whole arcseconds and use degree/minute/second
+notation: a value just below 360° prints as `359°59′59″`, not `360°`. Rule orbs
+and cell branches use six significant digits. Drawn geometry and full stored
+hit details keep the supplied values.
 
 ### English samples
 
@@ -94,8 +106,9 @@ records and calls above; their source notes are not printed.
 
 ## Size, fonts and errors
 
-The wheel is 1000 CSS pixels wide. Matrices have a minimum width of 1000 pixels
-and grow by 68 pixels per column after the row header and margins exceed it.
+The wheel is 1000 CSS pixels wide. A matrix has a minimum width of 1000 pixels.
+It grows when the combined width of its columns, row header and margins exceeds
+that minimum; each column takes 68 pixels. For example, 13 columns need 1014 pixels.
 Cell height grows to retain every hit; wrapped keys/configuration grow the figure
 height. There is no size or theme parameter. Inspect the root `width`, `height`
 and `viewBox` for the actual natural dimensions. Scaling down in a page also
@@ -106,7 +119,10 @@ font or remote resource, and uses ordinary text instead of astrology glyphs.
 Chinese needs a local CJK-capable fallback. Layout uses conservative Unicode
 budgets; recipient font metrics and pixel output can differ across viewers.
 
-Wrong concrete chart/comparison/catalog types raise `TypeError`. Invalid language,
+The chart, comparison and catalog must have exactly the `NatalChart`,
+`CrossChartAspects` and `Catalog` types respectively. Wrong types, including
+subclasses, raise `TypeError`.
+Invalid language,
 missing/stale translations, ambiguous or missing identity bindings and XML 1.0
 invalid text raise `ValueError`; a missing sign ID raises `KeyError`. There is no
 English fallback. XML-special characters remain text; XML-valid nonprinting

@@ -7,7 +7,7 @@ import subprocess
 import sys
 import unicodedata
 from collections.abc import Callable
-from dataclasses import replace
+from dataclasses import fields, replace
 from itertools import pairwise
 from typing import Any
 from xml.etree import ElementTree as ET
@@ -20,9 +20,13 @@ from astrology import (
   Body,
   Catalog,
   ChartConfig,
+  HouseSystem,
   LunarNode,
   MajorAspect,
   NatalChart,
+  ObjectOrb,
+  OrbCombination,
+  Sign,
   cross_chart_aspects,
   load_catalog,
   render_cross_matrix,
@@ -59,7 +63,11 @@ def _configured(source: NatalChart, *, orb: float = 180, objects: Any = None) ->
   return replace(
     source,
     requested=config,
-    effective=replace(source.effective, aspect_objects=config.aspect_participants()),
+    effective=replace(
+      source.effective,
+      aspect_objects=config.aspect_participants(),
+      orb_combination=config.orb_combination,
+    ),
     aspects=_aspects(source.positions, source.houses, config),
   )
 
@@ -74,6 +82,280 @@ def _catalog_name(catalog: Catalog, identity: str, name: str) -> Catalog:
       for c in catalog.concepts
     ),
   )
+
+
+def _drawn_text(root: ET.Element) -> str:
+  return "".join("".join(node.text or "" for node in root.iter(_SVG + "text")).split())
+
+
+@pytest.mark.parametrize("language", ["en", "zh-CN"])
+@pytest.mark.parametrize("renderer,_factory", _RENDERERS)
+def test_svg_metadata_keeps_configuration_and_rule_ownership(
+  renderer: Callable[..., str], _factory: Callable[[], Any], language: Language
+) -> None:
+  left = acceptance_svg_chart()
+  right = _cross_source(2001, "svg-right", ((Body.SUN, 40),), house_system=HouseSystem.EQUAL)
+  comparison = cross_chart_aspects(
+    left,
+    right,
+    (AspectRule(MajorAspect.SEXTILE, 7, (ObjectOrb(Body.SUN, 9),)),),
+    combination=OrbCombination.MEAN_OF_ORBS,
+  )
+  catalog = load_catalog()
+  root = ET.fromstring(
+    renderer(comparison if renderer is render_cross_matrix else left, catalog, language=language)
+  )
+  drawn = _drawn_text(root)
+  system, coordinates, times, models, combination = {
+    "en": (
+      "House system",
+      "Zodiac / center / position frame",
+      "JD(UT1) / JDE(TT)",
+      "Delta-T model / astrology / celestial-calendar",
+      "Orb combination",
+    ),
+    "zh-CN": (
+      "宫制",
+      "黄道 / 中心 / 位置坐标约定",
+      "JD(UT1) / JDE(TT)",
+      "ΔT 模型 / astrology / celestial-calendar",
+      "容许度合成规则",
+    ),
+  }[language]
+  sources = (left, right) if renderer is render_cross_matrix else (left,)
+  for chart in sources:
+    name = catalog.concept(f"house.{chart.effective.house_system.value}").name.text(language)
+    expected = (
+      f"{system}: {name}",
+      f"{coordinates}: {chart.requested.zodiac} / {chart.requested.center} / {chart.provenance.position_frame}",
+      f"{times}: {chart.times.jd_ut1} / {chart.times.jde_tt}",
+      f"{models}: {chart.effective.delta_t_model} / {chart.provenance.astrology_version} / {chart.provenance.celestial_version}",
+    )
+    for fragment in expected:
+      assert "".join(fragment.split()) in drawn
+  aspect = MajorAspect.SEXTILE if renderer is render_cross_matrix else MajorAspect.CONJUNCTION
+  name = catalog.concept(f"aspect.{aspect.value}").name.text(language)
+  sun = catalog.concept("body.sun").name.text(language)
+  base, override = (7, 9) if renderer is render_cross_matrix else (1, 3)
+  assert "".join(f"{name}: {base}°; {sun}={override}°".split()) in drawn
+  assert "".join(f"{combination}: mean_of_orbs".split()) in drawn
+  if renderer is render_cross_matrix:
+    assert "Conjunction:1°" not in drawn and "合相:1°" not in drawn
+
+
+@pytest.mark.parametrize("language", ["en", "zh-CN"])
+def test_wheel_drawn_geometry_and_callout_ownership(language: Language) -> None:
+  source = _cross_source(
+    2000,
+    "drawn-geometry",
+    ((Body.SUN, 0), (Body.MOON, 90), (Body.MERCURY, 180), (Body.VENUS, 270)),
+    axes=(0, 90, 180, 270),
+    cusps_deg=(0, 20, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330),
+  )
+  chart = _configured(source, orb=0)
+  root = ET.fromstring(render_natal_wheel(chart, load_catalog(), language=language))
+  identities = [n.attrib["data-identity"] for n in _roles(root, "object-key")]
+  for index, group in enumerate(_roles(root, "position"), start=1):
+    assert group.attrib["data-identity"] == identities[index - 1]
+    tick, leader = _roles(group, "position-tick")[0], _roles(group, "leader")[0]
+    start, end = (tuple(map(float, pair.split(","))) for pair in leader.attrib["points"].split())
+    assert start == (float(tick.attrib["x1"]), float(tick.attrib["y1"]))
+    box, label = _roles(group, "callout-box")[0], _roles(group, "callout-label")[0]
+    assert label.text == str(index)
+    assert end == (float(box.attrib["x"]) + 16, float(box.attrib["y"]) + 11)
+    assert float(label.attrib["x"]) == end[0]
+  endpoints = {"sun": (334, 430), "moon": (500, 596), "mercury": (666, 430), "venus": (500, 264)}
+  assert _roles(root, "aspect")
+  for group in _roles(root, "aspect"):
+    line = group.find(_SVG + "line")
+    assert line is not None
+    assert tuple(float(line.attrib[key]) for key in ("x1", "y1", "x2", "y2")) == pytest.approx(
+      (*endpoints[group.attrib["data-first"]], *endpoints[group.attrib["data-second"]]), abs=1e-10
+    )
+  outer: dict[float, tuple[int, int]] = {
+    0: (260, 430),
+    90: (500, 670),
+    180: (740, 430),
+    270: (500, 190),
+  }
+  inner: dict[float, tuple[int, int]] = {
+    0: (330, 430),
+    90: (500, 600),
+    180: (670, 430),
+    270: (500, 260),
+  }
+  for axis in _roles(root, "axis"):
+    assert (float(axis.attrib["x1"]), float(axis.attrib["y1"])) == (500, 430)
+    assert (float(axis.attrib["x2"]), float(axis.attrib["y2"])) == pytest.approx(
+      outer[float(axis.attrib["data-longitude"])], abs=1e-10
+    )
+  for cusp in _roles(root, "house-cusp"):
+    longitude = float(cusp.attrib["data-longitude"])
+    if longitude in outer:
+      assert tuple(float(cusp.attrib[key]) for key in ("x1", "y1", "x2", "y2")) == pytest.approx(
+        (*inner[longitude], *outer[longitude]), abs=1e-10
+      )
+  path = _roles(root, "zodiac-sector")[0].find(_SVG + "path")
+  assert path is not None
+  tokens = path.attrib["d"].split()
+  commands = (0, 3, 11, 14, 22)
+  assert [tokens[i] for i in commands] == ["M", "A", "L", "A", "Z"]
+  assert [float(token) for i, token in enumerate(tokens) if i not in commands] == pytest.approx(
+    [
+      222,
+      430,
+      278,
+      278,
+      0,
+      0,
+      0,
+      500 - 139 * math.sqrt(3),
+      569,
+      500 - 120 * math.sqrt(3),
+      550,
+      240,
+      240,
+      0,
+      0,
+      1,
+      260,
+      430,
+    ],
+    abs=1e-10,
+  )
+
+
+@pytest.mark.parametrize("language", ["en", "zh-CN"])
+def test_long_sign_names_have_correct_codes_and_complete_names(language: Language) -> None:
+  catalog = load_catalog()
+  names = [f"LongSign{index}" + "W" * 80 for index in range(1, 13)]
+  for sign, name in zip(Sign, names, strict=True):
+    catalog = _catalog_name(catalog, f"sign.{sign.value}", name)
+  root = ET.fromstring(render_natal_wheel(acceptance_svg_chart(), catalog, language=language))
+  assert [node.text for node in _roles(root, "sign-label")] == [
+    f"S{index}" for index in range(1, 13)
+  ]
+  drawn = _drawn_text(root)
+  for index, name in enumerate(names, start=1):
+    assert f"S{index}·{name}" in drawn
+
+
+@pytest.mark.parametrize(
+  "name,expected", [("A" * 10, "A" * 10), ("A" * 11, "S1"), ("宽" * 5, "宽" * 5), ("宽" * 6, "S1")]
+)
+def test_sign_short_label_threshold(name: str, expected: str) -> None:
+  catalog = _catalog_name(load_catalog(), "sign.aries", name)
+  root = ET.fromstring(render_natal_wheel(acceptance_svg_chart(), catalog))
+  assert _roles(root, "sign-label")[0].text == expected
+
+
+@pytest.mark.parametrize("renderer,factory", _RENDERERS)
+@pytest.mark.parametrize("catalog_subclass", [False, True])
+def test_svg_rejects_exact_input_subclasses(
+  renderer: Callable[..., str], factory: Callable[[], Any], catalog_subclass: bool
+) -> None:
+  value, catalog = factory(), load_catalog()
+  original = catalog if catalog_subclass else value
+  subclass = type("DerivedInput", (type(original),), {})
+  derived = subclass(**{field.name: getattr(original, field.name) for field in fields(original)})
+  with pytest.raises(TypeError):
+    renderer(value, derived) if catalog_subclass else renderer(derived, catalog)
+
+
+@pytest.mark.parametrize("language", ["en", "zh-CN"])
+def test_bottom_cluster_uses_backward_callout_clamp(language: Language) -> None:
+  chart = _cross_source(
+    2000,
+    "bottom-cluster",
+    tuple((identity, 90) for identity in (*Body, *LunarNode)),
+    axes=(0, 90, 90, 90),
+  )
+  root = ET.fromstring(render_natal_wheel(chart, load_catalog(), language=language))
+  centers = sorted(float(node.attrib["y"]) + 11 for node in _roles(root, "callout-box"))
+  assert len(centers) == 18 and centers[-1] == 686
+  assert centers[0] >= 192
+  assert all(right - left >= 26 for left, right in pairwise(centers))
+
+
+@pytest.mark.parametrize("language", ["en", "zh-CN"])
+@pytest.mark.parametrize("columns,expected", [(12, 1000), (13, 1014), (18, 1354)])
+def test_matrix_width_growth_uses_column_count(
+  language: Language, columns: int, expected: int
+) -> None:
+  chart = acceptance_svg_chart()
+  identities = (*chart.requested.objects, *Axis)
+  chart = _configured(chart, orb=0, objects=identities[:columns])
+  comparison = cross_chart_aspects(
+    chart, chart, (), left_objects=(Body.SUN,), right_objects=identities[:columns]
+  )
+  catalog = load_catalog()
+  for svg in (
+    render_natal_matrix(chart, catalog, language=language),
+    render_cross_matrix(comparison, catalog, language=language),
+  ):
+    root = ET.fromstring(svg)
+    assert len(_roles(root, "column-label")) == columns
+    assert int(root.attrib["width"]) == expected
+
+
+@pytest.mark.parametrize(
+  "language,empty,no_hits",
+  [("en", "No selected objects", "No matching aspects"), ("zh-CN", "未选择对象", "无相位命中")],
+)
+def test_svg_empty_status_labels(language: Language, empty: str, no_hits: str) -> None:
+  chart = _cross_source(2000, "status", ((Body.SUN, 13),))
+  catalog = load_catalog()
+  for svg in (
+    render_natal_matrix(chart, catalog, language=language),
+    render_cross_matrix(
+      cross_chart_aspects(chart, chart, (), left_objects=(), right_objects=()),
+      catalog,
+      language=language,
+    ),
+  ):
+    drawn = _drawn_text(ET.fromstring(svg))
+    assert "".join(empty.split()) in drawn and "".join(no_hits.split()) in drawn
+  assert "".join(no_hits.split()) in _drawn_text(
+    ET.fromstring(render_natal_wheel(chart, catalog, language=language))
+  )
+
+
+@pytest.mark.parametrize("renderer,_factory", _RENDERERS)
+@pytest.mark.parametrize("language", ["en", "zh-CN"])
+@pytest.mark.parametrize(
+  "longitude,expected",
+  [
+    (0.0, "0°00\u203200″"),
+    (1e-8, "0°00\u203200″"),
+    (0.5, "0°30\u203200″"),
+    (1.25, "1°15\u203200″"),
+    (math.nextafter(30, 0), "29°59\u203259″"),
+    (30.0, "30°00\u203200″"),
+    (359.99994, "359°59\u203259″"),
+    (math.nextafter(360, 0), "359°59\u203259″"),
+  ],
+)
+def test_svg_longitude_text_never_crosses_a_boundary(
+  renderer: Callable[..., str],
+  _factory: Callable[[], Any],
+  language: Language,
+  longitude: float,
+  expected: str,
+) -> None:
+  source = _cross_source(
+    2000,
+    "boundary",
+    ((Body.SUN, longitude),),
+    cusps_deg=tuple((longitude + index * 30) % 360 for index in range(12)),
+  )
+  chart = _configured(source, orb=0, objects=(Body.SUN,))
+  value = cross_chart_aspects(chart, chart, ()) if renderer is render_cross_matrix else chart
+  root = ET.fromstring(renderer(value, load_catalog(), language=language))
+  key = next(node for node in _roles(root, "object-key") if node.get("data-identity") == "sun")
+  assert key.attrib["data-longitude"] == str(longitude)
+  assert expected in _drawn_text(key)
+  if renderer is render_natal_wheel:
+    assert f"1:{expected}" in _drawn_text(_roles(root, "house-key")[0])
 
 
 @pytest.mark.parametrize("language", ["en", "zh-CN"])
