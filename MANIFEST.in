@@ -1,6 +1,6 @@
 include .gitattributes AGENTS.md README.zh-CN.md uv.lock
 include .github/workflows/checks.yml .github/workflows/release.yml
-recursive-include docs *.md *.py *.html
+recursive-include docs *.md *.py *.html *.svg
 recursive-include tests *.py
 recursive-include tests/reference *.json *.txt
 recursive-include tools *.py

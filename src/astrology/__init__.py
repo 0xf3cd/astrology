@@ -67,6 +67,7 @@ from astrology.summaries import (
   natal_lunar_phase,
   sign_distribution,
 )
+from astrology.svg import render_cross_matrix, render_natal_matrix, render_natal_wheel
 from astrology.text import (
   format_chart,
   format_cross_aspects,
@@ -156,6 +157,9 @@ __all__ = [
   "natal_chart",
   "natal_lunar_phase",
   "prepare_natal_input",
+  "render_cross_matrix",
+  "render_natal_matrix",
+  "render_natal_wheel",
   "resolve_birth_time",
   "sign_degree",
   "sign_distribution",

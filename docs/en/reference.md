@@ -136,6 +136,17 @@ See [the dignity guide](dignities.md) for the named source, simultaneous statuse
    :member-order: bysource
 ```
 
+## SVG figures
+
+See [SVG output](svg.md) for wheels and matrices from supplied results.
+
+```{eval-rst}
+.. automodule:: astrology.svg
+   :members: render_natal_wheel, render_natal_matrix, render_cross_matrix
+   :undoc-members:
+   :member-order: bysource
+```
+
 ## Independent knowledge
 
 Field roles are explained in the

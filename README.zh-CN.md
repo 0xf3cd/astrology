@@ -14,7 +14,8 @@
 当前源码另增[元素／模式分布与出生月相](https://0xf3cd.github.io/astrology/docs/zh-CN/summaries.html)、
 [传统星座守护与四种状态](https://0xf3cd.github.io/astrology/docs/zh-CN/dignities.html)，
 本命及静态双盘查询的[显式选四轴参与相位](https://0xf3cd.github.io/astrology/docs/zh-CN/aspects.html#axis-aspects-zh-cn)，
-以及[双盘落宫和双语比较文本](https://0xf3cd.github.io/astrology/docs/zh-CN/cross_aspects.html)，
+[双盘落宫和双语比较文本](https://0xf3cd.github.io/astrology/docs/zh-CN/cross_aspects.html)，
+以及 [SVG 本命轮和相位矩阵](https://0xf3cd.github.io/astrology/docs/zh-CN/svg.html)，
 计划随 0.3.0 交付。四轴只有被选择后才参与相位；不选轴的请求保持原行为。
 
 0.2.0（开发中）新增：

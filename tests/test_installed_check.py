@@ -572,6 +572,29 @@ def test_main_forwards_the_cross_observation_file(consumer: Path) -> None:
     installed_check.main(version("celestial-astrology"), expected_cross_observations=expected)
 
 
+@pytest.mark.parametrize("language", ["en", "zh-CN"])
+@pytest.mark.parametrize("kind", ["wheel", "natal", "cross"])
+def test_svg_consumer_compares_all_six_exact_strings(
+  tmp_path: Path, language: str, kind: str
+) -> None:
+  original = installed_check.svg_observations()
+  expected = tmp_path / "svg.json"
+  expected.write_text(original, encoding="utf-8")
+  installed_check._check_svg(expected)
+  values = json.loads(original)
+  values[language][kind] += " "
+  expected.write_text(json.dumps(values, sort_keys=True, ensure_ascii=True), encoding="utf-8")
+  with pytest.raises(ValueError, match="Installed SVG differs"):
+    installed_check._check_svg(expected)
+
+
+def test_main_forwards_svg_expectations(consumer: Path) -> None:
+  expected = consumer.parent / "wrong-svg.json"
+  expected.write_text("{}", encoding="utf-8")
+  with pytest.raises(ValueError, match="Installed SVG differs"):
+    installed_check.main(version("celestial-astrology"), expected_svg=expected)
+
+
 @pytest.mark.parametrize(
   "field",
   [

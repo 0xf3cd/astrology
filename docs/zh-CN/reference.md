@@ -144,6 +144,18 @@
    :no-index:
 ```
 
+## SVG 图形
+
+从给定结果生成轮盘与矩阵，见 [SVG 输出](svg.md)。
+
+```{eval-rst}
+.. automodule:: astrology.svg
+   :members: render_natal_wheel, render_natal_matrix, render_cross_matrix
+   :undoc-members:
+   :member-order: bysource
+   :no-index:
+```
+
 ## 独立知识查询
 
 字段职责见[知识记录字段](knowledge.md#记录与归属)。

@@ -450,6 +450,7 @@ def test_consumer_installs_only_retained_wheel_and_keeps_all_acceptance_modes(
       assert Path(command[command.index("--expected-cross-observations") + 1]).read_text() == (
         "runner-local-cross-result"
       )
+      assert Path(command[command.index("--expected-svg") + 1]).read_text() == "runner-local-svg"
 
   monkeypatch.setattr(checker, "run", capture)
   monkeypatch.setattr("tools.installed_check.acceptance_chart", lambda: None)
@@ -458,6 +459,7 @@ def test_consumer_installs_only_retained_wheel_and_keeps_all_acceptance_modes(
   )
   monkeypatch.setattr("tools.installed_check.acceptance_cross_aspects", lambda: None)
   monkeypatch.setattr("tools.installed_check.acceptance_house_overlays", lambda: None)
+  monkeypatch.setattr("tools.installed_check.svg_observations", lambda: "runner-local-svg")
   monkeypatch.setattr(
     "tools.installed_check.comparison_observations",
     lambda _aspects, _overlays, _catalog: "runner-local-cross-result",
@@ -482,6 +484,7 @@ def test_consumer_installs_only_retained_wheel_and_keeps_all_acceptance_modes(
   assert len(consumers) == 4
   assert ["--knowledge-only" in command for command in consumers] == [True, False, True, False]
   assert ["-O" in command for command in consumers] == [False, False, True, True]
+  assert ["--expected-svg" in command for command in consumers] == [False, True, False, True]
   assert ["--expected-cross-observations" in command for command in consumers] == [
     False,
     True,

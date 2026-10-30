@@ -14,8 +14,9 @@ from astrology.chart import NatalChart
 from astrology.config import AspectRule, HouseSystem, MajorAspect
 from astrology.cross_aspects import CrossChartAspects
 from astrology.house_overlays import CrossChartHouseOverlays
-from astrology.knowledge import Catalog, Concept, TranslationStatus
-from astrology.knowledge.catalog import _sign_concept
+from astrology.knowledge import Catalog, Concept
+from astrology.knowledge.catalog import _configuration_name
+from astrology.knowledge.catalog import _current_name as _raw_current_name
 from astrology.knowledge.records import _LANGUAGES, Language
 from astrology.lunar_phase import LunarPhaseResult
 from astrology.objects import Axis, ChartObject
@@ -213,23 +214,11 @@ def _name(
   catalog: Catalog,
   language: Language,
 ) -> str:
-  if isinstance(identity, Sign):
-    concept = _sign_concept(catalog, identity)
-  else:
-    matches = [concept for concept in catalog.concepts if concept.configuration is identity]
-    if len(matches) != 1:
-      raise ValueError(f"Expected one catalog concept for {identity.value}")
-    concept = matches[0]
-  return _current_name(concept, language)
+  return _cell(_configuration_name(identity, catalog, language))
 
 
 def _current_name(concept: Concept, language: Language) -> str:
-  if concept.name.status(language) is not TranslationStatus.CURRENT:
-    raise ValueError(f"Missing or stale {language} name for {concept.identifier}")
-  name = concept.name.text(language)
-  if name is None:
-    raise ValueError(f"Missing {language} name for {concept.identifier}")
-  return _cell(name)
+  return _cell(_raw_current_name(concept, language))
 
 
 def _longitude_text(value: float, catalog: Catalog, language: Language) -> str:
