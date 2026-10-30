@@ -1,5 +1,6 @@
 """SVG geometry, record preservation and rendering boundaries. SVG 几何、记录保全与显示边界。"""
 
+import json
 import math
 import os
 import subprocess
@@ -451,6 +452,10 @@ def test_recurring_layout_bounds_separation_and_expansion(language: Language) ->
           )
           assert units * int(text.attrib["font-size"]) <= w
     callouts = _roles(root, "callout-box")
+    for callout in callouts:
+      x, y = float(callout.attrib["x"]), float(callout.attrib["y"])
+      assert 0 <= x < x + float(callout.attrib["width"]) <= width
+      assert 0 <= y < y + float(callout.attrib["height"]) <= height
     for i, a in enumerate(callouts):
       for b in callouts[i + 1 :]:
         assert (
@@ -465,9 +470,12 @@ def test_recurring_layout_bounds_separation_and_expansion(language: Language) ->
 
 
 @pytest.mark.parametrize("mode", [(), ("-O",)])
-def test_fresh_process_determinism_and_effect_boundaries(mode: tuple[str, ...]) -> None:
+@pytest.mark.parametrize("encoding", ["utf-8", "cp1252"])
+def test_fresh_process_determinism_and_effect_boundaries(
+  mode: tuple[str, ...], encoding: str
+) -> None:
   script = """
-import builtins, io, importlib.metadata as metadata, socket
+import builtins, io, importlib.metadata as metadata, socket, json
 import astrology, astrology.chart as chart, astrology.birth as birth
 import astrology.knowledge.catalog as catalog_module
 from tools.installed_check import acceptance_svg_chart, acceptance_cross_aspects
@@ -487,17 +495,20 @@ astrology.natal_chart = chart.natal_chart = chart._aspects = forbidden
 birth.resolve_birth_time = birth.prepare_natal_input = forbidden
 for language in ('en','zh-CN'):
   for renderer, value in ((astrology.render_natal_wheel,source),(astrology.render_natal_matrix,source),(astrology.render_cross_matrix,cross)):
-    print(renderer(value,catalog,language=language))
+    print(json.dumps(renderer(value,catalog,language=language), ensure_ascii=True))
 """
   outputs = [
     subprocess.run(
       [sys.executable, *mode, "-c", script],
       check=True,
       capture_output=True,
-      env={**os.environ, "PYTHONHASHSEED": seed},
+      env={**os.environ, "PYTHONHASHSEED": seed, "PYTHONIOENCODING": encoding},
       text=True,
     ).stdout
     for seed in ("1", "73")
   ]
   assert outputs[0] == outputs[1]
   assert len(outputs[0].splitlines()) == 6
+  assert all(
+    ET.fromstring(json.loads(line)).tag == _SVG + "svg" for line in outputs[0].splitlines()
+  )
