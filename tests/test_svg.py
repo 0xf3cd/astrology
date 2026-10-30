@@ -328,6 +328,7 @@ def test_svg_empty_status_labels(language: Language, empty: str, no_hits: str) -
     (0.0, "0°00\u203200″"),
     (1e-8, "0°00\u203200″"),
     (0.5, "0°30\u203200″"),
+    (0.19166666666666665, "0°11\u203229″"),
     (1.25, "1°15\u203200″"),
     (math.nextafter(30, 0), "29°59\u203259″"),
     (30.0, "30°00\u203200″"),
@@ -528,6 +529,13 @@ def test_svg_is_accessible_deterministic_and_does_not_mutate_inputs(
   root = ET.fromstring(text)
   assert root.tag == _SVG + "svg"
   assert root.get("role") == "img"
+  if renderer is render_natal_wheel:
+    assert root.get("width") == "1000"
+  precision = {
+    "en": ("whole arcseconds", "six significant digits", "keep stored values"),
+    "zh-CN": ("整角秒截断", "六位有效数字", "保留已存数值"),
+  }[language]
+  assert all("".join(fragment.split()) in _drawn_text(root) for fragment in precision)
   assert root.get("{http://www.w3.org/XML/1998/namespace}lang") == language
   assert root.find(_SVG + "title") is not None and root.find(_SVG + "desc") is not None
   assert root.attrib["font-family"].endswith(", sans-serif")

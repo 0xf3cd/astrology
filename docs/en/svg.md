@@ -74,8 +74,10 @@ columns the second objects; each pair appears once above the diagonal.
 Participants without hits remain visible. No aspect rules means no participants.
 For a cross matrix, choose each side with `cross_chart_aspects(left_objects=...,
 right_objects=...)`. Rows follow the recorded `comparison.left_objects` (`L`),
-columns `comparison.right_objects` (`R`); the two Suns remain separate. Both
-matrices use each chart's stored body/node order, then selected axes in
+columns `comparison.right_objects` (`R`); the two Suns remain separate. The lists
+headed "Left chart" and "Right chart" give each side's object identities,
+longitudes and node definitions. Both matrices use each chart's stored body/node
+order, then selected axes in
 ASC/MC/DSC/IC order, not the order of the selection argument. An empty selection
 leaves that side empty. Cross-chart node pairs are retained; within one natal
 chart, nodes do not pair with each other.
