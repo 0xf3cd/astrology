@@ -39,6 +39,8 @@ def test_repository_required_topics() -> None:
     ("", "Missing required"),
     (BLOCK.replace("Choose the pair's orb limit.", ""), "needs prose"),
     (BLOCK.replace("Choose the pair's orb limit.", "## Only a heading"), "needs prose"),
+    (BLOCK.replace("Choose the pair's orb limit.", "12345!?"), "needs prose"),
+    (BLOCK.replace("Choose the pair's orb limit.", "`choose_the_orb_limit`"), "needs prose"),
     (BLOCK.replace(EXAMPLE, ""), "needs prose"),
     (BLOCK.replace(EXAMPLE, "```{doctest}\n2\n```\n"), "needs prose"),
     (BLOCK.replace(EXAMPLE, EXAMPLE * 2), "needs prose"),

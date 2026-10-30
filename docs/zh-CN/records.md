@@ -55,8 +55,8 @@
   （`None`）和显式指定之间的区别。`effective.aspect_objects` 先按请求顺序列出天体和交点，
   再按上升、中天、下降、天底顺序列出显式所选轴。
 - `positions` 保留未舍入的黄经、黄纬（度）、物理距离（AU）和黄经速率（度/TT 日）。
-  月交点没有距离（`None`）。`times` 保留 JD(UT1) 和 JDE(TT)。四轴、宫头、星座与落宫结果及
-  每条相位的分支、带符号偏差、上限和运动状态都可直接查看。
+  月交点没有距离（`None`）。`times` 保留 JD(UT1) 和 JDE(TT)。`houses` 保留四轴黄经与十二宫头，
+  单位为度；`placements` 给出星座与落宫。每条相位都保留分支、带符号偏差、上限和运动状态。
 - `provenance` 保留 astrology、celestial-calendar 版本、位置坐标约定及 UT1 推导方式；
   `effective` 保留已确定的 ΔT 模型及求值方式。
 

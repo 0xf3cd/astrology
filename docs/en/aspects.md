@@ -100,7 +100,7 @@ relative motion, not that either planet has stopped changing longitude (a statio
 The status describes this instant only. It does not predict whether an aspect
 will become exact; a planet may change direction before that happens.
 
-At a deviation of 180 degrees, the absolute wrapped deviation has a cusp and no
+At a deviation of 180 degrees, the absolute wrapped deviation has a sharp corner and no
 two-sided derivative when the relative rate is nonzero, so the status is
 `indeterminate` in both object orders. Equal rates still give `stationary`.
 This boundary can be a hit only with an orb of at least 180 degrees.

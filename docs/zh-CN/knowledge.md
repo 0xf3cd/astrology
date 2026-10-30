@@ -32,7 +32,14 @@ True
 10
 >>> bool(catalog.version)
 True
+>>> print(catalog.entry("entry.cross_aspect_evaluation").statement.text("zh-CN"))
+静态主要交叉相位比较两张给定本命盘结果，区分左右端点并保留双侧完整来源，不设运动字段。
+>>> print(catalog.variant("rule.project.cusp_ownership").definition.text("zh-CN"))
+落宫使用半开区间 [宫头, 下一宫头)：恰好落在宫头上的黄经归入从该宫头开始的宫，成员关系跨 0/360 环绕。
 ```
+
+用 `entry.statement.text(language)` 读取条目说明，用 `variant.definition.text(language)`
+读取规则定义。上面最后两次调用输出中文正文；传 `"en"` 可读取英文。
 
 同一个概念可以有多个名称，但只有一个标识。例如，`Sun`、`Sol` 和“日轮”都指向 `body.sun`。
 规则变体则记录某套具体定义，例如采用哪种宫制或月交点算法。天体名称和升降交点方向本身不另建规则。

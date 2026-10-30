@@ -17,8 +17,8 @@ phase](https://0xf3cd.github.io/astrology/docs/en/summaries.html),
 [explicit axis aspects for natal and static cross-chart queries](https://0xf3cd.github.io/astrology/docs/en/aspects.html#select-axes-explicitly),
 [cross-chart house overlays and bilingual comparison text](https://0xf3cd.github.io/astrology/docs/en/cross_aspects.html),
 and [SVG natal wheels and aspect matrices](https://0xf3cd.github.io/astrology/docs/en/svg.html).
-These additions are planned for 0.3.0. Axes participate only when selected;
-requests without selected axes keep their behavior.
+These additions are planned for 0.3.0. Axes (Ascendant, Midheaven, Descendant and
+Imum Coeli) participate in aspects only when explicitly selected.
 
 New in 0.2.0 (in development):
 
@@ -181,6 +181,7 @@ The chart supports Whole Sign, Equal and Placidus houses, the Sun, Moon and eigh
 planets, and explicitly selected lunar-node definitions. House placement uses
 longitude only, without object latitude. The five major aspects use caller-supplied
 orbs; applying/separating describes local motion, not a future-event prediction.
+Results keep the four axes separately from the twelve house cusps.
 Immutable results retain the original input, resolved time scales, configuration,
 unrounded astronomy and named models. Chart persistence is removed in the current source; see the
 [release notes](https://0xf3cd.github.io/astrology/docs/en/releases.html) for the

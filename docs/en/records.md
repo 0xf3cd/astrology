@@ -48,7 +48,8 @@ requested object order.
 
 The full table includes all requested objects, four axes, twelve cusps,
 aspects with their oriented branches, deviations, limits and motion labels,
-requested/effective configuration and provenance. Pass `language="zh-CN"` for
+requested/effective configuration and provenance. English is the default; pass
+`language="zh-CN"` for
 Chinese output. The supplied catalog must contain current names in that language;
 missing or ambiguous names fail rather than fall back to another language.
 Loading the catalog is explicit; formatting itself performs no resource I/O.
@@ -66,8 +67,9 @@ Loading the catalog is explicit; formatting itself performs no resource I/O.
   selected axes in ASC/MC/DSC/IC order.
 - `positions` keeps unrounded longitude/latitude in degrees, physical distance
   in AU and longitude rate in degrees per TT day. Nodes have no distance (`None`).
-  `times` keeps JD(UT1) and JDE(TT). Axes/cusps, placements and every aspect field
-  are available, including the branch, signed deviation, limit and motion status.
+  `times` keeps JD(UT1) and JDE(TT). `houses` keeps the four axis longitudes and
+  twelve cusps in degrees; `placements` gives signs and house membership. Every
+  aspect keeps its branch, signed deviation, limit and motion status.
 - `provenance` keeps astrology/celestial-calendar versions, position frame and
   UT1 derivation; `effective` keeps the resolved Delta-T model and evaluation.
 

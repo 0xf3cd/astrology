@@ -153,7 +153,8 @@ difference, but rotating floats may already round inputs; bitwise invariance is
 not promised.
 
 The phase formatter prints the stored float without arcsecond truncation. Labels
-never come from rounded text. Both formatters require current catalog names in
+never come from rounded text. `format_sign_distribution` and `format_lunar_phase`
+require current catalog names in
 `en` or `zh-CN`; missing/stale names raise `ValueError`, missing IDs `KeyError`, and
 invalid result/catalog types `TypeError`. Names' table delimiters and nonprinting
 characters are escaped.

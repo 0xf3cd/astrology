@@ -34,7 +34,15 @@ True
 10
 >>> bool(catalog.version)
 True
+>>> print(catalog.entry("entry.cross_aspect_evaluation").statement.text("en"))
+Static major cross aspects compare two supplied natal results with distinct left/right endpoints and preserve both complete sources, without a motion field.
+>>> print(catalog.variant("rule.project.cusp_ownership").definition.text("en"))
+House membership uses half-open intervals [cusp, next cusp): a longitude exactly on a cusp belongs to the house that starts there, and membership wraps across 0/360 degrees.
 ```
+
+Read an entry's explanation with `entry.statement.text(language)` and a rule's
+definition with `variant.definition.text(language)`. The last two calls above
+print those texts in English; use `"zh-CN"` for Chinese.
 
 Several names can identify one concept: `Sun`, `Sol` and `日轮` all refer to
 `body.sun`. A rule variant records a particular definition, such as a house

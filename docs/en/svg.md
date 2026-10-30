@@ -7,6 +7,9 @@ For two charts, first choose comparison rules with `cross_chart_aspects`, then
 pass its result to `render_cross_matrix`. Each renderer returns an SVG string;
 only your own file-writing code saves it.
 
+These renderers are source-checkout APIs planned for 0.3.0. Use the
+[source installation instructions](../../README.md#install-from-source).
+
 ## Render and save
 
 <!-- usage: svg.rendering -->
@@ -76,8 +79,9 @@ Choose natal participants with `ChartConfig.aspect_objects`; the matrix follows
 the resulting `chart.effective.aspect_objects`. Rows are the first objects and
 columns the second objects; each pair appears once above the diagonal.
 Participants without hits remain visible. No aspect rules means no participants.
-Natal matrix labels `N1`, `N2`, … refer to the numbered entries in its "Objects"
-list. In this sample, N1 is Sun, N2 Moon, N3 Venus, N4 Ascendant and N5 Midheaven.
+Natal matrix labels `N1`, `N2`, … refer to the numbered entries in its "Objects and
+stored longitudes" list. In this sample, N1 is Sun, N2 Moon, N3 Venus, N4 Ascendant
+and N5 Midheaven.
 The mean node is stored and drawn on the wheel but is not selected for natal
 aspects. Five participants are this example's selection, not a renderer limit.
 To include Mars, for example, add `Body.MARS` to both `objects` and `aspect_objects`

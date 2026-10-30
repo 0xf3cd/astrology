@@ -15,7 +15,7 @@
 本命及静态双盘查询的[显式选四轴参与相位](https://0xf3cd.github.io/astrology/docs/zh-CN/aspects.html#axis-aspects-zh-cn)，
 [双盘落宫和双语比较文本](https://0xf3cd.github.io/astrology/docs/zh-CN/cross_aspects.html)，
 以及 [SVG 本命轮和相位矩阵](https://0xf3cd.github.io/astrology/docs/zh-CN/svg.html)，
-计划随 0.3.0 交付。四轴只有被选择后才参与相位；不选轴的请求保持原行为。
+计划随 0.3.0 交付。四轴（上升点、中天、下降点、天底）只有被显式选择后才参与相位。
 
 0.2.0（开发中）新增：
 
@@ -165,6 +165,7 @@ body.sun
 
 支持 Whole Sign（整宫制）、Equal（等宫制）和 Placidus，计算太阳、月亮、八颗行星及显式选择的月交点定义。
 落宫只用黄经，不用对象黄纬。五大相位使用调用方提供的容许度；入相／离相描述局部运动，不预测未来事件。
+结果把四轴与十二宫头分别保存。
 不可变结果保留原始输入、解析后的时标、配置、未舍入天文值和具名模型。当前源码已撤回命盘持久化；
 与已发布 v0.1.0 API 的差异见[发行说明](https://0xf3cd.github.io/astrology/docs/zh-CN/releases.html)。
 

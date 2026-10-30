@@ -35,7 +35,8 @@ geometry fails explicitly; the [chart guide](chart.md) describes those limits.
 `Body` identifies the ten physical bodies from Sun and Moon through Pluto.
 `LunarNode` identifies mathematical ascending/descending nodes with either the
 mean or Meeus five-term true definition. The definition is part of the identity,
-not an accuracy flag. You may explicitly select both definitions in one request;
+not an accuracy flag or an interchangeable model. You may explicitly select both
+definitions in one request;
 the chart result names the astronomical models used.
 
 Object and rule sequences are copied into tuples, preserving order. Source lists
@@ -94,7 +95,8 @@ add axes. The Moon above still has a position, but takes part in no aspect. If
 `aspect_objects` is omitted, all requested bodies/nodes take part and no axes are added.
 
 Requested bodies/nodes keep their original order; selected axes follow in
-ASC/MC/DSC/IC order, independently of the selection argument's order. Axes can
+Ascendant/Midheaven/Descendant/Imum Coeli (ASC/MC/DSC/IC) order, independently of
+the selection argument's order. Axes can
 also be the only aspect participants, but `objects` must still contain at least
 one body/node. See [axis geometry and pairing](aspects.md#select-axes-explicitly).
 
