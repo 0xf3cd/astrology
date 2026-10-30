@@ -48,7 +48,8 @@ True
 这里的 `complete` 表示条目已经写清所需前提；`reference_only` 表示它仅供参考，
 `not_assessed` 表示没有判断某张命盘是否满足这些前提。三者回答不同的问题，详见[状态说明](#状态需要分开表达)。
 
-查询[双盘落宫](cross_aspects.md)时，使用独立的组合规则及其固定实现来源：
+双盘落宫的说明条目是 `entry.cross_house_overlays`。用 `rule_ids` 查看它采用的规则，
+用 `catalog.citations()` 读取引用及对应的来源记录：
 
 ```{doctest}
 >>> overlay = catalog.entry("entry.cross_house_overlays")
@@ -61,9 +62,13 @@ True
 ('complete', 'reference_only', 'not_assessed')
 ```
 
-`rule.project.cross_house_overlays` 复用 `rule.project.cusp_ownership` 的宫头区间规则。
-此组合区分对象所属盘与接收它的宫位所属盘，两侧独立选择对象，保留各自源盘的宫制。
-代码引用记录的是实现，不认证天文来源，也不提供关系解读。检索不会计算落宫或判断某张命盘。
+这里有两条规则：`rule.project.cross_house_overlays` 说明怎样分别选择两张盘的对象、
+区分对象所属盘与宫位所属盘，并保留各自的宫制；`rule.project.cusp_ownership` 定义宫头之间的区间，
+决定黄经落在哪一宫。双盘落宫沿用这套区间规则。
+
+来源记录指向一个固定提交中的实现代码，可以据此核对算法，但不能据此确认输入天文值的来源，
+也不能推出关系解读。上面的查询只读取说明和出处，不计算落宫，也不判断某张命盘。
+要对两张盘计算落宫，见[双盘落宫示例](cross_aspects.md#查询对象落入另一张盘的哪一宫)。
 
 ### 返回值与错误
 

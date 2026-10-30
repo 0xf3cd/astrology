@@ -509,16 +509,20 @@ def _comparison_sources(
 def format_house_overlays(
   result: CrossChartHouseOverlays, catalog: Catalog, *, language: Language = "en"
 ) -> str:
-  """Show both sources, selections and every overlay with its object and house owners.
+  """Format house overlays as a table that identifies both charts for each placement.
 
-  The caller supplies the Catalog. No I/O, astronomy or time resolution is performed.
-  Invalid result/catalog types raise TypeError; invalid language or missing/stale
-  displayed names raise ValueError. Supplied text is escaped as in format_chart.
-  This is a display table, not a lossless source record.
+  The table includes both charts' provenance, selected objects and every placement,
+  distinguishing the chart the object comes from and the chart whose houses are used.
+  Names come from the supplied Catalog. No I/O, astronomy or time resolution is performed.
+  Invalid result or catalog types raise TypeError. Invalid language, or missing or
+  stale displayed names, raises ValueError. Text is escaped as in format_chart;
+  the table cannot be used to restore the source charts without loss.
 
-  显示双侧来源、所选对象及每条落宫，区分对象所属盘和宫位所属盘。调用方提供 Catalog；
-  不执行 I/O、天文计算或时刻解析。结果和目录类型错误抛出 TypeError；语言非法或所显示名称
-  缺失、过期时抛出 ValueError。传入文字按 format_chart 转义。本表不是无损源盘记录。
+  将落宫结果排成表格，每条记录都标明对象来自哪张盘、使用哪张盘的宫位。
+  表中包含两张盘的来源信息、所选对象和全部落宫，名称取自传入的 Catalog。
+  不执行 I/O、天文计算或时刻解析。结果或目录类型错误时抛出 TypeError；
+  语言非法，或所需名称缺失、过期时，抛出 ValueError。文字按 format_chart 的规则转义，
+  不能用这份表格无损恢复原盘。
   """
   if type(result) is not CrossChartHouseOverlays or type(catalog) is not Catalog:
     raise TypeError("result and catalog must be CrossChartHouseOverlays and Catalog values")
@@ -541,16 +545,26 @@ def format_house_overlays(
 def format_cross_aspects(
   result: CrossChartAspects, catalog: Catalog, *, language: Language = "en"
 ) -> str:
-  """Show sources, selections, explicit rules and all static hits without motion labels.
+  """Format all static cross-chart aspect hits and their rules as a table.
 
-  Branches, deviations and effective inclusive orb limits use the existing whole-
-  arcsecond display rule, in degrees. Display truncation never changes which rows
-  appear. Rules include base orbs, object overrides and the chosen combination.
-  Type, language, name and escaping contracts follow format_house_overlays; no I/O.
+  The table includes chart provenance and selected objects, without motion labels.
+  Branches, deviations and effective orb limits are angles in degrees, displayed
+  with the whole-arcsecond truncation rule. A deviation whose absolute value equals
+  the orb limit counts as a hit. Truncation changes only the display, never which
+  records appear. Rules show base orbs, object overrides and the chosen combination.
 
-  显示来源、所选对象、显式规则与全部静态命中，不添加运动标签。分支、偏差和包含等号的
-  实际容许度上限以度计，沿用整角秒显示规则；截断不改变输出哪些记录。规则包括基础容许度、
-  对象单独设置及所选合成方式。类型、语言、名称和转义合同沿用 format_house_overlays；不执行 I/O。
+  Names come from the supplied Catalog; text is escaped as in format_house_overlays.
+  Invalid result or catalog types raise TypeError. Invalid language, or missing or
+  stale displayed names, raises ValueError. No I/O, astronomy or time resolution
+  is performed. The table cannot be used to restore the source charts without loss.
+
+  将全部静态双盘相位及其规则排成表格。表中包含命盘来源信息和所选对象，不添加运动标签。
+  分支、偏差和实际容许度上限以度计，按整角秒截断显示；偏差的绝对值等于上限时也算命中。
+  截断只影响显示，不改变输出哪些记录。规则列出基础容许度、对象单独设置及所选合成方式。
+
+  名称取自传入的 Catalog，文字按 format_house_overlays 的规则转义。
+  结果或目录类型错误时抛出 TypeError；语言非法，或所需名称缺失、过期时，抛出 ValueError。
+  不执行 I/O、天文计算或时刻解析，不能用这份表格无损恢复原盘。
   """
   if type(result) is not CrossChartAspects or type(catalog) is not Catalog:
     raise TypeError("result and catalog must be CrossChartAspects and Catalog values")

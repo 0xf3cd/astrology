@@ -43,16 +43,20 @@ the success contract of a complete chart; it does not become the owner of every
 shared definition. Common values move to a shared module only when actual users
 need them. Package imports and knowledge queries must not initialize celestial.
 
-`cross_aspects.py` composes existing chart results without astronomy. Shared
-angular/orb arithmetic remains in `aspects.py`; single-chart pair eligibility
-and local motion stay with `find_aspects`, separate from static cross pairing.
-`house_overlays.py` composes directional placements using the receiving chart's
-cusps and the existing `house_of` rule.
-`objects.py` owns the narrow body/node and broader chart-object families used by
-aspects and overlays.
-The adapter retains target bindings, text retains supplied-catalog naming, and
-`chart.py` supplies selected stored longitudes to natal aspects, static cross
-aspects and house overlays. It also checks comparison source conventions and selections.
+`cross_aspects.py` calculates static aspects from two existing charts without
+calling the astronomy library. It shares the angle and orb calculations in
+`aspects.py` with natal aspects, but `find_aspects` separately handles single-chart
+pair eligibility and local motion. `house_overlays.py` passes one chart's
+longitudes and the other chart's cusps to `house_of` to calculate placements in
+both directions.
+
+`objects.py` defines body, node and axis identities. It distinguishes body/node-only
+types from the types that also include axes, used by aspects and house overlays.
+The astronomy adapter maps these identities to calculation targets; the text
+module looks up names in the supplied catalog. `chart.py` extracts the selected
+stored longitudes for natal aspects, static cross-chart aspects and house
+overlays. It also checks coordinate compatibility and object selections for
+cross-chart comparisons.
 
 Knowledge and calculation remain connected by stable identifiers, described in
 [Knowledge organization](knowledge.md). Additional UI applications can consume

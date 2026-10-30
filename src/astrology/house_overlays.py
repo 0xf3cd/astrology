@@ -1,6 +1,6 @@
-"""Place selected objects from either supplied chart in the other chart's houses.
+"""Find which houses in one chart contain the other chart's selected objects.
 
-将两张给定命盘各自选中的对象，分别归入另一张盘的宫位。
+查询一张盘中选定的对象落入另一张盘的哪一宫。
 """
 
 from __future__ import annotations
@@ -21,14 +21,18 @@ from astrology.objects import ChartObject, _is_chart_object
 
 @dataclass(frozen=True, slots=True)
 class HouseOverlay:
-  """An object's house in the other source, with explicit opposite left/right owners.
+  """An object's house in the other chart.
 
-  `identity` is a Body, LunarNode or Axis. `house` is an integer in 1..12, not bool.
-  Source-relative geometry is checked by CrossChartHouseOverlays, not this row alone.
+  object_owner identifies the chart the object comes from; house_owner identifies
+  the chart whose houses are used. One must be "left" and the other "right".
+  identity is a Body, LunarNode or Axis. house is an integer from 1 to 12, not bool.
+  CrossChartHouseOverlays checks the house against the charts; this record alone
+  does not have the geometry needed for that check.
 
-  一个对象落入另一张源盘的宫位；对象所属侧和宫位所属侧显式区分，须为相反的 left/right。
-  identity 为 Body、LunarNode 或 Axis；house 是 1..12 的整数，不接受 bool。
-  单条记录不校验源盘几何，由 CrossChartHouseOverlays 校验。
+  一个对象落入另一张盘的宫位。object_owner 表示对象来自哪张盘，house_owner 表示使用哪张盘的宫位，
+  两者必须一个为 "left"、另一个为 "right"。identity 为 Body、LunarNode 或 Axis；
+  house 是 1 到 12 的整数，不接受 bool。单条记录没有校验落宫所需的几何数据，
+  由 CrossChartHouseOverlays 根据两张盘检查宫号是否正确。
   """
 
   object_owner: Literal["left", "right"]
@@ -52,16 +56,18 @@ class HouseOverlay:
 
 @dataclass(frozen=True, slots=True)
 class CrossChartHouseOverlays:
-  """Immutable sources, effective selections and every directional house placement.
+  """An immutable result containing both charts, selected objects and all placements.
 
-  Sources remain unchanged. Sequences are isolated in tuples; selections follow
-  source position order, then ASC/MC/DSC/IC. Placements run left objects in right
-  houses, then right objects in left houses. Construction recomputes that complete
-  sequence and rejects any difference. It does not authenticate astronomical origin.
+  Both charts remain unchanged. Input sequences are copied into tuples. Selected
+  bodies and nodes follow each chart's position order, then selected axes follow
+  in ASC/MC/DSC/IC order. Placements list left objects in right houses, then right
+  objects in left houses. Construction recomputes the complete placement sequence
+  and rejects any difference; it does not authenticate the charts' astronomical origin.
 
-  不可变的双侧源盘、实际对象选择及全部双向落宫。源盘保持不变；序列复制为元组。
-  选择按源位置顺序排列，再接上升、中天、下降、天底；落宫先列左对象入右宫，再列右对象入左宫。
-  构造时重算完整落宫序列，拒绝任何差异；不认证源盘的天文来源。
+  不可变的结果，包含两张命盘、所选对象和全部落宫记录。两张盘保持不变，传入的序列复制为元组。
+  所选天体和交点按各盘的位置记录顺序排列，所选四轴随后按上升、中天、下降、天底排列。
+  落宫记录先列左盘对象在右盘的落宫，再列右盘对象在左盘的落宫。
+  构造时会重新计算完整落宫序列，拒绝与它不同的记录；这些检查不证明命盘的天文来源真实。
   """
 
   chart_left: NatalChart
@@ -114,34 +120,47 @@ def cross_chart_house_overlays(
   left_objects: Sequence[ChartObject] | None = None,
   right_objects: Sequence[ChartObject] | None = None,
 ) -> CrossChartHouseOverlays:
-  """Place each side's selected stored longitudes in the other side's supplied houses.
+  """Find the house of each selected object in the other chart.
 
-  None selects that side's bodies/nodes, without axes or inherited natal participants.
-  Explicit selections may include stored axes; their fields, not cusps or synthesized
-  opposites, supply the longitudes. Selections use source order, then ASC/MC/DSC/IC.
-  Empty selections are valid and suppress only their own direction. Both sources and
-  requests are validated even for empty output. Same-named objects and the same chart
-  in both roles are allowed. The result retains both sources and orders left-to-right
-  placements before right-to-left placements. A longitude exactly on a cusp belongs
-  to the house starting there; angles are degrees, with membership wrapping at 360.
+  left_objects and right_objects select objects from their respective charts.
+  None selects all bodies and nodes in that chart, without axes, independently of
+  its natal aspect selection. Explicit selections may include stored axes. Their
+  longitudes come from the actual axis fields, not cusps or calculated opposites.
+  Bodies and nodes follow chart order, then selected axes follow in ASC/MC/DSC/IC order.
 
-  Sources must match in zodiac, center and position frame; current public constructors
-  admit only the tropical/geocentric own-date convention. Different dates, house
-  systems, models and versions are retained. This directly compares stored longitudes
-  with receiving cusps, without common-epoch conversion or three-dimensional placement.
-  Bad types raise TypeError; duplicate/unavailable selections or incompatible sources
-  raise ValueError. No astronomy, time resolution, version lookup or I/O is performed.
+  An empty selection skips placements of that chart's objects, but its houses are
+  still used for the other chart's objects. Both charts and selections are checked
+  even when output is empty. Same-named objects and the same chart on both sides
+  are allowed. The result retains both charts and lists left objects in right
+  houses before right objects in left houses.
 
-  将每侧选中的已存黄经归入另一侧的给定宫位。None 选该侧天体和交点，不加入四轴，
-  也不继承本命相位参与者。显式选择可含已存轴，读取其字段，不用宫头或合成对轴。
-  对象按源顺序排列，再接上升、中天、下降、天底。空选择合法，只取消其自身方向；
-  即使输出为空，仍校验双侧源盘和请求。允许同名对象及同一张盘占两侧角色；保留双源，
-  先列左对象入右宫，再列右对象入左宫。恰在宫头的黄经归入从该宫头开始的宫；角度以度计，
-  落宫跨 360 度回绕。
+  Placement compares stored longitudes with the other chart's cusps, in degrees,
+  wrapping at 360. A longitude exactly on a cusp belongs to the house starting
+  there. The charts must use the same zodiac, center and position frame. Current
+  public constructors accept only tropical, geocentric positions on the true
+  ecliptic and equinox of each chart's own date. Different dates, house systems,
+  models and versions are retained. There is no common-epoch conversion or
+  three-dimensional placement.
 
-  双源的黄道、中心和位置坐标约定须一致；当前公开构造器只接纳各自日期的热带地心约定。
-  不同日期、宫制、模型和版本均保留。直接比较已存黄经与接收盘宫头，不转换共同历元，
-  也不计算三维落宫。类型错误抛出 TypeError；重复或不可用对象、源盘坐标不兼容抛出 ValueError。
+  Invalid types raise TypeError. Duplicate or unavailable selections and incompatible
+  coordinates raise ValueError. No astronomy, time resolution, version lookup or I/O
+  is performed.
+
+  查询每个所选对象落入另一张盘的哪一宫。left_objects 和 right_objects 分别选择左右盘的对象。
+  None 表示该盘的全部天体和交点，不含四轴，也不沿用本命相位的对象选择。显式选择可以包含已存轴，
+  黄经从实际轴字段读取，不用宫头或计算出的对轴代替。天体和交点按盘中顺序排列，
+  所选四轴随后按上升、中天、下降、天底排列。
+
+  空选择表示不查该盘对象的落宫，但仍用它的宫位判断另一张盘对象的落宫。即使输出为空，
+  两张盘和对象选择仍会接受检查。允许同名对象，也可以把同一张盘传给两边。结果保留两张盘，
+  先列左盘对象在右盘的落宫，再列右盘对象在左盘的落宫。
+
+  落宫直接比较已存黄经与另一张盘的宫头，角度以度计，跨 360 度回绕。
+  黄经恰好等于宫头时，归入从该宫头开始的宫。两张盘的黄道、中心和位置坐标约定必须一致。
+  当前公开构造器只接受热带地心位置，以各盘自身日期的真黄道和真春分点为基准。
+  不同日期、宫制、模型和版本均保留，不转换到共同历元，也不计算三维落宫。
+
+  类型错误抛出 TypeError；重复选择、选择盘中没有的对象或坐标约定不一致时，抛出 ValueError。
   不执行天文计算、时刻解析、版本查询或 I/O。
   """
   _require_comparable_sources(chart_left, chart_right)

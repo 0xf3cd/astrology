@@ -54,8 +54,9 @@ Here, `complete` means the entry has stated its prerequisites, `reference_only`
 means it is for reference, and `not_assessed` means no chart has been checked
 against those prerequisites. These answer different questions; see [status meanings](#status-has-several-dimensions).
 
-For [house overlays](cross_aspects.md#find-houses-in-the-other-chart), retrieve the
-separate composition rule and its fixed implementation source:
+The house-overlay explanation is `entry.cross_house_overlays`. Read `rule_ids`
+for its rules, and use `catalog.citations()` to retrieve the citations and their
+source records:
 
 ```{doctest}
 >>> overlay = catalog.entry("entry.cross_house_overlays")
@@ -68,11 +69,17 @@ separate composition rule and its fixed implementation source:
 ('complete', 'reference_only', 'not_assessed')
 ```
 
-`rule.project.cross_house_overlays` uses the shared `rule.project.cusp_ownership`
-interval rule. The composition keeps the object owner distinct from the receiving house owner,
-with independent selections and retained source house systems. Its code citation
-documents the implementation, not astronomical authentication or relationship
-interpretation. Looking it up does not calculate placements or assess a chart.
+There are two rules here. `rule.project.cross_house_overlays` explains how to
+select objects from each chart independently, distinguish the object and house
+owners, and retain each chart's house system. `rule.project.cusp_ownership` defines
+the intervals between cusps that determine a longitude's house. House overlays use
+that same interval rule.
+
+The source record links to implementation code at a fixed commit, so you can
+check the algorithm. It does not verify where the input astronomical values came
+from or support relationship interpretation. The query above only reads explanations
+and citations; it does not calculate placements or assess a chart. To calculate
+placements between two charts, see the [house-overlay example](cross_aspects.md#find-houses-in-the-other-chart).
 
 ### Return values and errors
 

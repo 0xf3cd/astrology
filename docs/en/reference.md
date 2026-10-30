@@ -48,8 +48,8 @@ same enum classes. `Axis` is also available from `astrology`.
 
 ## Chart text
 
-See the [complete natal result and text example](records.md), or
-[render comparison text](cross_aspects.md#render-comparison-text) for the two-chart formatters.
+See the [complete natal result and text example](records.md) for natal output, or
+[render comparison text](cross_aspects.md#render-comparison-text) for cross-chart aspects and house overlays.
 
 ```{eval-rst}
 .. automodule:: astrology.text
@@ -85,7 +85,7 @@ See the [complete natal result and text example](records.md), or
 
 ## Static cross-chart aspects
 
-See the [two-chart example and static contract](cross_aspects.md).
+See [cross-chart aspects and house overlays](cross_aspects.md) for usage and the meaning of static aspects.
 
 ```{eval-rst}
 .. automodule:: astrology.cross_aspects
@@ -96,8 +96,8 @@ See the [two-chart example and static contract](cross_aspects.md).
 
 ## Cross-chart house overlays
 
-See [directional placements](cross_aspects.md#find-houses-in-the-other-chart) and
-[comparison text](cross_aspects.md#render-comparison-text).
+See the [house-overlay example](cross_aspects.md#find-houses-in-the-other-chart)
+for calculation and the [comparison text example](cross_aspects.md#render-comparison-text) for output.
 
 ```{eval-rst}
 .. automodule:: astrology.house_overlays
