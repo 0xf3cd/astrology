@@ -1,5 +1,6 @@
 """Installed-consumer rejection cases. 安装后消费者的拒绝用例。"""
 
+import builtins
 import json
 import sys
 from collections.abc import Iterator, Sequence
@@ -567,7 +568,7 @@ def test_cross_consumer_rejects_native_initialization(monkeypatch: pytest.Monkey
 def test_main_forwards_the_cross_observation_file(consumer: Path) -> None:
   expected = consumer.parent / "wrong-cross-observations.json"
   expected.write_text("{}", encoding="utf-8")
-  with pytest.raises(ValueError, match="cross aspects differ from the development"):
+  with pytest.raises(ValueError, match="comparison observations differ from the development"):
     installed_check.main(version("celestial-astrology"), expected_cross_observations=expected)
 
 
@@ -588,8 +589,12 @@ def test_cross_observations_cover_every_field_and_both_complete_sources(
   tmp_path: Path, field: str, changed: bool
 ) -> None:
   result = installed_check.acceptance_cross_aspects()
-  observations = installed_check.cross_observations(result)
-  values = json.loads(observations)
+  observations = json.loads(
+    installed_check.comparison_observations(
+      result, installed_check.acceptance_house_overlays(), astrology.load_catalog()
+    )
+  )
+  values = observations["aspects"]
   assert set(values) == {f.name for f in fields(result)}
   assert values["chart_left"] == json.loads(installed_check.chart_observations(result.chart_left))
   assert values["chart_right"] == json.loads(installed_check.chart_observations(result.chart_right))
@@ -606,11 +611,107 @@ def test_cross_observations_cover_every_field_and_both_complete_sources(
     else:
       values[field] = "different"
   expected = tmp_path / "cross-observations.json"
-  expected.write_text(json.dumps(values, sort_keys=True, allow_nan=False), encoding="utf-8")
+  expected.write_text(json.dumps(observations, sort_keys=True, allow_nan=False), encoding="utf-8")
   if changed:
-    with pytest.raises(ValueError, match="cross aspects differ from the development"):
+    with pytest.raises(ValueError, match="comparison observations differ from the development"):
       installed_check._check_cross_chart(expected)
   else:
+    installed_check._check_cross_chart(expected)
+
+
+def test_overlay_consumer_rejects_missing_hand_worked_direction(
+  monkeypatch: pytest.MonkeyPatch,
+) -> None:
+  result = installed_check.acceptance_house_overlays()
+  monkeypatch.setattr(
+    installed_check,
+    "acceptance_house_overlays",
+    lambda: SimpleNamespace(placements=result.placements[:-3]),
+  )
+  with pytest.raises(ValueError, match="house overlays differ from hand-worked geometry"):
+    installed_check._check_cross_chart()
+
+
+@pytest.mark.parametrize("name", ["format_house_overlays", "format_cross_aspects"])
+def test_comparison_consumer_rejects_missing_text(
+  name: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+  monkeypatch.setattr(astrology, name, lambda *args, **kwargs: "")
+  with pytest.raises(ValueError, match="text lost"):
+    installed_check._check_cross_chart()
+
+
+@pytest.mark.parametrize("name", ["format_house_overlays", "format_cross_aspects"])
+def test_comparison_consumer_blocks_native_import_after_inputs_and_restores_guard(
+  name: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+  original = builtins.__import__
+
+  def native_attempt(*args: object, **kwargs: object) -> str:
+    __import__("celestial_calendar")
+    raise RuntimeError("Native import was not blocked")
+
+  monkeypatch.setattr(astrology, name, native_attempt)
+  with pytest.raises(ValueError, match="attempted to initialize astronomy"):
+    installed_check._check_cross_chart()
+  assert builtins.__import__ is original
+
+
+@pytest.mark.parametrize(
+  "field", ["chart_left", "chart_right", "left_objects", "right_objects", "placements"]
+)
+@pytest.mark.parametrize("changed", [False, True])
+def test_overlay_observations_cover_all_fields_and_sources(
+  tmp_path: Path, field: str, changed: bool
+) -> None:
+  overlays = installed_check.acceptance_house_overlays()
+  values = json.loads(
+    installed_check.comparison_observations(
+      installed_check.acceptance_cross_aspects(), overlays, astrology.load_catalog()
+    )
+  )
+  observed = values["overlays"]
+  assert set(observed) == {f.name for f in fields(overlays)}
+  for side in ("left", "right"):
+    assert observed[f"chart_{side}"] == json.loads(
+      installed_check.chart_observations(getattr(overlays, f"chart_{side}"))
+    )
+    assert observed[f"{side}_objects"] == list(getattr(overlays, f"{side}_objects"))
+  assert observed["placements"] == [
+    [getattr(p, f.name) for f in fields(p)] for p in overlays.placements
+  ]
+  if changed:
+    if field == "placements":
+      observed[field][0][3] += 1
+    elif field in ("chart_left", "chart_right"):
+      observed[field]["provenance"] = "changed provenance"
+    else:
+      observed[field] = "different"
+  expected = tmp_path / "comparison-observations.json"
+  expected.write_text(json.dumps(values, sort_keys=True, allow_nan=False), encoding="utf-8")
+  if changed:
+    with pytest.raises(ValueError, match="comparison observations differ from the development"):
+      installed_check._check_cross_chart(expected)
+  else:
+    installed_check._check_cross_chart(expected)
+
+
+@pytest.mark.parametrize("language", ["en", "zh-CN"])
+@pytest.mark.parametrize("kind", ["overlays", "aspects"])
+def test_comparison_observations_reject_changed_bilingual_text(
+  tmp_path: Path, language: str, kind: str
+) -> None:
+  values = json.loads(
+    installed_check.comparison_observations(
+      installed_check.acceptance_cross_aspects(),
+      installed_check.acceptance_house_overlays(),
+      astrology.load_catalog(),
+    )
+  )
+  values["text"][language][kind] += "\nFORGED ROW"
+  expected = tmp_path / "comparison-observations.json"
+  expected.write_text(json.dumps(values, sort_keys=True, allow_nan=False), encoding="utf-8")
+  with pytest.raises(ValueError, match="comparison observations differ from the development"):
     installed_check._check_cross_chart(expected)
 
 
@@ -718,6 +819,51 @@ def test_installed_dignity_knowledge_defects(consumer: Path, defect: str) -> Non
   path.write_text(json.dumps(data), encoding="utf-8")
   with pytest.raises(ValueError, match="Installed dignity knowledge"):
     installed_check._check_dignities()
+
+
+@pytest.mark.parametrize(
+  "defect",
+  [
+    "entry_link",
+    "rule_link",
+    "configuration",
+    "source_link",
+    "source_status",
+    "source_url",
+    "output",
+    "prerequisites",
+    "translation",
+  ],
+)
+def test_installed_overlay_knowledge_defects(consumer: Path, defect: str) -> None:
+  path = consumer / "knowledge/catalog.json"
+  data = json.loads(path.read_text(encoding="utf-8"))
+  entry = next(e for e in data["entries"] if e["identifier"] == "entry.cross_house_overlays")
+  rule = next(v for v in data["variants"] if v["identifier"] == "rule.project.cross_house_overlays")
+  source = next(
+    s for s in data["sources"] if s["identifier"] == "source.astrology.house_overlays.f269d14"
+  )
+  if defect == "entry_link":
+    entry["rule_ids"] = ["rule.project.cusp_ownership"]
+  elif defect == "rule_link":
+    rule["concept_ids"] = rule["concept_ids"][:-1]
+  elif defect == "configuration":
+    rule["configuration"] = {"enum": "HouseSystem", "member": "EQUAL"}
+  elif defect == "source_link":
+    entry["citations"][0]["source_id"] = "source.astrology.cross_aspects.0d7122a"
+  elif defect == "source_status":
+    source["verification"] = "unverified"
+  elif defect == "source_url":
+    source["url"] = "https://github.com/0xf3cd/astrology/tree/main"
+  elif defect == "output":
+    entry["output_eligibility"] = "eligible"
+  elif defect == "prerequisites":
+    entry["prerequisite_status"] = "unresolved"
+  else:
+    rule["definition"]["revision"] = 2
+  path.write_text(json.dumps(data), encoding="utf-8")
+  with pytest.raises(ValueError, match="Installed overlay knowledge"):
+    installed_check._check_knowledge()
 
 
 def test_installed_ashmand_lookup_defect_is_rejected(

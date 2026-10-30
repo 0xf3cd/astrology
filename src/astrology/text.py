@@ -5,12 +5,15 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from typing import cast
 
 from astrology.aspects import AspectMotion
 from astrology.birth import Location
 from astrology.chart import NatalChart
-from astrology.config import HouseSystem, MajorAspect
+from astrology.config import AspectRule, HouseSystem, MajorAspect
+from astrology.cross_aspects import CrossChartAspects
+from astrology.house_overlays import CrossChartHouseOverlays
 from astrology.knowledge import Catalog, Concept, TranslationStatus
 from astrology.knowledge.catalog import _sign_concept
 from astrology.knowledge.records import _LANGUAGES, Language
@@ -149,6 +152,36 @@ _RULER_LABELS = {
     "empty": "这四项均未命中",
   },
 }
+_COMPARISON_LABELS = {
+  "en": {
+    "overlays": "Cross-chart house overlays",
+    "aspects": "Static cross-chart aspects",
+    "left": "Left",
+    "right": "Right",
+    "left_objects": "Left selected objects",
+    "right_objects": "Right selected objects",
+    "empty_objects": "No objects",
+    "sources": "Side | House system | Zodiac / center | Position frame | JD(UT1) / JDE(TT) | Delta-T model | astrology / celestial-calendar versions",
+    "overlay_columns": "Object owner | Object | House owner | House",
+    "aspect_columns": "Left object | Right object | Aspect | Branch | Deviation | Orb limit",
+    "placement": "Stored longitudes use the receiving chart's cusps; no three-dimensional placement.",
+    "static": "Static longitude comparison; rates are not used.",
+  },
+  "zh-CN": {
+    "overlays": "双盘落宫",
+    "aspects": "静态双盘相位",
+    "left": "左盘",
+    "right": "右盘",
+    "left_objects": "左盘所选对象",
+    "right_objects": "右盘所选对象",
+    "empty_objects": "无",
+    "sources": "所属盘 | 宫制 | 黄道 / 中心 | 位置坐标约定 | JD(UT1) / JDE(TT) | ΔT 模型 | astrology / celestial-calendar 版本",
+    "overlay_columns": "对象所属盘 | 对象 | 宫位所属盘 | 宫号",
+    "aspect_columns": "左盘对象 | 右盘对象 | 相位 | 分支 | 偏差 | 容许度上限",
+    "placement": "将已存黄经归入接收盘的宫头区间，不计算三维落宫。",
+    "static": "静态黄经比较，不使用速率。",
+  },
+}
 
 
 def _dms(arcseconds: int) -> str:
@@ -202,6 +235,26 @@ def _current_name(concept: Concept, language: Language) -> str:
 def _longitude_text(value: float, catalog: Catalog, language: Language) -> str:
   count = _whole_arcseconds(value) % (30 * 3600)
   return f"{_name(sign_of(value), catalog, language)} {_dms(count)}"
+
+
+def _aspect_rule_lines(
+  rules: Sequence[AspectRule], catalog: Catalog, language: Language
+) -> list[str]:
+  labels = _HEADINGS[language]
+  lines = []
+  for rule in rules:
+    overrides = (
+      ", ".join(
+        f"{_name(entry.identity, catalog, language)}={_angle(entry.orb_degrees)}"
+        for entry in rule.object_orbs
+      )
+      or labels["none"]
+    )
+    lines.append(
+      f"{labels['rule']}: {_name(rule.aspect, catalog, language)} / "
+      f"{_angle(rule.orb_degrees)} / {overrides}"
+    )
+  return lines
 
 
 def format_chart(chart: NatalChart, catalog: Catalog, *, language: Language = "en") -> str:
@@ -303,18 +356,7 @@ def format_chart(chart: NatalChart, catalog: Catalog, *, language: Language = "e
       f"{labels['combination']}: {requested.orb_combination or labels['none']}",
     ]
   )
-  for rule in requested.aspects:
-    overrides = (
-      ", ".join(
-        f"{_name(entry.identity, catalog, language)}={_angle(entry.orb_degrees)}"
-        for entry in rule.object_orbs
-      )
-      or labels["none"]
-    )
-    lines.append(
-      f"{labels['rule']}: {_name(rule.aspect, catalog, language)} / "
-      f"{_angle(rule.orb_degrees)} / {overrides}"
-    )
+  lines.extend(_aspect_rule_lines(requested.aspects, catalog, language))
   lines.extend(
     [
       "",
@@ -440,4 +482,117 @@ def format_house_rulers(result: HouseRulers, catalog: Catalog, *, language: Lang
       f"{record.house} | {_name(record.cusp_sign, catalog, language)} | "
       f"{_name(record.ruler, catalog, language)} | {position_text} | {status_text}"
     )
+  return "\n".join(lines)
+
+
+def _comparison_sources(
+  result: CrossChartAspects | CrossChartHouseOverlays, catalog: Catalog, language: Language
+) -> list[str]:
+  labels = _COMPARISON_LABELS[language]
+  lines = [labels["sources"]]
+  for side, chart in (("left", result.chart_left), ("right", result.chart_right)):
+    lines.append(
+      f"{labels[side]} | {_name(chart.houses.system, catalog, language)} | "
+      f"{chart.requested.zodiac} / {chart.requested.center} | "
+      f"{chart.provenance.position_frame} | {chart.times.jd_ut1} / {chart.times.jde_tt} | "
+      f"{_cell(chart.effective.delta_t_model)} | "
+      f"{_cell(chart.provenance.astrology_version)} / {_cell(chart.provenance.celestial_version)}"
+    )
+  for side, objects in (("left", result.left_objects), ("right", result.right_objects)):
+    names = ", ".join(
+      f"{_name(identity, catalog, language)} [{identity.value}]" for identity in objects
+    )
+    lines.append(f"{labels[f'{side}_objects']}: {names or labels['empty_objects']}")
+  return lines
+
+
+def format_house_overlays(
+  result: CrossChartHouseOverlays, catalog: Catalog, *, language: Language = "en"
+) -> str:
+  """Format house overlays as a table that identifies both charts for each placement.
+
+  The table includes both charts' provenance, selected objects and every placement,
+  distinguishing the chart the object comes from and the chart whose houses are used.
+  Names come from the supplied Catalog. No I/O, astronomy or time resolution is performed.
+  Invalid result or catalog types raise TypeError. Invalid language, or missing or
+  stale displayed names, raises ValueError. Text is escaped as in format_chart;
+  the table cannot be used to restore the source charts without loss.
+
+  将落宫结果排成表格，每条记录都标明对象来自哪张盘、使用哪张盘的宫位。
+  表中包含两张盘的来源信息、所选对象和全部落宫，名称取自传入的 Catalog。
+  不执行 I/O、天文计算或时刻解析。结果或目录类型错误时抛出 TypeError；
+  语言非法，或所需名称缺失、过期时，抛出 ValueError。文字按 format_chart 的规则转义，
+  不能用这份表格无损恢复原盘。
+  """
+  if type(result) is not CrossChartHouseOverlays or type(catalog) is not Catalog:
+    raise TypeError("result and catalog must be CrossChartHouseOverlays and Catalog values")
+  if type(language) is not str or language not in _LANGUAGES:
+    raise ValueError("language must be en or zh-CN")
+  labels = _COMPARISON_LABELS[language]
+  lines = [labels["overlays"], *_comparison_sources(result, catalog, language), ""]
+  lines.extend((labels["placement"], labels["overlay_columns"]))
+  for placement in result.placements:
+    lines.append(
+      f"{labels[placement.object_owner]} | "
+      f"{_name(placement.identity, catalog, language)} [{placement.identity.value}] | "
+      f"{labels[placement.house_owner]} | {placement.house}"
+    )
+  if not result.placements:
+    lines.append(_HEADINGS[language]["none"])
+  return "\n".join(lines)
+
+
+def format_cross_aspects(
+  result: CrossChartAspects, catalog: Catalog, *, language: Language = "en"
+) -> str:
+  """Format all static cross-chart aspect hits and their rules as a table.
+
+  The table includes chart provenance and selected objects, without motion labels.
+  Branches, deviations and effective orb limits are angles in degrees, displayed
+  with the whole-arcsecond truncation rule. A deviation whose absolute value equals
+  the orb limit counts as a hit. Truncation changes only the display, never which
+  records appear. Rules show base orbs, object overrides and the chosen combination.
+
+  Names come from the supplied Catalog; text is escaped as in format_house_overlays.
+  Invalid result or catalog types raise TypeError. Invalid language, or missing or
+  stale displayed names, raises ValueError. No I/O, astronomy or time resolution
+  is performed. The table cannot be used to restore the source charts without loss.
+
+  将全部静态双盘相位及其规则排成表格。表中包含命盘来源信息和所选对象，不添加运动标签。
+  分支、偏差和实际容许度上限以度计，按整角秒截断显示；偏差的绝对值等于上限时也算命中。
+  截断只影响显示，不改变输出哪些记录。规则列出基础容许度、对象单独设置及所选合成方式。
+
+  名称取自传入的 Catalog，文字按 format_house_overlays 的规则转义。
+  结果或目录类型错误时抛出 TypeError；语言非法，或所需名称缺失、过期时，抛出 ValueError。
+  不执行 I/O、天文计算或时刻解析，不能用这份表格无损恢复原盘。
+  """
+  if type(result) is not CrossChartAspects or type(catalog) is not Catalog:
+    raise TypeError("result and catalog must be CrossChartAspects and Catalog values")
+  if type(language) is not str or language not in _LANGUAGES:
+    raise ValueError("language must be en or zh-CN")
+  labels = _COMPARISON_LABELS[language]
+  headings = _HEADINGS[language]
+  lines = [labels["aspects"], *_comparison_sources(result, catalog, language), ""]
+  lines.extend((labels["static"], labels["aspect_columns"]))
+  for hit in result.hits:
+    lines.append(
+      " | ".join(
+        (
+          f"{_name(hit.left_object, catalog, language)} [{hit.left_object.value}]",
+          f"{_name(hit.right_object, catalog, language)} [{hit.right_object.value}]",
+          _name(hit.aspect, catalog, language),
+          _angle(hit.branch_deg, signed=True),
+          _angle(hit.deviation_deg, signed=True),
+          _angle(hit.orb_limit_deg),
+        )
+      )
+    )
+  if not result.hits:
+    lines.append(headings["none"])
+  lines.append(f"{headings['combination']}: {result.combination or headings['none']}")
+  lines.extend(
+    _aspect_rule_lines(result.rules, catalog, language)
+    or [f"{headings['rule']}: {headings['none']}"]
+  )
+  lines.append(headings["display"])
   return "\n".join(lines)

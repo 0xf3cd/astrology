@@ -16,7 +16,8 @@ See [Contributing](https://0xf3cd.github.io/astrology/docs/en/contributing.html)
 The current source also adds [element/modality distributions and natal lunar
 phase](https://0xf3cd.github.io/astrology/docs/en/summaries.html),
 [traditional sign rulers and four statuses](https://0xf3cd.github.io/astrology/docs/en/dignities.html),
-and [explicit axis aspects for natal and static cross-chart queries](https://0xf3cd.github.io/astrology/docs/en/aspects.html#select-axes-explicitly).
+[explicit axis aspects for natal and static cross-chart queries](https://0xf3cd.github.io/astrology/docs/en/aspects.html#select-axes-explicitly),
+and [cross-chart house overlays and bilingual comparison text](https://0xf3cd.github.io/astrology/docs/en/cross_aspects.html).
 These additions are planned for 0.3.0. Axes participate only when selected;
 requests without selected axes keep their behavior.
 

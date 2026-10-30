@@ -27,7 +27,7 @@ True
 >>> catalog.filter_entries(concept_id="body.sun")[0].identifier
 'entry.body_requests'
 >>> len(catalog.filter_sources(verification=SourceVerification.VERIFIED))
-9
+10
 >>> bool(catalog.version)
 True
 ```
@@ -54,6 +54,33 @@ Here, `complete` means the entry has stated its prerequisites, `reference_only`
 means it is for reference, and `not_assessed` means no chart has been checked
 against those prerequisites. These answer different questions; see [status meanings](#status-has-several-dimensions).
 
+The house-overlay explanation is `entry.cross_house_overlays`. Read `rule_ids`
+for its rules, and use `catalog.citations()` to retrieve the citations and their
+source records:
+
+```{doctest}
+>>> overlay = catalog.entry("entry.cross_house_overlays")
+>>> overlay.rule_ids
+('rule.project.cross_house_overlays', 'rule.project.cusp_ownership')
+>>> citation, source = catalog.citations(overlay.identifier)[0]
+>>> source.identifier
+'source.astrology.house_overlays.f269d14'
+>>> overlay.prerequisite_status.value, overlay.output_eligibility.value, overlay.chart_applicability
+('complete', 'reference_only', 'not_assessed')
+```
+
+There are two rules here. `rule.project.cross_house_overlays` explains how to
+select objects from each chart independently, distinguish the object and house
+owners, and retain each chart's house system. `rule.project.cusp_ownership` defines
+the intervals between cusps that determine a longitude's house. House overlays use
+that same interval rule.
+
+The source record links to implementation code at a fixed commit, so you can
+check the algorithm. It does not verify where the input astronomical values came
+from or support relationship interpretation. The query above only reads explanations
+and citations; it does not calculate placements or assess a chart. To calculate
+placements between two charts, see the [house-overlay example](cross_aspects.md#find-houses-in-the-other-chart).
+
 ### Return values and errors
 
 Each `load_catalog()` reads the packaged JSON file without network access or a
@@ -75,8 +102,8 @@ The catalog currently includes:
 
 - Available bodies, axes, house systems, lunar-node definitions and aspects, with their
   English and Chinese names.
-- How this project divides the zodiac into twelve signs, places objects in houses,
-  and calculates single-chart and cross-chart aspects.
+- How this project divides the zodiac into twelve signs, places objects in houses
+  (including cross-chart overlays), and calculates single-chart and cross-chart aspects.
 - The four sign groups in Ashmand's 1822 edition, with bibliographic records,
   excerpts and Chinese translations.
 - [Traditional sign rulers and four statuses](dignities.md) from William Lilly's

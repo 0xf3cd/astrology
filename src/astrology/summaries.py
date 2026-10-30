@@ -12,6 +12,7 @@ from types import MappingProxyType
 from astrology.chart import NatalChart, Placement
 from astrology.dignities import _RULE_ID as _DIGNITY_RULE_ID
 from astrology.dignities import DignityStatus, essential_dignities, sign_ruler
+from astrology.houses import _require_house_number
 from astrology.lunar_phase import LunarPhaseResult, lunar_phase
 from astrology.objects import AstronomicalObject, Body, _is_astronomical_object
 from astrology.zodiac import Element, Modality, Sign, element_of, modality_of, sign_of
@@ -155,10 +156,7 @@ class HouseRuler:
   placement: Placement | None
 
   def __post_init__(self) -> None:
-    if type(self.house) is not int:
-      raise TypeError("house must be an integer, not bool")
-    if not 1 <= self.house <= 12:
-      raise ValueError("house must be in [1, 12]")
+    _require_house_number(self.house)
     if type(self.cusp_sign) is not Sign:
       raise TypeError("cusp_sign must be a Sign")
     if self.placement is not None:

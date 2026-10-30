@@ -1,6 +1,6 @@
-"""Composition of a modern tropical natal chart from resolved input and configuration.
+"""Immutable natal results, shared chart access and modern tropical chart composition.
 
-把已解析的输入和请求的配置组合成现代热带本命盘。
+不可变本命盘结果、共用命盘访问，以及现代热带本命盘的组合。
 """
 
 from __future__ import annotations
@@ -14,7 +14,7 @@ from astrology._validation import finite_number
 from astrology.aspects import AspectHit, AspectObject, find_aspects
 from astrology.birth import MissingBirthDataError, ResolvedBirth
 from astrology.config import ChartConfig, HouseSystem, OrbCombination
-from astrology.houses import _cusps, house_of
+from astrology.houses import _cusps, _require_house_number, house_of
 from astrology.objects import (
   AstronomicalObject,
   Axis,
@@ -171,10 +171,7 @@ class Placement:
     if not 0.0 <= degree < 30.0:
       raise ValueError("sign_degree_deg must be in [0, 30)")
     object.__setattr__(self, "sign_degree_deg", degree)
-    if type(self.house) is not int:
-      raise TypeError("house must be an integer, not bool")
-    if not 1 <= self.house <= 12:
-      raise ValueError("house must be in [1, 12]")
+    _require_house_number(self.house)
 
 
 @dataclass(frozen=True, slots=True)
@@ -333,20 +330,66 @@ def _placements(
   )
 
 
+def _require_comparable_sources(chart_left: NatalChart, chart_right: NatalChart) -> None:
+  """Keep this boundary check even while public constructors admit one convention.
+
+  即使公开构造器目前只接纳一种坐标约定，也保留比较入口处的校验。
+  """
+  if type(chart_left) is not NatalChart or type(chart_right) is not NatalChart:
+    raise TypeError("chart_left and chart_right must be NatalChart values")
+  if (
+    chart_left.requested.zodiac != chart_right.requested.zodiac
+    or chart_left.requested.center != chart_right.requested.center
+    or chart_left.provenance.position_frame != chart_right.provenance.position_frame
+  ):
+    raise ValueError("Cross charts must use matching zodiac, center and position frame")
+
+
+def _selection_for_chart(
+  chart: NatalChart, objects: Sequence[ChartObject], name: str
+) -> tuple[ChartObject, ...]:
+  """Validate a comparison selection and order it by stored positions, then axes.
+
+  校验比较所用的对象选择，按已存位置及四轴的顺序排列。
+  """
+  if not isinstance(objects, Sequence) or isinstance(objects, (str, bytes)):
+    raise TypeError(f"{name} must be a sequence of Body, LunarNode or Axis values")
+  selected = tuple(objects)
+  if any(not _is_chart_object(value) for value in selected):
+    raise TypeError(f"{name} must contain Body, LunarNode or Axis values")
+  if len(set(selected)) != len(selected):
+    raise ValueError(f"{name} must not contain duplicate identities")
+  available: tuple[ChartObject, ...] = (*[position.identity for position in chart.positions], *Axis)
+  if not set(selected) <= set(available):
+    raise ValueError(f"{name} must name only objects available in its source chart")
+  return tuple(identity for identity in available if identity in selected)
+
+
+def _selected_longitudes(
+  positions: Sequence[EclipticPosition], houses: ChartHouses, participants: Sequence[ChartObject]
+) -> tuple[tuple[ChartObject, float], ...]:
+  """Read selected stored longitudes; axes follow bodies/nodes in their enum order.
+
+  读取选中的已存黄经；四轴按枚举顺序排在天体和交点之后。
+  """
+  return (
+    *[
+      (position.identity, position.longitude_deg)
+      for position in positions
+      if position.identity in participants
+    ],
+    *[(axis, getattr(houses, _AXIS_FIELDS[axis])) for axis in Axis if axis in participants],
+  )
+
+
 def _aspect_positions(
   positions: Sequence[EclipticPosition], houses: ChartHouses, participants: Sequence[ChartObject]
 ) -> tuple[AspectObject, ...]:
-  astronomical = tuple(
-    AspectObject(position.identity, position.longitude_deg, position.longitude_rate_deg_per_tt_day)
-    for position in positions
-    if position.identity in participants
+  rates = {position.identity: position.longitude_rate_deg_per_tt_day for position in positions}
+  return tuple(
+    AspectObject(identity, longitude, None if isinstance(identity, Axis) else rates[identity])
+    for identity, longitude in _selected_longitudes(positions, houses, participants)
   )
-  axes = tuple(
-    AspectObject(axis, getattr(houses, _AXIS_FIELDS[axis]), None)
-    for axis in Axis
-    if axis in participants
-  )
-  return (*astronomical, *axes)
 
 
 def _aspects(

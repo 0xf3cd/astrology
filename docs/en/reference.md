@@ -48,11 +48,12 @@ same enum classes. `Axis` is also available from `astrology`.
 
 ## Chart text
 
-See the [complete result and text example](records.md).
+See the [complete natal result and text example](records.md) for natal output, or
+[render comparison text](cross_aspects.md#render-comparison-text) for cross-chart aspects and house overlays.
 
 ```{eval-rst}
 .. automodule:: astrology.text
-   :members: format_chart, format_sign_distribution, format_lunar_phase, format_house_rulers
+   :members: format_chart, format_sign_distribution, format_lunar_phase, format_house_rulers, format_house_overlays, format_cross_aspects
 ```
 
 ## Zodiac classification
@@ -84,11 +85,23 @@ See the [complete result and text example](records.md).
 
 ## Static cross-chart aspects
 
-See the [two-chart example and static contract](cross_aspects.md).
+See [cross-chart aspects and house overlays](cross_aspects.md) for usage and the meaning of static aspects.
 
 ```{eval-rst}
 .. automodule:: astrology.cross_aspects
    :members: CrossAspectHit, CrossChartAspects, cross_chart_aspects
+   :undoc-members:
+   :member-order: bysource
+```
+
+## Cross-chart house overlays
+
+See the [house-overlay example](cross_aspects.md#find-houses-in-the-other-chart)
+for calculation and the [comparison text example](cross_aspects.md#render-comparison-text) for output.
+
+```{eval-rst}
+.. automodule:: astrology.house_overlays
+   :members: HouseOverlay, CrossChartHouseOverlays, cross_chart_house_overlays
    :undoc-members:
    :member-order: bysource
 ```

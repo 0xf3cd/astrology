@@ -49,11 +49,11 @@
 
 ## 命盘文本
 
-见[完整结果与文本例子](records.md)。
+本命盘的输出方法见[完整结果与文本例子](records.md)，双盘相位和落宫的输出方法见[输出比较文本](cross_aspects.md#输出比较文本)。
 
 ```{eval-rst}
 .. automodule:: astrology.text
-   :members: format_chart, format_sign_distribution, format_lunar_phase, format_house_rulers
+   :members: format_chart, format_sign_distribution, format_lunar_phase, format_house_rulers, format_house_overlays, format_cross_aspects
    :no-index:
 ```
 
@@ -89,11 +89,23 @@
 
 ## 静态双盘交叉相位
 
-见[双盘示例与静态合同](cross_aspects.md)。
+用法及静态相位的含义见[双盘相位与落宫](cross_aspects.md)。
 
 ```{eval-rst}
 .. automodule:: astrology.cross_aspects
    :members: CrossAspectHit, CrossChartAspects, cross_chart_aspects
+   :undoc-members:
+   :member-order: bysource
+   :no-index:
+```
+
+## 双盘落宫
+
+计算方法见[双盘落宫示例](cross_aspects.md#查询对象落入另一张盘的哪一宫)，文本输出见[比较文本示例](cross_aspects.md#输出比较文本)。
+
+```{eval-rst}
+.. automodule:: astrology.house_overlays
+   :members: HouseOverlay, CrossChartHouseOverlays, cross_chart_house_overlays
    :undoc-members:
    :member-order: bysource
    :no-index:

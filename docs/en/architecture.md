@@ -27,6 +27,7 @@ src/astrology/
   aspects.py        Aspect definitions, orbs, and local motion
   chart.py          Composition and immutable chart results
   cross_aspects.py  Static comparison of supplied charts, retaining both sources
+  house_overlays.py Directional house placement between supplied charts
   lunar_phase.py    Oriented solar/lunar arc and named lunation types
   dignities.py      Traditional sign rulers and domicile/exaltation/detriment/fall
   summaries.py      Explicit-population statistics and supplied-chart summaries
@@ -42,12 +43,20 @@ the success contract of a complete chart; it does not become the owner of every
 shared definition. Common values move to a shared module only when actual users
 need them. Package imports and knowledge queries must not initialize celestial.
 
-`cross_aspects.py` composes existing chart results without astronomy. Shared
-angular/orb arithmetic remains in `aspects.py`; single-chart pair eligibility
-and local motion stay with `find_aspects`, separate from static cross pairing.
-`objects.py` owns the narrow body/node and broader aspect identity families.
-The adapter retains target bindings, text retains supplied-catalog naming, and
-`chart.py` extracts selected stored axis positions for both compositions.
+`cross_aspects.py` calculates static aspects from two existing charts without
+calling the astronomy library. It shares the angle and orb calculations in
+`aspects.py` with natal aspects, but `find_aspects` separately handles single-chart
+pair eligibility and local motion. `house_overlays.py` passes one chart's
+longitudes and the other chart's cusps to `house_of` to calculate placements in
+both directions.
+
+`objects.py` defines body, node and axis identities. It distinguishes body/node-only
+types from the types that also include axes, used by aspects and house overlays.
+The astronomy adapter maps these identities to calculation targets; the text
+module looks up names in the supplied catalog. `chart.py` extracts the selected
+stored longitudes for natal aspects, static cross-chart aspects and house
+overlays. It also checks coordinate compatibility and object selections for
+cross-chart comparisons.
 
 Knowledge and calculation remain connected by stable identifiers, described in
 [Knowledge organization](knowledge.md). Additional UI applications can consume
