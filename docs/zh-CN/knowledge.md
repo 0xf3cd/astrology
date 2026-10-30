@@ -9,6 +9,10 @@
 
 ## 不排盘，先查知识
 
+<!-- usage: knowledge.lookup -->
+
+用 `lookup` 按名称或别名查询，用 `concept` 按稳定标识查询：
+
 ```{doctest}
 >>> from astrology.knowledge import ConceptKind, SourceVerification, load_catalog
 >>> catalog = load_catalog()
@@ -33,7 +37,11 @@ True
 同一个概念可以有多个名称，但只有一个标识。例如，`Sun`、`Sol` 和“日轮”都指向 `body.sun`。
 规则变体则记录某套具体定义，例如采用哪种宫制或月交点算法。天体名称和升降交点方向本身不另建规则。
 太阳链接有来源依据的尊贵规则，其中含具体归属，不是重复太阳名称。
-旧标识的处理见[规则标识变更](#首发前的规则标识变更)。
+一个身份可以没有关联变体；用 `concept()` 或 `lookup()` 仍可查询其名称。
+
+<!-- /usage: knowledge.lookup -->
+
+<!-- usage: knowledge.editorial_states -->
 
 也可以查询[双盘相位比较](cross_aspects.md)采用的规则。
 `entry.cross_aspect_evaluation` 是相关说明条目，`rule.project.cross_aspect_evaluation` 是它链接的规则。
@@ -47,6 +55,8 @@ True
 
 这里的 `complete` 表示条目已经写清所需前提；`reference_only` 表示它仅供参考，
 `not_assessed` 表示没有判断某张命盘是否满足这些前提。三者回答不同的问题，详见[状态说明](#状态需要分开表达)。
+
+<!-- /usage: knowledge.editorial_states -->
 
 双盘落宫的说明条目是 `entry.cross_house_overlays`。用 `rule_ids` 查看它采用的规则，
 用 `catalog.citations()` 读取引用及对应的来源记录：
@@ -202,8 +212,24 @@ True
 
 这些输出概念有各自的类别及稳定标识：`element.*`、`modality.*`、
 `lunation_type.rudhyar1950.*`，不链接请求配置。用法见[查询、统计及月相指南](summaries.md)。
-已核的来源是 Astrodienst 网页快照和 Rudhyar 在线转录，未核 Rudhyar 的杂志原件。分类不作性格解读；
+分类不作性格解读；
 生成表读取各领域的可执行定义。
+
+{ref}`元素 <catalog-zh-cn-rule-zodiac-elements>`及
+{ref}`模式 <catalog-zh-cn-rule-zodiac-modalities>`表依据 Astrodienst 无日期的编辑页面，
+按记录中的 2025-12-28 快照核验。来源的 `Sagitarius` 拼写单独记录，规范身份仍为
+`Sign.SAGITTARIUS`。`Modality` 与 `AshmandSignGroup` 身份分开：两者固定集合相同，
+现代变动集合与 Ashmand 双体集合相同；Ashmand 至点、分点两对合起来是现代基本模式集合。
+这种成员关系不合并它们的名称或历史定义。
+
+两个 `FIXED` 成员的字符串值都是 `"fixed"`；按 `StrEnum` 的字符串语义，它们比较相等，
+hash 也相同。要在同一映射中保留二者，请用 `(type(member), member.value)` 作键，
+或使用各自带类别前缀的目录 ID。
+
+月相分类采用 Rudhyar 的八种类型，依据 *Your Lunation Birthday* 第四部分在线转录。
+页面自述初刊于 *Horoscope Magazine* 1950 年 1 月，未核杂志原件。
+参见{ref}`区间及来源 <catalog-zh-cn-rule-lunation-rudhyar1950>`；项目的端点和方向政策见
+[用法指南](summaries.md#对给定日月位置分类)。
 
 ## 译文修订与搜索
 
@@ -241,39 +267,6 @@ True
    缺乏依据的解释不进入默认语料。
 5. 补充边界与来源测试，运行[完整检查](contributing.md)，核双语生成页。
    检查覆盖当前译文、完整配置／目录／API 及安装资源；语义审阅仍须核译意与来源保真。
-
-## 首发前的规则标识变更
-
-语料 `2026.10.21.1` 移除十四条仅重复请求身份的自动变体，保留其概念、别名、配置链接和条目。
-`entry.body_requests` 与 `entry.node_directions` 的 `rule_ids` 现为空；条目原本就允许这种形状。
-移除的标识如下：
-
-```text
-rule.body.sun
-rule.body.moon
-rule.body.mercury
-rule.body.venus
-rule.body.mars
-rule.body.jupiter
-rule.body.saturn
-rule.body.uranus
-rule.body.neptune
-rule.body.pluto
-rule.node.mean_ascending
-rule.node.mean_descending
-rule.node.meeus_five_term_true_ascending
-rule.node.meeus_five_term_true_descending
-```
-
-`variant()` 遇到这些标识会抛出 `KeyError`，不提供别名或隐式转换为概念。
-移除纯身份规则不限制后续增加有实质内容的规则：太阳、月亮及水星至土星现在关联到
-Lilly《Christian Astrology》（1647）所载的尊贵与弱势规则。保留的身份信息可用 `concept()`、`lookup()`
-或 `filter_entries()` 查询。三条 `rule.house.*`、两条 `rule.node_definition.*`、五条
-`rule.aspect.*` 以及原有九条显式规则标识均保留，相对顺序不变：十条带配置链接的规则在前，
-原有九条显式规则在后。该修订当时含 19 条变体，概念、来源和条目数量仍为 36、3 和 8。
-来源状态、前提完整性、输出资格和命盘适用性仍各自独立。
-
-新增双盘判断后，已有规则标识保持不变，参与者规则限定用于单盘判断，运动规则限定用于同一时刻的速率。
 
 ## 记录与归属
 

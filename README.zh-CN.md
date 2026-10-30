@@ -6,10 +6,9 @@
 [celestial-calendar](https://github.com/0xf3cd/celestial-calendar) 提供；本仓记录占星规则、
 出处和流派变体，并组织可复现的星盘结果。
 
-本包提供不可变的[出生记录与现代时刻解析](https://0xf3cd.github.io/astrology/docs/zh-CN/birth.html)、
-[排盘请求配置](https://0xf3cd.github.io/astrology/docs/zh-CN/configuration.html)、[热带本命盘计算](https://0xf3cd.github.io/astrology/docs/zh-CN/chart.html)、
-[命盘结果与文本输出](https://0xf3cd.github.io/astrology/docs/zh-CN/records.html)、独立[知识目录](https://0xf3cd.github.io/astrology/docs/zh-CN/knowledge.html)、质量检查和双语 [API 文档](https://0xf3cd.github.io/astrology/docs/zh-CN/reference.html)。
-运行检查见[参与开发](https://0xf3cd.github.io/astrology/docs/zh-CN/contributing.html)。
+可以从已知出生时刻和地点计算热带地心本命盘，也可以不排盘，直接查询知识目录。
+先运行下面的示例；完整约定见[使用指南](https://0xf3cd.github.io/astrology/docs/zh-CN/index.html)和
+[API 参考](https://0xf3cd.github.io/astrology/docs/zh-CN/reference.html)。
 
 当前源码另增[元素／模式分布与出生月相](https://0xf3cd.github.io/astrology/docs/zh-CN/summaries.html)、
 [传统星座守护与四种状态](https://0xf3cd.github.io/astrology/docs/zh-CN/dignities.html)，
@@ -23,11 +22,11 @@
 - 两张本命盘之间的[静态交叉相位](https://0xf3cd.github.io/astrology/docs/zh-CN/cross_aspects.html)，保留两张源盘并区分左右对象，不标入相／离相。
 - 用 `ashmand_sign_group(Sign.ARIES)` 查询十二星座在 Ashmand 1822 年版中的四组归属。见[来源及查询示例](https://0xf3cd.github.io/astrology/docs/zh-CN/knowledge.html#ashmand-sign-groups-zh-cn)。
 
+## 安装发行版
+
 安装随天文依赖而定：celestial-calendar 0.8.0 只发布 Linux x86_64 与 aarch64、
 macOS 14+ arm64、Windows amd64 的轮子，没有源码分发包。其他平台无法安装本包，
 连知识浏览也不可用。
-
-## 安装发行版
 
 分发包名是 `celestial-astrology`，Python 导入名仍是 `astrology`。
 请勿安装 PyPI 上另一个无关的 `astrology` 项目。
@@ -80,7 +79,7 @@ py -3.14 -m venv .venv
 
 ## 第一张命盘
 
-把下面的 Python 脚本保存为 `first_chart.py`；它不是交互式终端记录。
+把下面的 Python 脚本保存为 `first_chart.py`。
 Linux/macOS 运行 `.venv/bin/python first_chart.py`，PowerShell 运行
 `.venv\Scripts\python.exe first_chart.py`。
 输入明确使用 UTC 偏移和合成坐标；本例不请求相位。
@@ -129,6 +128,16 @@ moon: scorpio
 [排盘指南](https://0xf3cd.github.io/astrology/docs/zh-CN/chart.html)说明支持范围，
 [结果指南](https://0xf3cd.github.io/astrology/docs/zh-CN/records.html)说明结构化结果与双语文本表格。
 
+输出列出解析后的 UTC 时刻及每个所选对象的星座。修改 `ChartConfig.objects` 可以请求其他天体或交点；
+用 `aspect_objects` 和显式容许度规则选择谁参与相位。
+
+| 接下来要做什么 | 指南 |
+|---|---|
+| 解析当地钟点，或选择重复时刻 | [出生输入](https://0xf3cd.github.io/astrology/docs/zh-CN/birth.html) |
+| 选择对象、相位参与者和容许度 | [配置](https://0xf3cd.github.io/astrology/docs/zh-CN/configuration.html) |
+| 比较两张命盘 | [双盘相位与落宫](https://0xf3cd.github.io/astrology/docs/zh-CN/cross_aspects.html) |
+| 绘制结果（源码接口） | [SVG 轮盘与矩阵](https://0xf3cd.github.io/astrology/docs/zh-CN/svg.html) |
+
 ## 第一次查询知识
 
 把这份独立脚本保存为 `first_knowledge.py`，用同一个虚拟环境的 Python 运行。
@@ -149,33 +158,21 @@ print(catalog.lookup("日轮")[0].identifier)
 body.sun
 ```
 
-可继续浏览[完整知识目录](https://0xf3cd.github.io/astrology/docs/zh-CN/catalog.html)或
-[公开 API](https://0xf3cd.github.io/astrology/docs/zh-CN/reference.html)。
-文档共用搜索索引，结果可能包含两种语言；中文采用相邻双字切分，不做语义匹配或词典分词。
+[知识指南](https://0xf3cd.github.io/astrology/docs/zh-CN/knowledge.html)说明查询、引用和整理状态。
+定义与出处可直接浏览[完整知识目录](https://0xf3cd.github.io/astrology/docs/zh-CN/catalog.html)。
 
-## 首版目标
+## 支持的命盘
 
-已知出生时刻和地点，计算现代热带黄道、地心本命盘：
-
-- 保存出生原始记录，显式处理时区，保留最终时标与计算来源。
-- 计算太阳、月亮、八颗行星及明确选择的月交点。
-- 支持 Whole Sign（整宫制）、Equal（等宫制）、Placidus；请求的几何无定义时显式失败。
-- 计算星座、二维黄经落宫（只用黄经，不用对象黄纬）、五大相位，以及可配置容许度和局部入相／离相状态。
-- 输出不可变结构及文本表格，在内存中保留输入、配置、天文原值和模型身份。
-
-位置、四轴、宫头、星座、落宫、相位及文本输出已实现。当前源码已撤回命盘持久化；
+支持 Whole Sign（整宫制）、Equal（等宫制）和 Placidus，计算太阳、月亮、八颗行星及显式选择的月交点定义。
+落宫只用黄经，不用对象黄纬。五大相位使用调用方提供的容许度；入相／离相描述局部运动，不预测未来事件。
+不可变结果保留原始输入、解析后的时标、配置、未舍入天文值和具名模型。当前源码已撤回命盘持久化；
 与已发布 v0.1.0 API 的差异见[发行说明](https://0xf3cd.github.io/astrology/docs/zh-CN/releases.html)。
-
-交付任务与验收见 [v0.1.0 milestone](https://github.com/0xf3cd/astrology/milestone/1)。
 
 ## 设计边界
 
 - [仓库结构与计算边界](https://0xf3cd.github.io/astrology/docs/zh-CN/architecture.html)
 - [知识组织与双语文档](https://0xf3cd.github.io/astrology/docs/zh-CN/knowledge.html)
 - [开发与审阅约定](https://0xf3cd.github.io/astrology/docs/zh-CN/contributing.html)
-
-项目指南与公开参考文档提供中英文。两种语言引用同一组标识、可执行规则和来源记录。
-引文保留原文语言，译文单独标明。
 
 ## 后续方向
 

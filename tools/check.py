@@ -5,7 +5,6 @@ from __future__ import annotations
 import argparse
 import json
 import os
-import re
 import shutil
 import subprocess
 import sys
@@ -42,6 +41,7 @@ from tools.catalog_docs import (
   localized_texts,
 )
 from tools.docs_search import check_search_html
+from tools.guide_checks import check_examples, check_guide_content
 
 ROOT = Path(__file__).resolve().parents[1]
 PACKAGE_FILES = (
@@ -89,6 +89,7 @@ SDIST_FILES = (
   "tools/fetch_reference.py",
   "tools/catalog_docs.py",
   "tools/docs_search.py",
+  "tools/guide_checks.py",
   "tests/reference/natal_reference.json",
   "tests/reference/complete_chart_reference.json",
   "tests/reference/chart_regression.json",
@@ -182,31 +183,6 @@ def check_documents(root: Path = ROOT) -> None:
     raise ValueError("\n".join(errors))
 
 
-def check_examples(report: str) -> None:
-  """Require executed bilingual development and API-guide examples.
-
-  要求双语开发指南与 API 指南均有已执行的例子。
-  """
-  for language in get_args(Language):
-    for page in (
-      "contributing",
-      "birth",
-      "configuration",
-      "chart",
-      "aspects",
-      "cross_aspects",
-      "summaries",
-      "dignities",
-      "svg",
-      "records",
-      "knowledge",
-    ):
-      marker = f"Document: docs/{language}/{page}\n"
-      section = re.split(r"(?m)^Document: ", report.partition(marker)[2], maxsplit=1)[0]
-      if not re.search(r"(?m)^[1-9]\d* tests? in \d+ items?\.$", section):
-        raise ValueError(f"No executed documentation examples for {language}/{page}")
-
-
 class _ApiHtml(HTMLParser):
   """Read rendered Sphinx signature names, not names embedded in raw directive text."""
 
@@ -294,7 +270,7 @@ def check_package_files(root: Path = ROOT) -> None:
   }
   if unlisted := present - set(PACKAGE_FILES):
     raise ValueError(f"Package files missing from PACKAGE_FILES: {sorted(unlisted)}")
-  from tools.installed_check import MODULES
+  from tools.installed_check import module_names
 
   # The root is checked directly; the astronomy adapter is checked after explicit calculation.
   # 包根单独检查；天文适配层在显式计算之后检查。
@@ -303,7 +279,8 @@ def check_package_files(root: Path = ROOT) -> None:
     for name in PACKAGE_FILES
     if name.endswith(".py")
   } - {"__init__", "celestial"}
-  if set(MODULES) != expected_modules or len(MODULES) != len(set(MODULES)):
+  modules = module_names()
+  if set(modules) != expected_modules or len(modules) != len(set(modules)):
     raise ValueError("Installed-consumer module coverage differs from PACKAGE_FILES")
 
 
@@ -776,6 +753,7 @@ def check_distribution(directory: Path) -> None:
     env=source_environment,
   )
   check_documents(source)
+  check_guide_content(source)
   for builder in ("html", "doctest"):
     run(
       (
@@ -805,7 +783,7 @@ def check_distribution(directory: Path) -> None:
     root=source,
     source_revision=os.environ.get("ASTROLOGY_DOCS_SOURCE_SHA", ""),
   )
-  check_examples((directory / "source-doctest/output.txt").read_text(encoding="utf-8"))
+  check_examples((directory / "source-doctest/output.txt").read_text(encoding="utf-8"), source)
 
   check_installed_wheel(source, wheels[0], metadata["version"], directory)
 
@@ -830,6 +808,7 @@ def main(*, artifacts_dir: Path | None = None) -> None:
   for arguments in commands:
     run((sys.executable, *arguments))
   check_documents()
+  check_guide_content(ROOT)
   check_package_files()
   with tempfile.TemporaryDirectory(
     prefix="astrology-check-", dir=os.environ.get("SCRATCH")
@@ -861,7 +840,7 @@ def main(*, artifacts_dir: Path | None = None) -> None:
       directory / "html", source_revision=os.environ.get("ASTROLOGY_DOCS_SOURCE_SHA", "")
     )
     results = (directory / "doctest/output.txt").read_text(encoding="utf-8")
-    check_examples(results)
+    check_examples(results, ROOT)
     check_distribution(directory)
     if artifacts_dir is not None:
       artifacts_dir.mkdir(parents=True)

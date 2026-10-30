@@ -11,6 +11,8 @@ For a natal wheel or an aspect matrix, pass the same results to the [SVG rendere
 
 ## A complete example
 
+<!-- usage: records.output -->
+
 This synthetic record falls in the half-hour repeated when clocks move back on
 Lord Howe Island. Choose the earlier occurrence with `fold=0`. The location is
 specified separately, not inferred from the timezone. There are no default
@@ -50,6 +52,8 @@ requested/effective configuration and provenance. Pass `language="zh-CN"` for
 Chinese output. The supplied catalog must contain current names in that language;
 missing or ambiguous names fail rather than fall back to another language.
 Loading the catalog is explicit; formatting itself performs no resource I/O.
+
+<!-- /usage: records.output -->
 
 ## Read the structured result
 
@@ -100,49 +104,9 @@ presentation, not a lossless interchange format.
 
 ## Verification and limits
 
-The [complete checks](contributing.md) build through an sdist, install the wheel
-outside the checkout and compare its complete numeric result, resolved input,
-requested/effective configuration and provenance with the source result exactly
-for the same code revision. They also exercise both text languages and requested
-Placidus failure. Import origins, including the explicitly loaded native adapter,
-are checked.
-
-`tests/reference/chart_regression.json` retains numbers from two project-calculated
-synthetic Whole Sign cases: an IANA input with nonuniform aspect orbs from the
-`0.0.0` development tree and a fixed-offset, two-body case without aspects from
-the published v0.1.0 wheel. Extraction provenance includes the original sample
-hashes and the released wheel/manifest digests, source commit and generation
-procedure. These are regression samples, not independent astronomy references.
-Tests construct their inputs explicitly; they do not restore saved charts.
-
-Numerical regression checks models, frames, configuration, identities and
-classifications without requiring historical package-version equality. Absolute
-tolerances are 1e-8 degrees for angles, 1e-9 AU for distances, 1e-9 degrees/TT day
-for rates and 1e-8 days for Julian dates. A changed model needs a separately
-justified comparison. These finite cases do not establish global accuracy.
-
-`tests/reference/complete_chart_reference.json` contains independently executed
-Swiss Ephemeris 2.10.03 / pyswisseph 2.10.3.2 numeric states for four synthetic
-instants, each with three house systems. It records the pyswisseph Python wheel's
-SHA-256 hash, flags, coordinate/time conventions, source URLs, separate calibration
-and per-field tolerances. Moshier is requested explicitly; returned `calc` flags
-are checked. Swiss houses use Swiss UT1 and Delta-T, not Algo5, the fixed Delta-T
-model used by this adapter. Their tolerance includes that time-model difference.
-Signs, two-dimensional house membership (using longitude, not object latitude),
-aspects and motion were derived by separate project-authored arithmetic from the
-Swiss states; Swiss itself does not supply an aspect table. Mean-node
-longitude/rate are compared as named models, not assumed identical formulas.
-Node distance and true nodes are not equivalent comparisons; zero node latitude
-is a definition-level check.
-
-If a reference point is within the combined longitude/cusp tolerances of a cusp,
-the comparison accepts either adjoining house. It does not claim an exact
-independent house label for that point.
-
-The [Swiss documentation](https://www.astro.com/swisseph/swisseph.htm) describes
-Moshier's precision class. The recorded thresholds include both implementations'
-model differences and finite calibration; they are not global accuracy guarantees.
-The source tool was isolated and is not a runtime/dev dependency. Only generated
-numbers and project-authored metadata are included, not Swiss code or ephemeris
-files; see the [GNU output FAQ](https://www.gnu.org/licenses/gpl-faq.html#WhatCaseIsOutputGPL).
-This does not change the project's MIT license or constitute a general license assurance.
+Source/install comparisons check packaging agreement, not numerical correctness.
+Independent Swiss states and project regression samples provide different checks;
+their finite tolerances include model differences and do not establish global
+accuracy. Near a cusp, a reference may allow either adjoining house rather than
+assert an exact independent label. The [contributing guide](contributing.md#complete-chart-numerical-references)
+records the fixtures, conventions, tolerances and redistribution limits.

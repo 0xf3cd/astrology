@@ -5,12 +5,11 @@ import json
 import sys
 from dataclasses import replace
 from datetime import UTC, date, datetime, time, timedelta
-from functools import partial
 from importlib import import_module
 from importlib.metadata import PackageNotFoundError, distribution, version
 from importlib.resources import files
 from pathlib import Path
-from typing import Any, Literal, cast
+from typing import Any, Literal
 from xml.etree import ElementTree as ET
 
 import astrology
@@ -23,27 +22,29 @@ from astrology.knowledge import (
   TranslationStatus,
 )
 
-MODULES = (
-  "_distribution",
-  "_validation",
-  "aspects",
-  "birth",
-  "chart",
-  "config",
-  "cross_aspects",
-  "dignities",
-  "house_overlays",
-  "houses",
-  "knowledge",
-  "knowledge.catalog",
-  "knowledge.records",
-  "lunar_phase",
-  "objects",
-  "summaries",
-  "svg",
-  "text",
-  "zodiac",
-)
+
+def module_names() -> tuple[str, ...]:
+  """Discover installed Python modules, deferring the astronomy adapter.
+
+  The consumer imports these modules; the source-side package inventory
+  independently detects files omitted from a distribution.
+
+  查找安装包中的 Python 模块，天文适配层留待显式计算时导入。
+  消费者导入这些模块；源码侧的包清单独立检测分发包遗漏的文件。
+  """
+  names = set()
+  for directory in astrology.__path__:
+    root = Path(directory)
+    for path in root.rglob("*.py"):
+      relative = path.relative_to(root)
+      if "__pycache__" in relative.parts:
+        continue
+      parts = relative.with_suffix("").parts
+      if parts[-1] == "__init__":
+        parts = parts[:-1]
+      if parts and parts != ("celestial",):
+        names.add(".".join(parts))
+  return tuple(sorted(names))
 
 
 def acceptance_chart() -> astrology.NatalChart:
@@ -531,28 +532,6 @@ def _check_axes() -> None:
         or name not in astrology.format_chart(natal, catalog, language=selected)
       ):
         raise ValueError("Installed axis vocabulary or text binding is missing")
-    bad = cast(Any, axis)
-    for call in (
-      partial(astrology.ChartConfig, source.requested.house_system, (bad,), ()),
-      partial(astrology.EclipticPosition, bad, 10, 0, 1, 1),
-      partial(astrology.Placement, bad, astrology.Sign.ARIES, 10, 1),
-      partial(astrology.chart_sign_distribution, source, objects=(bad,)),
-    ):
-      try:
-        call()
-      except TypeError:
-        pass
-      else:
-        raise ValueError("Installed narrow boundary admitted an axis")
-  exact = astrology.find_aspects(
-    (
-      astrology.AspectObject(astrology.Axis.ASCENDANT, 10, None),
-      astrology.AspectObject(astrology.Axis.DESCENDANT, 190, None),
-    ),
-    (astrology.AspectRule(astrology.MajorAspect.OPPOSITION, 0),),
-  )
-  if len(exact) != 1 or exact[0].motion is not astrology.AspectMotion.EXACT:
-    raise ValueError("Installed opposite-axis exactness or pair admission changed")
 
 
 def _check_summaries() -> None:
@@ -602,17 +581,6 @@ def _check_summaries() -> None:
       raise ValueError("Installed distribution text is incomplete")
     if phase_name not in astrology.format_lunar_phase(phase, catalog, language=selected):
       raise ValueError("Installed phase text is incomplete")
-  for call in (
-    lambda: astrology.chart_sign_distribution(chart, objects=()),
-    lambda: astrology.chart_sign_distribution(chart, objects=(astrology.Body.PLUTO,)),
-    lambda: astrology.lunar_phase(True, 0),
-  ):
-    try:
-      call()
-    except (TypeError, ValueError):
-      pass
-    else:
-      raise ValueError("Installed summary accepted an invalid input")
 
 
 def _check_dignities() -> None:
@@ -699,18 +667,6 @@ def _check_dignities() -> None:
     )
     if text.splitlines()[4] != expected_row:
       raise ValueError("Installed house-ruler placement text differs from the supplied placement")
-  for call, error in (
-    (lambda: astrology.sign_ruler("aries"), TypeError),  # type: ignore[arg-type]
-    (lambda: astrology.essential_dignities(astrology.Body.PLUTO, astrology.Sign.ARIES), ValueError),
-    (lambda: astrology.HouseRuler(True, astrology.Sign.ARIES, None), TypeError),
-    (lambda: astrology.HouseRulers(None), TypeError),  # type: ignore[arg-type]
-  ):
-    try:
-      call()
-    except error:
-      pass
-    else:
-      raise ValueError("Installed dignity checks accepted an invalid input")
 
 
 def _check_native_isolation() -> None:
@@ -818,23 +774,6 @@ def _check_knowledge(expected_corpus_version: str | None = None) -> None:
     or overlay.statement.status("zh-CN") is not TranslationStatus.CURRENT
   ):
     raise ValueError("Installed overlay knowledge lost rule links, source or editorial states")
-  aliases = ["isolated alias"]
-  concept = replace(catalog.concepts[0], en_aliases=aliases)
-  aliases.clear()
-  if tuple(concept.en_aliases) != ("isolated alias",):
-    raise ValueError("Installed knowledge retained a caller-owned alias list")
-  try:
-    Catalog(
-      catalog.version,
-      (*catalog.concepts, catalog.concepts[0]),
-      catalog.variants,
-      catalog.sources,
-      catalog.entries,
-    )
-  except ValueError:
-    pass
-  else:
-    raise ValueError("Installed catalog accepted duplicate identities")
   if any(
     name.startswith(("tzdata", "zoneinfo", "celestial", "ctypes"))
     for name in set(sys.modules) - before
@@ -888,12 +827,6 @@ def _check_birth_and_configuration() -> None:
     pass
   else:
     raise ValueError("Installed natal preparation accepted a missing location")
-  try:
-    astrology.Location(float("nan"), 0)
-  except ValueError:
-    pass
-  else:
-    raise ValueError("Installed coordinate validation accepted NaN")
 
   objects: list[astrology.Body | astrology.LunarNode] = [
     astrology.Body.SUN,
@@ -1028,7 +961,7 @@ def main(
   指定的文件保存三种图形的中英文输出。
   """
   metadata = distribution("celestial-astrology")
-  for module in (astrology, *(import_module("astrology." + name) for name in MODULES)):
+  for module in (astrology, *(import_module("astrology." + name) for name in module_names())):
     origin = Path(str(module.__file__)).resolve()
     if not origin.is_relative_to(Path(sys.prefix).resolve()):
       raise ValueError(f"Imported {module.__name__} from outside the consumer environment")

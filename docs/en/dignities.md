@@ -17,6 +17,10 @@ or select rules dynamically.
 
 ## Query a sign without a chart
 
+<!-- usage: dignities.lookup -->
+
+Pass `Sign` and `Body` members to look up a sign's ruler or a planet's statuses:
+
 ```{doctest}
 >>> from astrology import Body, Sign, DignityStatus, sign_ruler, essential_dignities
 >>> sign_ruler(Sign.SCORPIO) is Body.MARS
@@ -41,6 +45,8 @@ raise `TypeError`; use exact `Body` and `Sign` members. Valid outer-planet bodie
 (`URANUS`, `NEPTUNE`, `PLUTO`) raise `ValueError` naming the unsupported body,
 rather than returning an empty assessment. Scorpio uses Mars, Aquarius Saturn
 and Pisces Jupiter; there is no modern co-ruler substitution.
+
+<!-- /usage: dignities.lookup -->
 
 ## Follow the rulers in an existing chart
 

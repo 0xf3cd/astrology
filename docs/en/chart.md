@@ -10,6 +10,8 @@ request asks for are in `chart.aspects`; the [aspect guide](aspects.md) explains
 
 ## Calculate one chart
 
+<!-- usage: chart.calculation -->
+
 Prepare the input first. A chart needs a known clock, an explicit timezone and
 a location; the [birth guide](birth.md) explains that preparation.
 
@@ -31,6 +33,8 @@ a location; the [birth guide](birth.md) explains that preparation.
 >>> chart.effective.house_system.value
 'placidus'
 ```
+
+<!-- /usage: chart.calculation -->
 
 Positions are apparent geocentric ecliptic longitudes and latitudes of date.
 The result keeps the unrounded values; the derived sign and house follow from
@@ -232,20 +236,10 @@ narrow the evaluated domain, and the result says so.
 
 ## Check the result against an independent reference
 
-The reference cases in `tests/reference/natal_reference.json` compare two
-instants, one per hemisphere, with JPL Horizons. Under matched conventions the
-checks require agreement within 3 arcseconds for the Sun and the planets, 15 for
-the Moon, 1 arcsecond in latitude (3 for the Moon) and 0.001 degrees for the
-axes. The Placidus cusps 2, 3, 11 and 12 are held to the same 0.001 degrees
-against the Placidus definition, evaluated at the Horizons sidereal time. The
-node check reimplements the Meeus chapter 47 formulas that the library also
-uses, and the leap-second relation `JDE(TT) - JD(UTC)` is exact. The
-[contributing guide](contributing.md#correctness) records what each reference
-can and cannot detect.
-
-Separate complete-chart cases compare against Swiss states, rates and all twelve
-cusps, with independent derived placements/aspects. Their conventions, tolerances
-and limits are in the [result guide](records.md#verification-and-limits).
+Finite reference cases compare positions with JPL Horizons and complete charts
+with independently executed Swiss states. They check matched conventions, not
+global accuracy. The [contributing guide](contributing.md#correctness) records
+the sources, tolerances and defects each reference can and cannot detect.
 
 ## Limits
 
@@ -258,4 +252,4 @@ and limits are in the [result guide](records.md#verification-and-limits).
   instants from 1972-01-01; the ephemeris range is narrower than the civil
   range, and an instant outside it fails explicitly.
 - Installs need a platform with a celestial-calendar wheel; see
-  [contributing](contributing.md#run-the-checks).
+  [installation](../../README.md#install-a-release).

@@ -21,7 +21,6 @@ from tools.check import (
   PACKAGE_FILES,
   SDIST_FILES,
   check_documents,
-  check_examples,
   check_package_files,
   check_sdist,
   check_wheel,
@@ -30,33 +29,20 @@ from tools.check import (
 )
 
 SDIST_PATHS = (*("src/" + name for name in PACKAGE_FILES), *SDIST_FILES)
-_EXAMPLE_PAGES = (
-  "contributing",
-  "birth",
-  "configuration",
-  "chart",
-  "aspects",
-  "cross_aspects",
-  "summaries",
-  "dignities",
-  "svg",
-  "records",
-  "knowledge",
-)
 
 
 @pytest.mark.parametrize(
   "modules",
   [
-    installed_check.MODULES[:-1],
-    (*installed_check.MODULES, "invented"),
-    (*installed_check.MODULES, installed_check.MODULES[0]),
+    installed_check.module_names()[:-1],
+    (*installed_check.module_names(), "invented"),
+    (*installed_check.module_names(), installed_check.module_names()[0]),
   ],
 )
 def test_consumer_module_guard_rejects_missing_extra_and_duplicate(
   monkeypatch: pytest.MonkeyPatch, modules: tuple[str, ...]
 ) -> None:
-  monkeypatch.setattr(installed_check, "MODULES", modules)
+  monkeypatch.setattr(installed_check, "module_names", lambda: modules)
   with pytest.raises(ValueError, match="module coverage"):
     check_package_files()
 
@@ -151,39 +137,6 @@ runpy.run_path(str(root / 'tools/check.py'), run_name='script_startup_probe')
   assert result.returncode == 0, result.stdout + result.stderr
 
 
-def valid_example_report() -> str:
-  return "".join(
-    f"Document: docs/{language}/{page}\n2 tests in 1 items.\n"
-    for language in ("en", "zh-CN")
-    for page in _EXAMPLE_PAGES
-  )
-
-
-@pytest.mark.parametrize("language", ["en", "zh-CN"])
-@pytest.mark.parametrize("page", _EXAMPLE_PAGES)
-@pytest.mark.parametrize("count", [None, 0])
-def test_examples_cannot_be_empty(language: str, page: str, count: int | None) -> None:
-  section = f"Document: docs/{language}/{page}\n2 tests in 1 items.\n"
-  replacement = "" if count is None else section.replace("2 tests", "0 tests")
-  report = valid_example_report().replace(section, replacement)
-  with pytest.raises(ValueError, match=f"{language}/{page}"):
-    check_examples(report)
-
-
-@pytest.mark.parametrize("word", ["item", "items"])
-def test_executed_examples(word: str) -> None:
-  check_examples(valid_example_report().replace("items.", f"{word}."))
-
-
-def test_document_word_in_doctest_group() -> None:
-  check_examples(
-    valid_example_report().replace(
-      "2 tests in 1 items.\n",
-      "1 item passed all tests:\n   2 tests in Document: group\n2 tests in 1 item.\n",
-    )
-  )
-
-
 def _package_tree(root: Path, names: Sequence[str]) -> None:
   for name in names:
     path = root / "src" / name
@@ -263,10 +216,21 @@ def test_main_keeps_required_validation_stages(
     if "-b" in command and command[command.index("-b") + 1] == "doctest":
       directory = Path(command[-1])
       directory.mkdir(parents=True)
-      (directory / "output.txt").write_text(valid_example_report(), encoding="utf-8")
+      (directory / "output.txt").write_text("executed examples", encoding="utf-8")
 
   monkeypatch.setattr(checker, "run", capture)
   monkeypatch.setattr(checker, "check_documents", lambda: commands.append(("documents",)))
+
+  def guides(root: Path) -> None:
+    assert root == checker.ROOT
+    commands.append(("guide_content",))
+
+  def examples(report: str, root: Path) -> None:
+    assert report == "executed examples" and root == checker.ROOT
+    commands.append(("examples",))
+
+  monkeypatch.setattr(checker, "check_guide_content", guides)
+  monkeypatch.setattr(checker, "check_examples", examples)
   monkeypatch.setattr(checker, "check_api_html", lambda directory: commands.append(("api_html",)))
   monkeypatch.setattr(
     checker, "check_catalog_html", lambda directory: commands.append(("catalog_html",))
@@ -315,6 +279,8 @@ def test_main_keeps_required_validation_stages(
     if "sphinx" in command
   )
   assert ("documents",) in commands
+  assert ("guide_content",) in commands
+  assert ("examples",) in commands
   assert ("api_html",) in commands
   assert ("catalog_html",) in commands
   assert ("search_html",) in commands
@@ -361,7 +327,7 @@ def test_distribution_keeps_dependency_install_and_both_consumer_modes(
     if "-b" in command and command[command.index("-b") + 1] == "doctest":
       output = Path(command[-1])
       output.mkdir(parents=True)
-      (output / "output.txt").write_text(valid_example_report(), encoding="utf-8")
+      (output / "output.txt").write_text("executed examples", encoding="utf-8")
 
   monkeypatch.setattr(checker, "ROOT", tmp_path)
   monkeypatch.setattr(checker, "run", capture)
@@ -375,6 +341,15 @@ def test_distribution_keeps_dependency_install_and_both_consumer_modes(
   monkeypatch.setattr(
     checker, "check_documents", lambda root: validations.append(("documents", root))
   )
+  monkeypatch.setattr(
+    checker, "check_guide_content", lambda root: validations.append(("guide_content", root))
+  )
+
+  def examples(report: str, root: Path) -> None:
+    assert report == "executed examples"
+    validations.append(("examples", root))
+
+  monkeypatch.setattr(checker, "check_examples", examples)
   monkeypatch.setattr(checker, "check_api_html", lambda root: validations.append(("api", root)))
   monkeypatch.setattr(
     checker, "check_catalog_html", lambda root: validations.append(("catalog", root))
@@ -413,6 +388,8 @@ def test_distribution_keeps_dependency_install_and_both_consumer_modes(
     assert command[-4:-1] == ("-c", "docs", ".")
   assert ("sdist", tmp_path / "artifacts/astrology.tar.gz") in validations
   assert ("documents", source) in validations
+  assert ("guide_content", source) in validations
+  assert ("examples", source) in validations
   assert {name for name, path in validations if path == tmp_path / "source-html"} == {
     "api",
     "catalog",

@@ -85,6 +85,8 @@ True
 
 ## 选择配对与容许度
 
+<!-- usage: cross.selection -->
+
 调用 `cross_chart_aspects` 时，同样用 `left_objects` 和 `right_objects` 分别选择两张盘的对象。
 `None` 表示该盘的全部天体和交点，不包含四轴，即使本命相位只使用了其中一部分。
 对象按盘中位置记录的顺序排列，不按传入选择的顺序排列。
@@ -92,6 +94,19 @@ True
 以及两边各自所选的任意交点组合。也可以把同一张盘传给两边。
 这些配对是本项目的几何计算约定，不是传统解读规则。
 [单盘交点排除规则](aspects.md#选择参与的对象)保持不变。
+
+```{doctest}
+>>> cross_chart_aspects(chart_left, chart_right, rules, left_objects=[]).hits
+()
+>>> cross_chart_aspects(chart_left, chart_right, ()).rules
+()
+```
+
+`hits=()` 可能表示选择为空、规则为空，或没有相位匹配；查看结果中记录的对象选择和规则可以区分原因。
+
+<!-- /usage: cross.selection -->
+
+<!-- usage: cross.orbs -->
 
 用 `ObjectOrb` 为某个 `Body`、`LunarNode` 或 `Axis` 单独设置容许度时，这项设置同时作用于两边。
 例如，为太阳设值会同时作用于两颗太阳，不能给左盘太阳和右盘太阳分别设值。
@@ -105,13 +120,8 @@ True
 ...   combination=OrbCombination.MEAN_OF_ORBS)
 >>> adjusted.hits[0].orb_limit_deg
 5.0
->>> cross_chart_aspects(chart_left, chart_right, rules, left_objects=[]).hits
-()
->>> cross_chart_aspects(chart_left, chart_right, ()).rules
-()
 ```
 
-`hits=()` 可能表示选择为空、规则为空，或没有相位匹配；查看结果中记录的对象选择和规则可以区分原因。
 以下请求会抛出 `ValueError`，即使没有对象可配对也一样：
 
 - 同一侧重复选择对象，或选择该盘没有的对象。
@@ -119,6 +129,8 @@ True
 - 有对象单独设置却未选合成方式，或没有对象单独设置却给了合成方式。
 
 传入的序列会复制为不可变元组，之后修改原序列不会改变结果。
+
+<!-- /usage: cross.orbs -->
 
 (cross-axis-aspects-zh-cn)=
 ## 分别选择两侧四轴

@@ -8,21 +8,12 @@ House system, object selection, and aspect rules must be supplied explicitly.
 An empty aspect sequence requests no aspect rules; object selection cannot be
 empty. There is no default house system or orb.
 
-## Preserve the selected identities
+## Choose the house system and output objects
 
-`HouseSystem` admits Whole Sign, Equal, and Placidus. This layer preserves the
-selection; it neither calculates geometry nor substitutes a different system.
-The [chart guide](chart.md) reports unavailable requested geometry explicitly.
+<!-- usage: configuration.objects -->
 
-`Body` identifies the ten physical bodies from Sun and Moon through Pluto.
-`LunarNode` identifies mathematical ascending/descending nodes with either the
-mean or Meeus five-term true definition. The definition is part of each node's
-identity, not an accuracy flag or an interchangeable model. Both definitions
-may be selected explicitly in one request.
-
-These are requested identities; the [chart adapter](chart.md) binds them to the
-astronomical definitions and models. No node formula is implemented in this
-layer.
+Choose a `HouseSystem` and put the bodies or nodes you want in `objects`.
+This example requests Sun, Moon and the mean ascending node, without aspects:
 
 ```{doctest}
 >>> from astrology import Body, ChartConfig, HouseSystem, LunarNode
@@ -39,10 +30,20 @@ layer.
 'meeus_five_term_true'
 ```
 
+`HouseSystem` admits Whole Sign, Equal and Placidus. Unavailable requested
+geometry fails explicitly; the [chart guide](chart.md) describes those limits.
+`Body` identifies the ten physical bodies from Sun and Moon through Pluto.
+`LunarNode` identifies mathematical ascending/descending nodes with either the
+mean or Meeus five-term true definition. The definition is part of the identity,
+not an accuracy flag. You may explicitly select both definitions in one request;
+the chart result names the astronomical models used.
+
 Object and rule sequences are copied into tuples, preserving order. Source lists
 can change without changing the request. Duplicate objects or duplicate aspect
 identities are rejected rather than silently merged. Enum value strings such as
 `"sun"` are not enum instances and are not implicitly converted.
+
+<!-- /usage: configuration.objects -->
 
 ## Request aspects
 
@@ -67,6 +68,8 @@ The zero orb above is an explicit synthetic request value, not a library default
 or recommendation.
 
 ## Choose who takes part in aspects
+
+<!-- usage: configuration.participants -->
 
 This request asks for Sun and Moon positions, with aspects only between the Sun
 and Ascendant:
@@ -95,7 +98,11 @@ ASC/MC/DSC/IC order, independently of the selection argument's order. Axes can
 also be the only aspect participants, but `objects` must still contain at least
 one body/node. See [axis geometry and pairing](aspects.md#select-axes-explicitly).
 
+<!-- /usage: configuration.participants -->
+
 ## Give an object its own orb
+
+<!-- usage: configuration.orbs -->
 
 Use `ObjectOrb` to set an object's orb separately; other objects use the rule's
 `orb_degrees`. If any rule uses `ObjectOrb`, you must choose `orb_combination` to
@@ -124,9 +131,8 @@ ValueError: orb_combination is required when aspect rules have object orbs
 NaN, infinity, negative orbs, booleans, unsupported modes, and inconsistent
 selections fail under normal Python and `python -O`.
 
+<!-- /usage: configuration.orbs -->
+
 The defining enums and API contracts are generated in the [reference](reference.md).
-Actual astronomy models, versions, time scales, and effective calculation
-settings belong to the chart result; they are not invented here to complete a
-metadata record. The [chart guide](chart.md) shows how a request becomes that
-result, and the [knowledge guide](knowledge.md) covers queries that need no
-chart at all.
+For calculated models, versions, time scales and effective settings, read the
+[chart result](records.md). For queries without a chart, see [knowledge](knowledge.md).

@@ -8,6 +8,8 @@
 
 ## 生成与保存
 
+<!-- usage: svg.rendering -->
+
 下面的合成出生记录使用 UTC，并显式给出地点。第二张盘沿用配置，但改用另一年。
 
 ```{doctest}
@@ -50,6 +52,8 @@ Path("natal.svg").write_text(wheel, encoding="utf-8")
 英文使用 `language="en"`，三个函数也都默认使用英文。生成 SVG 本身不加载 catalog、计算位置、
 解析时区、读写文件或访问网络，也不修改传入的结果。
 
+<!-- /usage: svg.rendering -->
+
 ## 怎样读图
 
 轮盘把实际上升点放在左侧，黄经沿逆时针递增。全部已存天体、交点和实际四轴都会画出，
@@ -63,6 +67,11 @@ Path("natal.svg").write_text(wheel, encoding="utf-8")
 用 `ChartConfig.aspect_objects` 选择本命相位的参与对象，矩阵按结果中的
 `chart.effective.aspect_objects` 排列，行是第一对象、列是第二对象，每对对象只在
 对角线上方出现一次。没有命中的参与对象仍保留；没有相位规则时，参与对象也为空。
+本命矩阵的 `N1`、`N2` 等标签对应“对象”列表中的编号。本例中 N1 是太阳，N2 月亮，N3 金星，
+N4 上升点，N5 中天。平均交点已有位置，也画在轮盘上，但没有被选来参与本命相位。
+五个参与者是这个示例的选择，不是渲染器的对象上限。例如要加入火星，在排盘前将 `Body.MARS`
+同时加入 `objects` 和 `aspect_objects`；渲染器不会补算缺少的对象。
+
 双盘矩阵用 `cross_chart_aspects(left_objects=..., right_objects=...)` 分别选择两侧对象。
 行按已存的 `comparison.left_objects` 排列（`L`），列按 `comparison.right_objects` 排列（`R`），
 两盘太阳不会合并。“左盘”和“右盘”列表分别说明各侧的对象标识、黄经和交点定义。

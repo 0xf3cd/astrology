@@ -8,6 +8,11 @@ changes. Formatters take a loaded catalog and do no resource I/O.
 
 ## Query signs and count an explicit population
 
+<!-- usage: summaries.population -->
+
+Pass the placements you want to count to `sign_distribution`. The example counts
+Sun and Moon equally and prints all element and modality categories:
+
 ```{doctest}
 >>> from astrology import (Body, Element, Modality, Placement, Sign, element_of,
 ...     modality_of, sign_distribution, format_sign_distribution, load_catalog)
@@ -54,20 +59,17 @@ authenticate it. Counts and proportions derive from the snapshot, so no inconsis
 total can be supplied separately. `element_of` and `modality_of` accept only `Sign`,
 not strings or unrelated enums.
 
-The {ref}`element <catalog-en-rule-zodiac-elements>` and
-{ref}`modality <catalog-en-rule-zodiac-modalities>` tables read executable
-definitions. The source is Astrodienst's undated editorial page, inspected through
-the recorded 2025-12-28 snapshot. Its `Sagitarius` spelling is recorded without
-changing `Sign.SAGITTARIUS`. `Modality` and `AshmandSignGroup` remain distinct.
-Their fixed sets agree; modern mutable agrees with Ashmand's bicorporeal set;
-Ashmand's tropical/equinoctial pairs together form the cardinal set. Membership
-agreement does not merge names or historical definitions.
+<!-- /usage: summaries.population -->
 
-Both `FIXED` members have the string value `"fixed"` and compare and hash equal
-as `StrEnum` members. To keep both in one mapping, use `(type(member), member.value)`
-keys or their distinct qualified catalog IDs.
+Classification sources and the distinction from historical sign groups are
+described in [knowledge](knowledge.md#elements-modalities-and-lunation-types).
 
 ## Classify a supplied Sun/Moon pair
+
+<!-- usage: summaries.lunar_phase -->
+
+Supply Sun first and Moon second, in degrees at the same instant and with the
+same coordinate convention. The result gives the oriented arc and its type:
 
 ```{doctest}
 >>> from astrology import lunar_phase, format_lunar_phase
@@ -84,16 +86,13 @@ A type covers an interval, not an exact event; no illuminated fraction is calcul
 ('waning', 'turning')
 ```
 
-Argument order is **Sun first, Moon second**. The oriented difference is
-`(Moon - Sun) mod 360`, in degrees. Finite inputs may contain whole turns.
+The oriented difference is `(Moon - Sun) mod 360`, in degrees. Finite inputs may contain whole turns.
 Booleans, strings and unrelated types raise `TypeError`; nonfinite values raise
-`ValueError`. The caller must supply the same instant and coordinate convention.
-Bare numbers carry neither, so the scalar function cannot detect a frame mismatch.
+`ValueError`. Bare numbers carry no instant or coordinate convention, so the
+scalar function cannot detect a frame mismatch.
 
-The convention is Rudhyar's eight lunation types in the inspected online
-transcription of *Your Lunation Birthday*, Part Four. The page reports first
-publication in *Horoscope Magazine*, January 1950; the original was not inspected.
-See the {ref}`generated intervals and source <catalog-en-rule-lunation-rudhyar1950>`.
+See the {ref}`generated intervals <catalog-en-rule-lunation-rudhyar1950>` and
+[source discussion](knowledge.md#elements-modalities-and-lunation-types).
 Each type spans 45°. The project uses half-open intervals: exact boundaries belong
 to the following type, with 360° wrapping to 0°. Strict `(0, 180)` is `waxing`,
 strict `(180, 360)` is `waning`, and 0°/180° are `turning`. Endpoints and direction
@@ -105,22 +104,7 @@ conjunction. No illuminated fraction, 3D phase angle, exact-event search or
 personality interpretation is calculated. Direction describes the arc, not a
 rate-based forecast.
 
-### Numerical angle and display
-
-Inputs use the numeric validator's float conversion. Exact ratios of those binary
-values avoid subtraction overflow and loss of boundary sides. The nearest float
-is returned unless conversion erases the interval side; then one adjacent float
-on the correct side is used. For example, `lunar_phase(5e-324, 0)` returns
-`359.99999999999994`, not 360° or a false exact conjunction. This is a numerical
-approximation, not an exact real angle. Equal rotations preserve the mathematical
-difference, but rotating floats may already round inputs; bitwise invariance is
-not promised.
-
-The phase formatter prints the stored float without arcsecond truncation. Labels
-never come from rounded text. Both formatters require current catalog names in
-`en` or `zh-CN`; missing/stale names raise `ValueError`, missing IDs `KeyError`, and
-invalid result/catalog types `TypeError`. Names' table delimiters and nonprinting
-characters are escaped.
+<!-- /usage: summaries.lunar_phase -->
 
 ## Compose from an existing natal chart
 
@@ -156,3 +140,20 @@ wrappers reject non-`NatalChart` inputs with `TypeError`. Checks work under `pyt
 Catalog entries remain `reference_only`, with stated prerequisites `complete` and
 chart applicability `not_assessed`. Verified source inspection does not make
 catalog lookup a chart evaluation.
+
+## Numerical angle and display
+
+Inputs use the numeric validator's float conversion. Exact ratios of those binary
+values avoid subtraction overflow and loss of boundary sides. The nearest float
+is returned unless conversion erases the interval side; then one adjacent float
+on the correct side is used. For example, `lunar_phase(5e-324, 0)` returns
+`359.99999999999994`, not 360° or a false exact conjunction. This is a numerical
+approximation, not an exact real angle. Equal rotations preserve the mathematical
+difference, but rotating floats may already round inputs; bitwise invariance is
+not promised.
+
+The phase formatter prints the stored float without arcsecond truncation. Labels
+never come from rounded text. Both formatters require current catalog names in
+`en` or `zh-CN`; missing/stale names raise `ValueError`, missing IDs `KeyError`, and
+invalid result/catalog types `TypeError`. Names' table delimiters and nonprinting
+characters are escaped.

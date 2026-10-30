@@ -6,17 +6,12 @@
 仅接纳 `tropical` 和 `geocentric`。宫制、对象选择及相位规则均须显式提供。
 空相位序列表示未请求相位规则；对象选择不能为空。不提供宫制或容许度默认值。
 
-## 保留所选标识
+## 选择宫制与输出对象
 
-`HouseSystem` 接纳 Whole Sign、Equal 和 Placidus。本层保留该选择，不计算宫位几何，也不替换宫制。
-[排盘指南](chart.md)会显式报告请求的几何不可用。
+<!-- usage: configuration.objects -->
 
-`Body` 标识太阳、月亮至冥王星的十个物理天体。`LunarNode` 标识采用平均定义或
-Meeus 五项真交点定义的数学升降交点。定义是各交点标识的一部分，不是精度开关，也不是可互换的模型。
-同一请求可显式选择两种定义。
-
-这些是请求标识；[排盘适配层](chart.md)将对应到精确的天文定义和模型。
-本层不实现交点公式。
+选择 `HouseSystem`，再把要计算的天体或交点放入 `objects`。
+下面请求太阳、月亮和平均升交点，不请求相位：
 
 ```{doctest}
 >>> from astrology import Body, ChartConfig, HouseSystem, LunarNode
@@ -33,8 +28,15 @@ Meeus 五项真交点定义的数学升降交点。定义是各交点标识的�
 'meeus_five_term_true'
 ```
 
+`HouseSystem` 接纳 Whole Sign、Equal 和 Placidus。请求的几何不可用时显式失败，
+支持范围见[排盘指南](chart.md)。`Body` 标识太阳、月亮至冥王星的十个物理天体。
+`LunarNode` 标识采用平均定义或 Meeus 五项真交点定义的数学升降交点。
+定义是标识的一部分，不是精度开关；同一请求可显式选择两种定义，排盘结果会记录所用的天文模型。
+
 对象和规则序列按原顺序复制为元组，调用方随后修改列表不会改变请求。
 重复对象或重复相位标识会被拒绝，不静默合并。`"sun"` 这样的枚举值字符串不是枚举实例，不作隐式转换。
+
+<!-- /usage: configuration.objects -->
 
 ## 请求相位
 
@@ -56,6 +58,8 @@ Meeus 五项真交点定义的数学升降交点。定义是各交点标识的�
 上例中的零容许度是为演示手动设置的，不是库的默认值或建议值。
 
 ## 选择参与相位的对象
+
+<!-- usage: configuration.participants -->
 
 这个请求要求排盘返回太阳和月亮的位置，但只判断太阳与上升点的相位：
 
@@ -81,7 +85,11 @@ Meeus 五项真交点定义的数学升降交点。定义是各交点标识的�
 相位参与者也可只选四轴，但 `objects` 仍须至少含一个天体或交点。
 几何与配对政策见{ref}`显式选择四轴 <axis-aspects-zh-cn>`。
 
+<!-- /usage: configuration.participants -->
+
 ## 给对象单独的容许度
+
+<!-- usage: configuration.orbs -->
 
 用 `ObjectOrb` 为某个对象单独设置容许度；其他对象使用规则的 `orb_degrees`。
 只要有规则使用了 `ObjectOrb`，就必须指定 `orb_combination`，说明两个对象的容许度如何合成一个上限；
@@ -108,6 +116,7 @@ ValueError: orb_combination is required when aspect rules have object orbs
 
 NaN、无穷、负容许度、布尔值、不支持的模式及不一致的选择，在普通 Python 和 `python -O` 下都会报错。
 
-定义枚举和 API 合同见从实际定义生成的[参考页](reference.md)。实际天文模型、版本、时标和生效计算设置
-归排盘结果，本层不为凑齐元数据而虚构它们。[排盘指南](chart.md)说明请求如何变成该结果，
-[知识指南](knowledge.md)覆盖完全无需排盘的查询。
+<!-- /usage: configuration.orbs -->
+
+定义枚举和 API 合同见从实际定义生成的[参考页](reference.md)。实际天文模型、版本、时标和生效设置
+见[排盘结果](records.md)；不排盘的查询见[知识指南](knowledge.md)。

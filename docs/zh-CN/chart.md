@@ -8,6 +8,8 @@
 
 ## 计算一张盘
 
+<!-- usage: chart.calculation -->
+
 先准备输入。排盘需要已知钟点、显式时区和地点；[出生指南](birth.md)说明这一步。
 
 ```{doctest}
@@ -28,6 +30,8 @@
 >>> chart.effective.house_system.value
 'placidus'
 ```
+
+<!-- /usage: chart.calculation -->
 
 位置是瞬时真黄道、真春分点上的地心视黄经与黄纬。结果保留未舍入的值，
 星座与落宫由这些值派生。
@@ -216,15 +220,9 @@ True
 
 ## 与独立参考比对
 
-`tests/reference/natal_reference.json` 中的参考案例覆盖南北半球各一个时刻，
-与 JPL Horizons 比对。在同口径下，检查要求太阳与行星一致到 3 角秒以内，月亮 15 角秒，
-黄纬 1 角秒（月亮 3 角秒），四轴 0.001 度。Placidus 第 2、3、11、12 宫头按 Placidus 定义、
-用 Horizons 的恒星时求值，同样要求一致到 0.001 度。交点检查重实现了库也在用的
-Meeus 第 47 章公式，闰秒关系 `JDE(TT) - JD(UTC)` 精确成立。各条参考能检出和检不出
-哪些缺陷见[参与开发](contributing.md#正确性)。
-
-另有完整盘例与 Swiss 的位置、速率及全部十二宫头比较，归属及相位由独立算术推导。
-其约定、容差和限度见[结果指南](records.md#验证与限度)。
+有限参考案例将位置与 JPL Horizons 比较，将完整盘与独立执行得到的 Swiss 状态比较。
+检查须匹配计算约定，不证明全域精度。[参与开发](contributing.md#正确性)记录来源、容差及各项参考
+能检出和检不出的缺陷。
 
 ## 限度
 
@@ -234,4 +232,4 @@ Meeus 第 47 章公式，闰秒关系 `JDE(TT) - JD(UTC)` 精确成立。各条�
 - 天文库支持 1885 至 2099 民用年，UTC 输入起于 1972-01-01；
   星历有效域比民用年范围更窄，超出即显式失败。
 - 安装需要有 celestial-calendar 轮子的平台；见
-  [参与开发](contributing.md#运行检查)。
+  [安装说明](../../README.zh-CN.md#安装发行版)。

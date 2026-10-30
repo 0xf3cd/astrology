@@ -13,8 +13,18 @@ That API keeps left/right ownership and has no motion field.
 
 ## Judge aspects from plain values
 
+<!-- usage: aspects.longitudes -->
+
 `find_aspects` needs no chart and does not call the astronomy library. Give it objects with a longitude in
 degrees and a rate in degrees per day, and the rules to apply.
+Use one instant and coordinate convention for all objects, and the same day unit
+for their rates (for example, the TT day). Bare numbers cannot verify those prerequisites.
+
+`AspectObject` accepts any finite longitude, including negative values, values
+above 360° and the largest finite float. It stores the supplied float without
+wrapping. Aspect calculations reduce each longitude around the circle before
+subtraction, so even extreme finite inputs do not overflow. Booleans and
+nonnumeric inputs raise `TypeError`; NaN and infinity raise `ValueError`.
 
 ```{doctest}
 >>> from astrology import (
@@ -32,6 +42,8 @@ degrees and a rate in degrees per day, and the rules to apply.
 The separation runs from the first object to the second: 68 minus 10 is 58 degrees.
 A sextile is 60 degrees, so the deviation is 58 minus 60, which is -2. It is inside
 the orb of 3 degrees. A deviation exactly at the limit also counts as a match.
+
+<!-- /usage: aspects.longitudes -->
 
 ## Read the branch and the deviation
 
@@ -95,6 +107,8 @@ This boundary can be a hit only with an orb of at least 180 degrees.
 
 ## Combine orbs when objects differ
 
+<!-- usage: aspects.orbs -->
+
 An aspect rule gives one orb for every object. To give an object its own orb, add an
 `ObjectOrb` to the rule and choose how the two orbs of a pair combine:
 
@@ -119,6 +133,8 @@ either_within_own_orb [13.0]
 both_within_own_orb []
 mean_of_orbs [8.0]
 ```
+
+<!-- /usage: aspects.orbs -->
 
 ## Choose the objects
 
@@ -217,22 +233,10 @@ The [cross-chart API](cross_aspects.md#select-axes-on-each-side) selects each si
 
 ## Check the results
 
-Hand-computed cases cover the wrap at 0 and 360 degrees, both branches, the orb
-endpoints, exact aspects, equal rates and retrograde motion. The longitude rates
-that decide the status are checked against the reported longitudes: over one hour,
-dividing the longitude change by the elapsed time agrees with each rate to about
-1e-6 degrees per day.
-
-The reference tests also configure the library with the published Hellenistic orbs
-and compare its aspects with a list derived from the JPL Horizons longitudes of the
-two reference instants, using plain unoriented separations. That style page gives
-the parameters, not the aspect list of a chart, so this does not compare against
-another program's output. The check requires that no pair lies within 0.4 degrees of
-an orb limit, and each of five departures from the convention changes the result at
-one instant or the other. Those instants hold conjunctions, squares and trines but no
-sextile or opposition, so the angles 60 and 180 degrees rest on the hand-computed
-cases, not on this comparison. The [contributing guide](contributing.md#correctness)
-records what the references can and cannot detect.
+Hand-computed boundaries and independently derived reference cases check the
+geometry. The [contributing guide](contributing.md#correctness) describes the
+rate checks, orb margins and limits of those finite comparisons; they do not
+establish a global accuracy bound or validate an interpretation.
 
 ## Limits
 

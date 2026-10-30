@@ -14,6 +14,10 @@
 
 ## 离盘查询星座
 
+<!-- usage: dignities.lookup -->
+
+传入 `Sign` 和 `Body` 成员，查询星座守护星或行星的状态：
+
 ```{doctest}
 >>> from astrology import Body, Sign, DignityStatus, sign_ruler, essential_dignities
 >>> sign_ruler(Sign.SCORPIO) is Body.MARS
@@ -36,6 +40,8 @@ True
 有效的外行星枚举（`URANUS`、`NEPTUNE`、`PLUTO`）抛出点明该对象的 `ValueError`，
 不会返回空状态冒充已判断。
 天蝎由火星守护，水瓶由土星守护，双鱼由木星守护，不替换为现代共守护星。
+
+<!-- /usage: dignities.lookup -->
 
 ## 跟随已有命盘的宫主星
 

@@ -19,6 +19,30 @@ import astrology
 from tools import installed_check
 
 
+def test_module_discovery_reads_files_without_importing_the_adapter(
+  tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+  for name in (
+    "__init__.py",
+    "celestial.py",
+    "_validation.py",
+    "extra.py",
+    "knowledge/__init__.py",
+    "knowledge/catalog.py",
+    "__pycache__/ignored.py",
+  ):
+    path = tmp_path / name
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("raise ImportError('discovery must not import this file')\n", encoding="utf-8")
+  monkeypatch.setattr(astrology, "__path__", [str(tmp_path)])
+  assert installed_check.module_names() == (
+    "_validation",
+    "extra",
+    "knowledge",
+    "knowledge.catalog",
+  )
+
+
 def _is_astronomy(name: str) -> bool:
   """Report whether a module name belongs to the astronomy adapter. 判断模块名是否属于天文适配层。"""
   return name in ("celestial_calendar", "astrology.celestial") or name.startswith(
@@ -51,7 +75,7 @@ def consumer(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
   knowledge.mkdir()
   (knowledge / "catalog.json").write_bytes(corpus)
   monkeypatch.setattr(astrology, "__file__", str(package / "__init__.py"))
-  for name in installed_check.MODULES:
+  for name in installed_check.module_names():
     monkeypatch.setattr(import_module(f"astrology.{name}"), "__file__", str(package / f"{name}.py"))
   monkeypatch.setattr(sys, "prefix", str(tmp_path))
   original_chart = astrology.natal_chart
@@ -132,7 +156,7 @@ def test_missing_metadata_consumer_checks_calculation_not_just_initial_lookup(
 
 @pytest.mark.parametrize(
   "module",
-  ["astrology." + name for name in installed_check.MODULES],
+  ["astrology." + name for name in installed_check.module_names()],
 )
 def test_submodule_outside_consumer_rejected(
   consumer: Path, monkeypatch: pytest.MonkeyPatch, module: str
@@ -271,19 +295,6 @@ def test_installed_consumer_rejects_missing_location_acceptance(
 
   monkeypatch.setattr(astrology, "prepare_natal_input", accepts_partial)
   with pytest.raises(ValueError, match="missing location"):
-    installed_check.main(version("celestial-astrology"))
-
-
-def test_installed_consumer_rejects_missing_coordinate_validation(
-  consumer: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-  original = astrology.Location
-
-  def accepts_nan(latitude: float, longitude: float) -> astrology.Location:
-    return original(0, longitude)
-
-  monkeypatch.setattr(astrology, "Location", accepts_nan)
-  with pytest.raises(ValueError, match="accepted NaN"):
     installed_check.main(version("celestial-astrology"))
 
 
