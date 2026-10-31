@@ -6,12 +6,10 @@ A Python library for reproducible Western astrology charts and knowledge queries
 [celestial-calendar](https://github.com/0xf3cd/celestial-calendar) for astronomy and
 keeps astrological rules, their sources, and their variants in this repository.
 
-The package provides immutable [birth records and modern time
-resolution](https://0xf3cd.github.io/astrology/docs/en/birth.html), [requested chart configuration](https://0xf3cd.github.io/astrology/docs/en/configuration.html),
-[tropical natal chart calculation](https://0xf3cd.github.io/astrology/docs/en/chart.html), [chart results and text output](https://0xf3cd.github.io/astrology/docs/en/records.html), an independent
-[knowledge catalog](https://0xf3cd.github.io/astrology/docs/en/knowledge.html), quality checks, and bilingual
-[API documentation](https://0xf3cd.github.io/astrology/docs/en/reference.html).
-See [Contributing](https://0xf3cd.github.io/astrology/docs/en/contributing.html) to run the checks.
+Calculate a tropical, geocentric natal chart from a known birth time and location,
+or query the knowledge catalog without a chart. Start with the examples below;
+the [guides](https://0xf3cd.github.io/astrology/docs/en/index.html) and
+[API reference](https://0xf3cd.github.io/astrology/docs/en/reference.html) explain further uses and parameters.
 
 The current source also adds [element/modality distributions and natal lunar
 phase](https://0xf3cd.github.io/astrology/docs/en/summaries.html),
@@ -19,8 +17,8 @@ phase](https://0xf3cd.github.io/astrology/docs/en/summaries.html),
 [explicit axis aspects for natal and static cross-chart queries](https://0xf3cd.github.io/astrology/docs/en/aspects.html#select-axes-explicitly),
 [cross-chart house overlays and bilingual comparison text](https://0xf3cd.github.io/astrology/docs/en/cross_aspects.html),
 and [SVG natal wheels and aspect matrices](https://0xf3cd.github.io/astrology/docs/en/svg.html).
-These additions are planned for 0.3.0. Axes participate only when selected;
-requests without selected axes keep their behavior.
+These additions are planned for 0.3.0. Axes (Ascendant, Midheaven, Descendant and
+Imum Coeli) participate in aspects only when explicitly selected.
 
 New in 0.2.0 (in development):
 
@@ -30,12 +28,12 @@ New in 0.2.0 (in development):
 - `ashmand_sign_group(Sign.ARIES)` queries the twelve signs' four groups in
   Ashmand's 1822 edition. See [the source and lookup example](https://0xf3cd.github.io/astrology/docs/en/knowledge.html#ashmand-1822-sign-groups).
 
-Installation follows the astronomy dependency: celestial-calendar 0.8.0 publishes
+## Install a release
+
+This library depends on celestial-calendar 0.8.0, which publishes
 wheels for Linux x86_64 and aarch64, macOS 14+ arm64 and Windows amd64, and no source
 distribution. On any other platform this package cannot be installed, and
 knowledge browsing is not available either.
-
-## Install a release
 
 `celestial-astrology` is the distribution name; the Python import is `astrology`.
 Do not install the unrelated PyPI project named `astrology`.
@@ -92,7 +90,7 @@ described in the contribution guide.
 
 ## First chart
 
-Save this Python script as `first_chart.py`; it is not an interactive transcript.
+Save this Python script as `first_chart.py`.
 Run `.venv/bin/python first_chart.py` on Linux/macOS, or
 `.venv\Scripts\python.exe first_chart.py` in PowerShell.
 The input has an explicit UTC offset and synthetic coordinates. No aspects are requested.
@@ -142,6 +140,17 @@ fallback. See the [chart guide](https://0xf3cd.github.io/astrology/docs/en/chart
 for admitted domains, and the [result guide](https://0xf3cd.github.io/astrology/docs/en/records.html)
 for structured results and bilingual text tables.
 
+The output lists the resolved UTC instant and the signs of the Sun and Moon.
+To include other bodies or nodes, set `objects` when constructing `ChartConfig`.
+To calculate aspects, supply orb rules in `aspects` and select participants with `aspect_objects`.
+
+| Next task | Guide |
+|---|---|
+| Resolve a local clock or select a repeated time | [Birth inputs](https://0xf3cd.github.io/astrology/docs/en/birth.html) |
+| Select objects, participants and orbs | [Configuration](https://0xf3cd.github.io/astrology/docs/en/configuration.html) |
+| Compare two charts | [Cross-chart aspects and house overlays](https://0xf3cd.github.io/astrology/docs/en/cross_aspects.html) |
+| Draw the result (source-checkout API) | [SVG wheels and matrices](https://0xf3cd.github.io/astrology/docs/en/svg.html) |
+
 ## First knowledge lookup
 
 Save this separate script as `first_knowledge.py` and run it with the same
@@ -162,44 +171,27 @@ Sun
 body.sun
 ```
 
-Browse the [complete catalog](https://0xf3cd.github.io/astrology/docs/en/catalog.html)
-or [public API](https://0xf3cd.github.io/astrology/docs/en/reference.html).
-The shared documentation search may return either language; Chinese queries use
-character pairs, not semantic matching or dictionary segmentation.
+The [knowledge guide](https://0xf3cd.github.io/astrology/docs/en/knowledge.html)
+explains lookup, citations and editorial status. Browse the
+[complete catalog](https://0xf3cd.github.io/astrology/docs/en/catalog.html) for definitions and sources.
 
-## First release
+## Supported chart
 
-The first target is a modern tropical, geocentric natal chart from a known birth
-time and location:
-
-- Preserve the birth record, resolve its timezone explicitly, and retain the
-  resulting time scales and calculation provenance.
-- Compute the Sun, Moon, eight planets, and explicitly selected lunar nodes.
-- Support Whole Sign, Equal, and Placidus houses, with explicit failures where a
-  requested geometry is undefined.
-- Derive signs, two-dimensional house placement (longitude only, without object latitude), and the five major
-  aspects with configurable orbs and local applying/separating status.
-- Return immutable structured results and a text table, retaining inputs,
-  configuration, astronomical values and model identities in memory.
-
-Positions, axes, cusps, signs, house placement, aspects and text output are
-implemented. Chart persistence is removed in the current source; see the
+The chart supports Whole Sign, Equal and Placidus houses, the Sun, Moon and eight
+planets, and explicitly selected lunar-node definitions. House placement uses
+longitude only, without object latitude. The five major aspects use caller-supplied
+orbs; applying/separating describes local motion, not a future-event prediction.
+Results keep the four axes separately from the twelve house cusps.
+Immutable results retain the original input, resolved time scales, configuration,
+unrounded astronomy and named models. Chart persistence is removed in the current source; see the
 [release notes](https://0xf3cd.github.io/astrology/docs/en/releases.html) for the
 difference from the published v0.1.0 API.
-
-See the [v0.1.0 milestone](https://github.com/0xf3cd/astrology/milestone/1) for
-delivery tasks and acceptance criteria.
 
 ## Design boundaries
 
 - [Repository structure and calculation boundaries](https://0xf3cd.github.io/astrology/docs/en/architecture.html)
 - [Knowledge organization and bilingual documentation](https://0xf3cd.github.io/astrology/docs/en/knowledge.html)
 - [Development and review conventions](https://0xf3cd.github.io/astrology/docs/en/contributing.html)
-
-Project guides and public reference documentation are provided in Chinese and
-English. Both languages refer to the same identifiers, executable rules, and
-source records. Quotations retain their original language; translations are
-identified as translations.
 
 ## Later work
 

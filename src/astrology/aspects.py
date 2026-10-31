@@ -64,10 +64,18 @@ class AspectMotion(StrEnum):
 class AspectObject:
   """One object's longitude in degrees and its rate in degrees per day, if it has one.
 
+  Any finite longitude is accepted, including negative values, values above 360
+  and the largest finite float. The supplied value is stored as a float without
+  wrapping; aspect calculations reduce each longitude around the circle before
+  subtracting, avoiding overflow for extreme finite inputs.
+
   The rate may be None where no meaningful motion exists; it is never borrowed from
   another object. All rates must use the same day unit, such as the TT day.
 
-  一个对象的黄经（度）及其速率（度/日，可为 None）。若无法给出有意义的速率，就用 None，
+  一个对象的黄经（度）及其速率（度/日，可为 None）。
+  黄经接受任何有限值，包括负值、超过 360 度的值及最大的有限浮点值。
+  传入值转为浮点数保存，不取模；相位计算先约去各黄经中的整圈，再相减，避免极大有限输入溢出。
+  若无法给出有意义的速率，就用 None，
   不借用其他对象的速率。所有速率必须采用相同的日作为时间单位，例如 TT 日。
   """
 

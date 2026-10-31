@@ -17,6 +17,12 @@ or select rules dynamically.
 
 ## Query a sign without a chart
 
+<!-- usage: dignities.lookup -->
+
+Use `sign_ruler` to look up a sign's traditional ruler, or `essential_dignities` to
+check the four statuses for a body in a sign. For example, Mars rules Scorpio;
+Mercury is both in domicile and exaltation in Virgo, and in detriment and fall in Pisces:
+
 ```{doctest}
 >>> from astrology import Body, Sign, DignityStatus, sign_ruler, essential_dignities
 >>> sign_ruler(Sign.SCORPIO) is Body.MARS
@@ -41,6 +47,8 @@ raise `TypeError`; use exact `Body` and `Sign` members. Valid outer-planet bodie
 (`URANUS`, `NEPTUNE`, `PLUTO`) raise `ValueError` naming the unsupported body,
 rather than returning an empty assessment. Scorpio uses Mars, Aquarius Saturn
 and Pisces Jupiter; there is no modern co-ruler substitution.
+
+<!-- /usage: dignities.lookup -->
 
 ## Follow the rulers in an existing chart
 

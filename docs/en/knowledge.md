@@ -11,6 +11,10 @@ for calculation.
 
 ## Browse without a chart
 
+<!-- usage: knowledge.lookup -->
+
+Use a name or alias with `lookup`, or a stable ID with `concept`:
+
 ```{doctest}
 >>> from astrology.knowledge import ConceptKind, SourceVerification, load_catalog
 >>> catalog = load_catalog()
@@ -30,14 +34,29 @@ True
 10
 >>> bool(catalog.version)
 True
+>>> print(catalog.entry("entry.cross_aspect_evaluation").statement.text("en"))
+Static major cross aspects compare two supplied natal results with distinct left/right endpoints and preserve both complete sources, without a motion field.
+>>> print(catalog.variant("rule.project.cusp_ownership").definition.text("en"))
+House membership uses half-open intervals [cusp, next cusp): a longitude exactly on a cusp belongs to the house that starts there, and membership wraps across 0/360 degrees.
 ```
+
+Read an entry's explanation with `entry.statement.text(language)` and a rule's
+definition with `variant.definition.text(language)`. The last two calls above
+print those texts in English; use `"zh-CN"` for Chinese.
 
 Several names can identify one concept: `Sun`, `Sol` and `日轮` all refer to
 `body.sun`. A rule variant records a particular definition, such as a house
-system or lunar-node algorithm. Body names and ascending/descending node directions
-do not get identity-only rules. The Sun links to the sourced dignity rule,
-which carries assignments rather than repeating its name. See [rule-ID changes](#pre-release-rule-id-changes)
-for the old identifiers.
+system or lunar-node algorithm. A record that only names a body or a node direction
+does not need a separate rule. Above, `list_variants(concept_id="body.sun")` finds
+the rule `rule.lilly1647.essential_dignities`. This rule records the signs of domicile,
+exaltation, detriment and fall for the Sun and other classical planets, citing Lilly's work.
+For example, `list_variants(concept_id="body.uranus")` returns an empty tuple:
+the catalog has no rule linked to Uranus. You can still retrieve its name record
+with `concept("body.uranus")` or `lookup("Uranus")`.
+
+<!-- /usage: knowledge.lookup -->
+
+<!-- usage: knowledge.editorial_states -->
 
 You can also look up the rules for [cross-chart aspect comparison](cross_aspects.md).
 `entry.cross_aspect_evaluation` is the explanatory entry;
@@ -53,6 +72,8 @@ returns the explanation rather than running a comparison:
 Here, `complete` means the entry has stated its prerequisites, `reference_only`
 means it is for reference, and `not_assessed` means no chart has been checked
 against those prerequisites. These answer different questions; see [status meanings](#status-has-several-dimensions).
+
+<!-- /usage: knowledge.editorial_states -->
 
 The house-overlay explanation is `entry.cross_house_overlays`. Read `rule_ids`
 for its rules, and use `catalog.citations()` to retrieve the citations and their
@@ -244,12 +265,32 @@ actual weather or daylight.
 
 ## Elements, modalities and lunation types
 
-These output concepts have their own kinds and stable IDs: `element.*`,
-`modality.*`, `lunation_type.rudhyar1950.*`, without request-configuration links.
-See the [queries, statistics and lunar phase guide](summaries.md). The inspected
-sources are an Astrodienst webpage snapshot and Rudhyar's online transcription;
-Rudhyar's magazine original was not inspected. Classifications carry no personality interpretation;
-generated tables read the owning executable definitions.
+Elements, modalities and lunation types use separate kinds and stable IDs:
+`element.*`, `modality.*` and `lunation_type.rudhyar1950.*`, respectively.
+See the [queries, statistics and lunar phase guide](summaries.md). They describe
+results, not chart configuration options. The classifications carry no personality
+interpretation, and reference tables read their definitions directly from calculation code.
+
+The {ref}`element <catalog-en-rule-zodiac-elements>` and
+{ref}`modality <catalog-en-rule-zodiac-modalities>` tables follow Astrodienst's
+undated editorial page, inspected through the recorded 2025-12-28 snapshot.
+Its `Sagitarius` spelling is recorded without changing `Sign.SAGITTARIUS`.
+The modern modalities (`Modality`) and historical groups (`AshmandSignGroup`) are
+different classifications, although some groups contain the same signs. Their fixed
+groups agree; the modern mutable group matches Ashmand's bicorporeal group, and
+Ashmand's tropical and equinoctial groups together match the modern cardinal group.
+Having the same members does not make their names or historical definitions equivalent.
+
+Both `FIXED` members have the string value `"fixed"` and compare and hash equal
+as `StrEnum` members. To keep both in one mapping, use `(type(member), member.value)`
+keys or their distinct qualified catalog IDs.
+
+The lunation convention is Rudhyar's eight types in the inspected online
+transcription of *Your Lunation Birthday*, Part Four. The page reports first
+publication in *Horoscope Magazine*, January 1950; the original was not inspected.
+See the {ref}`intervals and source <catalog-en-rule-lunation-rudhyar1950>` and
+the [usage guide](summaries.md#classify-a-supplied-sunmoon-pair) for how boundary
+angles are classified and waxing or waning is determined.
 
 ## Translation revisions and search
 
@@ -299,45 +340,6 @@ substring matching is not supported. Use `Catalog.lookup()` for exact identity l
    both generated language pages. Checks cover current translations, complete
    config/catalog/API references and installed resources. Semantic review still
    verifies translation meaning and source fidelity.
-
-## Pre-release rule-ID changes
-
-Corpus `2026.10.21.1` removes fourteen automatically generated variants that only
-repeated request identities. Their concepts, aliases, configuration links and
-entries remain. `entry.body_requests` and `entry.node_directions` now have empty
-`rule_ids`; entries already permitted that shape. The removed IDs are:
-
-```text
-rule.body.sun
-rule.body.moon
-rule.body.mercury
-rule.body.venus
-rule.body.mars
-rule.body.jupiter
-rule.body.saturn
-rule.body.uranus
-rule.body.neptune
-rule.body.pluto
-rule.node.mean_ascending
-rule.node.mean_descending
-rule.node.meeus_five_term_true_ascending
-rule.node.meeus_five_term_true_descending
-```
-
-`variant()` raises `KeyError` for these IDs; there is no alias or conversion to a
-concept. Their removal did not prohibit later substantive rules: the seven
-classical bodies now link to the dignity and debility rules recorded in Lilly's
-*Christian Astrology* (1647). Use `concept()`,
-`lookup()` or `filter_entries()` to retrieve the preserved identity information.
-The three `rule.house.*`, two `rule.node_definition.*`, five `rule.aspect.*` and
-nine original authored rule IDs remain. Their relative order is unchanged:
-the ten configuration-linked rules precede the original nine authored rules.
-That revision had 19 variants, with 36 concepts, 3 sources and 8 entries unchanged in
-count. Source status, prerequisite completeness, output eligibility and chart
-applicability retain their separate meanings.
-
-The cross-chart addition preserves existing rule identities while scoping
-participation to single-chart evaluation and motion to rates at one shared instant.
 
 ## Records and ownership
 

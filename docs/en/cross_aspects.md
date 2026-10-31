@@ -98,6 +98,8 @@ or a different order are rejected.
 
 ## Choose pairs and orbs
 
+<!-- usage: cross.selection -->
+
 When calling `cross_chart_aspects`, use `left_objects` and `right_objects` to
 select objects from each chart independently. `None` selects all bodies and nodes
 in that chart, without axes, even if its natal aspects used only a subset.
@@ -108,11 +110,26 @@ nodes selected on each side. You can also pass the same chart on both sides.
 These pairings are this project's geometric conventions, not traditional interpretation rules.
 The [single-chart node exclusion](aspects.md#choose-the-objects) remains unchanged.
 
+```{doctest}
+>>> cross_chart_aspects(chart_left, chart_right, rules, left_objects=[]).hits
+()
+>>> cross_chart_aspects(chart_left, chart_right, ()).rules
+()
+```
+
+`hits=()` can mean that a selection is empty, the rules are empty, or no aspects
+match. Read the recorded selections and rules to distinguish these cases.
+
+<!-- /usage: cross.selection -->
+
+<!-- usage: cross.orbs -->
+
 An `ObjectOrb` override for a `Body`, `LunarNode` or `Axis` applies to both sides.
 For example, a Sun override applies to both Suns; you cannot give the left and
 right Suns separate values. The object must be selected on at least one side.
-If any rule has overrides, choose an `OrbCombination`; otherwise, leave
-`combination=None`. The [three combination rules](aspects.md#combine-orbs-when-objects-differ)
+If any rule sets a separate orb for an object, choose an `OrbCombination` with the
+`combination` parameter; otherwise, leave `combination=None`.
+The [three combination rules](aspects.md#combine-orbs-when-objects-differ)
 are the same as for natal aspects. A deviation whose absolute value equals the
 orb limit also counts as a hit.
 
@@ -122,14 +139,8 @@ orb limit also counts as a hit.
 ...   combination=OrbCombination.MEAN_OF_ORBS)
 >>> adjusted.hits[0].orb_limit_deg
 5.0
->>> cross_chart_aspects(chart_left, chart_right, rules, left_objects=[]).hits
-()
->>> cross_chart_aspects(chart_left, chart_right, ()).rules
-()
 ```
 
-`hits=()` can mean that a selection is empty, the rules are empty, or no aspects
-match. Read the recorded selections and rules to distinguish these cases.
 The following requests raise `ValueError`, even when there are no pairs to compare:
 
 - Selecting an object twice on one side, or selecting an object absent from that chart.
@@ -138,6 +149,8 @@ The following requests raise `ValueError`, even when there are no pairs to compa
 
 Input sequences are copied into immutable tuples. Changing the originals later
 does not change the result.
+
+<!-- /usage: cross.orbs -->
 
 ## Select axes on each side
 

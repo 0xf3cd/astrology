@@ -201,6 +201,22 @@ def test_ashmand_groups_have_names_sources_and_separate_states(catalog: Catalog)
   assert "project-derived" in entry.exceptions.en
 
 
+def test_fixed_excerpt_retains_the_printed_internal_period(catalog: Catalog) -> None:
+  citation = next(
+    item
+    for item in catalog.entry("entry.ashmand_sign_groups").citations
+    if "fixed definition" in item.locator
+  )
+  assert citation.excerpt is not None
+  assert citation.excerpt.en == (
+    "Those signs, which severally follow immediately after the two tropical and "
+    "the two equinoctial. signs, are termed fixed"
+  )
+  assert "printed p. 35 / PDF p. 73" in citation.locator
+  assert "printed internal period" in citation.locator
+  assert citation.excerpt.revision == citation.excerpt.zh_revision == 2
+
+
 def test_partial_computation_cannot_promote_retrieval(catalog: Catalog) -> None:
   # Synthetic evidence, not a traditional claim or a bibliography.
   partial_evidence = {"condition_a": True, "condition_b": None}

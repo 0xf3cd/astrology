@@ -2,12 +2,18 @@
 
 [简体中文](../zh-CN/svg.md) · [Configuration](configuration.md) · [Cross-chart comparison](cross_aspects.md) · [Chart results](records.md) · [API](reference.md)
 
-Pass a chart and a loaded catalog to `render_natal_wheel` or `render_natal_matrix`.
+Pass a chart and a loaded knowledge catalog to `render_natal_wheel` for a natal
+wheel, or to `render_natal_matrix` for a natal aspect matrix.
 For two charts, first choose comparison rules with `cross_chart_aspects`, then
 pass its result to `render_cross_matrix`. Each renderer returns an SVG string;
 only your own file-writing code saves it.
 
+These renderers are source-checkout APIs planned for 0.3.0. Use the
+[source installation instructions](../../README.md#install-from-source).
+
 ## Render and save
+
+<!-- usage: svg.rendering -->
 
 These synthetic birth records use UTC and an explicit location. The second chart
 uses the same configuration but a different year.
@@ -53,6 +59,8 @@ Use `language="zh-CN"` for Chinese. All three functions default to `"en"`.
 Rendering itself does not load a catalog, calculate positions, resolve timezones,
 access files or the network, or modify the supplied results.
 
+<!-- /usage: svg.rendering -->
+
 ## Read the figures
 
 The wheel puts the actual Ascendant on the left; longitude increases
@@ -72,6 +80,14 @@ Choose natal participants with `ChartConfig.aspect_objects`; the matrix follows
 the resulting `chart.effective.aspect_objects`. Rows are the first objects and
 columns the second objects; each pair appears once above the diagonal.
 Participants without hits remain visible. No aspect rules means no participants.
+Natal matrix labels `N1`, `N2`, … refer to the numbered entries in its "Objects and
+stored longitudes" list. In this sample, N1 is Sun, N2 Moon, N3 Venus, N4 Ascendant
+and N5 Midheaven.
+The mean node is stored and drawn on the wheel but is not selected for natal
+aspects. Five participants are this example's selection, not a renderer limit.
+To include Mars, for example, add `Body.MARS` to both `objects` and `aspect_objects`
+before calculating the chart; the renderer does not calculate missing objects.
+
 For a cross matrix, choose each side with `cross_chart_aspects(left_objects=...,
 right_objects=...)`. Rows follow the recorded `comparison.left_objects` (`L`),
 columns `comparison.right_objects` (`R`); the two Suns remain separate. The lists

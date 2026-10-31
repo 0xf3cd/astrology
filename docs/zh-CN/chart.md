@@ -8,6 +8,8 @@
 
 ## 计算一张盘
 
+<!-- usage: chart.calculation -->
+
 先准备输入。排盘需要已知钟点、显式时区和地点；[出生指南](birth.md)说明这一步。
 
 ```{doctest}
@@ -29,6 +31,8 @@
 'placidus'
 ```
 
+<!-- /usage: chart.calculation -->
+
 位置是瞬时真黄道、真春分点上的地心视黄经与黄纬。结果保留未舍入的值，
 星座与落宫由这些值派生。
 
@@ -47,8 +51,8 @@
 
 ## 保存模型与口径
 
-请求配置与实际配置是两个分开的值。ΔT 模型由适配层固定，不是调用方请求项，
-但结果仍会具名记录。
+`chart.requested` 保存传入的配置，`chart.effective` 记录计算时实际使用的设置。
+例如，ΔT 模型由适配层固定，不能在请求中选择，但可以从结果中读到它的名称：
 
 ```{doctest}
 >>> chart.effective.delta_t_model
@@ -146,8 +150,8 @@ True
 
 ## 显式失败
 
-能预先判定的输入由适配层在调用天文库之前拒绝；上游报告的失败不做替代。
-绝不返回部分结果，请求的宫制也绝不替换。
+输入不满足计算要求时，`natal_chart` 会报错，不返回部分命盘，也不换用其他宫制。
+适配层会在调用天文库前检查能够预先判断的限制，其余计算失败由天文库报告。
 
 ```{doctest}
 >>> from astrology import ChartDomainError, MissingBirthDataError
@@ -185,7 +189,8 @@ True
 | 时刻超出支持的星历范围 | `ChartDomainError`，携带上游操作 |
 | 该纬度下请求的几何无定义 | `ChartDomainError`，携带请求的宫制 |
 
-分类从不依赖解析上游消息。调用前拒绝不带上游细节；由天文库报告的失败携带操作与记录状态。
+错误类型不靠解析天文库的消息文本来判断。在调用天文库前发现的问题不带上游细节；
+由天文库报告的失败会记录操作名 `operation` 及记录状态 `recorded`，如下例：
 
 ```{doctest}
 >>> high = prepare_natal_input(BirthRecord(
@@ -203,8 +208,9 @@ True
 
 ## 选取对象不扩大有效域
 
-天文库把十四个对象的快照与宫位几何一起求值。少选对象只是过滤输出，
-不缩小求值域，结果也会如实记录这一点。
+天文库每次会一起计算十四个对象的位置和宫位。`objects` 只选择返回哪些对象，
+不会跳过其他对象或宫位计算，因此少选对象也不会扩大可用的时刻、地点范围。
+`effective.evaluation` 记录了这种计算方式：
 
 ```{doctest}
 >>> one = natal_chart(resolved, ChartConfig(HouseSystem.WHOLE_SIGN, (Body.SUN,), ()))
@@ -216,22 +222,14 @@ True
 
 ## 与独立参考比对
 
-`tests/reference/natal_reference.json` 中的参考案例覆盖南北半球各一个时刻，
-与 JPL Horizons 比对。在同口径下，检查要求太阳与行星一致到 3 角秒以内，月亮 15 角秒，
-黄纬 1 角秒（月亮 3 角秒），四轴 0.001 度。Placidus 第 2、3、11、12 宫头按 Placidus 定义、
-用 Horizons 的恒星时求值，同样要求一致到 0.001 度。交点检查重实现了库也在用的
-Meeus 第 47 章公式，闰秒关系 `JDE(TT) - JD(UTC)` 精确成立。各条参考能检出和检不出
-哪些缺陷见[参与开发](contributing.md#正确性)。
-
-另有完整盘例与 Swiss 的位置、速率及全部十二宫头比较，归属及相位由独立算术推导。
-其约定、容差和限度见[结果指南](records.md#验证与限度)。
+测试会把本库算出的天体位置与 JPL Horizons 的数据比较，并用 Swiss Ephemeris 的结果检查整盘计算。
+这些测试覆盖有限的时刻，不是对整个支持范围的精度保证。具体方法、容差和参考数据的限制见
+[参与开发](contributing.md#正确性)。
 
 ## 限度
 
 - 请求的相位在参与的对象之间判断；规则和限度见[相位指南](aspects.md)。
-- Horizons 夹具本身没有外部宫头值，按 Placidus 定义核对仍可能与库有共同误读。
-  另设的 Swiss 夹具检查完整几何，但也存在自己的时刻模型差异。
 - 天文库支持 1885 至 2099 民用年，UTC 输入起于 1972-01-01；
   星历有效域比民用年范围更窄，超出即显式失败。
 - 安装需要有 celestial-calendar 轮子的平台；见
-  [参与开发](contributing.md#运行检查)。
+  [安装说明](../../README.zh-CN.md#安装发行版)。

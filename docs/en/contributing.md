@@ -27,10 +27,8 @@ Use a current patch release for development checks. Safe sdist extraction in the
 requires Python 3.11.4 or later; the installed library's supported minor versions
 remain 3.11–3.14.
 
-The astronomy dependency publishes wheels for Linux x86_64 and aarch64, macOS 14+
-arm64 and Windows amd64, and no source distribution. This package therefore
-cannot be installed on any other platform, and browsing the knowledge catalog
-needs the same install.
+Use one of the [supported installation platforms](../../README.md#install-a-release).
+The same dependency constraints apply to development and knowledge-only use.
 
 The command checks Ruff lint/two-space formatting, strict mypy, pytest in normal
 and optimized modes, document pairs/local links, fresh strict HTML/doctest builds,
@@ -41,11 +39,13 @@ runs `python -m build --wheel` inside the extracted tree. Strict HTML/doctest bu
 also run there and import the extracted package sources. The check then validates
 the API/catalog pages, generated search index and query code, and doctest results.
 
-The installed consumer exercises birth,
-timezone provenance and configuration outside the checkout; its complete-chart,
-raw-result comparison and text checks are described in the
-[result guide](records.md#verification-and-limits). A separate knowledge-only
-consumer lists, looks up, filters and resolves citations without time/native
+The installed-package test program checks birth inputs,
+timezone-data provenance and configuration outside the checkout. It compares the
+complete numeric chart, resolved input, requested/effective configuration,
+provenance, comparison text and SVG with source results from the same revision.
+It also tests a failed Placidus request and checks where modules were imported
+from, including the explicitly loaded native adapter. A separate knowledge-only
+program lists, looks up, filters and resolves citations without time/native
 initialization. Both use isolated imports in normal and optimized modes; wheel
 and sdist checks require the actual corpus resources.
 
@@ -85,29 +85,50 @@ uv run python -m sphinx \
 ```
 
 Open `build/docs/index.html` for both language entries. The current combined
-search index keeps English stemming and uses matching Python/JavaScript Chinese
-character-bigram tokenization. See [search limits](knowledge.md#translation-revisions-and-search).
-The gate checks the actual generated search index and emitted splitter/stemmer
-contract, per-page language/counterpart navigation, complete catalog anchors and
-current translations. A successful build alone is insufficient. Independent
+search index supports both languages. See [search limits](knowledge.md#translation-revisions-and-search).
+The checks inspect the generated search index, splitter and stemmer interfaces,
+each page's language and link to its counterpart, complete catalog anchors and
+whether translations are current. A successful build alone is insufficient. Independent
 verification can execute the generated JavaScript query/index code; a Python
 tokenizer unit test does not prove browser behavior.
+
+`tools/guide_checks.py` lists the usage topics that need explanations and examples.
+Each language must contain exactly one marked block per topic, with explanatory
+prose and one runnable `{doctest}` code block. For example, `<!-- usage: cross.orbs -->` opens the orb block
+and `<!-- /usage: cross.orbs -->` closes it. Titles, translations and page locations
+may change together with their content. Empty, nested, unmatched, unknown or
+duplicate blocks fail. The source and extracted sdist both run this check, then
+compare each document's source example count with its executed Sphinx count.
+Passing these structural checks does not establish that an explanation is clear
+or its translation accurate; both still need to be read and checked.
+
+`PACKAGE_FILES` in `tools/check.py` lists the source files expected in distributions.
+The checks independently scan the source tree for unlisted files and inspect the
+wheel and sdist for missing files. The installed-package test discovers actual Python modules and imports
+them explicitly, deferring the astronomy adapter until calculation. It does not
+import development check modules. Domain edge cases stay in domain tests;
+installed checks retain packaging, resources, metadata, initialization boundaries
+and representative complete use.
 
 Sphinx discovers only the two root READMEs and sources under `docs/`. Keep virtual
 environments outside `docs/`: sources anywhere under that directory are documentation
 inputs, while sibling directories are not. Warnings in these document sources still
 fail the strict build.
 
+<!-- usage: contributing.checks -->
+
 Install this development package from the checkout using `uv sync` above. Its
 distribution name/version is `celestial-astrology` / `0.2.0`; the Python import
 remains `astrology`. The unrelated
-PyPI project `astrology` is not this library. Confirm the installed identity:
+PyPI project `astrology` is not this library. Confirm the installed package and version:
 
 ```{doctest}
 >>> from importlib.metadata import version
 >>> version("celestial-astrology")
 '0.2.0'
 ```
+
+<!-- /usage: contributing.checks -->
 
 The checks execute both READMEs against an isolated wheel install, compare their
 documented output, inspect the wheel's actual Markdown links, and resolve both
@@ -207,7 +228,8 @@ the tolerance can still be caught. The cases below were judged with that offset 
 
 The Horizons-based and hand-computed aspect checks have three parts. Cases in `tests/test_aspects.py`
 need no astronomy. Dividing a one-hour longitude change by the elapsed time checks
-the sign and unit of the rates used to determine applying or separating motion.
+the sign and unit of the rates used to determine applying or separating motion,
+with agreement to about 1e-6 degrees per day.
 The reference tests configure the orbs that Astrodienst publishes for its
 Hellenistic drawing style and compare the resulting aspect set with one derived from
 the Horizons longitudes. Where a pair lies near an orb limit, they detect a wrong orb,
@@ -217,10 +239,10 @@ hold no sextile or opposition, so those angles rest on the hand-computed cases. 
 do not check the status against an external source: Horizons supplies no rates here,
 and the style page gives parameters, not the aspect list of a chart.
 
-The separate Swiss complete-chart fixture adds independent rates and all house
-cusps, plus separately derived placements, aspects and motion for four synthetic
-instants. All five aspect identities occur. Its case-specific tolerances and source
-limits are documented in the [result guide](records.md#verification-and-limits).
+The separate Swiss complete-chart reference data includes independently calculated
+rates and all house cusps. Tests use separately written arithmetic to derive signs,
+house placements, aspects and motion for four synthetic instants, covering all
+five aspects. Details follow below.
 The project-calculated numeric regression samples are not external evidence.
 Keep their original numbers and extraction provenance when changing pure rules
 or dependencies. Current provenance and numerical regression are distinct:
@@ -232,6 +254,48 @@ targets. A version-label change alone must pass numerical regression; an interna
 valid numerical change beyond tolerance must fail at the numerical assertion.
 Record the changed input or implementation, actual exit code and failure location
 in the PR. A constructor or import failure does not demonstrate a numerical check.
+
+### Complete-chart numerical references
+
+`tests/reference/chart_regression.json` retains numbers from two project-calculated
+synthetic Whole Sign cases: an IANA input with nonuniform aspect orbs from the
+`0.0.0` development tree and a fixed-offset, two-body case without aspects from
+the published v0.1.0 wheel. Extraction provenance includes the original sample
+hashes and the released wheel/manifest digests, source commit and generation
+procedure. These are regression samples, not independent astronomy references.
+Tests construct their inputs explicitly; they do not restore saved charts.
+
+Numerical regression checks models, frames, configuration, identities and
+classifications without requiring historical package-version equality. Absolute
+tolerances are 1e-8 degrees for angles, 1e-9 AU for distances, 1e-9 degrees/TT day
+for rates and 1e-8 days for Julian dates. A changed model needs a separately
+justified comparison. These finite cases do not establish global accuracy.
+
+`tests/reference/complete_chart_reference.json` contains independently executed
+Swiss Ephemeris 2.10.03 / pyswisseph 2.10.3.2 numeric states for four synthetic
+instants, each with three house systems. It records the pyswisseph Python wheel's
+SHA-256 hash, flags, coordinate/time conventions, source URLs, separate calibration
+and per-field tolerances. Moshier is requested explicitly; returned `calc` flags
+are checked. Swiss houses use Swiss UT1 and Delta-T, not Algo5, the fixed Delta-T
+model used by this adapter. Their tolerance includes that time-model difference.
+Signs, two-dimensional house membership (using longitude, not object latitude),
+aspects and motion were derived by separate project-authored arithmetic from the
+Swiss states; Swiss itself does not supply an aspect table. Mean-node
+longitude/rate are compared as named models, not assumed identical formulas.
+Node distance and true nodes are not equivalent comparisons; zero node latitude
+is a definition-level check.
+
+If a reference point is within the combined longitude/cusp tolerances of a cusp,
+the comparison accepts either adjoining house. It does not claim an exact
+independent house label for that point.
+
+The [Swiss documentation](https://www.astro.com/swisseph/swisseph.htm) describes
+Moshier's precision class. The recorded thresholds include both implementations'
+model differences and finite calibration; they are not global accuracy guarantees.
+The source tool was isolated and is not a runtime/dev dependency. Only generated
+numbers and project-authored metadata are included, not Swiss code or ephemeris
+files; see the [GNU output FAQ](https://www.gnu.org/licenses/gpl-faq.html#WhatCaseIsOutputGPL).
+This does not change the project's MIT license or constitute a general license assurance.
 
 ## Knowledge and documentation
 
