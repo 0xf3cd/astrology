@@ -2,7 +2,8 @@
 
 [简体中文](../zh-CN/svg.md) · [Configuration](configuration.md) · [Cross-chart comparison](cross_aspects.md) · [Chart results](records.md) · [API](reference.md)
 
-Pass a chart and a loaded catalog to `render_natal_wheel` or `render_natal_matrix`.
+Pass a chart and a loaded knowledge catalog to `render_natal_wheel` for a natal
+wheel, or to `render_natal_matrix` for a natal aspect matrix.
 For two charts, first choose comparison rules with `cross_chart_aspects`, then
 pass its result to `render_cross_matrix`. Each renderer returns an SVG string;
 only your own file-writing code saves it.

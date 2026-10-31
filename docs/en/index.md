@@ -8,11 +8,11 @@ task you need:
 | Task | Guide |
 |---|---|
 | Prepare a birth record and resolve its time | [Birth inputs](birth.md) |
-| Change objects, aspect participants or orbs | [Configuration](configuration.md) and [aspects](aspects.md) |
+| Select bodies, aspect participants or orbs | [Configuration](configuration.md) and [aspects](aspects.md) |
 | Calculate and read a chart | [Natal charts](chart.md) and [results/text](records.md) |
 | Compare two charts | [Cross-chart aspects and house overlays](cross_aspects.md) |
-| Count signs or classify lunar phase | [Summaries](summaries.md) |
-| Query traditional sign rulers and statuses | [Dignities](dignities.md) |
+| Count elements/modalities or classify lunar phase | [Sign distributions and natal lunar phase](summaries.md) |
+| Query traditional sign rulers and dignity statuses | [Traditional rulers and four statuses](dignities.md) |
 | Draw a wheel or matrix | [SVG](svg.md) |
 | Look up names, rules and sources without a chart | [Knowledge queries](knowledge.md) and [catalog](catalog.md) |
 

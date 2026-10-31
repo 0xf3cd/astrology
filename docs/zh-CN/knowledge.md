@@ -42,9 +42,11 @@ True
 读取规则定义。上面最后两次调用输出中文正文；传 `"en"` 可读取英文。
 
 同一个概念可以有多个名称，但只有一个标识。例如，`Sun`、`Sol` 和“日轮”都指向 `body.sun`。
-规则变体则记录某套具体定义，例如采用哪种宫制或月交点算法。天体名称和升降交点方向本身不另建规则。
-太阳链接有来源依据的尊贵规则，其中含具体归属，不是重复太阳名称。
-一个身份可以没有关联变体；用 `concept()` 或 `lookup()` 仍可查询其名称。
+规则变体记录某套具体定义，例如采用哪种宫制或月交点算法；仅记录天体名称或交点方向时，不另建规则。
+上例用 `list_variants(concept_id="body.sun")` 查到 `rule.lilly1647.essential_dignities` 这条规则，
+这条规则说明太阳等星体在哪些星座入庙、擢升、失势或落陷，出处是 Lilly 的著作。
+例如，`list_variants(concept_id="body.uranus")` 返回空元组，表示目录中没有与天王星关联的规则。
+但用 `concept("body.uranus")` 或 `lookup("Uranus")` 仍能查到天王星的名称记录。
 
 <!-- /usage: knowledge.lookup -->
 
@@ -217,25 +219,24 @@ True
 
 ## 元素、模式与月相类型
 
-这些输出概念有各自的类别及稳定标识：`element.*`、`modality.*`、
-`lunation_type.rudhyar1950.*`，不链接请求配置。用法见[查询、统计及月相指南](summaries.md)。
-分类不作性格解读；
-生成表读取各领域的可执行定义。
+元素、模式和月相类型分别使用 `element.*`、`modality.*`、`lunation_type.rudhyar1950.*` 作为稳定标识。
+用法见[查询、统计及月相指南](summaries.md)。
+它们用来描述结果，不是排盘配置项。分类不作性格解读，参考表直接读取计算代码中的定义。
 
 {ref}`元素 <catalog-zh-cn-rule-zodiac-elements>`及
 {ref}`模式 <catalog-zh-cn-rule-zodiac-modalities>`表依据 Astrodienst 无日期的编辑页面，
-按记录中的 2025-12-28 快照核验。来源的 `Sagitarius` 拼写单独记录，规范身份仍为
-`Sign.SAGITTARIUS`。`Modality` 与 `AshmandSignGroup` 身份分开：两者固定集合相同，
-现代变动集合与 Ashmand 双体集合相同；Ashmand 至点、分点两对合起来是现代基本模式集合。
-这种成员关系不合并它们的名称或历史定义。
+按记录中的 2025-12-28 快照核验。来源中的 `Sagitarius` 拼写单独注明，程序中仍使用
+`Sign.SAGITTARIUS`。现代模式分类 `Modality` 与历史分组 `AshmandSignGroup` 是两套不同的分类，
+虽然其中一些组包含相同的星座：两者的固定组相同，现代变动组与 Ashmand 双体组相同，
+Ashmand 的至点、分点两组合起来则对应现代基本模式。成员相同不表示名称和历史定义也相同。
 
 两个 `FIXED` 成员的字符串值都是 `"fixed"`；按 `StrEnum` 的字符串语义，它们比较相等，
 hash 也相同。要在同一映射中保留二者，请用 `(type(member), member.value)` 作键，
 或使用各自带类别前缀的目录 ID。
 
 月相分类采用 Rudhyar 的八种类型，依据 *Your Lunation Birthday* 第四部分在线转录。
-页面自述初刊于 *Horoscope Magazine* 1950 年 1 月，未核杂志原件。
-参见{ref}`区间及来源 <catalog-zh-cn-rule-lunation-rudhyar1950>`；项目的端点和方向政策见
+页面称原文初刊于 *Horoscope Magazine* 1950 年 1 月；本项目未核对杂志原件。
+参见{ref}`区间及来源 <catalog-zh-cn-rule-lunation-rudhyar1950>`；区间端点如何归类、盈亏方向如何判断，见
 [用法指南](summaries.md#对给定日月位置分类)。
 
 ## 译文修订与搜索

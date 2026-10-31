@@ -9,7 +9,7 @@ keeps astrological rules, their sources, and their variants in this repository.
 Calculate a tropical, geocentric natal chart from a known birth time and location,
 or query the knowledge catalog without a chart. Start with the examples below;
 the [guides](https://0xf3cd.github.io/astrology/docs/en/index.html) and
-[API reference](https://0xf3cd.github.io/astrology/docs/en/reference.html) cover the full contracts.
+[API reference](https://0xf3cd.github.io/astrology/docs/en/reference.html) explain further uses and parameters.
 
 The current source also adds [element/modality distributions and natal lunar
 phase](https://0xf3cd.github.io/astrology/docs/en/summaries.html),
@@ -30,7 +30,7 @@ New in 0.2.0 (in development):
 
 ## Install a release
 
-Installation follows the astronomy dependency: celestial-calendar 0.8.0 publishes
+This library depends on celestial-calendar 0.8.0, which publishes
 wheels for Linux x86_64 and aarch64, macOS 14+ arm64 and Windows amd64, and no source
 distribution. On any other platform this package cannot be installed, and
 knowledge browsing is not available either.
@@ -140,9 +140,9 @@ fallback. See the [chart guide](https://0xf3cd.github.io/astrology/docs/en/chart
 for admitted domains, and the [result guide](https://0xf3cd.github.io/astrology/docs/en/records.html)
 for structured results and bilingual text tables.
 
-The output lists the resolved UTC instant and each selected object's sign.
-Change `ChartConfig.objects` to request other bodies or nodes; use
-`aspect_objects` and explicit orb rules to choose who participates in aspects.
+The output lists the resolved UTC instant and the signs of the Sun and Moon.
+To include other bodies or nodes, set `objects` when constructing `ChartConfig`.
+To calculate aspects, supply orb rules in `aspects` and select participants with `aspect_objects`.
 
 | Next task | Guide |
 |---|---|

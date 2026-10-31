@@ -46,10 +46,13 @@ print those texts in English; use `"zh-CN"` for Chinese.
 
 Several names can identify one concept: `Sun`, `Sol` and `日轮` all refer to
 `body.sun`. A rule variant records a particular definition, such as a house
-system or lunar-node algorithm. Body names and ascending/descending node directions
-do not get identity-only rules. The Sun links to the sourced dignity rule,
-which carries assignments rather than repeating its name. An identity can have
-no linked variants; use `concept()` or `lookup()` to retrieve its names.
+system or lunar-node algorithm. A record that only names a body or a node direction
+does not need a separate rule. Above, `list_variants(concept_id="body.sun")` finds
+the rule `rule.lilly1647.essential_dignities`. This rule records the signs of domicile,
+exaltation, detriment and fall for the Sun and other classical planets, citing Lilly's work.
+For example, `list_variants(concept_id="body.uranus")` returns an empty tuple:
+the catalog has no rule linked to Uranus. You can still retrieve its name record
+with `concept("body.uranus")` or `lookup("Uranus")`.
 
 <!-- /usage: knowledge.lookup -->
 
@@ -262,19 +265,21 @@ actual weather or daylight.
 
 ## Elements, modalities and lunation types
 
-These output concepts have their own kinds and stable IDs: `element.*`,
-`modality.*`, `lunation_type.rudhyar1950.*`, without request-configuration links.
-See the [queries, statistics and lunar phase guide](summaries.md). Classifications carry no personality interpretation;
-generated tables read the owning executable definitions.
+Elements, modalities and lunation types use separate kinds and stable IDs:
+`element.*`, `modality.*` and `lunation_type.rudhyar1950.*`, respectively.
+See the [queries, statistics and lunar phase guide](summaries.md). They describe
+results, not chart configuration options. The classifications carry no personality
+interpretation, and reference tables read their definitions directly from calculation code.
 
 The {ref}`element <catalog-en-rule-zodiac-elements>` and
 {ref}`modality <catalog-en-rule-zodiac-modalities>` tables follow Astrodienst's
 undated editorial page, inspected through the recorded 2025-12-28 snapshot.
 Its `Sagitarius` spelling is recorded without changing `Sign.SAGITTARIUS`.
-`Modality` and `AshmandSignGroup` remain distinct. Their fixed sets agree; modern
-mutable agrees with Ashmand's bicorporeal set; Ashmand's tropical/equinoctial pairs
-together form the cardinal set. Membership agreement does not merge their names
-or historical definitions.
+The modern modalities (`Modality`) and historical groups (`AshmandSignGroup`) are
+different classifications, although some groups contain the same signs. Their fixed
+groups agree; the modern mutable group matches Ashmand's bicorporeal group, and
+Ashmand's tropical and equinoctial groups together match the modern cardinal group.
+Having the same members does not make their names or historical definitions equivalent.
 
 Both `FIXED` members have the string value `"fixed"` and compare and hash equal
 as `StrEnum` members. To keep both in one mapping, use `(type(member), member.value)`
@@ -284,8 +289,8 @@ The lunation convention is Rudhyar's eight types in the inspected online
 transcription of *Your Lunation Birthday*, Part Four. The page reports first
 publication in *Horoscope Magazine*, January 1950; the original was not inspected.
 See the {ref}`intervals and source <catalog-en-rule-lunation-rudhyar1950>` and
-the [usage guide](summaries.md#classify-a-supplied-sunmoon-pair) for the project's
-boundary and direction policies.
+the [usage guide](summaries.md#classify-a-supplied-sunmoon-pair) for how boundary
+angles are classified and waxing or waning is determined.
 
 ## Translation revisions and search
 

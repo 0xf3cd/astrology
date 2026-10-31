@@ -197,9 +197,9 @@ moon saturn trine -2.34 separating
 
 ## Select axes explicitly
 
-`Axis.ASCENDANT`, `MIDHEAVEN`, `DESCENDANT` and `IMUM_COELI` are distinct chart
-identities. In chart composition their longitudes come from the corresponding
-stored `ChartHouses` fields, never from house cusps or a synthesized opposite axis.
+`Axis.ASCENDANT`, `MIDHEAVEN`, `DESCENDANT` and `IMUM_COELI` identify the Ascendant,
+Midheaven, Descendant and Imum Coeli. Chart calculation reads each axis longitude
+from `ChartHouses`, without substituting a cusp or deriving it from the opposite axis.
 This matters in Whole Sign, where ASC/MC need not be first/tenth cusps.
 
 ```{doctest}
@@ -217,13 +217,13 @@ This matters in Whole Sign, where ASC/MC need not be first/tenth cusps.
 ['sun']
 ```
 
-Chart composition supplies no axis rate (`None`), so a non-exact hit involving an
-axis is `indeterminate`. Zero deviation still gives `exact`. Exactness uses the
-same direct float comparison: nearly opposite stored values can have a tiny
-nonzero deviation. Do not replace absence with zero or a planet's rate. Low-level
+Chart results have no axis longitude rates (`None`), so a hit involving an axis
+has motion status `indeterminate` unless its deviation is zero, which still gives
+`exact`. The check compares floats directly: nearly opposite stored values can
+have a tiny nonzero deviation. Missing rates are not replaced with zero or a planet's rate. Low-level
 `AspectObject` accepts a caller-supplied finite axis rate on the same day basis
 as the other objects (for example, the TT day).
-Axes acquire no physical distance, raw position or population-statistics entry.
+Axes have no physical distance, are not listed in `chart.positions`, and are not counted in sign distributions.
 
 Explicitly selected axes can pair with each other, including ASC/DSC and MC/IC.
 Opposite axes remain separate identities; all matching aspects/branches are kept.
@@ -233,10 +233,9 @@ The [cross-chart API](cross_aspects.md#select-axes-on-each-side) selects each si
 
 ## Check the results
 
-Hand-computed boundaries and independently derived reference cases check the
-geometry. The [contributing guide](contributing.md#correctness) describes the
-rate checks, orb margins and limits of those finite comparisons; they do not
-establish a global accuracy bound or validate an interpretation.
+Tests compare aspect angles and orb boundaries with hand-calculated expectations.
+They also compare the library's aspects with those derived from JPL Horizons
+longitudes. See the [contributing guide](contributing.md#correctness) for the test methods.
 
 ## Limits
 

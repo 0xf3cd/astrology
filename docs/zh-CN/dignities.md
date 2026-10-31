@@ -16,7 +16,8 @@
 
 <!-- usage: dignities.lookup -->
 
-传入 `Sign` 和 `Body` 成员，查询星座守护星或行星的状态：
+用 `sign_ruler` 查询一个星座的传统守护星；用 `essential_dignities` 查询某颗星体在某个星座的四种状态。
+例如，天蝎座的守护星是火星，水星在处女座同时入庙、擢升，在双鱼座则同时失势、落陷：
 
 ```{doctest}
 >>> from astrology import Body, Sign, DignityStatus, sign_ruler, essential_dignities

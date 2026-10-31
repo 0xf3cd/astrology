@@ -127,8 +127,9 @@ match. Read the recorded selections and rules to distinguish these cases.
 An `ObjectOrb` override for a `Body`, `LunarNode` or `Axis` applies to both sides.
 For example, a Sun override applies to both Suns; you cannot give the left and
 right Suns separate values. The object must be selected on at least one side.
-If any rule has overrides, choose an `OrbCombination`; otherwise, leave
-`combination=None`. The [three combination rules](aspects.md#combine-orbs-when-objects-differ)
+If any rule sets a separate orb for an object, choose an `OrbCombination` with the
+`combination` parameter; otherwise, leave `combination=None`.
+The [three combination rules](aspects.md#combine-orbs-when-objects-differ)
 are the same as for natal aspects. A deviation whose absolute value equals the
 orb limit also counts as a hit.
 

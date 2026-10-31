@@ -2,23 +2,29 @@
 
 [简体中文](../zh-CN/configuration.md) · [Documentation](index.md) · [API reference](reference.md)
 
-`ChartConfig` is an immutable request, not a calculated chart or resolved
-astronomy metadata. The only admitted modes are `tropical` and `geocentric`.
-House system, object selection, and aspect rules must be supplied explicitly.
-An empty aspect sequence requests no aspect rules; object selection cannot be
-empty. There is no default house system or orb.
+`ChartConfig` specifies the house system, bodies or nodes to return, and aspect rules.
+It cannot be changed after construction. It stores a request without calculating
+a chart; the [chart result](records.md) records the models and other calculation details.
+Only the tropical zodiac (`tropical`) and geocentric positions (`geocentric`) are supported.
+Supply the house system, objects and aspect rules explicitly. The object selection
+cannot be empty; pass `aspects=()` to skip aspects. There is no default house system or orb.
 
 ## Choose the house system and output objects
 
 <!-- usage: configuration.objects -->
 
-Choose a `HouseSystem` and put the bodies or nodes you want in `objects`.
-This example requests Sun, Moon and the mean ascending node, without aspects:
+For example, this request uses Whole Sign houses and asks for positions of the
+Sun, Moon and mean ascending node. `house_system` selects the house system,
+`objects` selects the bodies or nodes to return, and `aspects=()` skips aspects:
 
 ```{doctest}
 >>> from astrology import Body, ChartConfig, HouseSystem, LunarNode
 >>> objects = [Body.SUN, Body.MOON, LunarNode.MEAN_ASCENDING]
->>> request = ChartConfig(HouseSystem.WHOLE_SIGN, objects, ())
+>>> request = ChartConfig(
+...   house_system=HouseSystem.WHOLE_SIGN,
+...   objects=objects,
+...   aspects=(),
+... )
 >>> objects.clear()
 >>> tuple(value.value for value in request.objects)
 ('sun', 'moon', 'mean_ascending_node')
@@ -30,14 +36,15 @@ This example requests Sun, Moon and the mean ascending node, without aspects:
 'meeus_five_term_true'
 ```
 
-`HouseSystem` admits Whole Sign, Equal and Placidus. Unavailable requested
-geometry fails explicitly; the [chart guide](chart.md) describes those limits.
-`Body` identifies the ten physical bodies from Sun and Moon through Pluto.
-`LunarNode` identifies mathematical ascending/descending nodes with either the
-mean or Meeus five-term true definition. The definition is part of the identity,
-not an accuracy flag or an interchangeable model. You may explicitly select both
-definitions in one request;
-the chart result names the astronomical models used.
+`HouseSystem` supports Whole Sign, Equal and Placidus. If the selected system cannot
+be calculated at the given time or location, calculation fails without switching
+systems; see the [chart guide](chart.md) for the supported range.
+`Body` includes ten physical bodies: the Sun, Moon, and Mercury through Pluto.
+Lunar nodes are mathematical points, selected with `LunarNode`. It offers mean and
+Meeus five-term true definitions, each with ascending and descending nodes.
+The definition selects which node to calculate, not an accuracy level. The two
+definitions cannot substitute for each other, but you can select both in one request.
+The chart result records the astronomical models used.
 
 Object and rule sequences are copied into tuples, preserving order. Source lists
 can change without changing the request. Duplicate objects or duplicate aspect
@@ -49,10 +56,9 @@ identities are rejected rather than silently merged. Enum value strings such as
 ## Request aspects
 
 `MajorAspect` names conjunction, sextile, square, trine, and opposition.
-`AspectRule` carries a caller-supplied finite nonnegative `orb_degrees` value in
-degrees. This layer stores the request. It does not calculate aspects or choose a
-tradition's orb policy; the [aspect guide](aspects.md) explains how the request is
-judged.
+Use `AspectRule` to give an aspect an orb in degrees, `orb_degrees`, which must be
+finite and nonnegative. Configuration does not calculate aspects or choose a
+tradition's orbs for you. See the [aspect guide](aspects.md) for the calculation.
 
 ```{doctest}
 >>> from astrology import AspectRule, MajorAspect
@@ -65,8 +71,7 @@ judged.
 ('tropical', 'geocentric')
 ```
 
-The zero orb above is an explicit synthetic request value, not a library default
-or recommendation.
+The zero orb above was chosen for this example; it is not a library default or recommendation.
 
 ## Choose who takes part in aspects
 
@@ -109,7 +114,7 @@ one body/node. See [axis geometry and pairing](aspects.md#select-axes-explicitly
 Use `ObjectOrb` to set an object's orb separately; other objects use the rule's
 `orb_degrees`. If any rule uses `ObjectOrb`, you must choose `orb_combination` to
 combine the pair's orbs into one limit. Otherwise, leave `orb_combination` out.
-You can set a separate orb only for a participating identity, including an axis.
+You can set a separate orb only for a body, node or axis selected to participate.
 
 ```{doctest}
 >>> from astrology import LunarNode, ObjectOrb, OrbCombination
@@ -135,6 +140,6 @@ selections fail under normal Python and `python -O`.
 
 <!-- /usage: configuration.orbs -->
 
-The defining enums and API contracts are generated in the [reference](reference.md).
+See the [API reference](reference.md) for enum members, parameters and return values.
 For calculated models, versions, time scales and effective settings, read the
 [chart result](records.md). For queries without a chart, see [knowledge](knowledge.md).

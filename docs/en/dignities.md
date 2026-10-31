@@ -19,7 +19,9 @@ or select rules dynamically.
 
 <!-- usage: dignities.lookup -->
 
-Pass `Sign` and `Body` members to look up a sign's ruler or a planet's statuses:
+Use `sign_ruler` to look up a sign's traditional ruler, or `essential_dignities` to
+check the four statuses for a body in a sign. For example, Mars rules Scorpio;
+Mercury is both in domicile and exaltation in Virgo, and in detriment and fall in Pisces:
 
 ```{doctest}
 >>> from astrology import Body, Sign, DignityStatus, sign_ruler, essential_dignities

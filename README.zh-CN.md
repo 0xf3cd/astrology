@@ -7,7 +7,7 @@
 出处和流派变体，并组织可复现的星盘结果。
 
 可以从已知出生时刻和地点计算热带地心本命盘，也可以不排盘，直接查询知识目录。
-先运行下面的示例；完整约定见[使用指南](https://0xf3cd.github.io/astrology/docs/zh-CN/index.html)和
+先运行下面的示例；更多用法和参数说明见[使用指南](https://0xf3cd.github.io/astrology/docs/zh-CN/index.html)和
 [API 参考](https://0xf3cd.github.io/astrology/docs/zh-CN/reference.html)。
 
 当前源码另增[元素／模式分布与出生月相](https://0xf3cd.github.io/astrology/docs/zh-CN/summaries.html)、
@@ -24,7 +24,7 @@
 
 ## 安装发行版
 
-安装随天文依赖而定：celestial-calendar 0.8.0 只发布 Linux x86_64 与 aarch64、
+本库依赖 celestial-calendar 0.8.0。它只发布 Linux x86_64 与 aarch64、
 macOS 14+ arm64、Windows amd64 的轮子，没有源码分发包。其他平台无法安装本包，
 连知识浏览也不可用。
 
@@ -128,8 +128,8 @@ moon: scorpio
 [排盘指南](https://0xf3cd.github.io/astrology/docs/zh-CN/chart.html)说明支持范围，
 [结果指南](https://0xf3cd.github.io/astrology/docs/zh-CN/records.html)说明结构化结果与双语文本表格。
 
-输出列出解析后的 UTC 时刻及每个所选对象的星座。修改 `ChartConfig.objects` 可以请求其他天体或交点；
-用 `aspect_objects` 和显式容许度规则选择谁参与相位。
+输出列出解析后的 UTC 时刻及太阳、月亮所在的星座。要查看其他天体或交点，在构造 `ChartConfig` 时
+通过 `objects` 指定；要计算相位，再设置 `aspects` 中的容许度规则，用 `aspect_objects` 选择参与对象。
 
 | 接下来要做什么 | 指南 |
 |---|---|

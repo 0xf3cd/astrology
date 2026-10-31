@@ -39,13 +39,13 @@ runs `python -m build --wheel` inside the extracted tree. Strict HTML/doctest bu
 also run there and import the extracted package sources. The check then validates
 the API/catalog pages, generated search index and query code, and doctest results.
 
-The installed consumer exercises birth,
-timezone provenance and configuration outside the checkout. It compares the
+The installed-package test program checks birth inputs,
+timezone-data provenance and configuration outside the checkout. It compares the
 complete numeric chart, resolved input, requested/effective configuration,
 provenance, comparison text and SVG with source results from the same revision.
-Requested Placidus failure and import origins, including the explicitly loaded
-native adapter, are checked. A separate knowledge-only
-consumer lists, looks up, filters and resolves citations without time/native
+It also tests a failed Placidus request and checks where modules were imported
+from, including the explicitly loaded native adapter. A separate knowledge-only
+program lists, looks up, filters and resolves citations without time/native
 initialization. Both use isolated imports in normal and optimized modes; wheel
 and sdist checks require the actual corpus resources.
 
@@ -86,25 +86,25 @@ uv run python -m sphinx \
 
 Open `build/docs/index.html` for both language entries. The current combined
 search index supports both languages. See [search limits](knowledge.md#translation-revisions-and-search).
-The gate checks the actual generated search index and emitted splitter/stemmer
-contract, per-page language/counterpart navigation, complete catalog anchors and
-current translations. A successful build alone is insufficient. Independent
+The checks inspect the generated search index, splitter and stemmer interfaces,
+each page's language and link to its counterpart, complete catalog anchors and
+whether translations are current. A successful build alone is insufficient. Independent
 verification can execute the generated JavaScript query/index code; a Python
 tokenizer unit test does not prove browser behavior.
 
-`tools/guide_checks.py` owns the required usage-topic IDs. Each language must
-contain one bounded block per topic, with explanatory prose and one runnable
-`{doctest}` fence. For example, `<!-- usage: cross.orbs -->` opens the orb block
+`tools/guide_checks.py` lists the usage topics that need explanations and examples.
+Each language must contain exactly one marked block per topic, with explanatory
+prose and one runnable `{doctest}` code block. For example, `<!-- usage: cross.orbs -->` opens the orb block
 and `<!-- /usage: cross.orbs -->` closes it. Titles, translations and page locations
 may change together with their content. Empty, nested, unmatched, unknown or
 duplicate blocks fail. The source and extracted sdist both run this check, then
 compare each document's source example count with its executed Sphinx count.
-Structure cannot establish whether a paragraph explains the topic or translates
-it faithfully; semantic review remains necessary.
+Passing these structural checks does not establish that an explanation is clear
+or its translation accurate; both still need to be read and checked.
 
-`PACKAGE_FILES` in `tools/check.py` is the source-side distribution contract.
-An independent source-tree scan catches unlisted files; wheel/sdist checks catch
-omissions. The installed consumer discovers actual Python modules and imports
+`PACKAGE_FILES` in `tools/check.py` lists the source files expected in distributions.
+The checks independently scan the source tree for unlisted files and inspect the
+wheel and sdist for missing files. The installed-package test discovers actual Python modules and imports
 them explicitly, deferring the astronomy adapter until calculation. It does not
 import development check modules. Domain edge cases stay in domain tests;
 installed checks retain packaging, resources, metadata, initialization boundaries
@@ -120,7 +120,7 @@ fail the strict build.
 Install this development package from the checkout using `uv sync` above. Its
 distribution name/version is `celestial-astrology` / `0.2.0`; the Python import
 remains `astrology`. The unrelated
-PyPI project `astrology` is not this library. Confirm the installed identity:
+PyPI project `astrology` is not this library. Confirm the installed package and version:
 
 ```{doctest}
 >>> from importlib.metadata import version
@@ -239,9 +239,10 @@ hold no sextile or opposition, so those angles rest on the hand-computed cases. 
 do not check the status against an external source: Horizons supplies no rates here,
 and the style page gives parameters, not the aspect list of a chart.
 
-The separate Swiss complete-chart fixture adds independent rates and all house
-cusps, plus separately derived placements, aspects and motion for four synthetic
-instants. All five aspect identities occur; details follow below.
+The separate Swiss complete-chart reference data includes independently calculated
+rates and all house cusps. Tests use separately written arithmetic to derive signs,
+house placements, aspects and motion for four synthetic instants, covering all
+five aspects. Details follow below.
 The project-calculated numeric regression samples are not external evidence.
 Keep their original numbers and extraction provenance when changing pure rules
 or dependencies. Current provenance and numerical regression are distinct:

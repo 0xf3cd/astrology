@@ -41,10 +41,10 @@ Moon [moon] | Scorpio 13°32'41" | 4 | D
 Mercury [mercury] | Pisces 17°05'04" | 8 | D
 ```
 
-The Sun's orb is 10° and the other bodies use 6°; their mean is 8° for pairs with
-the Sun and 6° otherwise. The explicit participant list excludes the node and
-lists the bodies in reverse order; effective participants still follow the
-requested object order.
+The Sun's orb is 10° and the other bodies use 6°. Taking the mean gives a limit of
+8° for pairs involving the Sun and 6° for other pairs. `aspect_objects` excludes
+the node and lists the bodies in reverse order; participants in the result still
+follow the order in `objects`.
 
 The full table includes all requested objects, four axes, twelve cusps,
 aspects with their oriented branches, deviations, limits and motion labels,
@@ -73,10 +73,10 @@ Loading the catalog is explicit; formatting itself performs no resource I/O.
 - `provenance` keeps astrology/celestial-calendar versions, position frame and
   UT1 derivation; `effective` keeps the resolved Delta-T model and evaluation.
 
-Direct construction of `NatalChart` checks field types, ranges and pure derived-value consistency:
-signs, house membership and aspects must agree with the positions, stored axes, cusps and rules.
-It does not authenticate the supplied timezone choice, astronomical values,
-their relationship to the claimed UTC/location or the software-version labels.
+Constructing `NatalChart` directly checks field types, ranges, and whether signs,
+house membership and aspects agree with the supplied positions, axes, cusps and rules.
+It does not recheck the supplied timezone choice, astronomical values or software
+version labels, or verify that those values correspond to the stated UTC instant and location.
 Use `natal_chart` to calculate values from resolved input.
 
 Selected axis names in participants, orb overrides and hits come from the supplied
@@ -106,9 +106,10 @@ presentation, not a lossless interchange format.
 
 ## Verification and limits
 
-Source/install comparisons check packaging agreement, not numerical correctness.
-Independent Swiss states and project regression samples provide different checks;
-their finite tolerances include model differences and do not establish global
-accuracy. Near a cusp, a reference may allow either adjoining house rather than
-assert an exact independent label. The [contributing guide](contributing.md#complete-chart-numerical-references)
-records the fixtures, conventions, tolerances and redistribution limits.
+Tests compare results from the source checkout and installed package to check that
+packaging has not changed them. Separate tests check numerical agreement with Swiss
+Ephemeris data and changes from historical samples. These tests cover a limited set
+of cases and do not guarantee accuracy over the full supported range. The
+[contributing guide](contributing.md#complete-chart-numerical-references) records
+the test data, conventions, tolerances (including model differences and treatment
+near cusps), and redistribution limits.

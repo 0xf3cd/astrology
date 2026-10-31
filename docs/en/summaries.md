@@ -46,17 +46,19 @@ Fixed modality | 0/2 | 0.00%
 Mutable modality | 0/2 | 0.00%
 ```
 
-Each distinct selected identity contributes one count, with `total` as the common
-denominator. Every category is present, including zero counts. Percentage display
-rounds to two decimal places alongside exact count/total. No planet weights or
-dominant scores are assigned.
+Each selected object contributes one count. `total` gives the object count and is
+the denominator for every proportion. In this example, the Sun is in a fire sign
+and the Moon in a water sign, so each element has 50%. Both signs are cardinal,
+giving that modality 100%. Every category is shown, including zero counts.
+Percentages use two decimal places alongside the counts and total. No planet
+weights or dominant scores are assigned.
 
 `sign_distribution` and `SignDistribution` copy sequences to immutable placement
 tuples, preserving input order. Empty or duplicate populations raise `ValueError`;
 `None`, iterators and non-`Placement` members raise `TypeError`. The caller must
-ensure appropriate common provenance for low-level placements; the record cannot
-authenticate it. Counts and proportions derive from the snapshot, so no inconsistent
-total can be supplied separately. `element_of` and `modality_of` accept only `Sign`,
+ensure that directly supplied placements share a common source; the function
+cannot verify their origin. Counts, proportions and total derive from the stored
+placements, so a different total cannot be supplied separately. `element_of` and `modality_of` accept only `Sign`,
 not strings or unrelated enums.
 
 <!-- /usage: summaries.population -->
@@ -69,7 +71,8 @@ described in [knowledge](knowledge.md#elements-modalities-and-lunation-types).
 <!-- usage: summaries.lunar_phase -->
 
 Supply Sun first and Moon second, in degrees at the same instant and with the
-same coordinate convention. The result gives the oriented arc and its type:
+same coordinate convention. The function measures from the Sun to the Moon in the
+direction of increasing longitude, returning that angle and its lunar phase type:
 
 ```{doctest}
 >>> from astrology import lunar_phase, format_lunar_phase
@@ -86,17 +89,19 @@ A type covers an interval, not an exact event; no illuminated fraction is calcul
 ('waning', 'turning')
 ```
 
-The oriented difference is `(Moon - Sun) mod 360`, in degrees. Finite inputs may contain whole turns.
+The oriented difference is `(Moon - Sun) mod 360`, in degrees. Finite longitudes may
+exceed one turn; the calculation removes whole turns.
 Booleans, strings and unrelated types raise `TypeError`; nonfinite values raise
 `ValueError`. Bare numbers carry no instant or coordinate convention, so the
 scalar function cannot detect a frame mismatch.
 
 See the {ref}`generated intervals <catalog-en-rule-lunation-rudhyar1950>` and
 [source discussion](knowledge.md#elements-modalities-and-lunation-types).
-Each type spans 45°. The project uses half-open intervals: exact boundaries belong
-to the following type, with 360° wrapping to 0°. Strict `(0, 180)` is `waxing`,
-strict `(180, 360)` is `waning`, and 0°/180° are `turning`. Endpoints and direction
-labels are project policies.
+Each type spans 45°. The project uses half-open intervals, including the start but
+not the end. An exact boundary belongs to the following type, with 360° wrapping to
+0°. Angles within `(0, 180)` are `waxing`, those within `(180, 360)` are `waning`,
+and exactly 0° or 180° is `turning`. These boundary assignments and direction labels
+are defined by this project.
 
 `LunarPhaseResult` is immutable. Type, direction and rule ID derive from its angle;
 direct construction requires `[0, 360)`. New Moon Type at 20° is not an exact
@@ -108,8 +113,10 @@ rate-based forecast.
 
 ## Compose from an existing natal chart
 
-This synthetic chart is calculated once. Summary calls only read its existing
-positions and placements, using one chart's shared coordinate frame:
+First calculate a chart from synthetic data, then count selected objects with
+`chart_sign_distribution` and read its lunar phase with `natal_lunar_phase`. Those
+two functions only read the chart's existing positions and placements, without
+repeating astronomical calculations:
 
 ```{doctest}
 >>> from datetime import date, time, timedelta
@@ -143,10 +150,11 @@ catalog lookup a chart evaluation.
 
 ## Numerical angle and display
 
-Inputs use the numeric validator's float conversion. Exact ratios of those binary
-values avoid subtraction overflow and loss of boundary sides. The nearest float
-is returned unless conversion erases the interval side; then one adjacent float
-on the correct side is used. For example, `lunar_phase(5e-324, 0)` returns
+Inputs are converted to floats. The function calculates their difference using
+exact ratios of those binary values, avoiding subtraction overflow or placing an
+angle on the wrong side of a boundary. It usually returns the nearest float. If
+rounding would move an angle from one side onto a boundary, it uses the adjacent float on
+the correct side instead. For example, `lunar_phase(5e-324, 0)` returns
 `359.99999999999994`, not 360° or a false exact conjunction. This is a numerical
 approximation, not an exact real angle. Equal rotations preserve the mathematical
 difference, but rotating floats may already round inputs; bitwise invariance is

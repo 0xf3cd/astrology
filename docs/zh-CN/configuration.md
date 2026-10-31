@@ -2,21 +2,27 @@
 
 [English](../en/configuration.md) · [文档](index.md) · [API 参考](reference.md)
 
-`ChartConfig` 是不可变请求，不是已计算的命盘或已解析的天文元数据。
-仅接纳 `tropical` 和 `geocentric`。宫制、对象选择及相位规则均须显式提供。
-空相位序列表示未请求相位规则；对象选择不能为空。不提供宫制或容许度默认值。
+`ChartConfig` 用来指定排盘时的宫制、要返回的天体或交点，以及相位规则，构造后不能修改。
+它只保存请求，不计算命盘；天文模型等实际计算信息保存在[排盘结果](records.md)中。
+目前只支持热带黄道（`tropical`）和地心位置（`geocentric`）。
+宫制、对象和相位规则都要明确传入：对象不能为空，不计算相位时传 `aspects=()`。
+本库不提供默认宫制或默认容许度。
 
 ## 选择宫制与输出对象
 
 <!-- usage: configuration.objects -->
 
-选择 `HouseSystem`，再把要计算的天体或交点放入 `objects`。
-下面请求太阳、月亮和平均升交点，不请求相位：
+例如，要用整宫制计算太阳、月亮和平均升交点的位置，可以这样配置。
+`house_system` 指定宫制，`objects` 指定要返回哪些天体或交点，`aspects=()` 表示不计算相位：
 
 ```{doctest}
 >>> from astrology import Body, ChartConfig, HouseSystem, LunarNode
 >>> objects = [Body.SUN, Body.MOON, LunarNode.MEAN_ASCENDING]
->>> request = ChartConfig(HouseSystem.WHOLE_SIGN, objects, ())
+>>> request = ChartConfig(
+...   house_system=HouseSystem.WHOLE_SIGN,
+...   objects=objects,
+...   aspects=(),
+... )
 >>> objects.clear()
 >>> tuple(value.value for value in request.objects)
 ('sun', 'moon', 'mean_ascending_node')
@@ -28,10 +34,12 @@
 'meeus_five_term_true'
 ```
 
-`HouseSystem` 接纳 Whole Sign、Equal 和 Placidus。请求的几何不可用时显式失败，
-支持范围见[排盘指南](chart.md)。`Body` 标识太阳、月亮至冥王星的十个物理天体。
-`LunarNode` 标识采用平均定义或 Meeus 五项真交点定义的数学升降交点。
-定义是标识的一部分，不是精度开关，也不是可互换的模型；同一请求可显式选择两种定义，排盘结果会记录所用的天文模型。
+`HouseSystem` 可选 Whole Sign（整宫制）、Equal（等宫制）和 Placidus。所选宫制在给定时刻或地点
+无法计算时，排盘会报错，不会换成另一种宫制；支持范围见[排盘指南](chart.md)。
+`Body` 包括太阳、月亮及水星至冥王星，共十个物理天体。月交点不是物理天体，用 `LunarNode` 选择。
+它提供平均交点和 Meeus 五项真交点两种定义，每种都区分升交点和降交点。
+选择哪种定义决定了计算哪个交点，不是切换精度；两种定义不能互相替代，也可以在同一请求中同时选择。
+排盘结果会记录实际使用的天文模型。
 
 对象和规则序列按原顺序复制为元组，调用方随后修改列表不会改变请求。
 重复对象或重复相位标识会被拒绝，不静默合并。`"sun"` 这样的枚举值字符串不是枚举实例，不作隐式转换。
@@ -41,8 +49,8 @@
 ## 请求相位
 
 `MajorAspect` 标识合相（conjunction）、六分相（sextile）、四分相（square）、三分相（trine）和对分相（opposition）。
-`AspectRule` 保存调用方提供的有限、非负 `orb_degrees`，单位为度。本层只保存请求，不计算相位，
-也不替调用方选择流派的容许度规则；如何计算相位，见[相位指南](aspects.md)。
+用 `AspectRule` 为一种相位指定容许度 `orb_degrees`，单位为度，须为有限的非负数。
+配置本身不计算相位，也不替你选择某个流派的容许度；计算方法见[相位指南](aspects.md)。
 
 ```{doctest}
 >>> from astrology import AspectRule, MajorAspect
@@ -93,7 +101,7 @@
 
 用 `ObjectOrb` 为某个对象单独设置容许度；其他对象使用规则的 `orb_degrees`。
 只要有规则使用了 `ObjectOrb`，就必须指定 `orb_combination`，说明两个对象的容许度如何合成一个上限；
-没有规则使用时，就不能指定。只能为参与相位的身份单独设置容许度，包括所选四轴。
+没有规则使用时，就不能指定。只能为参与相位的天体、交点或四轴单独设置容许度。
 
 ```{doctest}
 >>> from astrology import LunarNode, ObjectOrb, OrbCombination
@@ -118,5 +126,5 @@ NaN、无穷、负容许度、布尔值、不支持的模式及不一致的选�
 
 <!-- /usage: configuration.orbs -->
 
-定义枚举和 API 合同见从实际定义生成的[参考页](reference.md)。实际天文模型、版本、时标和生效设置
+可用的枚举成员及参数、返回值说明见 [API 参考](reference.md)。实际天文模型、版本、时标和生效设置
 见[排盘结果](records.md)；不排盘的查询见[知识指南](knowledge.md)。
