@@ -106,7 +106,33 @@ def site(tmp_path: Path) -> tuple[Path, Path]:
       path = output / relative.partition("#")[0]
       path.parent.mkdir(parents=True, exist_ok=True)
       path.write_text('<p id="catalog">content</p>', encoding="utf-8")
+  for name in ("README.html", "README.zh-CN.html"):
+    (output / name).write_text(
+      '<a href="https://pypi.org/project/celestial-astrology/0.1.0/">Index</a>'
+      '<pre>.venv/bin/python -m pip install "celestial-astrology==0.1.0"</pre>'
+      '<pre>.venv\\Scripts\\python.exe -m pip install "celestial-astrology==0.1.0"</pre>',
+      encoding="utf-8",
+    )
   return root, output
+
+
+@pytest.mark.parametrize("name", ["README.html", "README.zh-CN.html"])
+@pytest.mark.parametrize("defect", ["candidate", "pin", "index"])
+def test_rendered_release_text_rejects_defects(
+  site: tuple[Path, Path], name: str, defect: str
+) -> None:
+  root, output = site
+  page = output / name
+  text = page.read_text(encoding="utf-8")
+  if defect == "candidate":
+    text += "<p>New in 0.1.0 (in development) / 0.1.0（开发中）</p>"
+  elif defect == "pin":
+    text = text.replace("==0.1.0", "==0.0.0")
+  else:
+    text = text.replace("pypi.org/project/", "example.org/project/")
+  page.write_text(text, encoding="utf-8")
+  with pytest.raises(ValueError, match=r"candidate claim|installation|index page"):
+    check_site_html(output, root=root)
 
 
 def test_valid_bilingual_site_and_snapshot(site: tuple[Path, Path]) -> None:

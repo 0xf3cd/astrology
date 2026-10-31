@@ -10,8 +10,8 @@ Both operations use the stored longitudes; check the
 [coordinate requirements](#source-compatibility-and-calculation-boundaries) before comparing charts.
 
 Static cross-chart aspects are available from 0.2.0. House overlays and comparison
-text are 0.3.0 additions still in development; use the
-[source installation instructions](../../README.md#install-from-source) for them.
+text are introduced in 0.3.0; see the [installation instructions](../../README.md#install-a-release)
+for package-index availability and source installation.
 
 ## Compare two example charts
 

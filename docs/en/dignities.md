@@ -2,8 +2,8 @@
 
 [简体中文](../zh-CN/dignities.md) · [API](reference.md) · [Knowledge](knowledge.md)
 
-These source-checkout APIs are planned for 0.3.0 and are not in the published
-0.2.0 package. They use the rules recorded in William Lilly's *Christian
+These APIs are introduced in 0.3.0; see the [installation instructions](../../README.md#install-a-release)
+for package-index availability and source installation. They use the rules recorded in William Lilly's *Christian
 Astrology* (London, 1647), for Sun, Moon, Mercury, Venus, Mars, Jupiter and Saturn,
 the seven classical planets in traditional astrology.
 
