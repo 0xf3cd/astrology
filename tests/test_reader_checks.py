@@ -155,7 +155,7 @@ def test_non_readme_rendered_claims_are_rejected(site: tuple[Path, Path], langua
   page.write_text(page.read_text(encoding="utf-8") + "<p>0.1.0（开发中）</p>", encoding="utf-8")
   with pytest.raises(ValueError, match="candidate claim") as caught:
     check_site_html(output, root=root)
-  assert f"docs/{language}/catalog.html" in str(caught.value)
+  assert str(page.relative_to(output)) in str(caught.value)
 
 
 @pytest.mark.parametrize("language", ["en", "zh-CN"])
