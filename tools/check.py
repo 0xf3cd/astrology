@@ -47,6 +47,7 @@ from tools.release_documents import (
   check_readme_installation,
   check_release_claims,
   check_release_documents,
+  check_svg_sample_versions,
   release_index_url,
 )
 
@@ -546,6 +547,7 @@ def check_site_html(directory: Path, *, root: Path = ROOT, source_revision: str 
     ):
       raise ValueError("Site root is missing its fixed source or bilingual snapshot installation")
   counterparts = {base + "README.html", base + "README.zh-CN.html"}
+  check_svg_sample_versions(directory / "_images", project["version"])
   for page in sorted(directory.rglob("*.html")):
     rendered = _CatalogHtml()
     rendered.feed(page.read_text(encoding="utf-8"))

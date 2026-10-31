@@ -11,7 +11,9 @@ or query the knowledge catalog without a chart. Start with the examples below;
 the [guides](https://0xf3cd.github.io/astrology/docs/en/index.html) and
 [API reference](https://0xf3cd.github.io/astrology/docs/en/reference.html) explain further uses and parameters.
 
-Version 0.3.0 adds [element/modality distributions and natal lunar
+This page documents 0.3.0. See the [installation instructions](https://0xf3cd.github.io/astrology/README.html#install-a-release)
+for package-index availability and source installation. Its additions include
+[element/modality distributions and natal lunar
 phase](https://0xf3cd.github.io/astrology/docs/en/summaries.html),
 [traditional sign rulers and four statuses](https://0xf3cd.github.io/astrology/docs/en/dignities.html),
 [explicit axis aspects for natal and static cross-chart queries](https://0xf3cd.github.io/astrology/docs/en/aspects.html#select-axes-explicitly),
@@ -41,7 +43,7 @@ Do not install the unrelated PyPI project named `astrology`.
 Use **Python 3.11–3.14** on one of the platforms listed above.
 
 The commands and examples below use 0.3.0. Before installing from the package
-index, check that its files are listed on [PyPI's 0.3.0 page](https://pypi.org/project/celestial-astrology/0.3.0/).
+index, check that its wheel and source distribution are listed on [PyPI's 0.3.0 page](https://pypi.org/project/celestial-astrology/0.3.0/).
 If they are not listed, [install from source](https://0xf3cd.github.io/astrology/README.html#install-from-source)
 to use the features documented here. A source snapshot and a published package
 with the same version number are not necessarily the same revision.
@@ -150,7 +152,7 @@ To calculate aspects, supply orb rules in `aspects` and select participants with
 | Resolve a local clock or select a repeated time | [Birth inputs](https://0xf3cd.github.io/astrology/docs/en/birth.html) |
 | Select objects, participants and orbs | [Configuration](https://0xf3cd.github.io/astrology/docs/en/configuration.html) |
 | Compare two charts | [Cross-chart aspects and house overlays](https://0xf3cd.github.io/astrology/docs/en/cross_aspects.html) |
-| Draw the result (source-checkout API) | [SVG wheels and matrices](https://0xf3cd.github.io/astrology/docs/en/svg.html) |
+| Draw the result | [SVG wheels and matrices](https://0xf3cd.github.io/astrology/docs/en/svg.html) |
 
 ## First knowledge lookup
 

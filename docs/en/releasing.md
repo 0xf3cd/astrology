@@ -42,11 +42,14 @@ installation and example pins in a separate reviewed change.
    retained-wheel consumers are Linux x86_64 3.11/3.12/3.13/3.14, Linux ARM64 3.14,
    macOS ARM64 3.14 and Windows amd64 3.14. These are distinct check sets, not every
    supported Python/platform combination.
-3. Inspect the actual sdist/wheel members and metadata, including both UTF-8
-   Markdown descriptions. They must match the accepted README and contain no
+3. Inspect the actual sdist/wheel members and metadata, including the UTF-8
+   Markdown descriptions in the sdist's `PKG-INFO` and the wheel's `METADATA`.
+   Both contain the English `README.md`, not separate English/Chinese descriptions.
+   They must match the accepted `README.md` and contain no
    stale candidate-only statements. README installation commands and example
    versions must agree with project metadata. Check the rendered English and
-   Chinese pages from both the checkout and the extracted sdist. Snapshot labels
+   Chinese pages from both the checkout and the extracted sdist, including the
+   version labels in the SVG samples. Snapshot labels
    are always checked; fixed-SHA source/archive links are checked when
    `ASTROLOGY_DOCS_SOURCE_SHA` identifies the build's source revision.
    The manifest records source
@@ -97,18 +100,20 @@ manual requirement into a claim of automatic enforcement.
 
 ### Rehearse without uploading
 
-Use the checked distributions and a disposable local directory. Do not dispatch
-the publishing workflow or contact an upload endpoint for this rehearsal.
+Use the checked distributions and a disposable local directory. In that directory,
+keep a rehearsal record with the version, source SHA, index availability and
+upload/GitHub Release/Pages states. These are simulated states, not the actual
+release record. Do not dispatch the publishing workflow or contact an upload endpoint.
 
 1. Prepare the manifest once and save both file digests. Verify the retained
    distributions using those digests and the accepted source.
-2. With a local fixture representing a version absent from the index, follow the
+2. Set index availability to absent in the rehearsal record, then follow the
    README's source-install fallback. Verify that its package descriptions and
    rendered pages make no claim of index availability.
-3. Change only the local availability fixture to represent a listed version.
+3. Change only index availability in that record to listed.
    The same descriptions and pages must still pass, without editing package bytes.
-4. Represent a completed upload but missing GitHub Release and Pages delivery.
-   Record the upload as complete and those two steps as pending. Reverify the
+4. In the same local record, mark the upload as simulated complete and GitHub
+   Release and Pages as pending. Reverify the
    original manifest/files and finish only the simulated missing steps. Do not
    rerun preparation over its existing manifest or substitute rebuilt packages.
 5. Compare the original and final file digests. Record commands, actual exit
