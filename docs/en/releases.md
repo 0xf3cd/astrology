@@ -2,7 +2,37 @@
 
 [简体中文](../zh-CN/releases.md) · [Documentation](index.md) · [Release procedure](releasing.md)
 
-## Next release: v0.2.0 (unreleased)
+## 0.3.0
+
+This version adds natal analysis and chart presentation. Check the
+[installation instructions](../../README.md#install-a-release) for package-index
+availability and the source-install path; a version heading is not a publication record.
+
+- [Element and modality distributions](summaries.md) count explicitly selected
+  objects equally and retain zero-count categories, counts and proportions.
+- [Natal lunar phase](summaries.md) classifies the Sun-to-Moon longitude angle
+  using the named Rudhyar rule and the project's documented interval boundaries.
+- [Traditional rulership and dignities](dignities.md) provide sign rulers, house
+  rulers and domicile, exaltation, detriment and fall under Lilly's fixed rule.
+- [Axis aspects](aspects.md#select-axes-explicitly) admit explicitly selected
+  Ascendant, Midheaven, Descendant and Imum Coeli in natal and static cross-chart
+  queries. Missing axis rates remain missing, not zero.
+- [Cross-chart house overlays and bilingual comparison text](cross_aspects.md)
+  retain both source charts and distinguish left/right objects and host houses.
+- [SVG natal wheels and aspect matrices](svg.md) return SVG strings for caller
+  storage, including static cross-chart matrices.
+
+The guides now organize first use, focused API examples and verification details
+separately. Release checks inspect package descriptions and rendered bilingual
+pages as well as source text. The [release procedure](releasing.md) distinguishes
+automatic protection from maintainer acceptance and describes partial-publication
+recovery without replacing published files.
+
+The astronomy models, Python/platform support and runtime dependency pins remain
+unchanged from 0.2.0. This version does not add transits, returns, constructed
+relationship charts or an interactive chart UI.
+
+## 0.2.0
 
 ### Static cross-chart aspects
 
@@ -21,7 +51,7 @@ source excerpts and Chinese translations.
 
 ### Breaking change: chart persistence removed
 
-The next release removes `dumps_chart`, `loads_chart`, `recompute_chart`, `ChartRecordError`,
+This release removed `dumps_chart`, `loads_chart`, `recompute_chart`, `ChartRecordError`,
 `ChartReplayError` and the `astrology.serialization` module. The chart storage
 schema and historical-record compatibility policy are withdrawn, with no
 replacement format or compatibility wrapper. The package no longer reads saved

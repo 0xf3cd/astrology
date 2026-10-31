@@ -42,6 +42,14 @@ from tools.catalog_docs import (
 )
 from tools.docs_search import check_search_html
 from tools.guide_checks import check_examples, check_guide_content
+from tools.release_documents import (
+  check_description,
+  check_readme_installation,
+  check_release_claims,
+  check_release_documents,
+  check_svg_sample_versions,
+  release_index_url,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 PACKAGE_FILES = (
@@ -90,6 +98,7 @@ SDIST_FILES = (
   "tools/catalog_docs.py",
   "tools/docs_search.py",
   "tools/guide_checks.py",
+  "tools/release_documents.py",
   "tests/reference/natal_reference.json",
   "tests/reference/complete_chart_reference.json",
   "tests/reference/chart_regression.json",
@@ -311,6 +320,7 @@ def check_wheel(wheel: Path, expected_version: str) -> None:
     if not isinstance(description, str):
       raise ValueError("Wheel README must be text")
     readme_links(description)
+    check_release_claims(description)
 
 
 def check_sdist(sdist: Path) -> None:
@@ -537,6 +547,14 @@ def check_site_html(directory: Path, *, root: Path = ROOT, source_revision: str 
     ):
       raise ValueError("Site root is missing its fixed source or bilingual snapshot installation")
   counterparts = {base + "README.html", base + "README.zh-CN.html"}
+  check_svg_sample_versions(directory / "_images", project["version"])
+  for page in sorted(directory.rglob("*.html")):
+    rendered = _CatalogHtml()
+    rendered.feed(page.read_text(encoding="utf-8"))
+    try:
+      check_release_claims("".join(rendered.text))
+    except ValueError as error:
+      raise ValueError(f"{page.relative_to(directory)}: {error}") from error
   sections = (
     ("README.md", "en", ("Install from source", "First chart", "First knowledge lookup")),
     ("README.zh-CN.md", "zh-CN", ("从源码安装", "第一张命盘", "第一次查询知识")),
@@ -573,6 +591,11 @@ def check_site_html(directory: Path, *, root: Path = ROOT, source_revision: str 
         page = (root / relative).resolve()
         if not page.is_relative_to(root.resolve()) or not page.is_file():
           raise ValueError(f"README links to an absent repository file: {target}")
+    rendered = _CatalogHtml()
+    rendered.feed((directory / Path(name).with_suffix(".html")).read_text(encoding="utf-8"))
+    check_readme_installation("".join(rendered.text), project["version"])
+    if release_index_url(project["version"]) not in rendered.links:
+      raise ValueError("Rendered README must link the documented version's index page")
 
 
 def readme_examples(text: str) -> tuple[tuple[str, str], ...]:
@@ -737,6 +760,11 @@ def check_distribution(directory: Path) -> None:
   if len(wheels) != 1:
     raise ValueError("Expected one wheel")
   check_wheel(wheels[0], metadata["version"])
+  readme = (ROOT / "README.md").read_text(encoding="utf-8")
+  check_description((source / "PKG-INFO").read_bytes(), readme)
+  with ZipFile(wheels[0]) as archive:
+    name = next(name for name in archive.namelist() if name.endswith(".dist-info/METADATA"))
+    check_description(archive.read(name), readme)
 
   source_environment = {**os.environ, "PYTHONPATH": str(source / "src")}
   run(
@@ -754,6 +782,7 @@ def check_distribution(directory: Path) -> None:
   )
   check_documents(source)
   check_guide_content(source)
+  check_release_documents(source)
   for builder in ("html", "doctest"):
     run(
       (
@@ -809,6 +838,7 @@ def main(*, artifacts_dir: Path | None = None) -> None:
     run((sys.executable, *arguments))
   check_documents()
   check_guide_content(ROOT)
+  check_release_documents(ROOT)
   check_package_files()
   with tempfile.TemporaryDirectory(
     prefix="astrology-check-", dir=os.environ.get("SCRATCH")

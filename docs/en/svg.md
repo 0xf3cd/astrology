@@ -8,8 +8,8 @@ For two charts, first choose comparison rules with `cross_chart_aspects`, then
 pass its result to `render_cross_matrix`. Each renderer returns an SVG string;
 only your own file-writing code saves it.
 
-These renderers are source-checkout APIs planned for 0.3.0. Use the
-[source installation instructions](../../README.md#install-from-source).
+These renderers are introduced in 0.3.0. See the
+[installation instructions](../../README.md#install-a-release) for package-index availability and source installation.
 
 ## Render and save
 

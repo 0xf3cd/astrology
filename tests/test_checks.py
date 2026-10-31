@@ -292,6 +292,7 @@ def test_distribution_keeps_dependency_install_and_both_consumer_modes(
   tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
   (tmp_path / "pyproject.toml").write_text('[project]\nversion = "0.0.0"\n', encoding="utf-8")
+  (tmp_path / "README.md").write_text("[Docs](https://example.org/)\n", encoding="utf-8")
   commands: list[tuple[str, ...]] = []
   contexts: list[tuple[Path, Mapping[str, str] | None]] = []
   validations: list[tuple[str, Path]] = []
@@ -314,6 +315,10 @@ def test_distribution_keeps_dependency_install_and_both_consumer_modes(
       with tarfile.open(artifacts / "astrology.tar.gz", "w:gz") as archive:
         for name in SDIST_PATHS:
           archive.addfile(tarfile.TarInfo("astrology/" + name), BytesIO())
+        content = b"Description-Content-Type: text/markdown\n\n[Docs](https://example.org/)\n"
+        member = tarfile.TarInfo("astrology/PKG-INFO")
+        member.size = len(content)
+        archive.addfile(member, BytesIO(content))
     if "--wheel" in command:
       artifacts = Path(command[-1])
       with ZipFile(artifacts / "astrology.whl", "w") as archive:
@@ -343,6 +348,9 @@ def test_distribution_keeps_dependency_install_and_both_consumer_modes(
   )
   monkeypatch.setattr(
     checker, "check_guide_content", lambda root: validations.append(("guide_content", root))
+  )
+  monkeypatch.setattr(
+    checker, "check_release_documents", lambda root: validations.append(("release_documents", root))
   )
 
   def examples(report: str, root: Path) -> None:
@@ -389,6 +397,7 @@ def test_distribution_keeps_dependency_install_and_both_consumer_modes(
   assert ("sdist", tmp_path / "artifacts/astrology.tar.gz") in validations
   assert ("documents", source) in validations
   assert ("guide_content", source) in validations
+  assert ("release_documents", source) in validations
   assert ("examples", source) in validations
   assert {name for name, path in validations if path == tmp_path / "source-html"} == {
     "api",

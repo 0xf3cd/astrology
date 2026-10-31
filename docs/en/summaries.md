@@ -2,8 +2,8 @@
 
 [简体中文](../zh-CN/summaries.md) · [API](reference.md) · [Knowledge](knowledge.md)
 
-These source-checkout APIs are planned for 0.3.0; they are not in the published
-0.2.0 package. They classify supplied values without astronomy or source-chart
+These APIs are introduced in 0.3.0; see the [installation instructions](../../README.md#install-a-release)
+for package-index availability and source installation. They classify supplied values without astronomy or source-chart
 changes. Formatters take a loaded catalog and do no resource I/O.
 
 ## Query signs and count an explicit population

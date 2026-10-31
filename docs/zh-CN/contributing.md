@@ -84,14 +84,14 @@ Sphinx 只发现根目录的两个 README 和 `docs/` 下的源文档。虚拟�
 
 <!-- usage: contributing.checks -->
 
-按上面的 `uv sync` 从本仓安装开发包，分发名／版本为 `celestial-astrology`／`0.2.0`，
+按上面的 `uv sync` 从本仓安装开发包，分发名／版本为 `celestial-astrology`／`0.3.0`，
 Python 导入名仍为 `astrology`。PyPI 的 `astrology` 是另一个无关项目，
 不是本库。可以这样确认装的是哪个包、哪个版本：
 
 ```{doctest}
 >>> from importlib.metadata import version
 >>> version("celestial-astrology")
-'0.2.0'
+'0.3.0'
 ```
 
 <!-- /usage: contributing.checks -->

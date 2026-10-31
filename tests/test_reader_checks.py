@@ -106,13 +106,86 @@ def site(tmp_path: Path) -> tuple[Path, Path]:
       path = output / relative.partition("#")[0]
       path.parent.mkdir(parents=True, exist_ok=True)
       path.write_text('<p id="catalog">content</p>', encoding="utf-8")
+  for name in ("README.html", "README.zh-CN.html"):
+    (output / name).write_text(
+      '<a href="https://pypi.org/project/celestial-astrology/0.1.0/">Index</a>'
+      '<pre>.venv/bin/python -m pip install "celestial-astrology==0.1.0"</pre>'
+      '<pre>.venv\\Scripts\\python.exe -m pip install "celestial-astrology==0.1.0"</pre>',
+      encoding="utf-8",
+    )
+  (output / "_images").mkdir()
+  for language in ("en", "zh-CN"):
+    (output / f"_images/svg-wheel-{language}.svg").write_text(
+      '<svg><g data-role="label"><text>Delta-T model / astrology / celestial-calendar: '
+      "algo5 / 0.1.0 / 0.8.0</text></g></svg>",
+      encoding="utf-8",
+    )
   return root, output
+
+
+@pytest.mark.parametrize("name", ["README.html", "README.zh-CN.html"])
+@pytest.mark.parametrize("defect", ["candidate", "pin", "index"])
+def test_rendered_release_text_rejects_defects(
+  site: tuple[Path, Path], name: str, defect: str
+) -> None:
+  root, output = site
+  page = output / name
+  text = page.read_text(encoding="utf-8")
+  if defect == "candidate":
+    text += "<p>New in 0.1.0 (in development) / 0.1.0（开发中）</p>"
+  elif defect == "pin":
+    text = text.replace("==0.1.0", "==0.0.0")
+  else:
+    text = text.replace("pypi.org/project/", "example.org/project/")
+  page.write_text(text, encoding="utf-8")
+  with pytest.raises(ValueError, match=r"candidate claim|installation|index page"):
+    check_site_html(output, root=root)
 
 
 def test_valid_bilingual_site_and_snapshot(site: tuple[Path, Path]) -> None:
   root, output = site
   check_site_html(output, root=root)
   check_site_html(output, root=root, source_revision=REVISION)
+
+
+@pytest.mark.parametrize("language", ["en", "zh-CN"])
+def test_non_readme_rendered_claims_are_rejected(site: tuple[Path, Path], language: str) -> None:
+  root, output = site
+  page = output / f"docs/{language}/catalog.html"
+  page.write_text(page.read_text(encoding="utf-8") + "<p>0.1.0（开发中）</p>", encoding="utf-8")
+  with pytest.raises(ValueError, match="candidate claim") as caught:
+    check_site_html(output, root=root)
+  assert str(page.relative_to(output)) in str(caught.value)
+
+
+@pytest.mark.parametrize("language", ["en", "zh-CN"])
+def test_rendered_svg_versions_are_checked(site: tuple[Path, Path], language: str) -> None:
+  root, output = site
+  page = output / f"_images/svg-wheel-{language}.svg"
+  page.write_text(page.read_text(encoding="utf-8").replace("0.1.0", "0.0.0"), encoding="utf-8")
+  with pytest.raises(ValueError, match="SVG sample version"):
+    check_site_html(output, root=root)
+
+
+def test_rendered_svg_samples_cannot_all_be_missing(site: tuple[Path, Path]) -> None:
+  root, output = site
+  for page in (output / "_images").glob("*.svg"):
+    page.unlink()
+  with pytest.raises(ValueError, match="SVG samples are missing"):
+    check_site_html(output, root=root)
+
+
+@pytest.mark.parametrize("language", ["en", "zh-CN"])
+def test_extra_unquoted_rendered_pin_is_rejected(site: tuple[Path, Path], language: str) -> None:
+  root, output = site
+  page = output / ("README.html" if language == "en" else "README.zh-CN.html")
+  page.write_text(
+    page.read_text(encoding="utf-8")
+    + "<pre>.venv/bin/python -m pip install celestial-astrology==0.0.0</pre>",
+    encoding="utf-8",
+  )
+  with pytest.raises(ValueError, match="inconsistent"):
+    check_site_html(output, root=root)
 
 
 @pytest.mark.parametrize(
@@ -177,7 +250,14 @@ def test_both_reader_paths_reject_defects(
     check_site_html(output, root=root)
 
 
-@pytest.mark.parametrize("body", ["[Docs](README.md)", '<a href="relative.html">API</a>'])
+@pytest.mark.parametrize(
+  "body",
+  [
+    "[Docs](README.md)",
+    '<a href="relative.html">API</a>',
+    "[Docs](https://example.org/)\n0.1.0（开发中）",
+  ],
+)
 def test_wheel_checks_actual_long_description(tmp_path: Path, body: str) -> None:
   wheel = tmp_path / "package.whl"
   for content_type, description in (
@@ -192,10 +272,10 @@ def test_wheel_checks_actual_long_description(tmp_path: Path, body: str) -> None
         "a.dist-info/METADATA",
         f"Name: celestial-astrology\nVersion: 0.1.0\nDescription-Content-Type: {content_type}\n\n{description}\n",
       )
-    if description.startswith("[Docs](https:"):
+    if description == "[Docs](https://example.org/)":
       check_wheel(wheel, "0.1.0")
     else:
-      with pytest.raises(ValueError, match=r"Markdown content|absolute HTTP"):
+      with pytest.raises(ValueError, match=r"Markdown content|absolute HTTP|candidate claim"):
         check_wheel(wheel, "0.1.0")
 
 
