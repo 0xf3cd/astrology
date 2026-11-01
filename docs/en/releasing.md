@@ -74,11 +74,10 @@ The workflow's `tools/release.py prepare` checks the unchanged source and writes
 `dist/manifest.json` plus separate build-job digest outputs. No second distribution
 wheel is built by preparation or consumption.
 
-The README describes the documented version without claiming that its files are
-already on the index. Readers check that version's PyPI page before using index
-commands, or use the source-install path. Keep this wording unchanged through
-publication. Actual availability and partial delivery belong in the release
-record, with the accepted source SHA, workflow run/artifact IDs and file digests.
+The README installs the latest release by package name and offers source
+installation separately. Release notes link to the index page for their version.
+Actual availability and partial delivery belong in the release record, with the
+accepted source SHA, workflow run/artifact IDs and file digests.
 The Pages site remains a source snapshot even when it shows a published version.
 
 ### Merge and publication acceptance
@@ -108,7 +107,7 @@ release record. Do not dispatch the publishing workflow or contact an upload end
 1. Prepare the manifest once and save both file digests. Verify the retained
    distributions using those digests and the accepted source.
 2. Set index availability to absent in the rehearsal record, then follow the
-   README's source-install fallback. Verify that its package descriptions and
+   README's source-install instructions. Verify that its package descriptions and
    rendered pages make no claim of index availability.
 3. Change only index availability in that record to listed.
    The same descriptions and pages must still pass, without editing package bytes.
@@ -148,8 +147,8 @@ and `skip-existing: false`. It runs no repository build code with that permissio
 ## Verify and record the published result
 
 Download both distribution files from PyPI and compare their bytes with the saved
-manifest's SHA-256 values. Read that version's PyPI description, check its version
-and installation pins, and compare it with the accepted README and descriptions
+manifest's SHA-256 values. Read that version's PyPI description, check its package
+name and installation commands, and compare it with the accepted README and descriptions
 inside the downloaded files. Use the README's package-index installation command in
 a fresh supported environment, then execute its chart and knowledge examples.
 A successful source-snapshot installation is not this index-install check.
