@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import re
-import tomllib
 from email.parser import Parser
 from pathlib import Path
 
@@ -23,9 +22,9 @@ _CANDIDATE_CLAIMS = (
 )
 
 
-def release_index_url(version: str) -> str:
-  """Return the index page for the documented version. 返回文档所用版本的包索引页面。"""
-  return f"https://pypi.org/project/celestial-astrology/{version}/"
+def release_index_url() -> str:
+  """Return the package's release index. 返回分发包的发行索引。"""
+  return "https://pypi.org/project/celestial-astrology/"
 
 
 def check_release_claims(text: str) -> None:
@@ -40,28 +39,28 @@ def check_release_claims(text: str) -> None:
     raise ValueError("Release text contains a publication-dependent candidate claim")
 
 
-def check_readme_installation(text: str, version: str) -> None:
-  """Require both platform commands to install the documented version.
+def check_readme_installation(text: str) -> None:
+  """Require both platform commands to install the latest release by package name.
 
-  要求两个平台的安装命令均钉到文档所用版本。
+  要求两个平台的命令均按分发包名安装最新发行版。
   """
   normalized = " ".join(text.split())
-  requirement = f"celestial-astrology=={version}"
+  target_pattern = r"-m\s+pip\s+install\s+[\"']?([^\s\"'`;|&<>]+)"
   for python in (".venv/bin/python", ".venv\\Scripts\\python.exe"):
-    if f'{python} -m pip install "{requirement}"' not in normalized:
-      raise ValueError("README installation command differs from the project version")
-  targets = re.findall(r"-m\s+pip\s+install\s+[\"']?([^\s\"'`;|&<>]+)", normalized)
-  if any(target.startswith("celestial-astrology") and target != requirement for target in targets):
-    raise ValueError("README has an inconsistent package-index installation pin")
+    targets = re.findall(re.escape(python) + r"\s+" + target_pattern, normalized)
+    if "celestial-astrology" not in targets:
+      raise ValueError("README installation command must install celestial-astrology without a pin")
+  if any(
+    target not in ("celestial-astrology", ".") for target in re.findall(target_pattern, normalized)
+  ):
+    raise ValueError("README has an inconsistent package installation command")
 
 
 def check_release_documents(root: Path) -> None:
-  """Check source release claims, README pins and bilingual snapshot labels.
+  """Check source release claims, README installation and bilingual snapshot labels.
 
-  检查源码发行说明、README 钉版与双语快照标签。
+  检查源码发行说明、README 安装命令与双语快照标签。
   """
-  project = tomllib.loads((root / "pyproject.toml").read_text(encoding="utf-8"))["project"]
-  version = project["version"]
   readmes = (root / "README.md", root / "README.zh-CN.md")
   for page in (*readmes, *sorted((root / "docs").rglob("*.md"))):
     try:
@@ -70,9 +69,9 @@ def check_release_documents(root: Path) -> None:
       raise ValueError(f"{page.relative_to(root)}: {error}") from error
   for page in readmes:
     text = page.read_text(encoding="utf-8")
-    check_readme_installation(text, version)
-    if release_index_url(version) not in text:
-      raise ValueError("README must link the documented version's index page")
+    check_readme_installation(text)
+    if release_index_url() not in text:
+      raise ValueError("README must link the package's index page")
     if "`astrology`" not in text:
       raise ValueError("README must distinguish the import and distribution names")
   for name in ("docs/index.md", "docs/_templates/site_index.html"):

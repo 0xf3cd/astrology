@@ -385,6 +385,8 @@ class _CatalogHtml(_ApiHtml):
 
   def handle_endtag(self, tag: str) -> None:
     super().handle_endtag(tag)
+    if tag == "pre":
+      self.text.append("\n")
     if self._row is not None:
       if tag in ("td", "th"):
         self._row.append(" ")
@@ -599,9 +601,9 @@ def check_site_html(directory: Path, *, root: Path = ROOT, source_revision: str 
           raise ValueError(f"README links to an absent repository file: {target}")
     rendered = _CatalogHtml()
     rendered.feed((directory / Path(name).with_suffix(".html")).read_text(encoding="utf-8"))
-    check_readme_installation("".join(rendered.text), project["version"])
-    if release_index_url(project["version"]) not in rendered.links:
-      raise ValueError("Rendered README must link the documented version's index page")
+    check_readme_installation("".join(rendered.text))
+    if release_index_url() not in rendered.links:
+      raise ValueError("Rendered README must link the package's index page")
 
 
 def readme_examples(text: str) -> tuple[tuple[str, str], ...]:

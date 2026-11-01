@@ -10,14 +10,13 @@
 先运行下面的示例；更多用法和参数说明见[使用指南](https://0xf3cd.github.io/astrology/docs/zh-CN/index.html)和
 [API 参考](https://0xf3cd.github.io/astrology/docs/zh-CN/reference.html)。
 
-本文介绍 0.3.0；包索引可用性与源码安装见[安装说明](https://0xf3cd.github.io/astrology/README.zh-CN.html#install-a-release-zh-cn)。
-此版本新增[元素／模式分布与出生月相](https://0xf3cd.github.io/astrology/docs/zh-CN/summaries.html)、
+功能包括[元素／模式分布与出生月相](https://0xf3cd.github.io/astrology/docs/zh-CN/summaries.html)、
 [传统星座守护与四种状态](https://0xf3cd.github.io/astrology/docs/zh-CN/dignities.html)，
 本命及静态双盘查询的[显式选四轴参与相位](https://0xf3cd.github.io/astrology/docs/zh-CN/aspects.html#axis-aspects-zh-cn)，
 以及[双盘落宫和双语比较文本](https://0xf3cd.github.io/astrology/docs/zh-CN/cross_aspects.html)。
 四轴（上升点、中天、下降点、天底）只有被显式选择后才参与相位。
 
-自 0.2.0 起提供：
+此外还提供：
 
 - 两张本命盘之间的[静态交叉相位](https://0xf3cd.github.io/astrology/docs/zh-CN/cross_aspects.html)，保留两张源盘并区分左右对象，不标入相／离相。
 - 用 `ashmand_sign_group(Sign.ARIES)` 查询十二星座在 Ashmand 1822 年版中的四组归属。见[来源及查询示例](https://0xf3cd.github.io/astrology/docs/zh-CN/knowledge.html#ashmand-sign-groups-zh-cn)。
@@ -35,22 +34,21 @@ macOS 14+ arm64、Windows amd64 的轮子，没有源码分发包。其他平台
 
 请在上述支持的平台使用 **Python 3.11–3.14**。
 
-下面的命令和示例使用 0.3.0。从包索引安装前，先确认 [PyPI 的 0.3.0 页面](https://pypi.org/project/celestial-astrology/0.3.0/)
-已列出 wheel 和源码分发包；若尚未列出，请[从源码安装](https://0xf3cd.github.io/astrology/README.zh-CN.html#install-from-source-zh-cn)，
-使用本文介绍的功能。源码快照与已发布包即使版本号相同，也不一定对应同一次源码修订。
+用下面的命令安装 [PyPI 上的最新发行版](https://pypi.org/project/celestial-astrology/)。
+若要试用源码中的新功能，请[从源码安装](https://0xf3cd.github.io/astrology/README.zh-CN.html#install-from-source-zh-cn)。
 
 Linux/macOS（可把 `python3.14` 换成其他受支持的 Python 版本）：
 
 ```sh
 python3.14 -m venv .venv
-.venv/bin/python -m pip install "celestial-astrology==0.3.0"
+.venv/bin/python -m pip install celestial-astrology
 ```
 
 Windows PowerShell：
 
 ```powershell
 py -3.14 -m venv .venv
-.venv\Scripts\python.exe -m pip install "celestial-astrology==0.3.0"
+.venv\Scripts\python.exe -m pip install celestial-astrology
 ```
 
 运行依赖仍精确固定为 `celestial-calendar==0.8.0` 和 `tzdata==2026.5`，
@@ -112,7 +110,6 @@ record = BirthRecord(
 )
 config = ChartConfig(HouseSystem.WHOLE_SIGN, (Body.SUN, Body.MOON), ())
 chart = natal_chart(prepare_natal_input(record), config)
-print(chart.provenance.astrology_version)
 print(chart.resolved.utc.isoformat())
 for placement in chart.placements:
   print(f"{placement.identity.value}: {placement.sign.value}")
@@ -121,7 +118,6 @@ for placement in chart.placements:
 输出：
 
 ```text
-0.3.0
 2000-01-01T12:00:00+00:00
 sun: capricorn
 moon: scorpio

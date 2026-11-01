@@ -11,8 +11,7 @@ or query the knowledge catalog without a chart. Start with the examples below;
 the [guides](https://0xf3cd.github.io/astrology/docs/en/index.html) and
 [API reference](https://0xf3cd.github.io/astrology/docs/en/reference.html) explain further uses and parameters.
 
-This page documents 0.3.0. See the [installation instructions](https://0xf3cd.github.io/astrology/README.html#install-a-release)
-for package-index availability and source installation. Its additions include
+Further features include
 [element/modality distributions and natal lunar
 phase](https://0xf3cd.github.io/astrology/docs/en/summaries.html),
 [traditional sign rulers and four statuses](https://0xf3cd.github.io/astrology/docs/en/dignities.html),
@@ -21,7 +20,7 @@ and [cross-chart house overlays and bilingual comparison text](https://0xf3cd.gi
 Axes (Ascendant, Midheaven, Descendant and
 Imum Coeli) participate in aspects only when explicitly selected.
 
-Available since 0.2.0:
+The library also provides:
 
 - [Static cross-chart aspects](https://0xf3cd.github.io/astrology/docs/en/cross_aspects.html)
   between two natal charts, retaining both source charts and distinct left/right
@@ -41,24 +40,21 @@ Do not install the unrelated PyPI project named `astrology`.
 
 Use **Python 3.11–3.14** on one of the platforms listed above.
 
-The commands and examples below use 0.3.0. Before installing from the package
-index, check that its wheel and source distribution are listed on [PyPI's 0.3.0 page](https://pypi.org/project/celestial-astrology/0.3.0/).
-If they are not listed, [install from source](https://0xf3cd.github.io/astrology/README.html#install-from-source)
-to use the features documented here. A source snapshot and a published package
-with the same version number are not necessarily the same revision.
+Install the latest [release on PyPI](https://pypi.org/project/celestial-astrology/) with the commands below.
+To try newer source changes, [install from source](https://0xf3cd.github.io/astrology/README.html#install-from-source).
 
 Linux/macOS (replace `python3.14` with your supported Python version):
 
 ```sh
 python3.14 -m venv .venv
-.venv/bin/python -m pip install "celestial-astrology==0.3.0"
+.venv/bin/python -m pip install celestial-astrology
 ```
 
 Windows PowerShell:
 
 ```powershell
 py -3.14 -m venv .venv
-.venv\Scripts\python.exe -m pip install "celestial-astrology==0.3.0"
+.venv\Scripts\python.exe -m pip install celestial-astrology
 ```
 
 Runtime dependencies remain exactly pinned to `celestial-calendar==0.8.0` and
@@ -123,7 +119,6 @@ record = BirthRecord(
 )
 config = ChartConfig(HouseSystem.WHOLE_SIGN, (Body.SUN, Body.MOON), ())
 chart = natal_chart(prepare_natal_input(record), config)
-print(chart.provenance.astrology_version)
 print(chart.resolved.utc.isoformat())
 for placement in chart.placements:
   print(f"{placement.identity.value}: {placement.sign.value}")
@@ -132,7 +127,6 @@ for placement in chart.placements:
 Output:
 
 ```text
-0.3.0
 2000-01-01T12:00:00+00:00
 sun: capricorn
 moon: scorpio

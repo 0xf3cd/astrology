@@ -32,7 +32,8 @@ is a blocker; do not switch to a token or weaken protection to continue.
 ## Prepare and inspect the candidate
 
 Before publishing a new version, prepare its version bump and matching
-installation and example pins in a separate reviewed change.
+documentation in a separate reviewed change. README commands install the latest
+release by package name; version-specific availability belongs in the release notes.
 
 1. Review the source, matching bilingual notes and the acceptance criteria in
    the release tracker. Keep dependency policy, calculation conventions and
@@ -46,8 +47,8 @@ installation and example pins in a separate reviewed change.
    Markdown descriptions in the sdist's `PKG-INFO` and the wheel's `METADATA`.
    Both contain the English `README.md`, not separate English/Chinese descriptions.
    They must match the accepted `README.md` and contain no
-   stale candidate-only statements. README installation commands and example
-   versions must agree with project metadata. Check the rendered English and
+    stale candidate-only statements. Check the README's package name and installation
+    commands, and execute its examples against the accepted package. Check the rendered English and
    Chinese pages from both the checkout and the extracted sdist. Snapshot labels
    are always checked; fixed-SHA source/archive links are checked when
    `ASTROLOGY_DOCS_SOURCE_SHA` identifies the build's source revision.

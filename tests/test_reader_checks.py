@@ -108,16 +108,16 @@ def site(tmp_path: Path) -> tuple[Path, Path]:
       path.write_text('<p id="catalog">content</p>', encoding="utf-8")
   for name in ("README.html", "README.zh-CN.html"):
     (output / name).write_text(
-      '<a href="https://pypi.org/project/celestial-astrology/0.1.0/">Index</a>'
-      '<pre>.venv/bin/python -m pip install "celestial-astrology==0.1.0"</pre>'
-      '<pre>.venv\\Scripts\\python.exe -m pip install "celestial-astrology==0.1.0"</pre>',
+      '<a href="https://pypi.org/project/celestial-astrology/">Index</a>'
+      "<pre>.venv/bin/python -m pip install celestial-astrology</pre>"
+      "<pre>.venv\\Scripts\\python.exe -m pip install celestial-astrology</pre>",
       encoding="utf-8",
     )
   return root, output
 
 
 @pytest.mark.parametrize("name", ["README.html", "README.zh-CN.html"])
-@pytest.mark.parametrize("defect", ["candidate", "pin", "index"])
+@pytest.mark.parametrize("defect", ["candidate", "pin", "package", "index"])
 def test_rendered_release_text_rejects_defects(
   site: tuple[Path, Path], name: str, defect: str
 ) -> None:
@@ -127,7 +127,9 @@ def test_rendered_release_text_rejects_defects(
   if defect == "candidate":
     text += "<p>New in 0.1.0 (in development) / 0.1.0（开发中）</p>"
   elif defect == "pin":
-    text = text.replace("==0.1.0", "==0.0.0")
+    text = text.replace("celestial-astrology</pre>", "celestial-astrology==0.0.0</pre>")
+  elif defect == "package":
+    text = text.replace("celestial-astrology</pre>", "astrology</pre>")
   else:
     text = text.replace("pypi.org/project/", "example.org/project/")
   page.write_text(text, encoding="utf-8")
@@ -139,6 +141,15 @@ def test_valid_bilingual_site_and_snapshot(site: tuple[Path, Path]) -> None:
   root, output = site
   check_site_html(output, root=root)
   check_site_html(output, root=root, source_revision=REVISION)
+
+
+def test_install_commands_survive_inline_highlighting(site: tuple[Path, Path]) -> None:
+  root, output = site
+  for name in ("README.html", "README.zh-CN.html"):
+    path = output / name
+    text = path.read_text(encoding="utf-8")
+    path.write_text(text.replace(".venv", "<span>.</span>venv"), encoding="utf-8")
+  check_site_html(output, root=root)
 
 
 @pytest.mark.parametrize("language", ["en", "zh-CN"])

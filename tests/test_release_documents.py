@@ -71,24 +71,21 @@ def test_source_documents_reject_candidate_claims(
 @pytest.mark.parametrize("future", [False, True])
 @pytest.mark.parametrize("python", [".venv/bin/python", ".venv\\Scripts\\python.exe"])
 @pytest.mark.parametrize(
-  "requirement", ["astrology", "celestial-astrology", "celestial-astrology==0.0.0"]
+  "requirement", ["astrology", "celestial-astrology-extra", "celestial-astrology==0.0.0"]
 )
-def test_installation_pins_follow_project_version(
+def test_installation_uses_package_name_independently_of_project_version(
   documents: Path, unit: str, future: bool, python: str, requirement: str
 ) -> None:
   project_file = documents / "pyproject.toml"
   version = tomllib.loads(project_file.read_text(encoding="utf-8"))["project"]["version"]
   if future:
     next_version = f"{int(version.split('.')[0]) + 1}.0.0"
-    for name in ("pyproject.toml", "README.md", "README.zh-CN.md"):
-      path = documents / name
-      path.write_text(
-        path.read_text(encoding="utf-8").replace(version, next_version), encoding="utf-8"
-      )
-    version = next_version
+    project_file.write_text(
+      project_file.read_text(encoding="utf-8").replace(version, next_version), encoding="utf-8"
+    )
   check_release_documents(documents)
   path = documents / unit
-  command = f'{python} -m pip install "celestial-astrology=={version}"'
+  command = f"{python} -m pip install celestial-astrology"
   text = path.read_text(encoding="utf-8")
   assert command in text
   path.write_text(
@@ -99,7 +96,7 @@ def test_installation_pins_follow_project_version(
 
 
 @pytest.mark.parametrize("unit", ["README.md", "README.zh-CN.md"])
-def test_source_requires_versioned_index_reference(documents: Path, unit: str) -> None:
+def test_source_requires_package_index_reference(documents: Path, unit: str) -> None:
   path = documents / unit
   text = path.read_text(encoding="utf-8")
   path.write_text(text.replace("pypi.org/project/", "example.org/project/"), encoding="utf-8")
@@ -183,17 +180,29 @@ def test_production_rejection_does_not_depend_on_assertions(mode: tuple[str, ...
 
 
 @pytest.mark.parametrize("quote", ['"', "'", ""])
-@pytest.mark.parametrize("requirement", ["celestial-astrology", "celestial-astrology==0.0.0"])
+@pytest.mark.parametrize(
+  "requirement", ["astrology", "celestial-astrology-extra", "celestial-astrology==0.0.0"]
+)
 def test_duplicate_conflicting_index_command_is_rejected(quote: str, requirement: str) -> None:
   text = "\n".join(
-    f'{p} -m pip install "celestial-astrology==0.3.0"'
+    f"{p} -m pip install celestial-astrology"
     for p in (".venv/bin/python", ".venv\\Scripts\\python.exe")
   )
-  check_readme_installation(text, "0.3.0")
+  check_readme_installation(text)
   check_readme_installation(
-    text + f"\n.venv/bin/python -m pip install {quote}celestial-astrology==0.3.0{quote}", "0.3.0"
+    text + f"\n.venv/bin/python -m pip install {quote}celestial-astrology{quote}"
   )
   with pytest.raises(ValueError, match="inconsistent"):
     check_readme_installation(
-      text + f"\n.venv/bin/python -m pip install {quote}{requirement}{quote}", "0.3.0"
+      text + f"\n.venv/bin/python -m pip install {quote}{requirement}{quote}"
     )
+
+
+@pytest.mark.parametrize("quote", ['"', "'", ""])
+def test_installation_allows_quoted_package_names_and_local_source(quote: str) -> None:
+  text = "\n".join(
+    f"{python} -m pip install {quote}{requirement}{quote}"
+    for python in (".venv/bin/python", ".venv\\Scripts\\python.exe")
+    for requirement in ("celestial-astrology", ".")
+  )
+  check_readme_installation(text)
