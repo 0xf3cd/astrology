@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Sign distributions and natal lunar phase &#8212; celestial-astrology 0.3.0 documentation / 文档</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
+    <script src="../../_static/documentation_options.js?v=e259d695"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/en/summaries.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Traditional sign rulers and four statuses" href="dignities.html" />
+    <link rel="prev" title="Cross-chart aspects and house overlays" href="cross_aspects.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="sign-distributions-and-natal-lunar-phase">
+<h1>Sign distributions and natal lunar phase<a class="headerlink" href="#sign-distributions-and-natal-lunar-phase" title="Link to this heading">¶</a></h1>
+<p><a class="reference internal" href="../zh-CN/summaries.html"><span class="std std-doc">简体中文</span></a> · <a class="reference internal" href="reference.html"><span class="std std-doc">API</span></a> · <a class="reference internal" href="knowledge.html"><span class="std std-doc">Knowledge</span></a></p>
+<p>These APIs are introduced in 0.3.0; see the <a class="reference internal" href="../../README.html#install-a-release"><span class="std std-ref">installation instructions</span></a>
+for package-index availability and source installation. They classify supplied values without astronomy or source-chart
+changes. Formatters take a loaded catalog and do no resource I/O.</p>
+<section id="query-signs-and-count-an-explicit-population">
+<h2>Query signs and count an explicit population<a class="headerlink" href="#query-signs-and-count-an-explicit-population" title="Link to this heading">¶</a></h2>
+<!-- usage: summaries.population -->
+<p>Pass the placements you want to count to <code class="docutils literal notranslate"><span class="pre">sign_distribution</span></code>. The example counts
+Sun and Moon equally and prints all element and modality categories:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">astrology</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">Body</span><span class="p">,</span> <span class="n">Element</span><span class="p">,</span> <span class="n">Modality</span><span class="p">,</span> <span class="n">Placement</span><span class="p">,</span> <span class="n">Sign</span><span class="p">,</span> <span class="n">element_of</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">modality_of</span><span class="p">,</span> <span class="n">sign_distribution</span><span class="p">,</span> <span class="n">format_sign_distribution</span><span class="p">,</span> <span class="n">load_catalog</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">element_of</span><span class="p">(</span><span class="n">Sign</span><span class="o">.</span><span class="n">ARIES</span><span class="p">)</span> <span class="ow">is</span> <span class="n">Element</span><span class="o">.</span><span class="n">FIRE</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">modality_of</span><span class="p">(</span><span class="n">Sign</span><span class="o">.</span><span class="n">CANCER</span><span class="p">)</span> <span class="ow">is</span> <span class="n">Modality</span><span class="o">.</span><span class="n">CARDINAL</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">placements</span> <span class="o">=</span> <span class="p">[</span><span class="n">Placement</span><span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">SUN</span><span class="p">,</span> <span class="n">Sign</span><span class="o">.</span><span class="n">ARIES</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+<span class="gp">... </span>              <span class="n">Placement</span><span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">MOON</span><span class="p">,</span> <span class="n">Sign</span><span class="o">.</span><span class="n">CANCER</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">4</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">sign_distribution</span><span class="p">(</span><span class="n">placements</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">placements</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span><span class="o">.</span><span class="n">objects</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">total</span>
+<span class="go">((&lt;Body.SUN: 'sun'&gt;, &lt;Body.MOON: 'moon'&gt;), 2)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span><span class="o">.</span><span class="n">element_counts</span><span class="p">[</span><span class="n">Element</span><span class="o">.</span><span class="n">FIRE</span><span class="p">],</span> <span class="n">result</span><span class="o">.</span><span class="n">element_proportions</span><span class="p">[</span><span class="n">Element</span><span class="o">.</span><span class="n">FIRE</span><span class="p">]</span>
+<span class="go">(1, 0.5)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span><span class="o">.</span><span class="n">modality_counts</span><span class="p">[</span><span class="n">Modality</span><span class="o">.</span><span class="n">CARDINAL</span><span class="p">]</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">catalog</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">format_sign_distribution</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">catalog</span><span class="p">))</span>
+<span class="go">Sign distribution (equal counts)</span>
+<span class="go">Counted objects: Sun [sun], Moon [moon]</span>
+<span class="go">Total / denominator: 2</span>
+<span class="go">Rule: rule.zodiac.elements, rule.zodiac.modalities</span>
+<span class="go">Category | Count / total | Proportion</span>
+<span class="go">Fire element | 1/2 | 50.00%</span>
+<span class="go">Earth element | 0/2 | 0.00%</span>
+<span class="go">Air element | 0/2 | 0.00%</span>
+<span class="go">Water element | 1/2 | 50.00%</span>
+<span class="go">Cardinal modality | 2/2 | 100.00%</span>
+<span class="go">Fixed modality | 0/2 | 0.00%</span>
+<span class="go">Mutable modality | 0/2 | 0.00%</span>
+</pre></div>
+</div>
+<p>Each selected object contributes one count. <code class="docutils literal notranslate"><span class="pre">total</span></code> gives the object count and is
+the denominator for every proportion. In this example, the Sun is in a fire sign
+and the Moon in a water sign, so each element has 50%. Both signs are cardinal,
+giving that modality 100%. Every category is shown, including zero counts.
+Percentages use two decimal places alongside the counts and total. No planet
+weights or dominant scores are assigned.</p>
+<p><code class="docutils literal notranslate"><span class="pre">sign_distribution</span></code> and <code class="docutils literal notranslate"><span class="pre">SignDistribution</span></code> copy sequences to immutable placement
+tuples, preserving input order. Empty or duplicate populations raise <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>;
+<code class="docutils literal notranslate"><span class="pre">None</span></code>, iterators and non-<code class="docutils literal notranslate"><span class="pre">Placement</span></code> members raise <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>. The caller must
+ensure that directly supplied placements share a common source; the function
+cannot verify their origin. Counts, proportions and total derive from the stored
+placements, so a different total cannot be supplied separately. <code class="docutils literal notranslate"><span class="pre">element_of</span></code> and <code class="docutils literal notranslate"><span class="pre">modality_of</span></code> accept only <code class="docutils literal notranslate"><span class="pre">Sign</span></code>,
+not strings or unrelated enums.</p>
+<!-- /usage: summaries.population -->
+<p>Classification sources and the distinction from historical sign groups are
+described in <a class="reference internal" href="knowledge.html#elements-modalities-and-lunation-types"><span class="std std-ref">knowledge</span></a>.</p>
+</section>
+<section id="classify-a-supplied-sun-moon-pair">
+<h2>Classify a supplied Sun/Moon pair<a class="headerlink" href="#classify-a-supplied-sun-moon-pair" title="Link to this heading">¶</a></h2>
+<!-- usage: summaries.lunar_phase -->
+<p>Supply Sun first and Moon second, in degrees at the same instant and with the
+same coordinate convention. The function measures from the Sun to the Moon in the
+direction of increasing longitude, returning that angle and its lunar phase type:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">astrology</span><span class="w"> </span><span class="kn">import</span> <span class="n">lunar_phase</span><span class="p">,</span> <span class="n">format_lunar_phase</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">phase</span> <span class="o">=</span> <span class="n">lunar_phase</span><span class="p">(</span><span class="n">sun_longitude_deg</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">moon_longitude_deg</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">phase</span><span class="o">.</span><span class="n">elongation_deg</span><span class="p">,</span> <span class="n">phase</span><span class="o">.</span><span class="n">phase</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">phase</span><span class="o">.</span><span class="n">direction</span>
+<span class="go">(20.0, 'new_moon', 'waxing')</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">format_lunar_phase</span><span class="p">(</span><span class="n">phase</span><span class="p">,</span> <span class="n">catalog</span><span class="p">))</span>
+<span class="go">Lunar phase type: New Moon Type</span>
+<span class="go">Moon minus Sun (longitude, degrees): 20.0</span>
+<span class="go">Angular direction: waxing</span>
+<span class="go">Rule: rule.lunation.rudhyar1950</span>
+<span class="go">A type covers an interval, not an exact event; no illuminated fraction is calculated.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lunar_phase</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">350</span><span class="p">)</span><span class="o">.</span><span class="n">direction</span><span class="p">,</span> <span class="n">lunar_phase</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">180</span><span class="p">)</span><span class="o">.</span><span class="n">direction</span>
+<span class="go">('waning', 'turning')</span>
+</pre></div>
+</div>
+<p>The oriented difference is <code class="docutils literal notranslate"><span class="pre">(Moon</span> <span class="pre">-</span> <span class="pre">Sun)</span> <span class="pre">mod</span> <span class="pre">360</span></code>, in degrees. Finite longitudes may
+exceed one turn; the calculation removes whole turns.
+Booleans, strings and unrelated types raise <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>; nonfinite values raise
+<code class="docutils literal notranslate"><span class="pre">ValueError</span></code>. Bare numbers carry no instant or coordinate convention, so the
+scalar function cannot detect a frame mismatch.</p>
+<p>See the <a class="reference internal" href="catalog.html#catalog-en-rule-lunation-rudhyar1950"><span class="std std-ref">generated intervals</span></a> and
+<a class="reference internal" href="knowledge.html#elements-modalities-and-lunation-types"><span class="std std-ref">source discussion</span></a>.
+Each type spans 45°. The project uses half-open intervals, including the start but
+not the end. An exact boundary belongs to the following type, with 360° wrapping to
+0°. Angles within <code class="docutils literal notranslate"><span class="pre">(0,</span> <span class="pre">180)</span></code> are <code class="docutils literal notranslate"><span class="pre">waxing</span></code>, those within <code class="docutils literal notranslate"><span class="pre">(180,</span> <span class="pre">360)</span></code> are <code class="docutils literal notranslate"><span class="pre">waning</span></code>,
+and exactly 0° or 180° is <code class="docutils literal notranslate"><span class="pre">turning</span></code>. These boundary assignments and direction labels
+are defined by this project.</p>
+<p><code class="docutils literal notranslate"><span class="pre">LunarPhaseResult</span></code> is immutable. Type, direction and rule ID derive from its angle;
+direct construction requires <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">360)</span></code>. New Moon Type at 20° is not an exact
+conjunction. No illuminated fraction, 3D phase angle, exact-event search or
+personality interpretation is calculated. Direction describes the arc, not a
+rate-based forecast.</p>
+<!-- /usage: summaries.lunar_phase -->
+</section>
+<section id="compose-from-an-existing-natal-chart">
+<h2>Compose from an existing natal chart<a class="headerlink" href="#compose-from-an-existing-natal-chart" title="Link to this heading">¶</a></h2>
+<p>First calculate a chart from synthetic data, then count selected objects with
+<code class="docutils literal notranslate"><span class="pre">chart_sign_distribution</span></code> and read its lunar phase with <code class="docutils literal notranslate"><span class="pre">natal_lunar_phase</span></code>. Those
+two functions only read the chart’s existing positions and placements, without
+repeating astronomical calculations:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">date</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">astrology</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">BirthRecord</span><span class="p">,</span> <span class="n">FixedOffset</span><span class="p">,</span> <span class="n">Location</span><span class="p">,</span> <span class="n">ChartConfig</span><span class="p">,</span> <span class="n">HouseSystem</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">natal_chart</span><span class="p">,</span> <span class="n">prepare_natal_input</span><span class="p">,</span> <span class="n">chart_sign_distribution</span><span class="p">,</span> <span class="n">natal_lunar_phase</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span> <span class="o">=</span> <span class="n">BirthRecord</span><span class="p">(</span><span class="n">date</span><span class="p">(</span><span class="mi">2000</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">time</span><span class="p">(</span><span class="mi">12</span><span class="p">),</span> <span class="n">FixedOffset</span><span class="p">(</span><span class="n">timedelta</span><span class="p">(</span><span class="mi">0</span><span class="p">)),</span> <span class="n">Location</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">chart</span> <span class="o">=</span> <span class="n">natal_chart</span><span class="p">(</span><span class="n">prepare_natal_input</span><span class="p">(</span><span class="n">record</span><span class="p">),</span>
+<span class="gp">... </span>    <span class="n">ChartConfig</span><span class="p">(</span><span class="n">HouseSystem</span><span class="o">.</span><span class="n">WHOLE_SIGN</span><span class="p">,</span> <span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">SUN</span><span class="p">,</span> <span class="n">Body</span><span class="o">.</span><span class="n">MOON</span><span class="p">),</span> <span class="p">()))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">summary</span> <span class="o">=</span> <span class="n">chart_sign_distribution</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">objects</span><span class="o">=</span><span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">MOON</span><span class="p">,</span> <span class="n">Body</span><span class="o">.</span><span class="n">SUN</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">summary</span><span class="o">.</span><span class="n">objects</span> <span class="o">==</span> <span class="n">chart</span><span class="o">.</span><span class="n">requested</span><span class="o">.</span><span class="n">objects</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">summary</span><span class="o">.</span><span class="n">total</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">natal_lunar_phase</span><span class="p">(</span><span class="n">chart</span><span class="p">)</span> <span class="o">==</span> <span class="n">lunar_phase</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">positions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">longitude_deg</span><span class="p">,</span>
+<span class="gp">... </span>                                      <span class="n">chart</span><span class="o">.</span><span class="n">positions</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">longitude_deg</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">objects</span></code> is required and nonempty. <code class="docutils literal notranslate"><span class="pre">None</span></code>, strings and wrong identity types raise
+<code class="docutils literal notranslate"><span class="pre">TypeError</span></code>; duplicates or unavailable identities raise <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>. Results
+follow source-chart order, not selection order. To count all requested objects,
+explicitly pass <code class="docutils literal notranslate"><span class="pre">objects=chart.requested.objects</span></code>. No unselected body, node or axis
+is added. Axes are not placements and are rejected even when explicitly selected
+for these statistics. <code class="docutils literal notranslate"><span class="pre">natal_lunar_phase</span></code> requires Sun and Moon; missing positions raise
+<code class="docutils literal notranslate"><span class="pre">ValueError</span></code> naming absent identities, never a request to calculate them. Both
+wrappers reject non-<code class="docutils literal notranslate"><span class="pre">NatalChart</span></code> inputs with <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>. Checks work under <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-O</span></code>.</p>
+<p>Catalog entries remain <code class="docutils literal notranslate"><span class="pre">reference_only</span></code>, with stated prerequisites <code class="docutils literal notranslate"><span class="pre">complete</span></code> and
+chart applicability <code class="docutils literal notranslate"><span class="pre">not_assessed</span></code>. Verified source inspection does not make
+catalog lookup a chart evaluation.</p>
+</section>
+<section id="numerical-angle-and-display">
+<h2>Numerical angle and display<a class="headerlink" href="#numerical-angle-and-display" title="Link to this heading">¶</a></h2>
+<p>Inputs are converted to floats. The function calculates their difference using
+exact ratios of those binary values, avoiding subtraction overflow or placing an
+angle on the wrong side of a boundary. It usually returns the nearest float. If
+rounding would move an angle from one side onto a boundary, it uses the adjacent float on
+the correct side instead. For example, <code class="docutils literal notranslate"><span class="pre">lunar_phase(5e-324,</span> <span class="pre">0)</span></code> returns
+<code class="docutils literal notranslate"><span class="pre">359.99999999999994</span></code>, not 360° or a false exact conjunction. This is a numerical
+approximation, not an exact real angle. Equal rotations preserve the mathematical
+difference, but rotating floats may already round inputs; bitwise invariance is
+not promised.</p>
+<p>The phase formatter prints the stored float without arcsecond truncation. Labels
+never come from rounded text. <code class="docutils literal notranslate"><span class="pre">format_sign_distribution</span></code> and <code class="docutils literal notranslate"><span class="pre">format_lunar_phase</span></code>
+require current catalog names in
+<code class="docutils literal notranslate"><span class="pre">en</span></code> or <code class="docutils literal notranslate"><span class="pre">zh-CN</span></code>; missing/stale names raise <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>, missing IDs <code class="docutils literal notranslate"><span class="pre">KeyError</span></code>, and
+invalid result/catalog types <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>. Names’ table delimiters and nonprinting
+characters are escaped.</p>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">celestial-astrology</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../README.html">celestial-astrology</a></li>
+<li class="toctree-l2"><a class="reference internal" href="birth.html">Birth records and modern time resolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html">Requested chart configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chart.html">Natal charts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aspects.html">Aspects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cross_aspects.html">Cross-chart aspects and house overlays</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Sign distributions and natal lunar phase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dignities.html">Traditional sign rulers and four statuses</a></li>
+<li class="toctree-l2"><a class="reference internal" href="records.html">Chart results and text</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference.html">Public API reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html">Repository structure and calculation boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="knowledge.html">Knowledge organization and bilingual documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="catalog.html">Knowledge catalog reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="releases.html">Release notes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="releasing.html">Release procedure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html">Contributing</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../zh-CN/index.html">文档入口</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Documentation</a><ul>
+      <li>Previous: <a href="cross_aspects.html" title="previous chapter">Cross-chart aspects and house overlays</a></li>
+      <li>Next: <a href="dignities.html" title="next chapter">Traditional sign rulers and four statuses</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 9.1.0</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../../_sources/docs/en/summaries.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

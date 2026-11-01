@@ -7,6 +7,8 @@ synthetic; these APIs prepare inputs, not charts.
 
 ## Preserve what is known
 
+<!-- usage: birth.resolution -->
+
 `BirthRecord` stores a proleptic Gregorian `datetime.date`, an optional naive
 `datetime.time`, timezone input, location, stated clock precision, and source
 metadata. `calendar="gregorian"` is the only admitted calendar; no calendar
@@ -35,6 +37,8 @@ claim clock precision. Pass timezone and fold separately: a recorded clock with
 `Location` uses finite degrees: latitude `[-90, 90]`, longitude `[-180, 180]`,
 north/east positive. Values are not wrapped. The poles and both longitude
 endpoints are valid *record* values, not promises of available house geometry.
+
+<!-- /usage: birth.resolution -->
 
 ## Choose an ambiguous instant
 

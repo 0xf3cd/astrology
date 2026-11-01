@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Documentation &#8212; celestial-astrology 0.2.0 documentation / 文档</title>
+    <title>Documentation &#8212; celestial-astrology 0.3.0 documentation / 文档</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
-    <script src="../../_static/documentation_options.js?v=938c9ccc"></script>
+    <script src="../../_static/documentation_options.js?v=e259d695"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/en/index.html" />
@@ -37,13 +37,41 @@
   <section id="documentation">
 <h1>Documentation<a class="headerlink" href="#documentation" title="Link to this heading">¶</a></h1>
 <p><a class="reference internal" href="../zh-CN/index.html"><span class="std std-doc">简体中文</span></a></p>
-<p>The package supplies birth records, modern timezone resolution, immutable
-requested configuration, tropical natal chart calculation, independent knowledge
-queries and development checks. Chart calculation is available through
-<a class="reference internal" href="chart.html"><span class="std std-doc">the chart guide</span></a> and aspects through <a class="reference internal" href="aspects.html"><span class="std std-doc">the aspect guide</span></a>;
-inspect structured results and text tables through the <a class="reference internal" href="records.html"><span class="std std-doc">result guide</span></a>.
-Compare two supplied charts through <a class="reference internal" href="cross_aspects.html"><span class="std std-doc">static cross-chart aspects</span></a>,
-without recomputing astronomy or assigning a shared motion.</p>
+<p>Start with <a class="reference internal" href="../../README.html"><span class="std std-doc">installation and the first chart</span></a>. Then follow the
+task you need:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Task</p></th>
+<th class="head"><p>Guide</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Prepare a birth record and resolve its time</p></td>
+<td><p><a class="reference internal" href="birth.html"><span class="std std-doc">Birth inputs</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Select bodies, aspect participants or orbs</p></td>
+<td><p><a class="reference internal" href="configuration.html"><span class="std std-doc">Configuration</span></a> and <a class="reference internal" href="aspects.html"><span class="std std-doc">aspects</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>Calculate and read a chart</p></td>
+<td><p><a class="reference internal" href="chart.html"><span class="std std-doc">Natal charts</span></a> and <a class="reference internal" href="records.html"><span class="std std-doc">results/text</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Compare two charts</p></td>
+<td><p><a class="reference internal" href="cross_aspects.html"><span class="std std-doc">Cross-chart aspects and house overlays</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>Count elements/modalities or classify lunar phase</p></td>
+<td><p><a class="reference internal" href="summaries.html"><span class="std std-doc">Sign distributions and natal lunar phase</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Query traditional sign rulers and dignity statuses</p></td>
+<td><p><a class="reference internal" href="dignities.html"><span class="std std-doc">Traditional rulers and four statuses</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>Look up names, rules and sources without a chart</p></td>
+<td><p><a class="reference internal" href="knowledge.html"><span class="std std-doc">Knowledge queries</span></a> and <a class="reference internal" href="catalog.html"><span class="std std-doc">catalog</span></a></p></td>
+</tr>
+</tbody>
+</table>
+<p><a class="reference internal" href="reference.html"><span class="std std-doc">API reference</span></a> gives type/function contracts. <a class="reference internal" href="architecture.html"><span class="std std-doc">Architecture</span></a>
+explains calculation boundaries; <a class="reference internal" href="contributing.html"><span class="std std-doc">contributing</span></a> and
+<a class="reference internal" href="releasing.html"><span class="std std-doc">release preparation</span></a> are maintainer workflows.</p>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../README.html">celestial-astrology</a></li>
@@ -51,7 +79,9 @@ without recomputing astronomy or assigning a shared motion.</p>
 <li class="toctree-l1"><a class="reference internal" href="configuration.html">Requested chart configuration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="chart.html">Natal charts</a></li>
 <li class="toctree-l1"><a class="reference internal" href="aspects.html">Aspects</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cross_aspects.html">Static cross-chart aspects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cross_aspects.html">Cross-chart aspects and house overlays</a></li>
+<li class="toctree-l1"><a class="reference internal" href="summaries.html">Sign distributions and natal lunar phase</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dignities.html">Traditional sign rulers and four statuses</a></li>
 <li class="toctree-l1"><a class="reference internal" href="records.html">Chart results and text</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reference.html">Public API reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="architecture.html">Repository structure and calculation boundaries</a></li>
@@ -97,7 +127,9 @@ without recomputing astronomy or assigning a shared motion.</p>
 <li class="toctree-l2"><a class="reference internal" href="configuration.html">Requested chart configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="chart.html">Natal charts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="aspects.html">Aspects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cross_aspects.html">Static cross-chart aspects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cross_aspects.html">Cross-chart aspects and house overlays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="summaries.html">Sign distributions and natal lunar phase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dignities.html">Traditional sign rulers and four statuses</a></li>
 <li class="toctree-l2"><a class="reference internal" href="records.html">Chart results and text</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference.html">Public API reference</a></li>
 <li class="toctree-l2"><a class="reference internal" href="architecture.html">Repository structure and calculation boundaries</a></li>

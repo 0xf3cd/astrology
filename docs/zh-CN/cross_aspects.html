@@ -5,17 +5,17 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>静态双盘交叉相位 &#8212; celestial-astrology 0.2.0 documentation / 文档</title>
+    <title>双盘相位与落宫 &#8212; celestial-astrology 0.3.0 documentation / 文档</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
-    <script src="../../_static/documentation_options.js?v=938c9ccc"></script>
+    <script src="../../_static/documentation_options.js?v=e259d695"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/zh-CN/cross_aspects.html" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="命盘结果与文本显示" href="records.html" />
+    <link rel="next" title="星座分布与出生月相" href="summaries.html" />
     <link rel="prev" title="相位" href="aspects.html" />
    
   <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
@@ -35,14 +35,18 @@
           <div class="body" role="main">
             
   <section id="id1">
-<h1>静态双盘交叉相位<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h1>
+<h1>双盘相位与落宫<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h1>
 <p><a class="reference internal" href="../en/cross_aspects.html"><span class="std std-doc">English</span></a> · <a class="reference internal" href="index.html"><span class="std std-doc">文档</span></a> · <a class="reference internal" href="reference.html"><span class="std std-doc">API</span></a></p>
-<p><code class="docutils literal notranslate"><span class="pre">cross_chart_aspects</span></code> 比较两张已有的内存 <code class="docutils literal notranslate"><span class="pre">NatalChart</span></code> 结果。左盘太阳与右盘太阳仍是不同端点，
-不必重命名对象或合并命盘。比较给定结果不执行天文计算、时区解析、版本查询或 I/O。</p>
-<p>此 API 自 0.2.0 起提供。目前该版本仍在开发中，安装见<a class="reference internal" href="../../README.zh-CN.html#id2"><span class="std std-ref">源码安装说明</span></a>。</p>
+<p>已有两张 <code class="docutils literal notranslate"><span class="pre">NatalChart</span></code> 时，可以用 <code class="docutils literal notranslate"><span class="pre">cross_chart_aspects</span></code> 查它们之间的静态主要相位，
+用 <code class="docutils literal notranslate"><span class="pre">cross_chart_house_overlays</span></code> 查一张盘的对象落入另一张盘的哪一宫。
+结果会区分左盘太阳和右盘太阳，不需要给对象改名，也不需要合并命盘。
+比较直接使用两张盘中已存的黄经；使用前请确认它们满足<a class="reference internal" href="#id8">坐标要求</a>。</p>
+<p>静态双盘相位自 0.2.0 起提供，双盘落宫和比较文本自 0.3.0 起提供；
+包索引可用性与源码安装见<a class="reference internal" href="../../README.zh-CN.html#id1"><span class="std std-ref">安装说明</span></a>。</p>
 <section id="id2">
-<h2>比较两份合成出生记录<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
-<p>先计算源盘。它们的本命相位规则可以为空；比较时显式给出另一组规则。</p>
+<h2>比较两张示例盘<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<p>下面用两份虚构的出生资料排盘，再查两颗太阳是否在 3 度容许度内合相。
+双盘比较使用单独传入的相位规则，因此排本命盘时可以不计算相位。</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">date</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">timedelta</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">astrology</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">AspectRule</span><span class="p">,</span> <span class="n">BirthRecord</span><span class="p">,</span> <span class="n">Body</span><span class="p">,</span> <span class="n">ChartConfig</span><span class="p">,</span> <span class="n">FixedOffset</span><span class="p">,</span>
 <span class="gp">... </span>  <span class="n">HouseSystem</span><span class="p">,</span> <span class="n">Location</span><span class="p">,</span> <span class="n">MajorAspect</span><span class="p">,</span> <span class="n">ObjectOrb</span><span class="p">,</span> <span class="n">OrbCombination</span><span class="p">,</span>
@@ -66,51 +70,162 @@
 <span class="go">True</span>
 </pre></div>
 </div>
-<p><code class="docutils literal notranslate"><span class="pre">result.chart_left</span></code> 与 <code class="docutils literal notranslate"><span class="pre">result.chart_right</span></code> 保留两张完整源盘，包括原始／已解析出生输入、位置、
-请求／实际配置及来源。<code class="docutils literal notranslate"><span class="pre">rules</span></code> 和 <code class="docutils literal notranslate"><span class="pre">combination</span></code> 保存本次比较请求；不继承任一盘的本命规则或参与对象。</p>
+<p><code class="docutils literal notranslate"><span class="pre">result.chart_left</span></code> 和 <code class="docutils literal notranslate"><span class="pre">result.chart_right</span></code> 仍是传入的两张完整命盘，可以继续读取原始出生资料、
+解析后的时刻、位置、请求与实际采用的配置，以及计算来源信息。
+结果的 <code class="docutils literal notranslate"><span class="pre">rules</span></code> 和 <code class="docutils literal notranslate"><span class="pre">combination</span></code> 记录本次比较使用的规则和容许度合成方式。
+比较不会沿用任一盘的本命相位规则或参与对象。</p>
 </section>
 <section id="id3">
-<h2>选择配对与容许度<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">left_objects</span></code> 与 <code class="docutils literal notranslate"><span class="pre">right_objects</span></code> 分别选择两侧对象。<code class="docutils literal notranslate"><span class="pre">None</span></code> 选该侧全部位置，即使其本命相位只用了
-较小的子集。参与者按源盘的位置顺序排列，不按选择参数的顺序排列。
-每个所选左对象都与每个所选右对象配对，包括同名对象，以及左侧每个所选交点标识与右侧每个所选交点标识的配对。
-也允许同一张盘占两个角色。这些是项目的几何选择，不是传统解读。
+<h2>查询对象落入另一张盘的哪一宫<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">placements</span></code> 中的每条记录都写明对象来自哪张盘（<code class="docutils literal notranslate"><span class="pre">object_owner</span></code>）、使用哪张盘的宫位
+（<code class="docutils literal notranslate"><span class="pre">house_owner</span></code>），以及落入的宫号（<code class="docutils literal notranslate"><span class="pre">house</span></code>）。下面第一条是左盘太阳落入右盘第一宫，
+第二条是右盘太阳落入左盘第一宫；这是两个方向的结果，不会合并。</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">astrology</span><span class="w"> </span><span class="kn">import</span> <span class="n">cross_chart_house_overlays</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">overlays</span> <span class="o">=</span> <span class="n">cross_chart_house_overlays</span><span class="p">(</span><span class="n">chart_left</span><span class="p">,</span> <span class="n">chart_right</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[(</span><span class="n">p</span><span class="o">.</span><span class="n">object_owner</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">identity</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">house_owner</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">house</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">overlays</span><span class="o">.</span><span class="n">placements</span><span class="p">]</span>
+<span class="go">[('left', 'sun', 'right', 1), ('right', 'sun', 'left', 1)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">overlays</span><span class="o">.</span><span class="n">chart_left</span> <span class="ow">is</span> <span class="n">chart_left</span><span class="p">,</span> <span class="n">overlays</span><span class="o">.</span><span class="n">chart_right</span> <span class="ow">is</span> <span class="n">chart_right</span>
+<span class="go">(True, True)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">one_way</span> <span class="o">=</span> <span class="n">cross_chart_house_overlays</span><span class="p">(</span><span class="n">chart_left</span><span class="p">,</span> <span class="n">chart_right</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">left_objects</span><span class="o">=</span><span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">SUN</span><span class="p">,),</span> <span class="n">right_objects</span><span class="o">=</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[(</span><span class="n">p</span><span class="o">.</span><span class="n">object_owner</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">house_owner</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">one_way</span><span class="o">.</span><span class="n">placements</span><span class="p">]</span>
+<span class="go">[('left', 'right')]</span>
+</pre></div>
+</div>
+<p>用 <code class="docutils literal notranslate"><span class="pre">left_objects</span></code> 选择左盘中要查落宫的对象，用 <code class="docutils literal notranslate"><span class="pre">right_objects</span></code> 选择右盘对象。
+上例的 <code class="docutils literal notranslate"><span class="pre">right_objects=()</span></code> 表示不查右盘对象的落宫；右盘的宫头仍用于判断左盘太阳落在哪一宫。
+两边都传空序列时，<code class="docutils literal notranslate"><span class="pre">placements</span></code> 为空。</p>
+<p>不传选择参数或传 <code class="docutils literal notranslate"><span class="pre">None</span></code> 时，选取该盘的全部天体和交点，不包含四轴。
+要查四轴的落宫，显式传入该盘已有的 <code class="docutils literal notranslate"><span class="pre">Axis</span></code>，写法见<a class="reference internal" href="#cross-axis-aspects-zh-cn"><span class="std std-ref">下方示例</span></a>。
+每张盘的天体和交点按盘中位置记录的顺序排列，所选四轴随后按上升、中天、下降、天底排列，
+不按传入选择的顺序排列。<code class="docutils literal notranslate"><span class="pre">placements</span></code> 先列左盘对象在右盘的落宫，再列右盘对象在左盘的落宫。</p>
+<p>落宫只比较对象的已存黄经与另一张盘的实际宫头，角度单位为度。
+每一宫从本宫宫头开始，到下一宫宫头之前结束，即半开区间 <code class="docutils literal notranslate"><span class="pre">[宫头,</span> <span class="pre">下一宫头)</span></code>；
+跨过 360 度后从 0 度继续。黄经恰好等于宫头时，归入从该宫头开始的宫。
+两张盘各用自己的宫制，原盘保持不变。交换参数中的左右盘后，结果中的所属盘也随之交换；
+也可以把同一张盘传给两边。</p>
+<p>同一侧重复选择对象，或选择该盘没有的对象，会抛出 <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>；传入非对象值或非序列选择，
+会抛出 <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>。即使另一侧选择为空，这些检查仍然执行。
+直接构造 <code class="docutils literal notranslate"><span class="pre">CrossChartHouseOverlays</span></code> 时，会按两张盘和所选对象重新计算完整落宫序列；
+缺少记录、宫号不同或顺序不同都会被拒绝。</p>
+</section>
+<section id="id4">
+<h2>选择配对与容许度<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h2>
+<!-- usage: cross.selection -->
+<p>调用 <code class="docutils literal notranslate"><span class="pre">cross_chart_aspects</span></code> 时，同样用 <code class="docutils literal notranslate"><span class="pre">left_objects</span></code> 和 <code class="docutils literal notranslate"><span class="pre">right_objects</span></code> 分别选择两张盘的对象。
+<code class="docutils literal notranslate"><span class="pre">None</span></code> 表示该盘的全部天体和交点，不包含四轴，即使本命相位只使用了其中一部分。
+对象按盘中位置记录的顺序排列，不按传入选择的顺序排列。
+左盘的每个所选对象都会与右盘的每个所选对象配对，包括两颗太阳这样的同名对象，
+以及两边各自所选的任意交点组合。也可以把同一张盘传给两边。
+这些配对是本项目的几何计算约定，不是传统解读规则。
 <a class="reference internal" href="aspects.html#id6"><span class="std std-ref">单盘交点排除规则</span></a>保持不变。</p>
-<p>对象容许度覆盖仍以 <code class="docutils literal notranslate"><span class="pre">Body</span></code> 或 <code class="docutils literal notranslate"><span class="pre">LunarNode</span></code> 标识作用于两侧。太阳覆盖同时作用于两颗太阳，不提供
-左太阳／右太阳分别设值的机制。覆盖必须指向至少一侧的所选对象。
-只要某条规则有覆盖，就必须选择 <code class="docutils literal notranslate"><span class="pre">OrbCombination</span></code>；没有覆盖时，<code class="docutils literal notranslate"><span class="pre">combination</span></code> 须为 <code class="docutils literal notranslate"><span class="pre">None</span></code>。
-<a class="reference internal" href="aspects.html#id5"><span class="std std-ref">三种合成方式</span></a>和包含等号的上限，沿用本命配对的算术。</p>
-<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">own_sun</span> <span class="o">=</span> <span class="p">[</span><span class="n">AspectRule</span><span class="p">(</span><span class="n">MajorAspect</span><span class="o">.</span><span class="n">CONJUNCTION</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">[</span><span class="n">ObjectOrb</span><span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">SUN</span><span class="p">,</span> <span class="mi">5</span><span class="p">)])]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">adjusted</span> <span class="o">=</span> <span class="n">cross_chart_aspects</span><span class="p">(</span><span class="n">chart_left</span><span class="p">,</span> <span class="n">chart_right</span><span class="p">,</span> <span class="n">own_sun</span><span class="p">,</span>
-<span class="gp">... </span>  <span class="n">combination</span><span class="o">=</span><span class="n">OrbCombination</span><span class="o">.</span><span class="n">MEAN_OF_ORBS</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">adjusted</span><span class="o">.</span><span class="n">hits</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">orb_limit_deg</span>
-<span class="go">5.0</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cross_chart_aspects</span><span class="p">(</span><span class="n">chart_left</span><span class="p">,</span> <span class="n">chart_right</span><span class="p">,</span> <span class="n">rules</span><span class="p">,</span> <span class="n">left_objects</span><span class="o">=</span><span class="p">[])</span><span class="o">.</span><span class="n">hits</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cross_chart_aspects</span><span class="p">(</span><span class="n">chart_left</span><span class="p">,</span> <span class="n">chart_right</span><span class="p">,</span> <span class="n">rules</span><span class="p">,</span> <span class="n">left_objects</span><span class="o">=</span><span class="p">[])</span><span class="o">.</span><span class="n">hits</span>
 <span class="go">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cross_chart_aspects</span><span class="p">(</span><span class="n">chart_left</span><span class="p">,</span> <span class="n">chart_right</span><span class="p">,</span> <span class="p">())</span><span class="o">.</span><span class="n">rules</span>
 <span class="go">()</span>
 </pre></div>
 </div>
-<p>空选择、空规则和没有匹配都会得到空命中，可从结果里的选择与规则区分。
-以下请求即使没有配对也会抛出 <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>：同一侧选择里重复的参与对象、源盘没有的对象、重复相位标识、
-指向未选对象的覆盖、无覆盖却给合成方式，以及有覆盖却未给合成方式。
-调用方序列会复制为不可变元组。</p>
+<p><code class="docutils literal notranslate"><span class="pre">hits=()</span></code> 可能表示选择为空、规则为空，或没有相位匹配；查看结果中记录的对象选择和规则可以区分原因。</p>
+<!-- /usage: cross.selection -->
+<!-- usage: cross.orbs -->
+<p>用 <code class="docutils literal notranslate"><span class="pre">ObjectOrb</span></code> 为某个 <code class="docutils literal notranslate"><span class="pre">Body</span></code>、<code class="docutils literal notranslate"><span class="pre">LunarNode</span></code> 或 <code class="docutils literal notranslate"><span class="pre">Axis</span></code> 单独设置容许度时，这项设置同时作用于两边。
+例如，为太阳设值会同时作用于两颗太阳，不能给左盘太阳和右盘太阳分别设值。
+设置的对象必须在至少一边被选中。只要某条规则为对象单独设置了容许度，就必须用 <code class="docutils literal notranslate"><span class="pre">combination</span></code>
+指定一种 <code class="docutils literal notranslate"><span class="pre">OrbCombination</span></code>；没有单独设置时，<code class="docutils literal notranslate"><span class="pre">combination</span></code> 须为 <code class="docutils literal notranslate"><span class="pre">None</span></code>。<a class="reference internal" href="aspects.html#id5"><span class="std std-ref">三种合成方式</span></a>
+与本命相位相同，偏差的绝对值等于容许度上限时也算命中。</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">own_sun</span> <span class="o">=</span> <span class="p">[</span><span class="n">AspectRule</span><span class="p">(</span><span class="n">MajorAspect</span><span class="o">.</span><span class="n">CONJUNCTION</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">[</span><span class="n">ObjectOrb</span><span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">SUN</span><span class="p">,</span> <span class="mi">5</span><span class="p">)])]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">adjusted</span> <span class="o">=</span> <span class="n">cross_chart_aspects</span><span class="p">(</span><span class="n">chart_left</span><span class="p">,</span> <span class="n">chart_right</span><span class="p">,</span> <span class="n">own_sun</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">combination</span><span class="o">=</span><span class="n">OrbCombination</span><span class="o">.</span><span class="n">MEAN_OF_ORBS</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">adjusted</span><span class="o">.</span><span class="n">hits</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">orb_limit_deg</span>
+<span class="go">5.0</span>
+</pre></div>
+</div>
+<p>以下请求会抛出 <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>，即使没有对象可配对也一样：</p>
+<ul class="simple">
+<li><p>同一侧重复选择对象，或选择该盘没有的对象。</p></li>
+<li><p>规则中重复指定同一种相位，或为两边都未选中的对象设置容许度。</p></li>
+<li><p>为对象单独设置了容许度却未选合成方式，或没有单独设置容许度却给了合成方式。</p></li>
+</ul>
+<p>传入的序列会复制为不可变元组，之后修改原序列不会改变结果。</p>
+<!-- /usage: cross.orbs -->
 </section>
-<section id="id4">
-<h2>读取静态几何<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h2>
-<p>每条命中包含 <code class="docutils literal notranslate"><span class="pre">left_object</span></code>、<code class="docutils literal notranslate"><span class="pre">right_object</span></code>、<code class="docutils literal notranslate"><span class="pre">aspect</span></code>、<code class="docutils literal notranslate"><span class="pre">branch_deg</span></code>、<code class="docutils literal notranslate"><span class="pre">deviation_deg</span></code> 与
-<code class="docutils literal notranslate"><span class="pre">orb_limit_deg</span></code>。<a class="reference internal" href="aspects.html#id3"><span class="std std-ref">分支与偏差的定义</span></a>不变，单位为度。
-返回所有匹配分支，按左位置、右位置、相位角升序及负分支在前排序。宽容许度可能让同一配对符合多个相位
-或两个分支；不会只留最近的一个，也不按显示精度舍入后再判断。</p>
-<p>不设运动字段，也不标入相／离相。两次出生时刻的速率不能描述共同的时间演化。
-偏差为零仍表示静态几何恰好精确，不预测之后的事件。</p>
-<p>源盘须使用相同的黄道、中心及位置坐标约定，不一致时抛出 <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>。当前公开构造器只接纳一种约定：
-热带地心位置，以各盘自身日期的真黄道和
-真春分点为基准。因此，不同日期的春分点基准不同：命中比较的是存储的黄经值，不是两个位置在同一时刻的夹角。
-不转换共同历元。
-不同日期、地点、宫制、模型及软件标签均保留，不因此自动拒绝。
-构造时按来源、选择和规则重算全部命中，拒绝任何差异，不认证所提供天文值或来源标签是否真实。</p>
-<p>Composite／Davison、宫位叠加、行运搜索及解读不属于此 API；不提供独立文本格式化入口。</p>
+<section id="cross-axis-aspects-zh-cn">
+<span id="id5"></span><h2>分别选择两侧四轴<a class="headerlink" href="#cross-axis-aspects-zh-cn" title="Link to this heading">¶</a></h2>
+<p>要让四轴参与比较，在 <code class="docutils literal notranslate"><span class="pre">left_objects</span></code> 或 <code class="docutils literal notranslate"><span class="pre">right_objects</span></code> 中显式选择该盘已有的轴；
+本命相位选择了哪些轴，不影响本次比较。天体和交点保留盘中顺序，所选四轴随后按上升、中天、下降、天底排列。
+每张盘都读取自己的实际轴字段，不用宫头代替，也不借用另一张盘的轴。
+轴与轴可以配对，包括同名轴和对轴；它们仍按各自的标识保留，不会因此合并或丢掉命中。
+给某个轴单独设置容许度时，与给天体设置一样，同时作用于两边的同名轴。</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">astrology</span><span class="w"> </span><span class="kn">import</span> <span class="n">Axis</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">axes</span> <span class="o">=</span> <span class="n">cross_chart_aspects</span><span class="p">(</span><span class="n">chart_left</span><span class="p">,</span> <span class="n">chart_left</span><span class="p">,</span> <span class="n">rules</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">left_objects</span><span class="o">=</span><span class="p">(</span><span class="n">Axis</span><span class="o">.</span><span class="n">ASCENDANT</span><span class="p">,),</span> <span class="n">right_objects</span><span class="o">=</span><span class="p">(</span><span class="n">Axis</span><span class="o">.</span><span class="n">ASCENDANT</span><span class="p">,))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[(</span><span class="n">h</span><span class="o">.</span><span class="n">left_object</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">h</span><span class="o">.</span><span class="n">right_object</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">h</span><span class="o">.</span><span class="n">deviation_deg</span><span class="p">)</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">axes</span><span class="o">.</span><span class="n">hits</span><span class="p">]</span>
+<span class="go">[('ascendant', 'ascendant', 0.0)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">hasattr</span><span class="p">(</span><span class="n">axes</span><span class="o">.</span><span class="n">hits</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">'motion'</span><span class="p">)</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+<p>比较直接读取盘中已有的轴，不重新执行原生天文计算，也不为轴增加距离或运动字段。
+本命相位的选择方法见<a class="reference internal" href="aspects.html#axis-aspects-zh-cn"><span class="std std-ref">本命选四轴</span></a>。</p>
+</section>
+<section id="id6">
+<h2>输出比较文本<a class="headerlink" href="#id6" title="Link to this heading">¶</a></h2>
+<p>用 <code class="docutils literal notranslate"><span class="pre">format_house_overlays</span></code> 输出落宫表，用 <code class="docutils literal notranslate"><span class="pre">format_cross_aspects</span></code> 输出双盘相位表。
+两者都需要传入 <code class="docutils literal notranslate"><span class="pre">load_catalog()</span></code> 返回的知识目录，表中的名称取自这份目录。
+默认输出英文，传 <code class="docutils literal notranslate"><span class="pre">language=&quot;zh-CN&quot;</span></code> 输出中文。</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">astrology</span><span class="w"> </span><span class="kn">import</span> <span class="n">format_house_overlays</span><span class="p">,</span> <span class="n">format_cross_aspects</span><span class="p">,</span> <span class="n">load_catalog</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">catalog</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">format_house_overlays</span><span class="p">(</span><span class="n">overlays</span><span class="p">,</span> <span class="n">catalog</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="s2">"zh-CN"</span><span class="p">))</span>
+<span class="go">双盘落宫</span>
+<span class="go">...</span>
+<span class="go">对象所属盘 | 对象 | 宫位所属盘 | 宫号</span>
+<span class="go">左盘 | 太阳 [sun] | 右盘 | 1</span>
+<span class="go">右盘 | 太阳 [sun] | 左盘 | 1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">format_cross_aspects</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">catalog</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="s2">"zh-CN"</span><span class="p">))</span>
+<span class="go">静态双盘相位</span>
+<span class="go">...</span>
+<span class="go">左盘对象 | 右盘对象 | 相位 | 分支 | 偏差 | 容许度上限</span>
+<span class="go">太阳 [sun] | 太阳 [sun] | 合相 | 0°00'00" | ... | 3°00'00"</span>
+<span class="go">...</span>
+<span class="go">相位规则 / 基础容许度 / 对象单独设置: 合相 / 3°00'00" / 无</span>
+<span class="go">...</span>
+</pre></div>
+</div>
+<p>表格开头列出两张盘各自的宫制、坐标约定、时标值、模型和版本标签，以及本次所选对象。
+落宫表随后逐条列出所属盘和宫号。相位表列出所有匹配分支，同一配对有多条命中时全部保留，
+不添加入相／离相等运动标签；表中还会列出基础容许度、对象单独设置、合成方式和每条命中的实际容许度上限。
+偏差的绝对值等于上限时也算命中。结果为空时，仍能从表中看到对象选择和相位规则。</p>
+<p>分支、偏差和容许度以度、分、秒显示，沿用<a class="reference internal" href="records.html#id4"><span class="std std-ref">整角秒截断规则</span></a>。
+截断只影响显示，不重新判断相位，也不删掉记录。
+目录中所需的名称和译文必须齐备且为当前版本；缺失、过期或对应关系不唯一时会抛出 <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>，
+不会改用另一种语言。表格会转义非打印字符和表格分隔符，只适合阅读，不能用来无损恢复命盘。</p>
+</section>
+<section id="id7">
+<h2>读取静态几何<a class="headerlink" href="#id7" title="Link to this heading">¶</a></h2>
+<p>每条命中用 <code class="docutils literal notranslate"><span class="pre">left_object</span></code> 和 <code class="docutils literal notranslate"><span class="pre">right_object</span></code> 标明两边对象，用 <code class="docutils literal notranslate"><span class="pre">aspect</span></code> 标明相位。
+<code class="docutils literal notranslate"><span class="pre">branch_deg</span></code>、<code class="docutils literal notranslate"><span class="pre">deviation_deg</span></code> 和 <code class="docutils literal notranslate"><span class="pre">orb_limit_deg</span></code> 分别是分支角、偏差和容许度上限，单位均为度，
+定义见<a class="reference internal" href="aspects.html#id3"><span class="std std-ref">分支与偏差</span></a>。
+结果按左盘对象的位置顺序、右盘对象的位置顺序、相位角升序排列，同一相位的负分支在前。
+容许度较宽时，同一配对可能符合多个相位或两个分支，所有匹配都会返回；
+不会只留最近的一个，也不会先按显示精度舍入再判断。</p>
+<p>命中没有运动字段，也不标入相／离相，因为两个出生时刻的速率不能说明这组相位怎样随时间变化。
+偏差为零只表示这次比较的静态几何恰好精确，不预测之后的事件。</p>
+</section>
+<section id="id8">
+<h2>源盘兼容与计算边界<a class="headerlink" href="#id8" title="Link to this heading">¶</a></h2>
+<p>两种比较都要求两张盘使用相同的黄道、中心和位置坐标约定，不一致时会抛出 <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>。
+当前公开构造器只接受热带地心位置，以各盘自身日期的真黄道和真春分点为基准。
+日期不同，春分点基准也就不同。双盘相位直接比较存储的黄经值，不把位置转换到共同历元，
+因此算出的不是两个位置在同一时刻的夹角。</p>
+<p>两张盘可以有不同的日期、地点、宫制、模型和软件标签，这些信息会原样保留，不会仅因不同就拒绝比较。
+构造双盘相位结果时，会按两张盘、所选对象和规则重算全部命中；构造双盘落宫结果时，
+会按两张盘和所选对象重算全部落宫。传入记录只要与重算结果不同，就会被拒绝。
+这些检查不证明所提供天文值或来源标签真实。</p>
+<p>双盘落宫同样直接比较对象在自身日期的已存黄经与另一张盘的宫头，不转换到共同历元，
+也不考虑对象纬度来计算三维落宫。
+两种操作在输出为空时仍检查请求。它们不执行天文计算、时区解析、版本查询或资源 I/O；
+格式化函数使用调用方传入的目录。</p>
+<p>Composite／Davison、行运搜索及解读不属于这些操作。</p>
 </section>
 </section>
 
@@ -148,7 +263,9 @@
 <li class="toctree-l2"><a class="reference internal" href="configuration.html">排盘请求配置</a></li>
 <li class="toctree-l2"><a class="reference internal" href="chart.html">本命盘</a></li>
 <li class="toctree-l2"><a class="reference internal" href="aspects.html">相位</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">静态双盘交叉相位</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">双盘相位与落宫</a></li>
+<li class="toctree-l2"><a class="reference internal" href="summaries.html">星座分布与出生月相</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dignities.html">传统星座守护与四种状态</a></li>
 <li class="toctree-l2"><a class="reference internal" href="records.html">命盘结果与文本显示</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference.html">公开 API 参考</a></li>
 <li class="toctree-l2"><a class="reference internal" href="architecture.html">仓库结构与计算边界</a></li>
@@ -167,7 +284,7 @@
   <li><a href="../index.html">Documentation overview</a><ul>
   <li><a href="index.html">文档入口</a><ul>
       <li>Previous: <a href="aspects.html" title="previous chapter">相位</a></li>
-      <li>Next: <a href="records.html" title="next chapter">命盘结果与文本显示</a></li>
+      <li>Next: <a href="summaries.html" title="next chapter">星座分布与出生月相</a></li>
   </ul></li>
   </ul></li>
 </ul>

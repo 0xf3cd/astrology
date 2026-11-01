@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>仓库结构与计算边界 &#8212; celestial-astrology 0.2.0 documentation / 文档</title>
+    <title>仓库结构与计算边界 &#8212; celestial-astrology 0.3.0 documentation / 文档</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
-    <script src="../../_static/documentation_options.js?v=938c9ccc"></script>
+    <script src="../../_static/documentation_options.js?v=e259d695"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/zh-CN/architecture.html" />
@@ -47,6 +47,7 @@
 <p>建议采用下面的包布局。首次功能出现时才建立对应模块；目录图里的名字不要求预建空包或额外层次。</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>src/astrology/
   birth.py          原始出生记录与已解析时刻
+  objects.py        天体、交点及四轴身份；按使用方区分接纳范围
   config.py         请求的排盘口径与流派选择
   celestial.py      celestial-calendar 的具体适配
   zodiac.py         黄道定义与星座归属
@@ -54,6 +55,10 @@
   aspects.py        相位定义、容许度与局部运动
   chart.py          组合与不可变命盘结果
   cross_aspects.py  静态比较给定命盘，保留双侧来源
+  house_overlays.py 给定命盘之间的双向落宫
+  lunar_phase.py    有向日月弧及具名月相类型
+  dignities.py      传统星座守护及入庙、擢升、失势、落陷判断
+  summaries.py      显式选定对象的统计及给定命盘摘要
   text.py           用传入词汇显示结果表格
   knowledge/        概念、来源、条目及独立查询
 tests/              领域测试与真实安装消费测试
@@ -63,8 +68,15 @@ docs/zh-CN/         对应的中文指南与说明
 </div>
 <p>可执行定义归各自领域模块。<code class="docutils literal notranslate"><span class="pre">chart.py</span></code> 负责组合及完整命盘的成功条件，不收容所有共享定义。
 有真实共同使用方时才提取共享值模块。包导入与知识查询不得初始化 celestial。</p>
-<p><code class="docutils literal notranslate"><span class="pre">cross_aspects.py</span></code> 组合已有命盘结果，不调用天文库。共享角度／容许度算术仍归 <code class="docutils literal notranslate"><span class="pre">aspects.py</span></code>；
-单盘配对准入及局部运动仍由 <code class="docutils literal notranslate"><span class="pre">find_aspects</span></code> 负责，与静态双盘配对分开。</p>
+<p><code class="docutils literal notranslate"><span class="pre">cross_aspects.py</span></code> 用两张已有命盘计算静态相位，不调用天文库。
+它与单盘相位共用 <code class="docutils literal notranslate"><span class="pre">aspects.py</span></code> 的角度和容许度计算，但单盘允许哪些对象配对、怎样判断局部运动，
+仍由 <code class="docutils literal notranslate"><span class="pre">find_aspects</span></code> 单独处理。<code class="docutils literal notranslate"><span class="pre">house_overlays.py</span></code> 则把一张盘的黄经和另一张盘的宫头交给
+<code class="docutils literal notranslate"><span class="pre">house_of</span></code>，得到两个方向的落宫结果。</p>
+<p><code class="docutils literal notranslate"><span class="pre">objects.py</span></code> 定义天体、交点和四轴的标识。其中一组类型只接纳天体和交点，
+相位和双盘落宫使用的类型还接纳四轴。
+天文适配层负责把这些标识映射到天文计算目标，文本层负责从传入目录中查询名称。
+<code class="docutils literal notranslate"><span class="pre">chart.py</span></code> 为本命相位、静态双盘相位和双盘落宫提取所选对象的已存黄经，
+也负责检查双盘比较的坐标约定是否一致、对象选择是否合法。</p>
 <p>知识与计算通过稳定标识关联，见<a class="reference internal" href="knowledge.html"><span class="std std-doc">知识组织</span></a>。后续界面应用消费已有结果，
 不必把计算搬到前端。</p>
 </section>
@@ -168,7 +180,9 @@ Equal 和 Whole Sign 同样保留上游对四轴无定义情形的限制，不�
 <li class="toctree-l2"><a class="reference internal" href="configuration.html">排盘请求配置</a></li>
 <li class="toctree-l2"><a class="reference internal" href="chart.html">本命盘</a></li>
 <li class="toctree-l2"><a class="reference internal" href="aspects.html">相位</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cross_aspects.html">静态双盘交叉相位</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cross_aspects.html">双盘相位与落宫</a></li>
+<li class="toctree-l2"><a class="reference internal" href="summaries.html">星座分布与出生月相</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dignities.html">传统星座守护与四种状态</a></li>
 <li class="toctree-l2"><a class="reference internal" href="records.html">命盘结果与文本显示</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference.html">公开 API 参考</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">仓库结构与计算边界</a></li>

@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Natal charts &#8212; celestial-astrology 0.2.0 documentation / 文档</title>
+    <title>Natal charts &#8212; celestial-astrology 0.3.0 documentation / 文档</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
-    <script src="../../_static/documentation_options.js?v=938c9ccc"></script>
+    <script src="../../_static/documentation_options.js?v=e259d695"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/en/chart.html" />
@@ -44,6 +44,7 @@ choices, the astronomical values and their provenance apart. The aspects a
 request asks for are in <code class="docutils literal notranslate"><span class="pre">chart.aspects</span></code>; the <a class="reference internal" href="aspects.html"><span class="std std-doc">aspect guide</span></a> explains them.</p>
 <section id="calculate-one-chart">
 <h2>Calculate one chart<a class="headerlink" href="#calculate-one-chart" title="Link to this heading">¶</a></h2>
+<!-- usage: chart.calculation -->
 <p>Prepare the input first. A chart needs a known clock, an explicit timezone and
 a location; the <a class="reference internal" href="birth.html"><span class="std std-doc">birth guide</span></a> explains that preparation.</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">date</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">timedelta</span>
@@ -64,6 +65,7 @@ a location; the <a class="reference internal" href="birth.html"><span class="std
 <span class="go">'placidus'</span>
 </pre></div>
 </div>
+<!-- /usage: chart.calculation -->
 <p>Positions are apparent geocentric ecliptic longitudes and latitudes of date.
 The result keeps the unrounded values; the derived sign and house follow from
 them.</p>
@@ -82,9 +84,9 @@ them.</p>
 </section>
 <section id="keep-the-models-and-the-conventions">
 <h2>Keep the models and the conventions<a class="headerlink" href="#keep-the-models-and-the-conventions" title="Link to this heading">¶</a></h2>
-<p>The requested configuration and the effective configuration are separate
-values. The adapter fixes the ΔT model; it is not a caller request, and the
-result names it anyway.</p>
+<p><code class="docutils literal notranslate"><span class="pre">chart.requested</span></code> keeps the configuration you supplied; <code class="docutils literal notranslate"><span class="pre">chart.effective</span></code> records
+the settings actually used. For example, the adapter fixes the ΔT model, so you
+cannot select it in a request, but you can read its name from the result.</p>
 <p>The result also keeps the actual input in <code class="docutils literal notranslate"><span class="pre">chart.resolved</span></code> and the astrology
 package version in <code class="docutils literal notranslate"><span class="pre">chart.provenance.astrology_version</span></code>. See the <a class="reference internal" href="records.html"><span class="std std-doc">result guide</span></a>
 for structured results and bilingual text output.</p>
@@ -178,9 +180,10 @@ truncation, so a displayed value never shows the next sign.</p>
 </section>
 <section id="fail-explicitly">
 <h2>Fail explicitly<a class="headerlink" href="#fail-explicitly" title="Link to this heading">¶</a></h2>
-<p>The adapter rejects input it can judge before the astronomy library is asked,
-and reports an upstream failure without inventing a substitute. Nothing is
-returned partially, and the requested house system is never replaced.</p>
+<p>When input falls outside the calculation’s requirements, <code class="docutils literal notranslate"><span class="pre">natal_chart</span></code> raises an
+error without returning a partial chart or switching house systems. The adapter
+checks known restrictions before calling the astronomy library; the library
+reports any remaining calculation failures.</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">astrology</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChartDomainError</span><span class="p">,</span> <span class="n">MissingBirthDataError</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">polar</span> <span class="o">=</span> <span class="n">BirthRecord</span><span class="p">(</span>
 <span class="gp">... </span>  <span class="n">date</span><span class="p">(</span><span class="mi">2003</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">17</span><span class="p">),</span> <span class="n">time</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">FixedOffset</span><span class="p">(</span><span class="n">timedelta</span><span class="p">(</span><span class="mi">0</span><span class="p">)),</span>
@@ -231,9 +234,10 @@ as such.</p>
 </tr>
 </tbody>
 </table>
-<p>The classification never depends on reading the upstream message. A failure
-raised before the library is called carries no upstream detail; a failure
-raised by the library carries the operation and the recording status.</p>
+<p>The error type is not determined by parsing the astronomy library’s message text.
+Errors detected before calling that library carry no upstream details. Failures
+reported by it record the operation name (<code class="docutils literal notranslate"><span class="pre">operation</span></code>) and recording status
+(<code class="docutils literal notranslate"><span class="pre">recorded</span></code>), as below:</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">high</span> <span class="o">=</span> <span class="n">prepare_natal_input</span><span class="p">(</span><span class="n">BirthRecord</span><span class="p">(</span>
 <span class="gp">... </span>  <span class="n">date</span><span class="p">(</span><span class="mi">1990</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">21</span><span class="p">),</span> <span class="n">time</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">FixedOffset</span><span class="p">(</span><span class="n">timedelta</span><span class="p">(</span><span class="mi">0</span><span class="p">)),</span>
 <span class="gp">... </span>  <span class="n">Location</span><span class="p">(</span><span class="mf">69.65</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span> <span class="n">TimePrecision</span><span class="o">.</span><span class="n">SECOND</span><span class="p">,</span> <span class="p">{</span><span class="s2">"record"</span><span class="p">:</span> <span class="s2">"synthetic"</span><span class="p">},</span>
@@ -250,9 +254,11 @@ raised by the library carries the operation and the recording status.</p>
 </section>
 <section id="select-objects-without-widening-the-domain">
 <h2>Select objects without widening the domain<a class="headerlink" href="#select-objects-without-widening-the-domain" title="Link to this heading">¶</a></h2>
-<p>The astronomy library evaluates the fourteen-object snapshot and the house
-geometry together. Selecting fewer objects filters that output; it does not
-narrow the evaluated domain, and the result says so.</p>
+<p>The astronomy library calculates positions for fourteen objects together with the
+houses on every call. <code class="docutils literal notranslate"><span class="pre">objects</span></code> only selects which objects to return; it does not
+skip the other objects or the house calculation. Selecting fewer objects therefore
+does not widen the supported range of times or locations. <code class="docutils literal notranslate"><span class="pre">effective.evaluation</span></code>
+records this calculation method:</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">one</span> <span class="o">=</span> <span class="n">natal_chart</span><span class="p">(</span><span class="n">resolved</span><span class="p">,</span> <span class="n">ChartConfig</span><span class="p">(</span><span class="n">HouseSystem</span><span class="o">.</span><span class="n">WHOLE_SIGN</span><span class="p">,</span> <span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">SUN</span><span class="p">,),</span> <span class="p">()))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">one</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span>
 <span class="go">1</span>
@@ -263,33 +269,21 @@ narrow the evaluated domain, and the result says so.</p>
 </section>
 <section id="check-the-result-against-an-independent-reference">
 <h2>Check the result against an independent reference<a class="headerlink" href="#check-the-result-against-an-independent-reference" title="Link to this heading">¶</a></h2>
-<p>The reference cases in <code class="docutils literal notranslate"><span class="pre">tests/reference/natal_reference.json</span></code> compare two
-instants, one per hemisphere, with JPL Horizons. Under matched conventions the
-checks require agreement within 3 arcseconds for the Sun and the planets, 15 for
-the Moon, 1 arcsecond in latitude (3 for the Moon) and 0.001 degrees for the
-axes. The Placidus cusps 2, 3, 11 and 12 are held to the same 0.001 degrees
-against the Placidus definition, evaluated at the Horizons sidereal time. The
-node check reimplements the Meeus chapter 47 formulas that the library also
-uses, and the leap-second relation <code class="docutils literal notranslate"><span class="pre">JDE(TT)</span> <span class="pre">-</span> <span class="pre">JD(UTC)</span></code> is exact. The
-<a class="reference internal" href="contributing.html#correctness"><span class="std std-ref">contributing guide</span></a> records what each reference
-can and cannot detect.</p>
-<p>Separate complete-chart cases compare against Swiss states, rates and all twelve
-cusps, with independent derived placements/aspects. Their conventions, tolerances
-and limits are in the <a class="reference internal" href="records.html#verification-and-limits"><span class="std std-ref">result guide</span></a>.</p>
+<p>Tests compare the calculated positions with JPL Horizons data and use Swiss
+Ephemeris results to check complete charts. These tests cover a limited set of
+instants and do not guarantee accuracy over the full supported range. See the
+<a class="reference internal" href="contributing.html#correctness"><span class="std std-ref">contributing guide</span></a> for methods, tolerances and reference-data limits.</p>
 </section>
 <section id="limits">
 <h2>Limits<a class="headerlink" href="#limits" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Requested aspects are judged among the participating objects; the
 <a class="reference internal" href="aspects.html"><span class="std std-doc">aspect guide</span></a> explains the rules and their limits.</p></li>
-<li><p>The Horizons fixture itself has no external cusp values; its checks against the
-Placidus definition can share a misreading with the library. The separate Swiss
-fixture checks the complete geometry but has its own time-model differences.</p></li>
 <li><p>The astronomy library supports civil years 1885 to 2099 and, for UTC input,
 instants from 1972-01-01; the ephemeris range is narrower than the civil
 range, and an instant outside it fails explicitly.</p></li>
 <li><p>Installs need a platform with a celestial-calendar wheel; see
-<a class="reference internal" href="contributing.html#run-the-checks"><span class="std std-ref">contributing</span></a>.</p></li>
+<a class="reference internal" href="../../README.html#install-a-release"><span class="std std-ref">installation</span></a>.</p></li>
 </ul>
 </section>
 </section>
@@ -327,7 +321,9 @@ range, and an instant outside it fails explicitly.</p></li>
 <li class="toctree-l2"><a class="reference internal" href="configuration.html">Requested chart configuration</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Natal charts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="aspects.html">Aspects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cross_aspects.html">Static cross-chart aspects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cross_aspects.html">Cross-chart aspects and house overlays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="summaries.html">Sign distributions and natal lunar phase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dignities.html">Traditional sign rulers and four statuses</a></li>
 <li class="toctree-l2"><a class="reference internal" href="records.html">Chart results and text</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference.html">Public API reference</a></li>
 <li class="toctree-l2"><a class="reference internal" href="architecture.html">Repository structure and calculation boundaries</a></li>

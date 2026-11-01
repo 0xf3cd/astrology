@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>发行说明 &#8212; celestial-astrology 0.2.0 documentation / 文档</title>
+    <title>发行说明 &#8212; celestial-astrology 0.3.0 documentation / 文档</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
-    <script src="../../_static/documentation_options.js?v=938c9ccc"></script>
+    <script src="../../_static/documentation_options.js?v=e259d695"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/zh-CN/releases.html" />
@@ -37,10 +37,29 @@
   <section id="id1">
 <h1>发行说明<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h1>
 <p><a class="reference internal" href="../en/releases.html"><span class="std std-doc">English</span></a> · <a class="reference internal" href="index.html"><span class="std std-doc">文档</span></a> · <a class="reference internal" href="releasing.html"><span class="std std-doc">发行流程</span></a></p>
-<section id="v0-2-0">
-<h2>下一版：v0.2.0（未发布）<a class="headerlink" href="#v0-2-0" title="Link to this heading">¶</a></h2>
 <section id="id2">
-<h3>静态双盘交叉相位<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h3>
+<h2>0.3.0<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<p>此版本增加本命分析、四轴相位选择和双盘落宫功能。
+已发布文件见 <a class="reference external" href="https://pypi.org/project/celestial-astrology/0.3.0/">PyPI</a>；
+若尚未列出此版本，请<a class="reference internal" href="../../README.zh-CN.html#id2"><span class="std std-ref">从源码安装</span></a>。</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="summaries.html"><span class="std std-doc">元素／模式分布</span></a>：等权统计明确选择的对象，保留零计数类别、计数及比例。</p></li>
+<li><p><a class="reference internal" href="summaries.html"><span class="std std-doc">出生月相</span></a>：按具名的 Rudhyar 规则及本项目说明的区间边界，对日月黄经角度分类。</p></li>
+<li><p><a class="reference internal" href="dignities.html"><span class="std std-doc">传统守护与尊贵状态</span></a>：按 Lilly 的固定规则查询星座守护星、宫主星，以及入庙、擢升、失势和落陷。</p></li>
+<li><p><a class="reference internal" href="aspects.html#axis-aspects-zh-cn"><span class="std std-ref">四轴相位</span></a>：本命及静态双盘查询可显式选择上升点、中天、下降点和天底。
+缺少的轴速率仍表示为缺失，不补成零。</p></li>
+<li><p><a class="reference internal" href="cross_aspects.html"><span class="std std-doc">双盘落宫和双语比较文本</span></a>：保留两张源盘，区分左右对象和接收对象的宫位。</p></li>
+</ul>
+<p>此前源码快照中的 SVG 功能已删除。命盘计算、结构化结果和双语文本输出仍可使用。</p>
+<p>指南按首次使用、具体 API 用法及验证细节分层。发行检查除了源码文字，还检查包描述和生成的双语页面。
+<a class="reference internal" href="releasing.html"><span class="std std-doc">发行流程</span></a>区分自动保护和维护者验收，并说明如何在发布部分失败后补齐交付而不替换已发布文件。</p>
+<p>天文模型、Python／平台支持和运行依赖钉版与 0.2.0 相同。
+本版不增加行运、返照、构造关系盘或交互式排盘界面。</p>
+</section>
+<section id="id3">
+<h2>0.2.0<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
+<section id="id4">
+<h3>静态双盘交叉相位<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">cross_chart_aspects</span></code> 用显式规则比较两张内存本命盘结果。<code class="docutils literal notranslate"><span class="pre">CrossAspectHit</span></code> 记录静态几何并区分左右端点，
 <code class="docutils literal notranslate"><span class="pre">CrossChartAspects</span></code> 保留双侧完整来源及比较请求。允许同名对象和交点间跨盘配对，
 不设运动字段，也不转换共同历元。见<a class="reference internal" href="cross_aspects.html"><span class="std std-doc">双盘指南</span></a>。</p>
@@ -50,9 +69,9 @@
 <p><code class="docutils literal notranslate"><span class="pre">ashmand_sign_group</span></code> 将已有 <code class="docutils literal notranslate"><span class="pre">Sign</span></code> 归入一个 <code class="docutils literal notranslate"><span class="pre">AshmandSignGroup</span></code>：至点、分点、固定或双体星座。
 十二星座的完整分组表、历史命名说明、原文摘录和中文译文见<a class="reference internal" href="knowledge.html#ashmand-sign-groups-zh-cn"><span class="std std-ref">知识指南</span></a>。</p>
 </section>
-<section id="id3">
-<h3>不兼容变化：撤回命盘持久化<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h3>
-<p>下一版删除 <code class="docutils literal notranslate"><span class="pre">dumps_chart</span></code>、<code class="docutils literal notranslate"><span class="pre">loads_chart</span></code>、<code class="docutils literal notranslate"><span class="pre">recompute_chart</span></code>、<code class="docutils literal notranslate"><span class="pre">ChartRecordError</span></code>、
+<section id="id5">
+<h3>不兼容变化：撤回命盘持久化<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h3>
+<p>此版本删除了 <code class="docutils literal notranslate"><span class="pre">dumps_chart</span></code>、<code class="docutils literal notranslate"><span class="pre">loads_chart</span></code>、<code class="docutils literal notranslate"><span class="pre">recompute_chart</span></code>、<code class="docutils literal notranslate"><span class="pre">ChartRecordError</span></code>、
 <code class="docutils literal notranslate"><span class="pre">ChartReplayError</span></code> 及 <code class="docutils literal notranslate"><span class="pre">astrology.serialization</span></code> 模块。命盘保存格式与历史记录兼容政策一并撤回，
 不提供替代格式或兼容壳，包不再读取已保存的命盘 JSON。应用若仍需旧 API，可保留已发布的
 v0.1.0 环境；其标签和制品不变。</p>
@@ -61,8 +80,8 @@ v0.1.0 环境；其标签和制品不变。</p>
 这次删除不改变天文计算、时区政策或依赖钉版。</p>
 </section>
 </section>
-<section id="id4">
-<h2>0.1.0<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h2>
+<section id="id6">
+<h2>0.1.0<a class="headerlink" href="#id6" title="Link to this heading">¶</a></h2>
 <p>首版提供现代热带黄道、地心本命盘，以及可独立浏览的中英文知识目录。
 安装分发包 <code class="docutils literal notranslate"><span class="pre">celestial-astrology</span></code>，Python 导入名仍是 <code class="docutils literal notranslate"><span class="pre">astrology</span></code>。</p>
 <section id="api">
@@ -81,8 +100,8 @@ v0.1.0 环境；其标签和制品不变。</p>
 </ul>
 <p><a class="reference internal" href="chart.html"><span class="std std-doc">排盘</span></a>、<a class="reference internal" href="aspects.html"><span class="std std-doc">相位</span></a>、<a class="reference external" href="https://github.com/0xf3cd/astrology/blob/6b3293fae94b2f61e89a1d95778464f307c0d373/docs/zh-CN/records.md">v0.1.0 记录</a>及<a class="reference internal" href="knowledge.html"><span class="std std-doc">知识</span></a>指南定义本项目采用的约定和收录的语料范围。</p>
 </section>
-<section id="id5">
-<h3>安装与兼容<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h3>
+<section id="id7">
+<h3>安装与兼容<a class="headerlink" href="#id7" title="Link to this heading">¶</a></h3>
 <p>支持 Python 3.11–3.14。运行依赖精确固定为 <code class="docutils literal notranslate"><span class="pre">celestial-calendar==0.8.0</span></code> 和 <code class="docutils literal notranslate"><span class="pre">tzdata==2026.5</span></code>。
 这保留了选定的模型和时区数据，但可能无法与要求其他版本的应用共同安装。
 本版不升级到 celestial 0.9，也不放宽依赖范围。</p>
@@ -94,8 +113,8 @@ astrology wheel 的 <code class="docutils literal notranslate"><span class="pre"
 能恢复历史记录，不表示能在 <code class="docutils literal notranslate"><span class="pre">0.1.0</span></code> 下重算；版本或模型不匹配会抛出 <code class="docutils literal notranslate"><span class="pre">ChartReplayError</span></code>。
 详见 <a class="reference external" href="https://github.com/0xf3cd/astrology/blob/6b3293fae94b2f61e89a1d95778464f307c0d373/docs/zh-CN/records.md">v0.1.0 记录指南</a>。</p>
 </section>
-<section id="id6">
-<h3>验证与限制<a class="headerlink" href="#id6" title="Link to this heading">¶</a></h3>
+<section id="id8">
+<h3>验证与限制<a class="headerlink" href="#id8" title="Link to this heading">¶</a></h3>
 <p>完整质量工作流覆盖 Linux Python 3.11／3.14 及 macOS／Windows 3.14。
 发行安装消费者在 Linux x86_64 3.11／3.12／3.13／3.14、Linux ARM64 3.14、
 macOS ARM64 3.14 和 Windows amd64 3.14 上使用同一份保留的 wheel。
@@ -147,7 +166,9 @@ macOS ARM64 3.14 和 Windows amd64 3.14 上使用同一份保留的 wheel。
 <li class="toctree-l2"><a class="reference internal" href="configuration.html">排盘请求配置</a></li>
 <li class="toctree-l2"><a class="reference internal" href="chart.html">本命盘</a></li>
 <li class="toctree-l2"><a class="reference internal" href="aspects.html">相位</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cross_aspects.html">静态双盘交叉相位</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cross_aspects.html">双盘相位与落宫</a></li>
+<li class="toctree-l2"><a class="reference internal" href="summaries.html">星座分布与出生月相</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dignities.html">传统星座守护与四种状态</a></li>
 <li class="toctree-l2"><a class="reference internal" href="records.html">命盘结果与文本显示</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference.html">公开 API 参考</a></li>
 <li class="toctree-l2"><a class="reference internal" href="architecture.html">仓库结构与计算边界</a></li>

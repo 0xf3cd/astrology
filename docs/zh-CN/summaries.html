@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>星座分布与出生月相 &#8212; celestial-astrology 0.3.0 documentation / 文档</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
+    <script src="../../_static/documentation_options.js?v=e259d695"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/zh-CN/summaries.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="传统星座守护与四种状态" href="dignities.html" />
+    <link rel="prev" title="双盘相位与落宫" href="cross_aspects.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="id1">
+<h1>星座分布与出生月相<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h1>
+<p><a class="reference internal" href="../en/summaries.html"><span class="std std-doc">English</span></a> · <a class="reference internal" href="reference.html"><span class="std std-doc">API</span></a> · <a class="reference internal" href="knowledge.html"><span class="std std-doc">知识</span></a></p>
+<p>这些接口自 0.3.0 起提供；包索引可用性与源码安装见<a class="reference internal" href="../../README.zh-CN.html#id1"><span class="std std-ref">安装说明</span></a>。它们对给定值分类，不调用天文库，
+也不改变源盘。格式化函数接受已加载的目录，不读取资源。</p>
+<section id="id2">
+<h2>查星座分类并统计所选对象<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<!-- usage: summaries.population -->
+<p>把要统计的落点传给 <code class="docutils literal notranslate"><span class="pre">sign_distribution</span></code>。本例对太阳和月亮等权计数，并输出全部元素和模式类别：</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">astrology</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">Body</span><span class="p">,</span> <span class="n">Element</span><span class="p">,</span> <span class="n">Modality</span><span class="p">,</span> <span class="n">Placement</span><span class="p">,</span> <span class="n">Sign</span><span class="p">,</span> <span class="n">element_of</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">modality_of</span><span class="p">,</span> <span class="n">sign_distribution</span><span class="p">,</span> <span class="n">format_sign_distribution</span><span class="p">,</span> <span class="n">load_catalog</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">element_of</span><span class="p">(</span><span class="n">Sign</span><span class="o">.</span><span class="n">ARIES</span><span class="p">)</span> <span class="ow">is</span> <span class="n">Element</span><span class="o">.</span><span class="n">FIRE</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">modality_of</span><span class="p">(</span><span class="n">Sign</span><span class="o">.</span><span class="n">CANCER</span><span class="p">)</span> <span class="ow">is</span> <span class="n">Modality</span><span class="o">.</span><span class="n">CARDINAL</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">placements</span> <span class="o">=</span> <span class="p">[</span><span class="n">Placement</span><span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">SUN</span><span class="p">,</span> <span class="n">Sign</span><span class="o">.</span><span class="n">ARIES</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+<span class="gp">... </span>              <span class="n">Placement</span><span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">MOON</span><span class="p">,</span> <span class="n">Sign</span><span class="o">.</span><span class="n">CANCER</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">4</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">sign_distribution</span><span class="p">(</span><span class="n">placements</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">placements</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span><span class="o">.</span><span class="n">objects</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">total</span>
+<span class="go">((&lt;Body.SUN: 'sun'&gt;, &lt;Body.MOON: 'moon'&gt;), 2)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span><span class="o">.</span><span class="n">element_counts</span><span class="p">[</span><span class="n">Element</span><span class="o">.</span><span class="n">FIRE</span><span class="p">],</span> <span class="n">result</span><span class="o">.</span><span class="n">element_proportions</span><span class="p">[</span><span class="n">Element</span><span class="o">.</span><span class="n">FIRE</span><span class="p">]</span>
+<span class="go">(1, 0.5)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span><span class="o">.</span><span class="n">modality_counts</span><span class="p">[</span><span class="n">Modality</span><span class="o">.</span><span class="n">CARDINAL</span><span class="p">]</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">catalog</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">format_sign_distribution</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">catalog</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="s2">"zh-CN"</span><span class="p">))</span>
+<span class="go">星座分布（等权计数）</span>
+<span class="go">计数对象: 太阳 [sun], 月亮 [moon]</span>
+<span class="go">总数 / 分母: 2</span>
+<span class="go">规则: rule.zodiac.elements, rule.zodiac.modalities</span>
+<span class="go">类别 | 计数 / 总数 | 比例</span>
+<span class="go">火元素 | 1/2 | 50.00%</span>
+<span class="go">土元素 | 0/2 | 0.00%</span>
+<span class="go">风元素 | 0/2 | 0.00%</span>
+<span class="go">水元素 | 1/2 | 50.00%</span>
+<span class="go">基本模式 | 2/2 | 100.00%</span>
+<span class="go">固定模式 | 0/2 | 0.00%</span>
+<span class="go">变动模式 | 0/2 | 0.00%</span>
+</pre></div>
+</div>
+<p>每个所选对象计一次，总数保存在 <code class="docutils literal notranslate"><span class="pre">total</span></code> 中，也是所有比例的分母。上例共两个对象，
+太阳属于火元素，月亮属于水元素，所以两类各占 50%；它们都属于基本模式，所以基本模式占 100%。
+所有类别都会列出，包括计数为零的类别。百分比显示为两位小数，同时保留计数和总数。
+这里不设置行星权重，也不计算主导评分。</p>
+<p><code class="docutils literal notranslate"><span class="pre">sign_distribution</span></code> 与 <code class="docutils literal notranslate"><span class="pre">SignDistribution</span></code> 将序列复制为不可变的落点元组，保留输入顺序。
+空集合或重复身份抛出 <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>；<code class="docutils literal notranslate"><span class="pre">None</span></code>、迭代器和非 <code class="docutils literal notranslate"><span class="pre">Placement</span></code> 成员抛出 <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>。
+直接传入 <code class="docutils literal notranslate"><span class="pre">Placement</span></code> 时，请先确认这些落点的数据来源一致；函数本身不会核实来源。
+计数、比例和总数都由保存的落点推导，不能另传一个不同的总数。
+<code class="docutils literal notranslate"><span class="pre">element_of</span></code> 和 <code class="docutils literal notranslate"><span class="pre">modality_of</span></code> 只接受 <code class="docutils literal notranslate"><span class="pre">Sign</span></code>，不接受字符串或其他枚举。</p>
+<!-- /usage: summaries.population -->
+<p>分类来源及它们与历史星座分组的区别，见<a class="reference internal" href="knowledge.html#id6"><span class="std std-ref">知识说明</span></a>。</p>
+</section>
+<section id="id3">
+<h2>对给定日月位置分类<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
+<!-- usage: summaries.lunar_phase -->
+<p>按太阳在前、月亮在后的顺序传入黄经，单位为度；两者须采用同一时刻和坐标约定。
+函数沿黄经递增方向，从太阳量到月亮，返回这个角度和对应的月相类型：</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">astrology</span><span class="w"> </span><span class="kn">import</span> <span class="n">lunar_phase</span><span class="p">,</span> <span class="n">format_lunar_phase</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">phase</span> <span class="o">=</span> <span class="n">lunar_phase</span><span class="p">(</span><span class="n">sun_longitude_deg</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">moon_longitude_deg</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">phase</span><span class="o">.</span><span class="n">elongation_deg</span><span class="p">,</span> <span class="n">phase</span><span class="o">.</span><span class="n">phase</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">phase</span><span class="o">.</span><span class="n">direction</span>
+<span class="go">(20.0, 'new_moon', 'waxing')</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">format_lunar_phase</span><span class="p">(</span><span class="n">phase</span><span class="p">,</span> <span class="n">catalog</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="s2">"zh-CN"</span><span class="p">))</span>
+<span class="go">月相类型: 新月型</span>
+<span class="go">月亮减太阳（黄经，度）: 20.0</span>
+<span class="go">角度方向: 盈</span>
+<span class="go">规则: rule.lunation.rudhyar1950</span>
+<span class="go">每型覆盖一段区间，不表示精确事件；不计算照亮比例。</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lunar_phase</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">350</span><span class="p">)</span><span class="o">.</span><span class="n">direction</span><span class="p">,</span> <span class="n">lunar_phase</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">180</span><span class="p">)</span><span class="o">.</span><span class="n">direction</span>
+<span class="go">('waning', 'turning')</span>
+</pre></div>
+</div>
+<p>有向差为 <code class="docutils literal notranslate"><span class="pre">(月亮</span> <span class="pre">-</span> <span class="pre">太阳)</span> <span class="pre">mod</span> <span class="pre">360</span></code>，单位为度。
+有限的黄经可以超出一圈，计算时会约去整圈。布尔值、字符串及其他类型抛出 <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>，非有限值抛出 <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>。
+传入的数值本身不带时刻或坐标信息，函数无法发现是否混用了不同的坐标约定。</p>
+<p>参见<a class="reference internal" href="catalog.html#catalog-zh-cn-rule-lunation-rudhyar1950"><span class="std std-ref">生成区间表</span></a>和<a class="reference internal" href="knowledge.html#id6"><span class="std std-ref">来源说明</span></a>。
+每型跨度为 45°。本项目采用半开区间：包含起点，不包含终点，恰在边界时归入后一型，360° 回到 0°。
+角度在 <code class="docutils literal notranslate"><span class="pre">(0,</span> <span class="pre">180)</span></code> 内为 <code class="docutils literal notranslate"><span class="pre">waxing</span></code>（盈），在 <code class="docutils literal notranslate"><span class="pre">(180,</span> <span class="pre">360)</span></code> 内为 <code class="docutils literal notranslate"><span class="pre">waning</span></code>（亏），
+恰为 0° 或 180° 时为 <code class="docutils literal notranslate"><span class="pre">turning</span></code>（转折点）。这些端点归属和方向标签由本项目定义。</p>
+<p><code class="docutils literal notranslate"><span class="pre">LunarPhaseResult</span></code> 不可变，类型、方向及规则标识从角度推导；直接构造要求 <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">360)</span></code>。
+20° 的新月型结果不是精确合日。不计算照亮比例、三维相角或精确事件搜索，也不作性格解读。
+方向描述当前弧，不是根据速率作出的运动预测。</p>
+<!-- /usage: summaries.lunar_phase -->
+</section>
+<section id="id4">
+<h2>从已有本命盘组合<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h2>
+<p>下面先用合成资料排一张盘，再用 <code class="docutils literal notranslate"><span class="pre">chart_sign_distribution</span></code> 统计所选对象，
+用 <code class="docutils literal notranslate"><span class="pre">natal_lunar_phase</span></code> 读取出生月相。后两个函数只读取盘中已有的位置和落点，不重新计算天文值：</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">date</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">astrology</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">BirthRecord</span><span class="p">,</span> <span class="n">FixedOffset</span><span class="p">,</span> <span class="n">Location</span><span class="p">,</span> <span class="n">ChartConfig</span><span class="p">,</span> <span class="n">HouseSystem</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">natal_chart</span><span class="p">,</span> <span class="n">prepare_natal_input</span><span class="p">,</span> <span class="n">chart_sign_distribution</span><span class="p">,</span> <span class="n">natal_lunar_phase</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span> <span class="o">=</span> <span class="n">BirthRecord</span><span class="p">(</span><span class="n">date</span><span class="p">(</span><span class="mi">2000</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">time</span><span class="p">(</span><span class="mi">12</span><span class="p">),</span> <span class="n">FixedOffset</span><span class="p">(</span><span class="n">timedelta</span><span class="p">(</span><span class="mi">0</span><span class="p">)),</span> <span class="n">Location</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">chart</span> <span class="o">=</span> <span class="n">natal_chart</span><span class="p">(</span><span class="n">prepare_natal_input</span><span class="p">(</span><span class="n">record</span><span class="p">),</span>
+<span class="gp">... </span>    <span class="n">ChartConfig</span><span class="p">(</span><span class="n">HouseSystem</span><span class="o">.</span><span class="n">WHOLE_SIGN</span><span class="p">,</span> <span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">SUN</span><span class="p">,</span> <span class="n">Body</span><span class="o">.</span><span class="n">MOON</span><span class="p">),</span> <span class="p">()))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">summary</span> <span class="o">=</span> <span class="n">chart_sign_distribution</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="n">objects</span><span class="o">=</span><span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">MOON</span><span class="p">,</span> <span class="n">Body</span><span class="o">.</span><span class="n">SUN</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">summary</span><span class="o">.</span><span class="n">objects</span> <span class="o">==</span> <span class="n">chart</span><span class="o">.</span><span class="n">requested</span><span class="o">.</span><span class="n">objects</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">summary</span><span class="o">.</span><span class="n">total</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">natal_lunar_phase</span><span class="p">(</span><span class="n">chart</span><span class="p">)</span> <span class="o">==</span> <span class="n">lunar_phase</span><span class="p">(</span><span class="n">chart</span><span class="o">.</span><span class="n">positions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">longitude_deg</span><span class="p">,</span>
+<span class="gp">... </span>                                      <span class="n">chart</span><span class="o">.</span><span class="n">positions</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">longitude_deg</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">objects</span></code> 必填且非空。<code class="docutils literal notranslate"><span class="pre">None</span></code>、字符串或错误身份类型抛出 <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>，重复或不可用身份抛出
+<code class="docutils literal notranslate"><span class="pre">ValueError</span></code>。结果按源盘顺序，而非选择顺序排列。统计全部请求对象时，须显式传
+<code class="docutils literal notranslate"><span class="pre">objects=chart.requested.objects</span></code>。不加入未选天体、交点或四轴。四轴不是落点，即使显式选择也不能参与这项统计。
+<code class="docutils literal notranslate"><span class="pre">natal_lunar_phase</span></code> 要求日月齐备；
+缺位置抛出 <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> 并列出缺失身份，不补算。两个入口对非 <code class="docutils literal notranslate"><span class="pre">NatalChart</span></code> 输入均抛出
+<code class="docutils literal notranslate"><span class="pre">TypeError</span></code>。这些检查在 <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-O</span></code> 下同样有效。</p>
+<p>目录条目仍是 <code class="docutils literal notranslate"><span class="pre">reference_only</span></code>，已声明完整前提 <code class="docutils literal notranslate"><span class="pre">complete</span></code>，而命盘适用性为 <code class="docutils literal notranslate"><span class="pre">not_assessed</span></code>。
+来源已核不代表目录查询会判断命盘。</p>
+</section>
+<section id="id5">
+<h2>数值角度与显示<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h2>
+<p>输入先转为浮点数，函数再用这些二进制值的精确比值计算差值，避免相减溢出或把角度算到边界的另一侧。
+结果通常取最近的浮点值；若舍入会把原本在边界一侧的角度变成边界值，就改取正确一侧的相邻浮点值。
+例如 <code class="docutils literal notranslate"><span class="pre">lunar_phase(5e-324,</span> <span class="pre">0)</span></code> 返回 <code class="docutils literal notranslate"><span class="pre">359.99999999999994</span></code>，不会变成 360° 或误判为精确合日。
+结果是数值近似，不是精确实数角度。两黄经同时旋转保持数学上的差不变，但旋转浮点数时可能
+已经舍入输入，因此不保证结果逐位相同。</p>
+<p>月相格式化函数不截断到角秒，而是显示存储的浮点值。标签不从舍入文本推断。<code class="docutils literal notranslate"><span class="pre">format_sign_distribution</span></code> 和 <code class="docutils literal notranslate"><span class="pre">format_lunar_phase</span></code>
+都要求所选语言（<code class="docutils literal notranslate"><span class="pre">en</span></code> 或 <code class="docutils literal notranslate"><span class="pre">zh-CN</span></code>）的目录名称为当前版本。名称缺失或过期抛出 <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>，
+标识缺失抛出 <code class="docutils literal notranslate"><span class="pre">KeyError</span></code>，结果或目录类型错误抛出 <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>。名称的表格分隔符及非打印字符
+会转义显示。</p>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">celestial-astrology</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../en/index.html">Documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">文档入口</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../README.zh-CN.html">celestial-astrology</a></li>
+<li class="toctree-l2"><a class="reference internal" href="birth.html">出生记录与现代时刻解析</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html">排盘请求配置</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chart.html">本命盘</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aspects.html">相位</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cross_aspects.html">双盘相位与落宫</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">星座分布与出生月相</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dignities.html">传统星座守护与四种状态</a></li>
+<li class="toctree-l2"><a class="reference internal" href="records.html">命盘结果与文本显示</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference.html">公开 API 参考</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html">仓库结构与计算边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="knowledge.html">知识组织与双语文档</a></li>
+<li class="toctree-l2"><a class="reference internal" href="catalog.html">知识目录参考</a></li>
+<li class="toctree-l2"><a class="reference internal" href="releases.html">发行说明</a></li>
+<li class="toctree-l2"><a class="reference internal" href="releasing.html">发行流程</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html">参与开发</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">文档入口</a><ul>
+      <li>Previous: <a href="cross_aspects.html" title="previous chapter">双盘相位与落宫</a></li>
+      <li>Next: <a href="dignities.html" title="next chapter">传统星座守护与四种状态</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 9.1.0</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../../_sources/docs/zh-CN/summaries.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

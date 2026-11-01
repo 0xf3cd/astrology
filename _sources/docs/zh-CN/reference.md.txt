@@ -18,9 +18,20 @@
 
 ## 请求配置
 
+对象身份定义在 `astrology.objects`；原来从 `astrology.config` 导入的 `Body`、
+`LunarNode` 和 `NodeDefinition` 仍是同一枚举类的别名。也可从 `astrology` 导入 `Axis`。
+
+```{eval-rst}
+.. automodule:: astrology.objects
+   :members: Body, NodeDefinition, LunarNode, Axis, AstronomicalObject, ChartObject
+   :undoc-members:
+   :member-order: bysource
+   :no-index:
+```
+
 ```{eval-rst}
 .. automodule:: astrology.config
-   :members: HouseSystem, Body, NodeDefinition, LunarNode, MajorAspect, OrbCombination, ObjectOrb, AspectRule, ChartConfig
+   :members: HouseSystem, MajorAspect, OrbCombination, ObjectOrb, AspectRule, ChartConfig
    :undoc-members:
    :member-order: bysource
    :no-index:
@@ -38,11 +49,11 @@
 
 ## 命盘文本
 
-见[完整结果与文本例子](records.md)。
+本命盘的输出方法见[完整结果与文本例子](records.md)，双盘相位和落宫的输出方法见[输出比较文本](cross_aspects.md#输出比较文本)。
 
 ```{eval-rst}
 .. automodule:: astrology.text
-   :members: format_chart
+   :members: format_chart, format_sign_distribution, format_lunar_phase, format_house_rulers, format_house_overlays, format_cross_aspects
    :no-index:
 ```
 
@@ -50,7 +61,7 @@
 
 ```{eval-rst}
 .. automodule:: astrology.zodiac
-   :members: Sign, AshmandSignGroup, ashmand_sign_group, sign_of, sign_degree, truncate_display
+   :members: Sign, AshmandSignGroup, Element, Modality, ashmand_sign_group, element_of, modality_of, sign_of, sign_degree, truncate_display
    :undoc-members:
    :member-order: bysource
    :no-index:
@@ -78,11 +89,56 @@
 
 ## 静态双盘交叉相位
 
-见[双盘示例与静态合同](cross_aspects.md)。
+用法及静态相位的含义见[双盘相位与落宫](cross_aspects.md)。
 
 ```{eval-rst}
 .. automodule:: astrology.cross_aspects
    :members: CrossAspectHit, CrossChartAspects, cross_chart_aspects
+   :undoc-members:
+   :member-order: bysource
+   :no-index:
+```
+
+## 双盘落宫
+
+计算方法见[双盘落宫示例](cross_aspects.md#查询对象落入另一张盘的哪一宫)，文本输出见[比较文本示例](cross_aspects.md#输出比较文本)。
+
+```{eval-rst}
+.. automodule:: astrology.house_overlays
+   :members: HouseOverlay, CrossChartHouseOverlays, cross_chart_house_overlays
+   :undoc-members:
+   :member-order: bysource
+   :no-index:
+```
+
+## 命盘摘要与月相
+
+显式选定对象的统计、来源约定及错误行为见[摘要指南](summaries.md)。
+宫主星记录见[尊贵指南](dignities.md)。
+
+```{eval-rst}
+.. automodule:: astrology.lunar_phase
+   :members: LunationType, LunarPhaseResult, lunar_phase
+   :undoc-members:
+   :member-order: bysource
+   :no-index:
+```
+
+```{eval-rst}
+.. automodule:: astrology.summaries
+   :members: SignDistribution, sign_distribution, chart_sign_distribution, natal_lunar_phase, HouseRuler, HouseRulers
+   :undoc-members:
+   :member-order: bysource
+   :no-index:
+```
+
+## 传统守护与本质尊贵
+
+具名来源、同时命中和缺失落点见[尊贵指南](dignities.md)。
+
+```{eval-rst}
+.. automodule:: astrology.dignities
+   :members: DignityStatus, sign_ruler, essential_dignities
    :undoc-members:
    :member-order: bysource
    :no-index:

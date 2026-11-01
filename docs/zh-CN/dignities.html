@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>传统星座守护与四种状态 &#8212; celestial-astrology 0.3.0 documentation / 文档</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
+    <script src="../../_static/documentation_options.js?v=e259d695"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/zh-CN/dignities.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="命盘结果与文本显示" href="records.html" />
+    <link rel="prev" title="星座分布与出生月相" href="summaries.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="id1">
+<h1>传统星座守护与四种状态<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h1>
+<p><a class="reference internal" href="../en/dignities.html"><span class="std std-doc">English</span></a> · <a class="reference internal" href="reference.html"><span class="std std-doc">API</span></a> · <a class="reference internal" href="knowledge.html"><span class="std std-doc">知识</span></a></p>
+<p>这些接口自 0.3.0 起提供；包索引可用性与源码安装见<a class="reference internal" href="../../README.zh-CN.html#id1"><span class="std std-ref">安装说明</span></a>。采用 William Lilly（威廉·利利）的
+《Christian Astrology》（伦敦，1647）所载规则，适用于太阳、月亮、水星、金星、火星、木星和土星。
+这七颗星体在传统占星中称为 seven classical planets。</p>
+<p>这些判断属于传统占星的本质尊贵与弱势（essential dignities and debilities）。本接口仅判断
+入庙（domicile）、擢升（exaltation）、失势（detriment）、落陷（fall）四种星座级状态。</p>
+<p><code class="docutils literal notranslate"><span class="pre">rule.lilly1647.essential_dignities</span></code> 是这套固定规则的标识，用于对应代码实现、
+<code class="docutils literal notranslate"><span class="pre">HouseRulers.rule_id</span></code> 和知识目录记录，不负责动态加载或选择规则。</p>
+<section id="id2">
+<h2>离盘查询星座<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<!-- usage: dignities.lookup -->
+<p>用 <code class="docutils literal notranslate"><span class="pre">sign_ruler</span></code> 查询一个星座的传统守护星；用 <code class="docutils literal notranslate"><span class="pre">essential_dignities</span></code> 查询某颗星体在某个星座的四种状态。
+例如，天蝎座的守护星是火星，水星在处女座同时入庙、擢升，在双鱼座则同时失势、落陷：</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">astrology</span><span class="w"> </span><span class="kn">import</span> <span class="n">Body</span><span class="p">,</span> <span class="n">Sign</span><span class="p">,</span> <span class="n">DignityStatus</span><span class="p">,</span> <span class="n">sign_ruler</span><span class="p">,</span> <span class="n">essential_dignities</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sign_ruler</span><span class="p">(</span><span class="n">Sign</span><span class="o">.</span><span class="n">SCORPIO</span><span class="p">)</span> <span class="ow">is</span> <span class="n">Body</span><span class="o">.</span><span class="n">MARS</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">essential_dignities</span><span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">MERCURY</span><span class="p">,</span> <span class="n">Sign</span><span class="o">.</span><span class="n">VIRGO</span><span class="p">)</span>
+<span class="go">(&lt;DignityStatus.DOMICILE: 'domicile'&gt;, &lt;DignityStatus.EXALTATION: 'exaltation'&gt;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">essential_dignities</span><span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">MERCURY</span><span class="p">,</span> <span class="n">Sign</span><span class="o">.</span><span class="n">PISCES</span><span class="p">)</span>
+<span class="go">(&lt;DignityStatus.DETRIMENT: 'detriment'&gt;, &lt;DignityStatus.FALL: 'fall'&gt;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">essential_dignities</span><span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">SUN</span><span class="p">,</span> <span class="n">Sign</span><span class="o">.</span><span class="n">TAURUS</span><span class="p">)</span>
+<span class="go">()</span>
+</pre></div>
+</div>
+<p>全部命中按入庙、擢升、失势、落陷的顺序返回。入庙指行星位于自己的某一守护星座；
+原文在此所说的 houses 不是命盘编号宫位。擢升覆盖所定的整个星座。
+失势与某一入庙星座相对，落陷与擢升星座相对。具体归属见
+<a class="reference internal" href="catalog.html#catalog-zh-cn-rule-lilly1647-essential-dignities"><span class="std std-ref">生成的十二星座表</span></a>。</p>
+<p>空元组表示<strong>这四项均未命中</strong>，不等于游离，因为其他尊贵尚未判断。
+字符串、交点及无关枚举抛出 <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>；应传入确切的 <code class="docutils literal notranslate"><span class="pre">Body</span></code> 和 <code class="docutils literal notranslate"><span class="pre">Sign</span></code> 成员。
+有效的外行星枚举（<code class="docutils literal notranslate"><span class="pre">URANUS</span></code>、<code class="docutils literal notranslate"><span class="pre">NEPTUNE</span></code>、<code class="docutils literal notranslate"><span class="pre">PLUTO</span></code>）抛出点明该对象的 <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>，
+不会返回空状态冒充已判断。
+天蝎由火星守护，水瓶由土星守护，双鱼由木星守护，不替换为现代共守护星。</p>
+<!-- /usage: dignities.lookup -->
+</section>
+<section id="id3">
+<h2>跟随已有命盘的宫主星<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
+<p>合成示例只计算一次，随后读取已有宫头和落点：</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">date</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">astrology</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">BirthRecord</span><span class="p">,</span> <span class="n">FixedOffset</span><span class="p">,</span> <span class="n">Location</span><span class="p">,</span> <span class="n">ChartConfig</span><span class="p">,</span> <span class="n">HouseSystem</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">natal_chart</span><span class="p">,</span> <span class="n">prepare_natal_input</span><span class="p">,</span> <span class="n">HouseRulers</span><span class="p">,</span> <span class="n">format_house_rulers</span><span class="p">,</span> <span class="n">load_catalog</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">chart</span> <span class="o">=</span> <span class="n">natal_chart</span><span class="p">(</span><span class="n">prepare_natal_input</span><span class="p">(</span><span class="n">BirthRecord</span><span class="p">(</span><span class="n">date</span><span class="p">(</span><span class="mi">2000</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">time</span><span class="p">(</span><span class="mi">12</span><span class="p">),</span>
+<span class="gp">... </span>    <span class="n">FixedOffset</span><span class="p">(</span><span class="n">timedelta</span><span class="p">(</span><span class="mi">0</span><span class="p">)),</span> <span class="n">Location</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))),</span>
+<span class="gp">... </span>    <span class="n">ChartConfig</span><span class="p">(</span><span class="n">HouseSystem</span><span class="o">.</span><span class="n">WHOLE_SIGN</span><span class="p">,</span> <span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">SUN</span><span class="p">,</span> <span class="n">Body</span><span class="o">.</span><span class="n">MERCURY</span><span class="p">),</span> <span class="p">()))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">HouseRulers</span><span class="p">(</span><span class="n">chart</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span><span class="o">.</span><span class="n">chart</span> <span class="ow">is</span> <span class="n">chart</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">houses</span><span class="p">),</span> <span class="n">result</span><span class="o">.</span><span class="n">rule_id</span>
+<span class="go">(True, 12, 'rule.lilly1647.essential_dignities')</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">first</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">houses</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">first</span><span class="o">.</span><span class="n">house</span><span class="p">,</span> <span class="n">first</span><span class="o">.</span><span class="n">cusp_sign</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">first</span><span class="o">.</span><span class="n">ruler</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">first</span><span class="o">.</span><span class="n">placement</span><span class="p">,</span> <span class="n">first</span><span class="o">.</span><span class="n">statuses</span>
+<span class="go">(1, 'aries', 'mars', None, None)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">third</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">houses</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">third</span><span class="o">.</span><span class="n">ruler</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">third</span><span class="o">.</span><span class="n">placement</span> <span class="ow">is</span> <span class="n">chart</span><span class="o">.</span><span class="n">placements</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">third</span><span class="o">.</span><span class="n">statuses</span>
+<span class="go">('mercury', True, ())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">catalog</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">text</span> <span class="o">=</span> <span class="n">format_house_rulers</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">catalog</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="s2">"zh-CN"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">text</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()[:</span><span class="mi">5</span><span class="p">]))</span>
+<span class="go">宫主星（Lilly 1647）</span>
+<span class="go">宫制: 整宫制</span>
+<span class="go">规则: rule.lilly1647.essential_dignities</span>
+<span class="go">宫位 | 宫头星座 | 宫主星 | 宫主星落点 | 状态</span>
+<span class="go">1 | 白羊座 | 火星 | 未计算 | 未计算</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">text</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()[</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">"这四项均未命中"</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">HouseRulers</span></code> 只保存给定的 <code class="docutils literal notranslate"><span class="pre">NatalChart</span></code>。每次读取 <code class="docutils literal notranslate"><span class="pre">houses</span></code>，按宫号顺序生成十二条新记录；
+两次读取所得的元组相等。使用<strong>实际宫头黄经</strong>，不借 ASC 或 MC 代替一宫头或十宫头。重复宫头星座仍保留为不同宫的记录。
+请求的宫制和原始天文值不变；不重算或补入宫主星，可用落点保留源盘中的原对象。</p>
+<p><code class="docutils literal notranslate"><span class="pre">placement=None</span></code> 且 <code class="docutils literal notranslate"><span class="pre">statuses=None</span></code> 表示未计算宫主星位置；已有落点但 <code class="docutils literal notranslate"><span class="pre">statuses=()</span></code>
+表示已判断而四项均未命中。文本明确区分两者，并显示全部同时命中的状态。
+宫主星落点包括其星座、未舍入的星座内度数和编号宫位；状态只依星座判断，不依显示的度数。</p>
+<section id="id4">
+<h3>单独构造一条记录<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h3>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">astrology</span><span class="w"> </span><span class="kn">import</span> <span class="n">HouseRuler</span><span class="p">,</span> <span class="n">Placement</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">placement</span> <span class="o">=</span> <span class="n">Placement</span><span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">MERCURY</span><span class="p">,</span> <span class="n">Sign</span><span class="o">.</span><span class="n">VIRGO</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span> <span class="o">=</span> <span class="n">HouseRuler</span><span class="p">(</span><span class="n">house</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">cusp_sign</span><span class="o">=</span><span class="n">Sign</span><span class="o">.</span><span class="n">GEMINI</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="n">placement</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">ruler</span> <span class="ow">is</span> <span class="n">Body</span><span class="o">.</span><span class="n">MERCURY</span><span class="p">,</span> <span class="n">record</span><span class="o">.</span><span class="n">statuses</span> <span class="o">==</span> <span class="n">essential_dignities</span><span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">MERCURY</span><span class="p">,</span> <span class="n">Sign</span><span class="o">.</span><span class="n">VIRGO</span><span class="p">)</span>
+<span class="go">(True, True)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">placement</span> <span class="ow">is</span> <span class="n">placement</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">HouseRuler</span></code> 不可变，<code class="docutils literal notranslate"><span class="pre">ruler</span></code> 和 <code class="docutils literal notranslate"><span class="pre">statuses</span></code> 从字段推导，不能单独传入。
+字段类型错误抛出 <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>，包括把布尔值当宫号；宫号不在 1–12 或落点身份不等于所推导的
+宫主星时抛出 <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>。低层记录不核实命盘来源，也不把宫头星座与宫号绑定；
+<code class="docutils literal notranslate"><span class="pre">HouseRulers(chart)</span></code> 完成这项组合。它拒绝非 <code class="docutils literal notranslate"><span class="pre">NatalChart</span></code> 输入，抛出 <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>，
+且不接受另行传入宫记录元组。运行时检查在 <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-O</span></code> 下仍执行。</p>
+<p><code class="docutils literal notranslate"><span class="pre">format_house_rulers</span></code> 要求传入 <code class="docutils literal notranslate"><span class="pre">Catalog</span></code> 及 <code class="docutils literal notranslate"><span class="pre">en</span></code> 或 <code class="docutils literal notranslate"><span class="pre">zh-CN</span></code> 的当前名称。
+结果或目录类型错误抛出 <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>；语言非法、名称缺译或过期抛出 <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>；
+星座或状态标识缺失抛出 <code class="docutils literal notranslate"><span class="pre">KeyError</span></code>；目录中某个宫主星或宫制没有唯一对应的概念时，格式化抛出 <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>。
+名称中的表格分隔符及不可打印字符会转义。
+格式化不读取资源；纯查询和盘级组合不初始化原生天文库。</p>
+</section>
+</section>
+<section id="id5">
+<h2>来源与限制<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h2>
+<p><a class="reference internal" href="catalog.html#catalog-zh-cn-source-lilly-christian-astrology-1647"><span class="std std-ref">来源记录</span></a>定位已核的 Wellcome 扫描本、
+1647 年出版页、图像摘要及 Public Domain Mark 声明。第一卷第 VIII–XIV 章给出行星归属，
+第 XVIII 章及印刷页 102、104–105 说明擢升覆盖整个星座和相对星座关系。
+行星章节直接列出其中六颗星体的失势，土星失势由其入庙星座及所述关系推出。
+生成表由项目按这些归属展开，不是逐格转录整张印刷表。</p>
+<p>三段简短英文引文与署名中文译文、项目解释分别呈现。定位信息写明截取边界；
+长 s 字形、换行及占星符号按记录作了规范化。另一份扫描可旁证同一历史文本的字形，
+不构成独立传统。Lilly 称其表依据 Ptolemy；此处未核 Ptolemy 原文。</p>
+<p>接口不判断精确擢升度数、昼夜条件、交点尊贵、三分性、界、面、互容、综合评分或解读。
+原文的昼夜庙标签不作为四项星座查询的额外条件。来源核验只记录该版本说了什么，
+不确立实证有效性。</p>
+<p>目录状态概念使用 <code class="docutils literal notranslate"><span class="pre">dignity_status.&lt;value&gt;</span></code>，不链接请求配置。
+<code class="docutils literal notranslate"><span class="pre">entry.essential_dignities</span></code> 的查询前提完整，但仍为 <code class="docutils literal notranslate"><span class="pre">reference_only</span></code> 和 <code class="docutils literal notranslate"><span class="pre">not_assessed</span></code>。
+目录检索不执行命盘判断。</p>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">celestial-astrology</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../en/index.html">Documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">文档入口</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../README.zh-CN.html">celestial-astrology</a></li>
+<li class="toctree-l2"><a class="reference internal" href="birth.html">出生记录与现代时刻解析</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html">排盘请求配置</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chart.html">本命盘</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aspects.html">相位</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cross_aspects.html">双盘相位与落宫</a></li>
+<li class="toctree-l2"><a class="reference internal" href="summaries.html">星座分布与出生月相</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">传统星座守护与四种状态</a></li>
+<li class="toctree-l2"><a class="reference internal" href="records.html">命盘结果与文本显示</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference.html">公开 API 参考</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html">仓库结构与计算边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="knowledge.html">知识组织与双语文档</a></li>
+<li class="toctree-l2"><a class="reference internal" href="catalog.html">知识目录参考</a></li>
+<li class="toctree-l2"><a class="reference internal" href="releases.html">发行说明</a></li>
+<li class="toctree-l2"><a class="reference internal" href="releasing.html">发行流程</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html">参与开发</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">文档入口</a><ul>
+      <li>Previous: <a href="summaries.html" title="previous chapter">星座分布与出生月相</a></li>
+      <li>Next: <a href="records.html" title="next chapter">命盘结果与文本显示</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 9.1.0</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../../_sources/docs/zh-CN/dignities.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

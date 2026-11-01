@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Repository structure and calculation boundaries &#8212; celestial-astrology 0.2.0 documentation / 文档</title>
+    <title>Repository structure and calculation boundaries &#8212; celestial-astrology 0.3.0 documentation / 文档</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
-    <script src="../../_static/documentation_options.js?v=938c9ccc"></script>
+    <script src="../../_static/documentation_options.js?v=e259d695"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/en/architecture.html" />
@@ -51,6 +51,7 @@ to its underlying knowledge.</p>
 arrives; a name in this map does not require an empty package or an extra layer.</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>src/astrology/
   birth.py          Original records and resolved instants
+  objects.py        Body, node and axis identities; consumer-specific admission
   config.py         Requested chart and tradition choices
   celestial.py      Concrete adapter to celestial-calendar
   zodiac.py         Zodiac definitions and sign classification
@@ -58,6 +59,10 @@ arrives; a name in this map does not require an empty package or an extra layer.
   aspects.py        Aspect definitions, orbs, and local motion
   chart.py          Composition and immutable chart results
   cross_aspects.py  Static comparison of supplied charts, retaining both sources
+  house_overlays.py Directional house placement between supplied charts
+  lunar_phase.py    Oriented solar/lunar arc and named lunation types
+  dignities.py      Traditional sign rulers and domicile/exaltation/detriment/fall
+  summaries.py      Explicit-population statistics and supplied-chart summaries
   text.py           Result tables with supplied vocabulary
   knowledge/        Concepts, sources, entries, and independent queries
 tests/              Domain tests and installed-consumer tests
@@ -69,9 +74,19 @@ docs/zh-CN/         Matching Chinese guides and explanations
 the success contract of a complete chart; it does not become the owner of every
 shared definition. Common values move to a shared module only when actual users
 need them. Package imports and knowledge queries must not initialize celestial.</p>
-<p><code class="docutils literal notranslate"><span class="pre">cross_aspects.py</span></code> composes existing chart results without astronomy. Shared
-angular/orb arithmetic remains in <code class="docutils literal notranslate"><span class="pre">aspects.py</span></code>; single-chart pair eligibility
-and local motion stay with <code class="docutils literal notranslate"><span class="pre">find_aspects</span></code>, separate from static cross pairing.</p>
+<p><code class="docutils literal notranslate"><span class="pre">cross_aspects.py</span></code> calculates static aspects from two existing charts without
+calling the astronomy library. It shares the angle and orb calculations in
+<code class="docutils literal notranslate"><span class="pre">aspects.py</span></code> with natal aspects, but <code class="docutils literal notranslate"><span class="pre">find_aspects</span></code> separately handles single-chart
+pair eligibility and local motion. <code class="docutils literal notranslate"><span class="pre">house_overlays.py</span></code> passes one chart’s
+longitudes and the other chart’s cusps to <code class="docutils literal notranslate"><span class="pre">house_of</span></code> to calculate placements in
+both directions.</p>
+<p><code class="docutils literal notranslate"><span class="pre">objects.py</span></code> defines body, node and axis identities. It distinguishes body/node-only
+types from the types that also include axes, used by aspects and house overlays.
+The astronomy adapter maps these identities to calculation targets; the text
+module looks up names in the supplied catalog. <code class="docutils literal notranslate"><span class="pre">chart.py</span></code> extracts the selected
+stored longitudes for natal aspects, static cross-chart aspects and house
+overlays. It also checks coordinate compatibility and object selections for
+cross-chart comparisons.</p>
 <p>Knowledge and calculation remain connected by stable identifiers, described in
 <a class="reference internal" href="knowledge.html"><span class="std std-doc">Knowledge organization</span></a>. Additional UI applications can consume
 the result later without moving calculation into a frontend.</p>
@@ -194,7 +209,9 @@ shared needs; a general backend/plugin framework is not a prerequisite.</p>
 <li class="toctree-l2"><a class="reference internal" href="configuration.html">Requested chart configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="chart.html">Natal charts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="aspects.html">Aspects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cross_aspects.html">Static cross-chart aspects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cross_aspects.html">Cross-chart aspects and house overlays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="summaries.html">Sign distributions and natal lunar phase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dignities.html">Traditional sign rulers and four statuses</a></li>
 <li class="toctree-l2"><a class="reference internal" href="records.html">Chart results and text</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference.html">Public API reference</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Repository structure and calculation boundaries</a></li>

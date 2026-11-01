@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Public API reference &#8212; celestial-astrology 0.2.0 documentation / 文档</title>
+    <title>Public API reference &#8212; celestial-astrology 0.3.0 documentation / 文档</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
-    <script src="../../_static/documentation_options.js?v=938c9ccc"></script>
+    <script src="../../_static/documentation_options.js?v=e259d695"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/en/reference.html" />
@@ -339,9 +339,161 @@ version metadata and remaining resource I/O failures are environment errors.</p>
 </dd></dl>
 
 </section>
-<section id="module-astrology.config">
-<span id="requested-configuration"></span><h2>Requested configuration<a class="headerlink" href="#module-astrology.config" title="Link to this heading">¶</a></h2>
-<p>Immutable requested chart choices, without astronomy or rule evaluation.</p>
+<section id="requested-configuration">
+<h2>Requested configuration<a class="headerlink" href="#requested-configuration" title="Link to this heading">¶</a></h2>
+<p>Object identities live in <code class="docutils literal notranslate"><span class="pre">astrology.objects</span></code>; existing imports of <code class="docutils literal notranslate"><span class="pre">Body</span></code>,
+<code class="docutils literal notranslate"><span class="pre">LunarNode</span></code> and <code class="docutils literal notranslate"><span class="pre">NodeDefinition</span></code> from <code class="docutils literal notranslate"><span class="pre">astrology.config</span></code> remain aliases to the
+same enum classes. <code class="docutils literal notranslate"><span class="pre">Axis</span></code> is also available from <code class="docutils literal notranslate"><span class="pre">astrology</span></code>.</p>
+<p id="module-astrology.objects">Object identities and the families admitted by their consumers, without astronomy.</p>
+<p>对象身份及各使用方接纳的对象类别，不调用天文库。</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="astrology.objects.Body">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">astrology.objects.</span></span><span class="sig-name descname"><span class="pre">Body</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrology.objects.Body" title="Link to this definition">¶</a></dt>
+<dd><p>Physical natal bodies, distinct from mathematical nodes. 本命盘物理天体，与数学交点区分。</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.objects.Body.SUN">
+<span class="sig-name descname"><span class="pre">SUN</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'sun'</span></span><a class="headerlink" href="#astrology.objects.Body.SUN" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.objects.Body.MOON">
+<span class="sig-name descname"><span class="pre">MOON</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'moon'</span></span><a class="headerlink" href="#astrology.objects.Body.MOON" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.objects.Body.MERCURY">
+<span class="sig-name descname"><span class="pre">MERCURY</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'mercury'</span></span><a class="headerlink" href="#astrology.objects.Body.MERCURY" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.objects.Body.VENUS">
+<span class="sig-name descname"><span class="pre">VENUS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'venus'</span></span><a class="headerlink" href="#astrology.objects.Body.VENUS" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.objects.Body.MARS">
+<span class="sig-name descname"><span class="pre">MARS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'mars'</span></span><a class="headerlink" href="#astrology.objects.Body.MARS" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.objects.Body.JUPITER">
+<span class="sig-name descname"><span class="pre">JUPITER</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'jupiter'</span></span><a class="headerlink" href="#astrology.objects.Body.JUPITER" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.objects.Body.SATURN">
+<span class="sig-name descname"><span class="pre">SATURN</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'saturn'</span></span><a class="headerlink" href="#astrology.objects.Body.SATURN" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.objects.Body.URANUS">
+<span class="sig-name descname"><span class="pre">URANUS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'uranus'</span></span><a class="headerlink" href="#astrology.objects.Body.URANUS" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.objects.Body.NEPTUNE">
+<span class="sig-name descname"><span class="pre">NEPTUNE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'neptune'</span></span><a class="headerlink" href="#astrology.objects.Body.NEPTUNE" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.objects.Body.PLUTO">
+<span class="sig-name descname"><span class="pre">PLUTO</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'pluto'</span></span><a class="headerlink" href="#astrology.objects.Body.PLUTO" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="astrology.objects.NodeDefinition">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">astrology.objects.</span></span><span class="sig-name descname"><span class="pre">NodeDefinition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrology.objects.NodeDefinition" title="Link to this definition">¶</a></dt>
+<dd><p>Named lunar-node definitions, not accuracy settings. 具名月交点定义，不是精度档位。</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.objects.NodeDefinition.MEAN">
+<span class="sig-name descname"><span class="pre">MEAN</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'mean'</span></span><a class="headerlink" href="#astrology.objects.NodeDefinition.MEAN" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.objects.NodeDefinition.MEEUS_FIVE_TERM_TRUE">
+<span class="sig-name descname"><span class="pre">MEEUS_FIVE_TERM_TRUE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'meeus_five_term_true'</span></span><a class="headerlink" href="#astrology.objects.NodeDefinition.MEEUS_FIVE_TERM_TRUE" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="astrology.objects.LunarNode">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">astrology.objects.</span></span><span class="sig-name descname"><span class="pre">LunarNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrology.objects.LunarNode" title="Link to this definition">¶</a></dt>
+<dd><p>Mathematical nodes whose identity includes their definition and direction.</p>
+<p>数学月交点，其标识同时包含定义与升降方向。</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.objects.LunarNode.MEAN_ASCENDING">
+<span class="sig-name descname"><span class="pre">MEAN_ASCENDING</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'mean_ascending_node'</span></span><a class="headerlink" href="#astrology.objects.LunarNode.MEAN_ASCENDING" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.objects.LunarNode.MEAN_DESCENDING">
+<span class="sig-name descname"><span class="pre">MEAN_DESCENDING</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'mean_descending_node'</span></span><a class="headerlink" href="#astrology.objects.LunarNode.MEAN_DESCENDING" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.objects.LunarNode.MEEUS_FIVE_TERM_TRUE_ASCENDING">
+<span class="sig-name descname"><span class="pre">MEEUS_FIVE_TERM_TRUE_ASCENDING</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'meeus_five_term_true_ascending_node'</span></span><a class="headerlink" href="#astrology.objects.LunarNode.MEEUS_FIVE_TERM_TRUE_ASCENDING" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.objects.LunarNode.MEEUS_FIVE_TERM_TRUE_DESCENDING">
+<span class="sig-name descname"><span class="pre">MEEUS_FIVE_TERM_TRUE_DESCENDING</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'meeus_five_term_true_descending_node'</span></span><a class="headerlink" href="#astrology.objects.LunarNode.MEEUS_FIVE_TERM_TRUE_DESCENDING" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="astrology.objects.LunarNode.definition">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">definition</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#astrology.objects.NodeDefinition" title="astrology.objects.NodeDefinition"><span class="pre">NodeDefinition</span></a></span><a class="headerlink" href="#astrology.objects.LunarNode.definition" title="Link to this definition">¶</a></dt>
+<dd><p>Return the identity’s named definition. 返回该标识对应的具名定义。</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="astrology.objects.Axis">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">astrology.objects.</span></span><span class="sig-name descname"><span class="pre">Axis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrology.objects.Axis" title="Link to this definition">¶</a></dt>
+<dd><p>Stored chart axes, distinct from bodies, nodes and house cusps.</p>
+<p>Chart composition appends selected axes after bodies/nodes, in ASC/MC/DSC/IC
+iteration order.</p>
+<p>命盘保存的四轴身份，与天体、交点及宫头区分。
+命盘组合按枚举迭代顺序，在天体和交点之后追加所选四轴：上升、中天、下降、天底。</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.objects.Axis.ASCENDANT">
+<span class="sig-name descname"><span class="pre">ASCENDANT</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ascendant'</span></span><a class="headerlink" href="#astrology.objects.Axis.ASCENDANT" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.objects.Axis.MIDHEAVEN">
+<span class="sig-name descname"><span class="pre">MIDHEAVEN</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'midheaven'</span></span><a class="headerlink" href="#astrology.objects.Axis.MIDHEAVEN" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.objects.Axis.DESCENDANT">
+<span class="sig-name descname"><span class="pre">DESCENDANT</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'descendant'</span></span><a class="headerlink" href="#astrology.objects.Axis.DESCENDANT" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.objects.Axis.IMUM_COELI">
+<span class="sig-name descname"><span class="pre">IMUM_COELI</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'imum_coeli'</span></span><a class="headerlink" href="#astrology.objects.Axis.IMUM_COELI" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="astrology.objects.AstronomicalObject">
+<span class="sig-prename descclassname"><span class="pre">astrology.objects.</span></span><span class="sig-name descname"><span class="pre">AstronomicalObject</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.TypeAlias" title="(in Python v3.11)"><span class="pre">TypeAlias</span></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">astrology.objects.Body</span> <span class="pre">|</span> <span class="pre">astrology.objects.LunarNode</span></span><a class="headerlink" href="#astrology.objects.AstronomicalObject" title="Link to this definition">¶</a></dt>
+<dd><p>Native-output identities, also used by placements and statistics. 天文输出、落点及统计所用的身份。</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="astrology.objects.ChartObject">
+<span class="sig-prename descclassname"><span class="pre">astrology.objects.</span></span><span class="sig-name descname"><span class="pre">ChartObject</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.TypeAlias" title="(in Python v3.11)"><span class="pre">TypeAlias</span></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">astrology.objects.Body</span> <span class="pre">|</span> <span class="pre">astrology.objects.LunarNode</span> <span class="pre">|</span> <span class="pre">astrology.objects.Axis</span></span><a class="headerlink" href="#astrology.objects.ChartObject" title="Link to this definition">¶</a></dt>
+<dd><p>Identities for aspects and house overlays, including selected axes. 相位及双盘落宫所用的身份，含所选四轴。</p>
+</dd></dl>
+
+<p id="module-astrology.config">Immutable requested chart choices, without astronomy or rule evaluation.</p>
 <p>不可变的排盘请求配置，不执行天文计算或规则求值。</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="astrology.config.HouseSystem">
@@ -362,111 +514,6 @@ version metadata and remaining resource I/O failures are environment errors.</p>
 <dt class="sig sig-object py" id="astrology.config.HouseSystem.PLACIDUS">
 <span class="sig-name descname"><span class="pre">PLACIDUS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'placidus'</span></span><a class="headerlink" href="#astrology.config.HouseSystem.PLACIDUS" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="astrology.config.Body">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">astrology.config.</span></span><span class="sig-name descname"><span class="pre">Body</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrology.config.Body" title="Link to this definition">¶</a></dt>
-<dd><p>Physical natal bodies, distinct from mathematical nodes. 本命盘物理天体，与数学交点区分。</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="astrology.config.Body.SUN">
-<span class="sig-name descname"><span class="pre">SUN</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'sun'</span></span><a class="headerlink" href="#astrology.config.Body.SUN" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="astrology.config.Body.MOON">
-<span class="sig-name descname"><span class="pre">MOON</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'moon'</span></span><a class="headerlink" href="#astrology.config.Body.MOON" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="astrology.config.Body.MERCURY">
-<span class="sig-name descname"><span class="pre">MERCURY</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'mercury'</span></span><a class="headerlink" href="#astrology.config.Body.MERCURY" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="astrology.config.Body.VENUS">
-<span class="sig-name descname"><span class="pre">VENUS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'venus'</span></span><a class="headerlink" href="#astrology.config.Body.VENUS" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="astrology.config.Body.MARS">
-<span class="sig-name descname"><span class="pre">MARS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'mars'</span></span><a class="headerlink" href="#astrology.config.Body.MARS" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="astrology.config.Body.JUPITER">
-<span class="sig-name descname"><span class="pre">JUPITER</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'jupiter'</span></span><a class="headerlink" href="#astrology.config.Body.JUPITER" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="astrology.config.Body.SATURN">
-<span class="sig-name descname"><span class="pre">SATURN</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'saturn'</span></span><a class="headerlink" href="#astrology.config.Body.SATURN" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="astrology.config.Body.URANUS">
-<span class="sig-name descname"><span class="pre">URANUS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'uranus'</span></span><a class="headerlink" href="#astrology.config.Body.URANUS" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="astrology.config.Body.NEPTUNE">
-<span class="sig-name descname"><span class="pre">NEPTUNE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'neptune'</span></span><a class="headerlink" href="#astrology.config.Body.NEPTUNE" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="astrology.config.Body.PLUTO">
-<span class="sig-name descname"><span class="pre">PLUTO</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'pluto'</span></span><a class="headerlink" href="#astrology.config.Body.PLUTO" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="astrology.config.NodeDefinition">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">astrology.config.</span></span><span class="sig-name descname"><span class="pre">NodeDefinition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrology.config.NodeDefinition" title="Link to this definition">¶</a></dt>
-<dd><p>Named lunar-node definitions, not accuracy settings. 具名月交点定义，不是精度档位。</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="astrology.config.NodeDefinition.MEAN">
-<span class="sig-name descname"><span class="pre">MEAN</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'mean'</span></span><a class="headerlink" href="#astrology.config.NodeDefinition.MEAN" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="astrology.config.NodeDefinition.MEEUS_FIVE_TERM_TRUE">
-<span class="sig-name descname"><span class="pre">MEEUS_FIVE_TERM_TRUE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'meeus_five_term_true'</span></span><a class="headerlink" href="#astrology.config.NodeDefinition.MEEUS_FIVE_TERM_TRUE" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="astrology.config.LunarNode">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">astrology.config.</span></span><span class="sig-name descname"><span class="pre">LunarNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrology.config.LunarNode" title="Link to this definition">¶</a></dt>
-<dd><p>Mathematical nodes whose identity includes their definition and direction.</p>
-<p>数学月交点，其标识同时包含定义与升降方向。</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="astrology.config.LunarNode.MEAN_ASCENDING">
-<span class="sig-name descname"><span class="pre">MEAN_ASCENDING</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'mean_ascending_node'</span></span><a class="headerlink" href="#astrology.config.LunarNode.MEAN_ASCENDING" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="astrology.config.LunarNode.MEAN_DESCENDING">
-<span class="sig-name descname"><span class="pre">MEAN_DESCENDING</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'mean_descending_node'</span></span><a class="headerlink" href="#astrology.config.LunarNode.MEAN_DESCENDING" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="astrology.config.LunarNode.MEEUS_FIVE_TERM_TRUE_ASCENDING">
-<span class="sig-name descname"><span class="pre">MEEUS_FIVE_TERM_TRUE_ASCENDING</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'meeus_five_term_true_ascending_node'</span></span><a class="headerlink" href="#astrology.config.LunarNode.MEEUS_FIVE_TERM_TRUE_ASCENDING" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="astrology.config.LunarNode.MEEUS_FIVE_TERM_TRUE_DESCENDING">
-<span class="sig-name descname"><span class="pre">MEEUS_FIVE_TERM_TRUE_DESCENDING</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'meeus_five_term_true_descending_node'</span></span><a class="headerlink" href="#astrology.config.LunarNode.MEEUS_FIVE_TERM_TRUE_DESCENDING" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="astrology.config.LunarNode.definition">
-<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">definition</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#astrology.config.NodeDefinition" title="astrology.config.NodeDefinition"><span class="pre">NodeDefinition</span></a></span><a class="headerlink" href="#astrology.config.LunarNode.definition" title="Link to this definition">¶</a></dt>
-<dd><p>Return the identity’s named definition. 返回该标识对应的具名定义。</p>
-</dd></dl>
 
 </dd></dl>
 
@@ -538,14 +585,14 @@ either object’s orb contains it (the larger orb), both objects’ orbs contain
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>identity</strong> (<a class="reference internal" href="#astrology.config.Body" title="astrology.config.Body"><em>Body</em></a><em> | </em><a class="reference internal" href="#astrology.config.LunarNode" title="astrology.config.LunarNode"><em>LunarNode</em></a>)</p></li>
+<li><p><strong>identity</strong> (<a class="reference internal" href="#astrology.objects.Body" title="astrology.objects.Body"><em>Body</em></a><em> | </em><a class="reference internal" href="#astrology.objects.LunarNode" title="astrology.objects.LunarNode"><em>LunarNode</em></a><em> | </em><a class="reference internal" href="#astrology.objects.Axis" title="astrology.objects.Axis"><em>Axis</em></a>)</p></li>
 <li><p><strong>orb_degrees</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>)</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="astrology.config.ObjectOrb.identity">
-<span class="sig-name descname"><span class="pre">identity</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#astrology.config.Body" title="astrology.config.Body"><span class="pre">Body</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.config.LunarNode" title="astrology.config.LunarNode"><span class="pre">LunarNode</span></a></span><a class="headerlink" href="#astrology.config.ObjectOrb.identity" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">identity</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#astrology.objects.Body" title="astrology.objects.Body"><span class="pre">Body</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.objects.LunarNode" title="astrology.objects.LunarNode"><span class="pre">LunarNode</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.objects.Axis" title="astrology.objects.Axis"><span class="pre">Axis</span></a></span><a class="headerlink" href="#astrology.config.ObjectOrb.identity" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -597,14 +644,16 @@ each object once. There is no default orb, and this type does not evaluate.</p>
 <dd><p>Requested choices only, preserving order in isolated immutable tuples.</p>
 <p>Select a house system, nonempty unique objects, and explicit unique aspect rules.
 An empty aspect sequence is allowed. Aspects are judged among <cite>aspect_objects</cite>,
-which must be a subset of <cite>objects</cite>; omitted, it means all requested objects.
+which selects requested bodies/nodes and may explicitly add stored axes. Omitted,
+it means all requested bodies/nodes and no axes. Axes are not native outputs.
 <cite>orb_combination</cite> is required exactly when some rule has per-object orbs, and a
 per-object orb may name only a participating object. Only tropical/geocentric is
 admitted. No orb or house defaults, effective-model claims, computation, or
 fallback are supplied.</p>
 <p>只保存排盘请求。对象和相位规则按原顺序复制为不可变元组，不受调用方后续修改列表的影响。
 必须指定宫制和至少一个对象，对象不能重复；相位规则也不能重复，但可以为空。
-<cite>aspect_objects</cite> 指定参与相位的对象，必须是 <cite>objects</cite> 的子集；省略时所有请求的对象都参与。
+<cite>aspect_objects</cite> 从请求的天体或交点中选择参与者，也可显式加入已存四轴；省略时所有请求的
+天体或交点都参与，不加入四轴。四轴不是天文输出对象。
 只要有规则为对象单独设置容许度，就必须给出 <cite>orb_combination</cite>，否则不能给。
 单独设置容许度的对象必须参与相位。仅支持热带黄道和地心，不提供默认容许度或默认宫制，
 不记录实际计算模型，也不执行计算或提供替代策略。</p>
@@ -612,11 +661,11 @@ fallback are supplied.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>house_system</strong> (<a class="reference internal" href="#astrology.config.HouseSystem" title="astrology.config.HouseSystem"><em>HouseSystem</em></a>)</p></li>
-<li><p><strong>objects</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.11)"><em>Sequence</em></a><em>[</em><a class="reference internal" href="#astrology.config.Body" title="astrology.config.Body"><em>Body</em></a><em> | </em><a class="reference internal" href="#astrology.config.LunarNode" title="astrology.config.LunarNode"><em>LunarNode</em></a><em>]</em>)</p></li>
+<li><p><strong>objects</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.11)"><em>Sequence</em></a><em>[</em><a class="reference internal" href="#astrology.objects.Body" title="astrology.objects.Body"><em>Body</em></a><em> | </em><a class="reference internal" href="#astrology.objects.LunarNode" title="astrology.objects.LunarNode"><em>LunarNode</em></a><em>]</em>)</p></li>
 <li><p><strong>aspects</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.11)"><em>Sequence</em></a><em>[</em><a class="reference internal" href="#astrology.config.AspectRule" title="astrology.config.AspectRule"><em>AspectRule</em></a><em>]</em>)</p></li>
 <li><p><strong>zodiac</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Literal" title="(in Python v3.11)"><em>Literal</em></a><em>[</em><em>'tropical'</em><em>]</em>)</p></li>
 <li><p><strong>center</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Literal" title="(in Python v3.11)"><em>Literal</em></a><em>[</em><em>'geocentric'</em><em>]</em>)</p></li>
-<li><p><strong>aspect_objects</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.11)"><em>Sequence</em></a><em>[</em><a class="reference internal" href="#astrology.config.Body" title="astrology.config.Body"><em>Body</em></a><em> | </em><a class="reference internal" href="#astrology.config.LunarNode" title="astrology.config.LunarNode"><em>LunarNode</em></a><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>aspect_objects</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.11)"><em>Sequence</em></a><em>[</em><a class="reference internal" href="#astrology.objects.Body" title="astrology.objects.Body"><em>Body</em></a><em> | </em><a class="reference internal" href="#astrology.objects.LunarNode" title="astrology.objects.LunarNode"><em>LunarNode</em></a><em> | </em><a class="reference internal" href="#astrology.objects.Axis" title="astrology.objects.Axis"><em>Axis</em></a><em>] </em><em>| </em><em>None</em>)</p></li>
 <li><p><strong>orb_combination</strong> (<a class="reference internal" href="#astrology.config.OrbCombination" title="astrology.config.OrbCombination"><em>OrbCombination</em></a><em> | </em><em>None</em>)</p></li>
 </ul>
 </dd>
@@ -628,7 +677,7 @@ fallback are supplied.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="astrology.config.ChartConfig.objects">
-<span class="sig-name descname"><span class="pre">objects</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.11)"><span class="pre">Sequence</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#astrology.config.Body" title="astrology.config.Body"><span class="pre">Body</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.config.LunarNode" title="astrology.config.LunarNode"><span class="pre">LunarNode</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#astrology.config.ChartConfig.objects" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">objects</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.11)"><span class="pre">Sequence</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#astrology.objects.Body" title="astrology.objects.Body"><span class="pre">Body</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.objects.LunarNode" title="astrology.objects.LunarNode"><span class="pre">LunarNode</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#astrology.config.ChartConfig.objects" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -648,7 +697,7 @@ fallback are supplied.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="astrology.config.ChartConfig.aspect_objects">
-<span class="sig-name descname"><span class="pre">aspect_objects</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.11)"><span class="pre">Sequence</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#astrology.config.Body" title="astrology.config.Body"><span class="pre">Body</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.config.LunarNode" title="astrology.config.LunarNode"><span class="pre">LunarNode</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/constants.html#None" title="(in Python v3.11)"><span class="pre">None</span></a></span><a class="headerlink" href="#astrology.config.ChartConfig.aspect_objects" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">aspect_objects</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.11)"><span class="pre">Sequence</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#astrology.objects.Body" title="astrology.objects.Body"><span class="pre">Body</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.objects.LunarNode" title="astrology.objects.LunarNode"><span class="pre">LunarNode</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.objects.Axis" title="astrology.objects.Axis"><span class="pre">Axis</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/constants.html#None" title="(in Python v3.11)"><span class="pre">None</span></a></span><a class="headerlink" href="#astrology.config.ChartConfig.aspect_objects" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -659,11 +708,12 @@ fallback are supplied.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="astrology.config.ChartConfig.aspect_participants">
 <span class="sig-name descname"><span class="pre">aspect_participants</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#astrology.config.ChartConfig.aspect_participants" title="Link to this definition">¶</a></dt>
-<dd><p>Return participants in requested object order, or an empty tuple without rules.</p>
-<p>按请求对象的顺序返回参与相位的对象；没有相位规则时返回空元组。</p>
+<dd><p>Return requested bodies/nodes in order, then selected axes in ASC/MC/DSC/IC order.</p>
+<p>No rules means no participants. 没有规则时返回空元组；天体和交点按请求顺序排列，
+所选四轴按上升、中天、下降、天底顺序追加。</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#tuple" title="(in Python v3.11)">tuple</a>[<a class="reference internal" href="#astrology.config.Body" title="astrology.config.Body"><em>Body</em></a> | <a class="reference internal" href="#astrology.config.LunarNode" title="astrology.config.LunarNode"><em>LunarNode</em></a>, …]</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#tuple" title="(in Python v3.11)">tuple</a>[<a class="reference internal" href="#astrology.objects.Body" title="astrology.objects.Body"><em>Body</em></a> | <a class="reference internal" href="#astrology.objects.LunarNode" title="astrology.objects.LunarNode"><em>LunarNode</em></a> | <a class="reference internal" href="#astrology.objects.Axis" title="astrology.objects.Axis"><em>Axis</em></a>, …]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -673,8 +723,8 @@ fallback are supplied.</p>
 </section>
 <section id="module-astrology.chart">
 <span id="natal-chart-composition"></span><h2>Natal chart composition<a class="headerlink" href="#module-astrology.chart" title="Link to this heading">¶</a></h2>
-<p>Composition of a modern tropical natal chart from resolved input and configuration.</p>
-<p>把已解析的输入和请求的配置组合成现代热带本命盘。</p>
+<p>Immutable natal results, shared chart access and modern tropical chart composition.</p>
+<p>不可变本命盘结果、共用命盘访问，以及现代热带本命盘的组合。</p>
 <dl class="py exception">
 <dt class="sig sig-object py" id="astrology.chart.ChartDomainError">
 <span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">astrology.chart.</span></span><span class="sig-name descname"><span class="pre">ChartDomainError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">house_system</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recorded</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upstream_message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrology.chart.ChartDomainError" title="Link to this definition">¶</a></dt>
@@ -740,7 +790,7 @@ decreasing at that instant. Positions do not depend on the birth location.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>identity</strong> (<a class="reference internal" href="#astrology.config.Body" title="astrology.config.Body"><em>Body</em></a><em> | </em><a class="reference internal" href="#astrology.config.LunarNode" title="astrology.config.LunarNode"><em>LunarNode</em></a>)</p></li>
+<li><p><strong>identity</strong> (<a class="reference internal" href="#astrology.objects.Body" title="astrology.objects.Body"><em>Body</em></a><em> | </em><a class="reference internal" href="#astrology.objects.LunarNode" title="astrology.objects.LunarNode"><em>LunarNode</em></a>)</p></li>
 <li><p><strong>longitude_deg</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>)</p></li>
 <li><p><strong>latitude_deg</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>)</p></li>
 <li><p><strong>distance_au</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a><em> | </em><em>None</em>)</p></li>
@@ -750,7 +800,7 @@ decreasing at that instant. Positions do not depend on the birth location.</p>
 </dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="astrology.chart.EclipticPosition.identity">
-<span class="sig-name descname"><span class="pre">identity</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#astrology.config.Body" title="astrology.config.Body"><span class="pre">Body</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.config.LunarNode" title="astrology.config.LunarNode"><span class="pre">LunarNode</span></a></span><a class="headerlink" href="#astrology.chart.EclipticPosition.identity" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">identity</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#astrology.objects.Body" title="astrology.objects.Body"><span class="pre">Body</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.objects.LunarNode" title="astrology.objects.LunarNode"><span class="pre">LunarNode</span></a></span><a class="headerlink" href="#astrology.chart.EclipticPosition.identity" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -834,7 +884,7 @@ decreasing at that instant. Positions do not depend on the birth location.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>identity</strong> (<a class="reference internal" href="#astrology.config.Body" title="astrology.config.Body"><em>Body</em></a><em> | </em><a class="reference internal" href="#astrology.config.LunarNode" title="astrology.config.LunarNode"><em>LunarNode</em></a>)</p></li>
+<li><p><strong>identity</strong> (<a class="reference internal" href="#astrology.objects.Body" title="astrology.objects.Body"><em>Body</em></a><em> | </em><a class="reference internal" href="#astrology.objects.LunarNode" title="astrology.objects.LunarNode"><em>LunarNode</em></a>)</p></li>
 <li><p><strong>sign</strong> (<a class="reference internal" href="#astrology.zodiac.Sign" title="astrology.zodiac.Sign"><em>Sign</em></a>)</p></li>
 <li><p><strong>sign_degree_deg</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>)</p></li>
 <li><p><strong>house</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>)</p></li>
@@ -843,7 +893,7 @@ decreasing at that instant. Positions do not depend on the birth location.</p>
 </dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="astrology.chart.Placement.identity">
-<span class="sig-name descname"><span class="pre">identity</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#astrology.config.Body" title="astrology.config.Body"><span class="pre">Body</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.config.LunarNode" title="astrology.config.LunarNode"><span class="pre">LunarNode</span></a></span><a class="headerlink" href="#astrology.chart.Placement.identity" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">identity</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#astrology.objects.Body" title="astrology.objects.Body"><span class="pre">Body</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.objects.LunarNode" title="astrology.objects.LunarNode"><span class="pre">LunarNode</span></a></span><a class="headerlink" href="#astrology.chart.Placement.identity" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -872,13 +922,15 @@ this calculation, not a caller request. <cite>evaluation</cite> names the joint
 evaluation that produced the positions: selecting a subset of the requested
 objects filters that output and does not narrow the evaluated domain.
 <cite>aspect_objects</cite> holds the objects aspects were judged among, in the order of
-the requested objects, and is empty when no aspect rules were requested.
+the requested bodies/nodes, then selected axes in ASC/MC/DSC/IC order. It is empty
+when no aspect rules were requested.
 <cite>orb_combination</cite> repeats the requested rule, or None when no rule has
 per-object orbs.</p>
 <p>实际采用的已确定选择。请求的宫制不会在这里变成另一种宫制。<cite>delta_t_model</cite> 是适配层为
 这次计算固定下来的上游 ΔT 模型取值，不是调用方的请求；<cite>evaluation</cite> 说明位置来自哪种
 联合求值：只选一部分对象时，只是筛选输出，不缩小求值域。<cite>aspect_objects</cite> 是判断相位时
-所用的对象，按请求对象的顺序排列；没有请求相位规则时为空。<cite>orb_combination</cite> 保存请求中的
+所用的对象，天体和交点按请求顺序排列，所选四轴按上升、中天、下降、天底顺序追加；
+没有请求相位规则时为空。<cite>orb_combination</cite> 保存请求中的
 合成规则；没有规则带按对象的容许度时为 None。</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -886,7 +938,7 @@ per-object orbs.</p>
 <li><p><strong>house_system</strong> (<a class="reference internal" href="#astrology.config.HouseSystem" title="astrology.config.HouseSystem"><em>HouseSystem</em></a>)</p></li>
 <li><p><strong>delta_t_model</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>)</p></li>
 <li><p><strong>evaluation</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Literal" title="(in Python v3.11)"><em>Literal</em></a><em>[</em><em>'fixed_fourteen_object_joint_snapshot'</em><em>]</em>)</p></li>
-<li><p><strong>aspect_objects</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#tuple" title="(in Python v3.11)"><em>tuple</em></a><em>[</em><a class="reference internal" href="#astrology.config.Body" title="astrology.config.Body"><em>Body</em></a><em> | </em><a class="reference internal" href="#astrology.config.LunarNode" title="astrology.config.LunarNode"><em>LunarNode</em></a><em>, </em><em>...</em><em>]</em>)</p></li>
+<li><p><strong>aspect_objects</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#tuple" title="(in Python v3.11)"><em>tuple</em></a><em>[</em><a class="reference internal" href="#astrology.objects.Body" title="astrology.objects.Body"><em>Body</em></a><em> | </em><a class="reference internal" href="#astrology.objects.LunarNode" title="astrology.objects.LunarNode"><em>LunarNode</em></a><em> | </em><a class="reference internal" href="#astrology.objects.Axis" title="astrology.objects.Axis"><em>Axis</em></a><em>, </em><em>...</em><em>]</em>)</p></li>
 <li><p><strong>orb_combination</strong> (<a class="reference internal" href="#astrology.config.OrbCombination" title="astrology.config.OrbCombination"><em>OrbCombination</em></a><em> | </em><em>None</em>)</p></li>
 </ul>
 </dd>
@@ -908,7 +960,7 @@ per-object orbs.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="astrology.chart.EffectiveConfiguration.aspect_objects">
-<span class="sig-name descname"><span class="pre">aspect_objects</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#tuple" title="(in Python v3.11)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#astrology.config.Body" title="astrology.config.Body"><span class="pre">Body</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.config.LunarNode" title="astrology.config.LunarNode"><span class="pre">LunarNode</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#astrology.chart.EffectiveConfiguration.aspect_objects" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">aspect_objects</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#tuple" title="(in Python v3.11)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#astrology.objects.Body" title="astrology.objects.Body"><span class="pre">Body</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.objects.LunarNode" title="astrology.objects.LunarNode"><span class="pre">LunarNode</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.objects.Axis" title="astrology.objects.Axis"><span class="pre">Axis</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#astrology.chart.EffectiveConfiguration.aspect_objects" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -1044,14 +1096,18 @@ importing astrology or querying knowledge never initializes native astronomy.
 A requested geometry outside the joint upstream domain raises
 <cite>ChartDomainError</cite> and never falls back to another house system. Requested
 aspect rules are judged among the objects of <cite>config.aspect_objects</cite>, or among
-all requested objects when it is unset, from the positions and longitude rates
-of this calculation. The distribution must be installed: missing package metadata
+all requested bodies/nodes when it is unset. Explicitly selected axes use the
+stored axis fields, not cusps, and have no supplied rate. Their non-exact hits
+are INDETERMINATE; zero deviation still gives EXACT. No axis is added to raw
+positions or placements. The distribution must be installed: missing package metadata
 raises <cite>importlib.metadata.PackageNotFoundError</cite> rather than inventing a version.</p>
 <p>为已解析的出生时刻计算热带地心本命盘。出生记录必须带地点；时间未知的记录在准备阶段
 就已被拒绝。天文适配层在这个函数里才导入，不在导入包时导入，所以导入 astrology 或查询
 知识都不会初始化原生天文库。请求的几何超出上游的联合求值域时，抛出
 <cite>ChartDomainError</cite>，不会改用别的宫制。根据这次计算的位置和黄经速率，
-在 <cite>config.aspect_objects</cite> 指定的对象之间计算相位；未设置时，所有请求的对象都参与。
+在 <cite>config.aspect_objects</cite> 指定的对象之间计算相位；未设置时，所有请求的天体和交点都参与。
+显式所选四轴直接使用已存轴字段，不使用宫头，也不提供速率；其非精确命中为 INDETERMINATE，
+偏差恰为零时仍为 EXACT。不把四轴加入原始位置或落点。
 分发包必须已安装；元数据缺失时抛出 <cite>importlib.metadata.PackageNotFoundError</cite>，不编造版本号。</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1069,7 +1125,8 @@ raises <cite>importlib.metadata.PackageNotFoundError</cite> rather than inventin
 </section>
 <section id="chart-text">
 <h2>Chart text<a class="headerlink" href="#chart-text" title="Link to this heading">¶</a></h2>
-<p>See the <a class="reference internal" href="records.html"><span class="std std-doc">complete result and text example</span></a>.</p>
+<p>See the <a class="reference internal" href="records.html"><span class="std std-doc">complete natal result and text example</span></a> for natal output, or
+<a class="reference internal" href="cross_aspects.html#render-comparison-text"><span class="std std-ref">render comparison text</span></a> for cross-chart aspects and house overlays.</p>
 <p id="module-astrology.text">Render chart results using caller-supplied bilingual vocabulary, without I/O.</p>
 <p>用调用方提供的双语词汇显示命盘结果，不执行 I/O。</p>
 <dl class="py function">
@@ -1104,11 +1161,144 @@ chart/catalog 类型错误时抛出 TypeError。本表不是无损命盘记录�
 </dl>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="astrology.text.format_cross_aspects">
+<span class="sig-prename descclassname"><span class="pre">astrology.text.</span></span><span class="sig-name descname"><span class="pre">format_cross_aspects</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">result</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">catalog</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">language</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'en'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrology.text.format_cross_aspects" title="Link to this definition">¶</a></dt>
+<dd><p>Format all static cross-chart aspect hits and their rules as a table.</p>
+<p>The table includes chart provenance and selected objects, without motion labels.
+Branches, deviations and effective orb limits are angles in degrees, displayed
+with the whole-arcsecond truncation rule. A deviation whose absolute value equals
+the orb limit counts as a hit. Truncation changes only the display, never which
+records appear. Rules show base orbs, object overrides and the chosen combination.</p>
+<p>Names come from the supplied Catalog; text is escaped as in format_house_overlays.
+Invalid result or catalog types raise TypeError. Invalid language, or missing or
+stale displayed names, raises ValueError. No I/O, astronomy or time resolution
+is performed. The table cannot be used to restore the source charts without loss.</p>
+<p>将全部静态双盘相位及其规则排成表格。表中包含命盘来源信息和所选对象，不添加运动标签。
+分支、偏差和实际容许度上限以度计，按整角秒截断显示；偏差的绝对值等于上限时也算命中。
+截断只影响显示，不改变输出哪些记录。规则列出基础容许度、对象单独设置及所选合成方式。</p>
+<p>名称取自传入的 Catalog，文字按 format_house_overlays 的规则转义。
+结果或目录类型错误时抛出 TypeError；语言非法，或所需名称缺失、过期时，抛出 ValueError。
+不执行 I/O、天文计算或时刻解析，不能用这份表格无损恢复原盘。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>result</strong> (<a class="reference internal" href="#astrology.cross_aspects.CrossChartAspects" title="astrology.cross_aspects.CrossChartAspects"><em>CrossChartAspects</em></a>)</p></li>
+<li><p><strong>catalog</strong> (<a class="reference internal" href="#astrology.knowledge.Catalog" title="astrology.knowledge.catalog.Catalog"><em>Catalog</em></a>)</p></li>
+<li><p><strong>language</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Literal" title="(in Python v3.11)"><em>Literal</em></a><em>[</em><em>'en'</em><em>, </em><em>'zh-CN'</em><em>]</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="astrology.text.format_house_overlays">
+<span class="sig-prename descclassname"><span class="pre">astrology.text.</span></span><span class="sig-name descname"><span class="pre">format_house_overlays</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">result</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">catalog</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">language</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'en'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrology.text.format_house_overlays" title="Link to this definition">¶</a></dt>
+<dd><p>Format house overlays as a table that identifies both charts for each placement.</p>
+<p>The table includes both charts’ provenance, selected objects and every placement,
+distinguishing the chart the object comes from and the chart whose houses are used.
+Names come from the supplied Catalog. No I/O, astronomy or time resolution is performed.
+Invalid result or catalog types raise TypeError. Invalid language, or missing or
+stale displayed names, raises ValueError. Text is escaped as in format_chart;
+the table cannot be used to restore the source charts without loss.</p>
+<p>将落宫结果排成表格，每条记录都标明对象来自哪张盘、使用哪张盘的宫位。
+表中包含两张盘的来源信息、所选对象和全部落宫，名称取自传入的 Catalog。
+不执行 I/O、天文计算或时刻解析。结果或目录类型错误时抛出 TypeError；
+语言非法，或所需名称缺失、过期时，抛出 ValueError。文字按 format_chart 的规则转义，
+不能用这份表格无损恢复原盘。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>result</strong> (<a class="reference internal" href="#astrology.house_overlays.CrossChartHouseOverlays" title="astrology.house_overlays.CrossChartHouseOverlays"><em>CrossChartHouseOverlays</em></a>)</p></li>
+<li><p><strong>catalog</strong> (<a class="reference internal" href="#astrology.knowledge.Catalog" title="astrology.knowledge.catalog.Catalog"><em>Catalog</em></a>)</p></li>
+<li><p><strong>language</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Literal" title="(in Python v3.11)"><em>Literal</em></a><em>[</em><em>'en'</em><em>, </em><em>'zh-CN'</em><em>]</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="astrology.text.format_house_rulers">
+<span class="sig-prename descclassname"><span class="pre">astrology.text.</span></span><span class="sig-name descname"><span class="pre">format_house_rulers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">result</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">catalog</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">language</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'en'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrology.text.format_house_rulers" title="Link to this definition">¶</a></dt>
+<dd><p>Show all twelve rulers, available placements and every assessed status.</p>
+<p>Distinguish uncalculated placements from no match among the four statuses.
+Type, language and name errors follow format_sign_distribution; no I/O.</p>
+<p>显示十二宫主星、可用落点及全部命中状态，区分落点未计算与四项均未命中。
+类型、语言及名称错误沿用 format_sign_distribution；不执行 I/O。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>result</strong> (<a class="reference internal" href="#astrology.summaries.HouseRulers" title="astrology.summaries.HouseRulers"><em>HouseRulers</em></a>)</p></li>
+<li><p><strong>catalog</strong> (<a class="reference internal" href="#astrology.knowledge.Catalog" title="astrology.knowledge.catalog.Catalog"><em>Catalog</em></a>)</p></li>
+<li><p><strong>language</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Literal" title="(in Python v3.11)"><em>Literal</em></a><em>[</em><em>'en'</em><em>, </em><em>'zh-CN'</em><em>]</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="astrology.text.format_lunar_phase">
+<span class="sig-prename descclassname"><span class="pre">astrology.text.</span></span><span class="sig-name descname"><span class="pre">format_lunar_phase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">result</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">catalog</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">language</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'en'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrology.text.format_lunar_phase" title="Link to this definition">¶</a></dt>
+<dd><p>Render the type and untruncated numerical angle using the supplied bilingual catalog.</p>
+<p>repr-style degree output preserves the stored float; direction and type never
+come from display rounding. No I/O or astronomy. Type, language and name errors
+follow format_sign_distribution; supplied names are escaped as in format_chart.</p>
+<p>用给定双语目录显示类型及未经截断的数值角度。度数按 repr 形式保留存储的浮点值；方向和类型
+不由显示舍入决定。不执行 I/O 或天文计算。类型、语言和名称错误沿用 format_sign_distribution，
+名称按 format_chart 的规则转义。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>result</strong> (<a class="reference internal" href="#astrology.lunar_phase.LunarPhaseResult" title="astrology.lunar_phase.LunarPhaseResult"><em>LunarPhaseResult</em></a>)</p></li>
+<li><p><strong>catalog</strong> (<a class="reference internal" href="#astrology.knowledge.Catalog" title="astrology.knowledge.catalog.Catalog"><em>Catalog</em></a>)</p></li>
+<li><p><strong>language</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Literal" title="(in Python v3.11)"><em>Literal</em></a><em>[</em><em>'en'</em><em>, </em><em>'zh-CN'</em><em>]</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="astrology.text.format_sign_distribution">
+<span class="sig-prename descclassname"><span class="pre">astrology.text.</span></span><span class="sig-name descname"><span class="pre">format_sign_distribution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">result</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">catalog</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">language</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'en'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrology.text.format_sign_distribution" title="Link to this definition">¶</a></dt>
+<dd><p>Render counted identities, denominator and all category counts using the supplied catalog.</p>
+<p>Proportions display as percentages with two decimal places; exact count/total
+remains visible. No I/O or astronomy. Invalid result/catalog types raise
+TypeError, invalid language or missing/stale names ValueError (missing IDs
+raise KeyError). Supplied names are escaped as in format_chart.</p>
+<p>用给定目录显示计数对象、分母和各类计数。比例显示为两位小数的百分比，同时保留精确的
+计数 / 总数。不执行 I/O 或天文计算。结果或目录类型错误抛出 TypeError，语言非法或
+名称缺失或过期抛出 ValueError（标识缺失抛出 KeyError）。名称按 format_chart 的规则转义。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>result</strong> (<a class="reference internal" href="#astrology.summaries.SignDistribution" title="astrology.summaries.SignDistribution"><em>SignDistribution</em></a>)</p></li>
+<li><p><strong>catalog</strong> (<a class="reference internal" href="#astrology.knowledge.Catalog" title="astrology.knowledge.catalog.Catalog"><em>Catalog</em></a>)</p></li>
+<li><p><strong>language</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Literal" title="(in Python v3.11)"><em>Literal</em></a><em>[</em><em>'en'</em><em>, </em><em>'zh-CN'</em><em>]</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 <section id="module-astrology.zodiac">
 <span id="zodiac-classification"></span><h2>Zodiac classification<a class="headerlink" href="#module-astrology.zodiac" title="Link to this heading">¶</a></h2>
-<p>Tropical sign sectors and Ashmand’s historical sign groups, without astronomy.</p>
-<p>热带黄道星座区间与 Ashmand 的历史星座分组，不涉及天文计算。</p>
+<p>Tropical signs, elements, modalities and Ashmand’s groups, without astronomy.</p>
+<p>热带黄道星座、元素、模式与 Ashmand 分组，不涉及天文计算。</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="astrology.zodiac.Sign">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">astrology.zodiac.</span></span><span class="sig-name descname"><span class="pre">Sign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrology.zodiac.Sign" title="Link to this definition">¶</a></dt>
@@ -1204,6 +1394,90 @@ A group label alone gives no chart interpretation or observed-season guarantee.<
 <span class="sig-name descname"><span class="pre">BICORPOREAL</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'bicorporeal'</span></span><a class="headerlink" href="#astrology.zodiac.AshmandSignGroup.BICORPOREAL" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="astrology.zodiac.Element">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">astrology.zodiac.</span></span><span class="sig-name descname"><span class="pre">Element</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrology.zodiac.Element" title="Link to this definition">¶</a></dt>
+<dd><p>The four elements used to classify signs. 用于星座分类的四元素。</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.zodiac.Element.FIRE">
+<span class="sig-name descname"><span class="pre">FIRE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'fire'</span></span><a class="headerlink" href="#astrology.zodiac.Element.FIRE" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.zodiac.Element.EARTH">
+<span class="sig-name descname"><span class="pre">EARTH</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'earth'</span></span><a class="headerlink" href="#astrology.zodiac.Element.EARTH" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.zodiac.Element.AIR">
+<span class="sig-name descname"><span class="pre">AIR</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'air'</span></span><a class="headerlink" href="#astrology.zodiac.Element.AIR" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.zodiac.Element.WATER">
+<span class="sig-name descname"><span class="pre">WATER</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'water'</span></span><a class="headerlink" href="#astrology.zodiac.Element.WATER" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="astrology.zodiac.Modality">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">astrology.zodiac.</span></span><span class="sig-name descname"><span class="pre">Modality</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrology.zodiac.Modality" title="Link to this definition">¶</a></dt>
+<dd><p>Modern three-way sign classification, distinct from Ashmand’s four groups.</p>
+<p>现代星座三模式分类，与 Ashmand 的四分组身份不同。</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.zodiac.Modality.CARDINAL">
+<span class="sig-name descname"><span class="pre">CARDINAL</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'cardinal'</span></span><a class="headerlink" href="#astrology.zodiac.Modality.CARDINAL" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.zodiac.Modality.FIXED">
+<span class="sig-name descname"><span class="pre">FIXED</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'fixed'</span></span><a class="headerlink" href="#astrology.zodiac.Modality.FIXED" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.zodiac.Modality.MUTABLE">
+<span class="sig-name descname"><span class="pre">MUTABLE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'mutable'</span></span><a class="headerlink" href="#astrology.zodiac.Modality.MUTABLE" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="astrology.zodiac.element_of">
+<span class="sig-prename descclassname"><span class="pre">astrology.zodiac.</span></span><span class="sig-name descname"><span class="pre">element_of</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sign</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrology.zodiac.element_of" title="Link to this definition">¶</a></dt>
+<dd><p>Return the sign’s element under rule.zodiac.elements; accept only Sign members.</p>
+<p>Source: Astrodienst, The four Elements and the Signs (see the catalog).
+Strings and other enums raise TypeError. No chart or astronomy is needed.</p>
+<p>按 rule.zodiac.elements 返回星座元素，只接受 Sign 成员。来源为 Astrodienst 的
+The four Elements and the Signs，书目见目录。字符串和其他枚举抛出 TypeError；不需命盘或天文计算。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sign</strong> (<a class="reference internal" href="#astrology.zodiac.Sign" title="astrology.zodiac.Sign"><em>Sign</em></a>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#astrology.zodiac.Element" title="astrology.zodiac.Element"><em>Element</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="astrology.zodiac.modality_of">
+<span class="sig-prename descclassname"><span class="pre">astrology.zodiac.</span></span><span class="sig-name descname"><span class="pre">modality_of</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sign</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrology.zodiac.modality_of" title="Link to this definition">¶</a></dt>
+<dd><p>Return the sign’s modality under rule.zodiac.modalities; accept only Sign members.</p>
+<p>Source: Astrodienst, The four Elements and the Signs (see the catalog).
+Strings and other enums raise TypeError. This does not return an Ashmand group.</p>
+<p>按 rule.zodiac.modalities 返回星座模式，只接受 Sign 成员。来源为 Astrodienst 的
+The four Elements and the Signs，书目见目录。字符串和其他枚举抛出 TypeError；结果不是 Ashmand 分组。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sign</strong> (<a class="reference internal" href="#astrology.zodiac.Sign" title="astrology.zodiac.Sign"><em>Sign</em></a>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#astrology.zodiac.Modality" title="astrology.zodiac.Modality"><em>Modality</em></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -1379,14 +1653,21 @@ its magnitude has no two-sided derivative there.</p>
 <dt class="sig sig-object py" id="astrology.aspects.AspectObject">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">astrology.aspects.</span></span><span class="sig-name descname"><span class="pre">AspectObject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">identity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">longitude_deg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">longitude_rate_deg_per_day</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrology.aspects.AspectObject" title="Link to this definition">¶</a></dt>
 <dd><p>One object’s longitude in degrees and its rate in degrees per day, if it has one.</p>
+<p>Any finite longitude is accepted, including negative values, values above 360
+and the largest finite float. The supplied value is stored as a float without
+wrapping; aspect calculations reduce each longitude around the circle before
+subtracting, avoiding overflow for extreme finite inputs.</p>
 <p>The rate may be None where no meaningful motion exists; it is never borrowed from
-another object. All objects must use the same day, such as the TT day.</p>
-<p>一个对象的黄经（度）及其速率（度/日，可为 None）。若无法给出有意义的速率，就用 None，
-不借用其他对象的速率。所有对象的速率必须使用相同的日长定义，例如 TT 日。</p>
+another object. All rates must use the same day unit, such as the TT day.</p>
+<p>一个对象的黄经（度）及其速率（度/日，可为 None）。
+黄经接受任何有限值，包括负值、超过 360 度的值及最大的有限浮点值。
+传入值转为浮点数保存，不取模；相位计算先约去各黄经中的整圈，再相减，避免极大有限输入溢出。
+若无法给出有意义的速率，就用 None，
+不借用其他对象的速率。所有速率必须采用相同的日作为时间单位，例如 TT 日。</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>identity</strong> (<a class="reference internal" href="#astrology.config.Body" title="astrology.config.Body"><em>Body</em></a><em> | </em><a class="reference internal" href="#astrology.config.LunarNode" title="astrology.config.LunarNode"><em>LunarNode</em></a>)</p></li>
+<li><p><strong>identity</strong> (<a class="reference internal" href="#astrology.objects.Body" title="astrology.objects.Body"><em>Body</em></a><em> | </em><a class="reference internal" href="#astrology.objects.LunarNode" title="astrology.objects.LunarNode"><em>LunarNode</em></a><em> | </em><a class="reference internal" href="#astrology.objects.Axis" title="astrology.objects.Axis"><em>Axis</em></a>)</p></li>
 <li><p><strong>longitude_deg</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>)</p></li>
 <li><p><strong>longitude_rate_deg_per_day</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a><em> | </em><em>None</em>)</p></li>
 </ul>
@@ -1394,7 +1675,7 @@ another object. All objects must use the same day, such as the TT day.</p>
 </dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="astrology.aspects.AspectObject.identity">
-<span class="sig-name descname"><span class="pre">identity</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#astrology.config.Body" title="astrology.config.Body"><span class="pre">Body</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.config.LunarNode" title="astrology.config.LunarNode"><span class="pre">LunarNode</span></a></span><a class="headerlink" href="#astrology.aspects.AspectObject.identity" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">identity</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#astrology.objects.Body" title="astrology.objects.Body"><span class="pre">Body</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.objects.LunarNode" title="astrology.objects.LunarNode"><span class="pre">LunarNode</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.objects.Axis" title="astrology.objects.Axis"><span class="pre">Axis</span></a></span><a class="headerlink" href="#astrology.aspects.AspectObject.identity" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -1426,8 +1707,8 @@ where there are two; the status does not change.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>first</strong> (<a class="reference internal" href="#astrology.config.Body" title="astrology.config.Body"><em>Body</em></a><em> | </em><a class="reference internal" href="#astrology.config.LunarNode" title="astrology.config.LunarNode"><em>LunarNode</em></a>)</p></li>
-<li><p><strong>second</strong> (<a class="reference internal" href="#astrology.config.Body" title="astrology.config.Body"><em>Body</em></a><em> | </em><a class="reference internal" href="#astrology.config.LunarNode" title="astrology.config.LunarNode"><em>LunarNode</em></a>)</p></li>
+<li><p><strong>first</strong> (<a class="reference internal" href="#astrology.objects.Body" title="astrology.objects.Body"><em>Body</em></a><em> | </em><a class="reference internal" href="#astrology.objects.LunarNode" title="astrology.objects.LunarNode"><em>LunarNode</em></a><em> | </em><a class="reference internal" href="#astrology.objects.Axis" title="astrology.objects.Axis"><em>Axis</em></a>)</p></li>
+<li><p><strong>second</strong> (<a class="reference internal" href="#astrology.objects.Body" title="astrology.objects.Body"><em>Body</em></a><em> | </em><a class="reference internal" href="#astrology.objects.LunarNode" title="astrology.objects.LunarNode"><em>LunarNode</em></a><em> | </em><a class="reference internal" href="#astrology.objects.Axis" title="astrology.objects.Axis"><em>Axis</em></a>)</p></li>
 <li><p><strong>aspect</strong> (<a class="reference internal" href="#astrology.config.MajorAspect" title="astrology.config.MajorAspect"><em>MajorAspect</em></a>)</p></li>
 <li><p><strong>branch_deg</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>)</p></li>
 <li><p><strong>deviation_deg</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>)</p></li>
@@ -1438,12 +1719,12 @@ where there are two; the status does not change.</p>
 </dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="astrology.aspects.AspectHit.first">
-<span class="sig-name descname"><span class="pre">first</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#astrology.config.Body" title="astrology.config.Body"><span class="pre">Body</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.config.LunarNode" title="astrology.config.LunarNode"><span class="pre">LunarNode</span></a></span><a class="headerlink" href="#astrology.aspects.AspectHit.first" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">first</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#astrology.objects.Body" title="astrology.objects.Body"><span class="pre">Body</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.objects.LunarNode" title="astrology.objects.LunarNode"><span class="pre">LunarNode</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.objects.Axis" title="astrology.objects.Axis"><span class="pre">Axis</span></a></span><a class="headerlink" href="#astrology.aspects.AspectHit.first" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="astrology.aspects.AspectHit.second">
-<span class="sig-name descname"><span class="pre">second</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#astrology.config.Body" title="astrology.config.Body"><span class="pre">Body</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.config.LunarNode" title="astrology.config.LunarNode"><span class="pre">LunarNode</span></a></span><a class="headerlink" href="#astrology.aspects.AspectHit.second" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">second</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#astrology.objects.Body" title="astrology.objects.Body"><span class="pre">Body</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.objects.LunarNode" title="astrology.objects.LunarNode"><span class="pre">LunarNode</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.objects.Axis" title="astrology.objects.Axis"><span class="pre">Axis</span></a></span><a class="headerlink" href="#astrology.aspects.AspectHit.second" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -1499,12 +1780,14 @@ one. A hit holds when the deviation’s magnitude is at most the limit, with the
 itself included. The limit is the rule’s orb, or the combination of the two objects’
 orbs when the rule has per-object orbs, which then requires <cite>combination</cite>. Two lunar
 nodes never form an aspect: the four identities are one pair of nodes under two
-definitions and two directions.</p>
+definitions and two directions. Axes may pair with any other distinct identity,
+including an opposite axis; their identities and all matching branches remain separate.</p>
 <p>按固定顺序返回对象两两之间符合规则的所有相位。配对按 <cite>objects</cite> 的顺序排列，再按相位角排序，
 同一相位的负分支排在正分支之前。容许度较宽时，同一对对象可能符合多个相位或分支，都会返回，
 不会只保留偏差最小的一个。偏差的绝对值不超过容许度上限就算符合，等于上限也算。
 上限通常是规则的容许度；规则给对象单独设置容许度时，上限由两个对象的容许度合成，
-此时必须给出 <cite>combination</cite>。两个月交点之间不构成相位：四个标识表示同一对交点的两种定义和两个方向。</p>
+此时必须给出 <cite>combination</cite>。两个月交点之间不构成相位：四个标识表示同一对交点的两种定义和两个方向。
+四轴可与任一不同身份配对，包括其对轴；各身份及全部命中分支分别保留。</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1522,7 +1805,7 @@ definitions and two directions.</p>
 </section>
 <section id="static-cross-chart-aspects">
 <h2>Static cross-chart aspects<a class="headerlink" href="#static-cross-chart-aspects" title="Link to this heading">¶</a></h2>
-<p>See the <a class="reference internal" href="cross_aspects.html"><span class="std std-doc">two-chart example and static contract</span></a>.</p>
+<p>See <a class="reference internal" href="cross_aspects.html"><span class="std std-doc">cross-chart aspects and house overlays</span></a> for usage and the meaning of static aspects.</p>
 <p id="module-astrology.cross_aspects">Static major aspects between two supplied natal results, without astronomy or motion.</p>
 <p>对两张给定本命盘结果判断静态主要相位，不调用天文库，也不判断运动状态。</p>
 <dl class="py class">
@@ -1538,8 +1821,8 @@ rates at separate birth instants do not define a shared time evolution.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>left_object</strong> (<a class="reference internal" href="#astrology.config.Body" title="astrology.config.Body"><em>Body</em></a><em> | </em><a class="reference internal" href="#astrology.config.LunarNode" title="astrology.config.LunarNode"><em>LunarNode</em></a>)</p></li>
-<li><p><strong>right_object</strong> (<a class="reference internal" href="#astrology.config.Body" title="astrology.config.Body"><em>Body</em></a><em> | </em><a class="reference internal" href="#astrology.config.LunarNode" title="astrology.config.LunarNode"><em>LunarNode</em></a>)</p></li>
+<li><p><strong>left_object</strong> (<a class="reference internal" href="#astrology.objects.Body" title="astrology.objects.Body"><em>Body</em></a><em> | </em><a class="reference internal" href="#astrology.objects.LunarNode" title="astrology.objects.LunarNode"><em>LunarNode</em></a><em> | </em><a class="reference internal" href="#astrology.objects.Axis" title="astrology.objects.Axis"><em>Axis</em></a>)</p></li>
+<li><p><strong>right_object</strong> (<a class="reference internal" href="#astrology.objects.Body" title="astrology.objects.Body"><em>Body</em></a><em> | </em><a class="reference internal" href="#astrology.objects.LunarNode" title="astrology.objects.LunarNode"><em>LunarNode</em></a><em> | </em><a class="reference internal" href="#astrology.objects.Axis" title="astrology.objects.Axis"><em>Axis</em></a>)</p></li>
 <li><p><strong>aspect</strong> (<a class="reference internal" href="#astrology.config.MajorAspect" title="astrology.config.MajorAspect"><em>MajorAspect</em></a>)</p></li>
 <li><p><strong>branch_deg</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>)</p></li>
 <li><p><strong>deviation_deg</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>)</p></li>
@@ -1549,12 +1832,12 @@ rates at separate birth instants do not define a shared time evolution.</p>
 </dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="astrology.cross_aspects.CrossAspectHit.left_object">
-<span class="sig-name descname"><span class="pre">left_object</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#astrology.config.Body" title="astrology.config.Body"><span class="pre">Body</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.config.LunarNode" title="astrology.config.LunarNode"><span class="pre">LunarNode</span></a></span><a class="headerlink" href="#astrology.cross_aspects.CrossAspectHit.left_object" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">left_object</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#astrology.objects.Body" title="astrology.objects.Body"><span class="pre">Body</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.objects.LunarNode" title="astrology.objects.LunarNode"><span class="pre">LunarNode</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.objects.Axis" title="astrology.objects.Axis"><span class="pre">Axis</span></a></span><a class="headerlink" href="#astrology.cross_aspects.CrossAspectHit.left_object" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="astrology.cross_aspects.CrossAspectHit.right_object">
-<span class="sig-name descname"><span class="pre">right_object</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#astrology.config.Body" title="astrology.config.Body"><span class="pre">Body</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.config.LunarNode" title="astrology.config.LunarNode"><span class="pre">LunarNode</span></a></span><a class="headerlink" href="#astrology.cross_aspects.CrossAspectHit.right_object" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">right_object</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#astrology.objects.Body" title="astrology.objects.Body"><span class="pre">Body</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.objects.LunarNode" title="astrology.objects.LunarNode"><span class="pre">LunarNode</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.objects.Axis" title="astrology.objects.Axis"><span class="pre">Axis</span></a></span><a class="headerlink" href="#astrology.cross_aspects.CrossAspectHit.right_object" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -1584,20 +1867,22 @@ rates at separate birth instants do not define a shared time evolution.</p>
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">astrology.cross_aspects.</span></span><span class="sig-name descname"><span class="pre">CrossChartAspects</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chart_left</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chart_right</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">left_objects</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right_objects</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rules</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">combination</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hits</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrology.cross_aspects.CrossChartAspects" title="Link to this definition">¶</a></dt>
 <dd><p>Immutable sources, effective selections, explicit rules and all static cross hits.</p>
 <p><cite>chart_left</cite> and <cite>chart_right</cite> retain the complete source charts unchanged.
-Sequences are isolated in tuples; selections follow their source’s position order.
+Sequences are isolated in tuples; selections follow their source’s position order,
+then selected axes in ASC/MC/DSC/IC order.
 Construction recomputes all hits from the two sources, selections and rules and rejects any difference.
 It does not authenticate the sources’ astronomical values or provenance labels.</p>
 <p>不可变的双侧来源、实际参与对象、显式规则与全部静态交叉命中。<cite>chart_left</cite> 与 <cite>chart_right</cite>
 保留两张完整源盘，不改变它们。
-序列复制为元组；参与对象按各自源盘的位置顺序排列。构造时按两侧来源、选择和规则重算全部命中，拒绝任何差异，
+序列复制为元组；天体和交点按各自源盘的位置顺序排列，所选四轴按上升、中天、下降、天底顺序追加。
+构造时按两侧来源、选择和规则重算全部命中，拒绝任何差异，
 不认证源盘的天文值或来源标签是否真实。</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>chart_left</strong> (<a class="reference internal" href="#astrology.chart.NatalChart" title="astrology.chart.NatalChart"><em>NatalChart</em></a>)</p></li>
 <li><p><strong>chart_right</strong> (<a class="reference internal" href="#astrology.chart.NatalChart" title="astrology.chart.NatalChart"><em>NatalChart</em></a>)</p></li>
-<li><p><strong>left_objects</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#tuple" title="(in Python v3.11)"><em>tuple</em></a><em>[</em><a class="reference internal" href="#astrology.config.Body" title="astrology.config.Body"><em>Body</em></a><em> | </em><a class="reference internal" href="#astrology.config.LunarNode" title="astrology.config.LunarNode"><em>LunarNode</em></a><em>, </em><em>...</em><em>]</em>)</p></li>
-<li><p><strong>right_objects</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#tuple" title="(in Python v3.11)"><em>tuple</em></a><em>[</em><a class="reference internal" href="#astrology.config.Body" title="astrology.config.Body"><em>Body</em></a><em> | </em><a class="reference internal" href="#astrology.config.LunarNode" title="astrology.config.LunarNode"><em>LunarNode</em></a><em>, </em><em>...</em><em>]</em>)</p></li>
+<li><p><strong>left_objects</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#tuple" title="(in Python v3.11)"><em>tuple</em></a><em>[</em><a class="reference internal" href="#astrology.objects.Body" title="astrology.objects.Body"><em>Body</em></a><em> | </em><a class="reference internal" href="#astrology.objects.LunarNode" title="astrology.objects.LunarNode"><em>LunarNode</em></a><em> | </em><a class="reference internal" href="#astrology.objects.Axis" title="astrology.objects.Axis"><em>Axis</em></a><em>, </em><em>...</em><em>]</em>)</p></li>
+<li><p><strong>right_objects</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#tuple" title="(in Python v3.11)"><em>tuple</em></a><em>[</em><a class="reference internal" href="#astrology.objects.Body" title="astrology.objects.Body"><em>Body</em></a><em> | </em><a class="reference internal" href="#astrology.objects.LunarNode" title="astrology.objects.LunarNode"><em>LunarNode</em></a><em> | </em><a class="reference internal" href="#astrology.objects.Axis" title="astrology.objects.Axis"><em>Axis</em></a><em>, </em><em>...</em><em>]</em>)</p></li>
 <li><p><strong>rules</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#tuple" title="(in Python v3.11)"><em>tuple</em></a><em>[</em><a class="reference internal" href="#astrology.config.AspectRule" title="astrology.config.AspectRule"><em>AspectRule</em></a><em>, </em><em>...</em><em>]</em>)</p></li>
 <li><p><strong>combination</strong> (<a class="reference internal" href="#astrology.config.OrbCombination" title="astrology.config.OrbCombination"><em>OrbCombination</em></a><em> | </em><em>None</em>)</p></li>
 <li><p><strong>hits</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#tuple" title="(in Python v3.11)"><em>tuple</em></a><em>[</em><a class="reference internal" href="#astrology.cross_aspects.CrossAspectHit" title="astrology.cross_aspects.CrossAspectHit"><em>CrossAspectHit</em></a><em>, </em><em>...</em><em>]</em>)</p></li>
@@ -1616,12 +1901,12 @@ It does not authenticate the sources’ astronomical values or provenance labels
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="astrology.cross_aspects.CrossChartAspects.left_objects">
-<span class="sig-name descname"><span class="pre">left_objects</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#tuple" title="(in Python v3.11)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#astrology.config.Body" title="astrology.config.Body"><span class="pre">Body</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.config.LunarNode" title="astrology.config.LunarNode"><span class="pre">LunarNode</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#astrology.cross_aspects.CrossChartAspects.left_objects" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">left_objects</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#tuple" title="(in Python v3.11)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#astrology.objects.Body" title="astrology.objects.Body"><span class="pre">Body</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.objects.LunarNode" title="astrology.objects.LunarNode"><span class="pre">LunarNode</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.objects.Axis" title="astrology.objects.Axis"><span class="pre">Axis</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#astrology.cross_aspects.CrossChartAspects.left_objects" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="astrology.cross_aspects.CrossChartAspects.right_objects">
-<span class="sig-name descname"><span class="pre">right_objects</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#tuple" title="(in Python v3.11)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#astrology.config.Body" title="astrology.config.Body"><span class="pre">Body</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.config.LunarNode" title="astrology.config.LunarNode"><span class="pre">LunarNode</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#astrology.cross_aspects.CrossChartAspects.right_objects" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">right_objects</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#tuple" title="(in Python v3.11)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#astrology.objects.Body" title="astrology.objects.Body"><span class="pre">Body</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.objects.LunarNode" title="astrology.objects.LunarNode"><span class="pre">LunarNode</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.objects.Axis" title="astrology.objects.Axis"><span class="pre">Axis</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#astrology.cross_aspects.CrossChartAspects.right_objects" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -1645,13 +1930,16 @@ It does not authenticate the sources’ astronomical values or provenance labels
 <dt class="sig sig-object py" id="astrology.cross_aspects.cross_chart_aspects">
 <span class="sig-prename descclassname"><span class="pre">astrology.cross_aspects.</span></span><span class="sig-name descname"><span class="pre">cross_chart_aspects</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chart_left</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chart_right</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rules</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">left_objects</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right_objects</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">combination</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrology.cross_aspects.cross_chart_aspects" title="Link to this definition">¶</a></dt>
 <dd><p>Compare each selected left position with every selected right position, without motion.</p>
-<p>None selects all positions on that side, independently of natal participants;
-an empty selection or rule sequence is valid. Same identities, node-node pairs
+<p>None selects all bodies/nodes on that side and no axes, independently of natal participants;
+explicit selections may include any of its stored axes, even if absent from natal
+aspects. Read the actual axis fields, never cusps or synthesized opposite axes.
+An empty selection or rule sequence is valid. Same identities, node-node pairs
 and the same chart in both roles are allowed. Rules are explicit and never
 inherited. Object-orb overrides apply by identity on either side and may name
 only selected objects; a combination is required exactly when overrides exist.
 Duplicate rules/participants and unavailable objects are rejected.</p>
-<p>Every matching branch is returned, ordered by left position, right position,
+<p>Selected axes follow bodies/nodes in ASC/MC/DSC/IC order. Axis-axis and opposite-axis
+pairs are retained, not folded. Every matching branch is returned, ordered by left position, right position,
 ascending aspect angle, then negative before positive branch. The inclusive
 limits and signed deviations are in degrees. Both charts must have matching
 zodiac, center and position frame. Their own-date tropical longitudes are
@@ -1659,10 +1947,12 @@ compared without common-epoch conversion or a simultaneous spatial-angle claim.
 Different dates, locations, house systems, models and version labels are kept,
 not automatically rejected. No I/O, time resolution, version lookup or native
 astronomy is performed; source charts are retained unchanged.</p>
-<p>将每个所选左盘位置与每个所选右盘位置比较，不判断运动状态。None 选该侧全部位置，
+<p>将每个所选左盘位置与每个所选右盘位置比较，不判断运动状态。None 选该侧全部天体和交点，不加入四轴；
+显式选择可含该盘任一已存轴，即使未参与本命相位。直接读取轴字段，不使用宫头或合成对轴。
 不继承本命相位参与者；空选择和空规则合法。允许同名对象、跨盘交点配对及同一张盘占两个角色。
 规则须显式给出，不继承源盘规则。对象容许度按标识作用于两侧，只能指向所选对象；有覆盖时
 必须给合成方式，无覆盖时不能给。拒绝重复规则、重复参与对象及源盘没有的对象。
+所选四轴在天体和交点之后按上升、中天、下降、天底顺序排列。保留轴间及对轴配对，不折叠身份。
 返回全部命中分支，按左位置、右位置、相位角升序及负分支在前排序。容许度包含等号，
 带符号偏差和上限以度计。两盘的黄道、中心和位置坐标约定须一致；比较各自日期的热带黄经，
 不转换共同历元，也不声称是同时刻的空间角。保留不同日期、地点、宫制、模型和版本标签，
@@ -1673,13 +1963,557 @@ astronomy is performed; source charts are retained unchanged.</p>
 <li><p><strong>chart_left</strong> (<a class="reference internal" href="#astrology.chart.NatalChart" title="astrology.chart.NatalChart"><em>NatalChart</em></a>)</p></li>
 <li><p><strong>chart_right</strong> (<a class="reference internal" href="#astrology.chart.NatalChart" title="astrology.chart.NatalChart"><em>NatalChart</em></a>)</p></li>
 <li><p><strong>rules</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.11)"><em>Sequence</em></a><em>[</em><a class="reference internal" href="#astrology.config.AspectRule" title="astrology.config.AspectRule"><em>AspectRule</em></a><em>]</em>)</p></li>
-<li><p><strong>left_objects</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.11)"><em>Sequence</em></a><em>[</em><a class="reference internal" href="#astrology.config.Body" title="astrology.config.Body"><em>Body</em></a><em> | </em><a class="reference internal" href="#astrology.config.LunarNode" title="astrology.config.LunarNode"><em>LunarNode</em></a><em>] </em><em>| </em><em>None</em>)</p></li>
-<li><p><strong>right_objects</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.11)"><em>Sequence</em></a><em>[</em><a class="reference internal" href="#astrology.config.Body" title="astrology.config.Body"><em>Body</em></a><em> | </em><a class="reference internal" href="#astrology.config.LunarNode" title="astrology.config.LunarNode"><em>LunarNode</em></a><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>left_objects</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.11)"><em>Sequence</em></a><em>[</em><a class="reference internal" href="#astrology.objects.Body" title="astrology.objects.Body"><em>Body</em></a><em> | </em><a class="reference internal" href="#astrology.objects.LunarNode" title="astrology.objects.LunarNode"><em>LunarNode</em></a><em> | </em><a class="reference internal" href="#astrology.objects.Axis" title="astrology.objects.Axis"><em>Axis</em></a><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>right_objects</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.11)"><em>Sequence</em></a><em>[</em><a class="reference internal" href="#astrology.objects.Body" title="astrology.objects.Body"><em>Body</em></a><em> | </em><a class="reference internal" href="#astrology.objects.LunarNode" title="astrology.objects.LunarNode"><em>LunarNode</em></a><em> | </em><a class="reference internal" href="#astrology.objects.Axis" title="astrology.objects.Axis"><em>Axis</em></a><em>] </em><em>| </em><em>None</em>)</p></li>
 <li><p><strong>combination</strong> (<a class="reference internal" href="#astrology.config.OrbCombination" title="astrology.config.OrbCombination"><em>OrbCombination</em></a><em> | </em><em>None</em>)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="#astrology.cross_aspects.CrossChartAspects" title="astrology.cross_aspects.CrossChartAspects"><em>CrossChartAspects</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="cross-chart-house-overlays">
+<h2>Cross-chart house overlays<a class="headerlink" href="#cross-chart-house-overlays" title="Link to this heading">¶</a></h2>
+<p>See the <a class="reference internal" href="cross_aspects.html#find-houses-in-the-other-chart"><span class="std std-ref">house-overlay example</span></a>
+for calculation and the <a class="reference internal" href="cross_aspects.html#render-comparison-text"><span class="std std-ref">comparison text example</span></a> for output.</p>
+<p id="module-astrology.house_overlays">Find which houses in one chart contain the other chart’s selected objects.</p>
+<p>查询一张盘中选定的对象落入另一张盘的哪一宫。</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="astrology.house_overlays.HouseOverlay">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">astrology.house_overlays.</span></span><span class="sig-name descname"><span class="pre">HouseOverlay</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">object_owner</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">house_owner</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">identity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">house</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrology.house_overlays.HouseOverlay" title="Link to this definition">¶</a></dt>
+<dd><p>An object’s house in the other chart.</p>
+<p>object_owner identifies the chart the object comes from; house_owner identifies
+the chart whose houses are used. One must be “left” and the other “right”.
+identity is a Body, LunarNode or Axis. house is an integer from 1 to 12, not bool.
+CrossChartHouseOverlays checks the house against the charts; this record alone
+does not have the geometry needed for that check.</p>
+<p>一个对象落入另一张盘的宫位。object_owner 表示对象来自哪张盘，house_owner 表示使用哪张盘的宫位，
+两者必须一个为 “left”、另一个为 “right”。identity 为 Body、LunarNode 或 Axis；
+house 是 1 到 12 的整数，不接受 bool。单条记录没有校验落宫所需的几何数据，
+由 CrossChartHouseOverlays 根据两张盘检查宫号是否正确。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>object_owner</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Literal" title="(in Python v3.11)"><em>Literal</em></a><em>[</em><em>'left'</em><em>, </em><em>'right'</em><em>]</em>)</p></li>
+<li><p><strong>house_owner</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Literal" title="(in Python v3.11)"><em>Literal</em></a><em>[</em><em>'left'</em><em>, </em><em>'right'</em><em>]</em>)</p></li>
+<li><p><strong>identity</strong> (<a class="reference internal" href="#astrology.objects.Body" title="astrology.objects.Body"><em>Body</em></a><em> | </em><a class="reference internal" href="#astrology.objects.LunarNode" title="astrology.objects.LunarNode"><em>LunarNode</em></a><em> | </em><a class="reference internal" href="#astrology.objects.Axis" title="astrology.objects.Axis"><em>Axis</em></a>)</p></li>
+<li><p><strong>house</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.house_overlays.HouseOverlay.object_owner">
+<span class="sig-name descname"><span class="pre">object_owner</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Literal" title="(in Python v3.11)"><span class="pre">Literal</span></a><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'left'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'right'</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#astrology.house_overlays.HouseOverlay.object_owner" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.house_overlays.HouseOverlay.house_owner">
+<span class="sig-name descname"><span class="pre">house_owner</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Literal" title="(in Python v3.11)"><span class="pre">Literal</span></a><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'left'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'right'</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#astrology.house_overlays.HouseOverlay.house_owner" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.house_overlays.HouseOverlay.identity">
+<span class="sig-name descname"><span class="pre">identity</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#astrology.objects.Body" title="astrology.objects.Body"><span class="pre">Body</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.objects.LunarNode" title="astrology.objects.LunarNode"><span class="pre">LunarNode</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.objects.Axis" title="astrology.objects.Axis"><span class="pre">Axis</span></a></span><a class="headerlink" href="#astrology.house_overlays.HouseOverlay.identity" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.house_overlays.HouseOverlay.house">
+<span class="sig-name descname"><span class="pre">house</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span><a class="headerlink" href="#astrology.house_overlays.HouseOverlay.house" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="astrology.house_overlays.CrossChartHouseOverlays">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">astrology.house_overlays.</span></span><span class="sig-name descname"><span class="pre">CrossChartHouseOverlays</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chart_left</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chart_right</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">left_objects</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right_objects</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">placements</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrology.house_overlays.CrossChartHouseOverlays" title="Link to this definition">¶</a></dt>
+<dd><p>An immutable result containing both charts, selected objects and all placements.</p>
+<p>Both charts remain unchanged. Input sequences are copied into tuples. Selected
+bodies and nodes follow each chart’s position order, then selected axes follow
+in ASC/MC/DSC/IC order. Placements list left objects in right houses, then right
+objects in left houses. Construction recomputes the complete placement sequence
+and rejects any difference; it does not authenticate the charts’ astronomical origin.</p>
+<p>不可变的结果，包含两张命盘、所选对象和全部落宫记录。两张盘保持不变，传入的序列复制为元组。
+所选天体和交点按各盘的位置记录顺序排列，所选四轴随后按上升、中天、下降、天底排列。
+落宫记录先列左盘对象在右盘的落宫，再列右盘对象在左盘的落宫。
+构造时会重新计算完整落宫序列，拒绝与它不同的记录；这些检查不证明命盘的天文来源真实。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>chart_left</strong> (<a class="reference internal" href="#astrology.chart.NatalChart" title="astrology.chart.NatalChart"><em>NatalChart</em></a>)</p></li>
+<li><p><strong>chart_right</strong> (<a class="reference internal" href="#astrology.chart.NatalChart" title="astrology.chart.NatalChart"><em>NatalChart</em></a>)</p></li>
+<li><p><strong>left_objects</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#tuple" title="(in Python v3.11)"><em>tuple</em></a><em>[</em><a class="reference internal" href="#astrology.objects.Body" title="astrology.objects.Body"><em>Body</em></a><em> | </em><a class="reference internal" href="#astrology.objects.LunarNode" title="astrology.objects.LunarNode"><em>LunarNode</em></a><em> | </em><a class="reference internal" href="#astrology.objects.Axis" title="astrology.objects.Axis"><em>Axis</em></a><em>, </em><em>...</em><em>]</em>)</p></li>
+<li><p><strong>right_objects</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#tuple" title="(in Python v3.11)"><em>tuple</em></a><em>[</em><a class="reference internal" href="#astrology.objects.Body" title="astrology.objects.Body"><em>Body</em></a><em> | </em><a class="reference internal" href="#astrology.objects.LunarNode" title="astrology.objects.LunarNode"><em>LunarNode</em></a><em> | </em><a class="reference internal" href="#astrology.objects.Axis" title="astrology.objects.Axis"><em>Axis</em></a><em>, </em><em>...</em><em>]</em>)</p></li>
+<li><p><strong>placements</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#tuple" title="(in Python v3.11)"><em>tuple</em></a><em>[</em><a class="reference internal" href="#astrology.house_overlays.HouseOverlay" title="astrology.house_overlays.HouseOverlay"><em>HouseOverlay</em></a><em>, </em><em>...</em><em>]</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.house_overlays.CrossChartHouseOverlays.chart_left">
+<span class="sig-name descname"><span class="pre">chart_left</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#astrology.chart.NatalChart" title="astrology.chart.NatalChart"><span class="pre">NatalChart</span></a></span><a class="headerlink" href="#astrology.house_overlays.CrossChartHouseOverlays.chart_left" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.house_overlays.CrossChartHouseOverlays.chart_right">
+<span class="sig-name descname"><span class="pre">chart_right</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#astrology.chart.NatalChart" title="astrology.chart.NatalChart"><span class="pre">NatalChart</span></a></span><a class="headerlink" href="#astrology.house_overlays.CrossChartHouseOverlays.chart_right" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.house_overlays.CrossChartHouseOverlays.left_objects">
+<span class="sig-name descname"><span class="pre">left_objects</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#tuple" title="(in Python v3.11)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#astrology.objects.Body" title="astrology.objects.Body"><span class="pre">Body</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.objects.LunarNode" title="astrology.objects.LunarNode"><span class="pre">LunarNode</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.objects.Axis" title="astrology.objects.Axis"><span class="pre">Axis</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#astrology.house_overlays.CrossChartHouseOverlays.left_objects" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.house_overlays.CrossChartHouseOverlays.right_objects">
+<span class="sig-name descname"><span class="pre">right_objects</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#tuple" title="(in Python v3.11)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#astrology.objects.Body" title="astrology.objects.Body"><span class="pre">Body</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.objects.LunarNode" title="astrology.objects.LunarNode"><span class="pre">LunarNode</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.objects.Axis" title="astrology.objects.Axis"><span class="pre">Axis</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#astrology.house_overlays.CrossChartHouseOverlays.right_objects" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.house_overlays.CrossChartHouseOverlays.placements">
+<span class="sig-name descname"><span class="pre">placements</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#tuple" title="(in Python v3.11)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#astrology.house_overlays.HouseOverlay" title="astrology.house_overlays.HouseOverlay"><span class="pre">HouseOverlay</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#astrology.house_overlays.CrossChartHouseOverlays.placements" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="astrology.house_overlays.cross_chart_house_overlays">
+<span class="sig-prename descclassname"><span class="pre">astrology.house_overlays.</span></span><span class="sig-name descname"><span class="pre">cross_chart_house_overlays</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chart_left</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chart_right</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">left_objects</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right_objects</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrology.house_overlays.cross_chart_house_overlays" title="Link to this definition">¶</a></dt>
+<dd><p>Find the house of each selected object in the other chart.</p>
+<p>left_objects and right_objects select objects from their respective charts.
+None selects all bodies and nodes in that chart, without axes, independently of
+its natal aspect selection. Explicit selections may include stored axes. Their
+longitudes come from the actual axis fields, not cusps or calculated opposites.
+Bodies and nodes follow chart order, then selected axes follow in ASC/MC/DSC/IC order.</p>
+<p>An empty selection skips placements of that chart’s objects, but its houses are
+still used for the other chart’s objects. Both charts and selections are checked
+even when output is empty. Same-named objects and the same chart on both sides
+are allowed. The result retains both charts and lists left objects in right
+houses before right objects in left houses.</p>
+<p>Placement compares stored longitudes with the other chart’s cusps, in degrees,
+wrapping at 360. A longitude exactly on a cusp belongs to the house starting
+there. The charts must use the same zodiac, center and position frame. Current
+public constructors accept only tropical, geocentric positions on the true
+ecliptic and equinox of each chart’s own date. Different dates, house systems,
+models and versions are retained. There is no common-epoch conversion or
+three-dimensional placement.</p>
+<p>Invalid types raise TypeError. Duplicate or unavailable selections and incompatible
+coordinates raise ValueError. No astronomy, time resolution, version lookup or I/O
+is performed.</p>
+<p>查询每个所选对象落入另一张盘的哪一宫。left_objects 和 right_objects 分别选择左右盘的对象。
+None 表示该盘的全部天体和交点，不含四轴，也不沿用本命相位的对象选择。显式选择可以包含已存轴，
+黄经从实际轴字段读取，不用宫头或计算出的对轴代替。天体和交点按盘中顺序排列，
+所选四轴随后按上升、中天、下降、天底排列。</p>
+<p>空选择表示不查该盘对象的落宫，但仍用它的宫位判断另一张盘对象的落宫。即使输出为空，
+两张盘和对象选择仍会接受检查。允许同名对象，也可以把同一张盘传给两边。结果保留两张盘，
+先列左盘对象在右盘的落宫，再列右盘对象在左盘的落宫。</p>
+<p>落宫直接比较已存黄经与另一张盘的宫头，角度以度计，跨 360 度回绕。
+黄经恰好等于宫头时，归入从该宫头开始的宫。两张盘的黄道、中心和位置坐标约定必须一致。
+当前公开构造器只接受热带地心位置，以各盘自身日期的真黄道和真春分点为基准。
+不同日期、宫制、模型和版本均保留，不转换到共同历元，也不计算三维落宫。</p>
+<p>类型错误抛出 TypeError；重复选择、选择盘中没有的对象或坐标约定不一致时，抛出 ValueError。
+不执行天文计算、时刻解析、版本查询或 I/O。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>chart_left</strong> (<a class="reference internal" href="#astrology.chart.NatalChart" title="astrology.chart.NatalChart"><em>NatalChart</em></a>)</p></li>
+<li><p><strong>chart_right</strong> (<a class="reference internal" href="#astrology.chart.NatalChart" title="astrology.chart.NatalChart"><em>NatalChart</em></a>)</p></li>
+<li><p><strong>left_objects</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.11)"><em>Sequence</em></a><em>[</em><a class="reference internal" href="#astrology.objects.Body" title="astrology.objects.Body"><em>Body</em></a><em> | </em><a class="reference internal" href="#astrology.objects.LunarNode" title="astrology.objects.LunarNode"><em>LunarNode</em></a><em> | </em><a class="reference internal" href="#astrology.objects.Axis" title="astrology.objects.Axis"><em>Axis</em></a><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>right_objects</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.11)"><em>Sequence</em></a><em>[</em><a class="reference internal" href="#astrology.objects.Body" title="astrology.objects.Body"><em>Body</em></a><em> | </em><a class="reference internal" href="#astrology.objects.LunarNode" title="astrology.objects.LunarNode"><em>LunarNode</em></a><em> | </em><a class="reference internal" href="#astrology.objects.Axis" title="astrology.objects.Axis"><em>Axis</em></a><em>] </em><em>| </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#astrology.house_overlays.CrossChartHouseOverlays" title="astrology.house_overlays.CrossChartHouseOverlays"><em>CrossChartHouseOverlays</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="chart-summaries-and-lunar-phase">
+<h2>Chart summaries and lunar phase<a class="headerlink" href="#chart-summaries-and-lunar-phase" title="Link to this heading">¶</a></h2>
+<p>See the <a class="reference internal" href="summaries.html"><span class="std std-doc">summary guide</span></a> for explicit populations, source conventions and errors.
+The <a class="reference internal" href="dignities.html"><span class="std std-doc">dignity guide</span></a> covers the house-ruler records.</p>
+<p id="module-astrology.lunar_phase">Oriented longitude difference and Rudhyar’s eight lunation types, without astronomy.</p>
+<p>有向黄经差与 Rudhyar 八种月相类型，不调用天文库。</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="astrology.lunar_phase.LunationType">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">astrology.lunar_phase.</span></span><span class="sig-name descname"><span class="pre">LunationType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrology.lunar_phase.LunationType" title="Link to this definition">¶</a></dt>
+<dd><p>Rudhyar’s eight angular categories; each name denotes a range, not an exact event.</p>
+<p>Rudhyar 的八种角度分类；每个名称表示一段区间，不表示精确天象事件。</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.lunar_phase.LunationType.NEW_MOON">
+<span class="sig-name descname"><span class="pre">NEW_MOON</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'new_moon'</span></span><a class="headerlink" href="#astrology.lunar_phase.LunationType.NEW_MOON" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.lunar_phase.LunationType.CRESCENT_MOON">
+<span class="sig-name descname"><span class="pre">CRESCENT_MOON</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'crescent_moon'</span></span><a class="headerlink" href="#astrology.lunar_phase.LunationType.CRESCENT_MOON" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.lunar_phase.LunationType.FIRST_QUARTER">
+<span class="sig-name descname"><span class="pre">FIRST_QUARTER</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'first_quarter'</span></span><a class="headerlink" href="#astrology.lunar_phase.LunationType.FIRST_QUARTER" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.lunar_phase.LunationType.GIBBOUS_MOON">
+<span class="sig-name descname"><span class="pre">GIBBOUS_MOON</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'gibbous_moon'</span></span><a class="headerlink" href="#astrology.lunar_phase.LunationType.GIBBOUS_MOON" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.lunar_phase.LunationType.FULL_MOON">
+<span class="sig-name descname"><span class="pre">FULL_MOON</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'full_moon'</span></span><a class="headerlink" href="#astrology.lunar_phase.LunationType.FULL_MOON" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.lunar_phase.LunationType.DISSEMINATING_MOON">
+<span class="sig-name descname"><span class="pre">DISSEMINATING_MOON</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'disseminating_moon'</span></span><a class="headerlink" href="#astrology.lunar_phase.LunationType.DISSEMINATING_MOON" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.lunar_phase.LunationType.LAST_QUARTER">
+<span class="sig-name descname"><span class="pre">LAST_QUARTER</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'last_quarter'</span></span><a class="headerlink" href="#astrology.lunar_phase.LunationType.LAST_QUARTER" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.lunar_phase.LunationType.BALSAMIC_MOON">
+<span class="sig-name descname"><span class="pre">BALSAMIC_MOON</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'balsamic_moon'</span></span><a class="headerlink" href="#astrology.lunar_phase.LunationType.BALSAMIC_MOON" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="astrology.lunar_phase.LunarPhaseResult">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">astrology.lunar_phase.</span></span><span class="sig-name descname"><span class="pre">LunarPhaseResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elongation_deg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrology.lunar_phase.LunarPhaseResult" title="Link to this definition">¶</a></dt>
+<dd><p>A normalized Moon-minus-Sun angle in degrees, with derived type, direction and rule ID.</p>
+<p>Construction requires a finite angle in [0, 360); invalid types/ranges raise
+TypeError/ValueError. Labels derive from this angle, never from rounded display.
+This is neither a 3D phase angle nor an illuminated fraction or event search.</p>
+<p>归一化的月减日角度（度），附由角度推导的类型、盈亏方向和规则标识。构造要求有限的
+[0, 360) 内角度；类型或范围非法时抛出 TypeError 或 ValueError。标签从此角度推导，不由
+显示舍入值决定。这不是三维相角、照亮比例或事件搜索。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>elongation_deg</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>)</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.lunar_phase.LunarPhaseResult.elongation_deg">
+<span class="sig-name descname"><span class="pre">elongation_deg</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a></span><a class="headerlink" href="#astrology.lunar_phase.LunarPhaseResult.elongation_deg" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="astrology.lunar_phase.LunarPhaseResult.phase">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">phase</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#astrology.lunar_phase.LunationType" title="astrology.lunar_phase.LunationType"><span class="pre">LunationType</span></a></span><a class="headerlink" href="#astrology.lunar_phase.LunarPhaseResult.phase" title="Link to this definition">¶</a></dt>
+<dd><p>Return the type in half-open 45° sectors. 返回半开 45° 区间对应的类型。</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="astrology.lunar_phase.LunarPhaseResult.direction">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">direction</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Literal" title="(in Python v3.11)"><span class="pre">Literal</span></a><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'waxing'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'waning'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'turning'</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#astrology.lunar_phase.LunarPhaseResult.direction" title="Link to this definition">¶</a></dt>
+<dd><p>Label strict (0, 180) as waxing, (180, 360) as waning, and 0/180 as turning.</p>
+<p>严格 (0, 180) 为盈、(180, 360) 为亏，0 和 180 为转折点。</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="astrology.lunar_phase.LunarPhaseResult.rule_id">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">rule_id</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span><a class="headerlink" href="#astrology.lunar_phase.LunarPhaseResult.rule_id" title="Link to this definition">¶</a></dt>
+<dd><p>Return the stable classification rule ID. 返回稳定的分类规则标识。</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="astrology.lunar_phase.lunar_phase">
+<span class="sig-prename descclassname"><span class="pre">astrology.lunar_phase.</span></span><span class="sig-name descname"><span class="pre">lunar_phase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sun_longitude_deg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">moon_longitude_deg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrology.lunar_phase.lunar_phase" title="Link to this definition">¶</a></dt>
+<dd><p>Return (Moon minus Sun) modulo 360 and its Rudhyar lunation type.</p>
+<p>Supply finite degrees, Sun first; whole turns are allowed. The caller must
+ensure the same instant and coordinate convention. Wrong types (including bool)
+raise TypeError; nonfinite values raise ValueError. The angle is a float
+approximation in [0, 360). Sources, boundary policies and numerical details
+are in the <a class="reference internal" href="summaries.html"><span class="doc">summary guide</span></a>.</p>
+<p>返回（月亮减太阳）模 360 的角度及 Rudhyar 月相类型。输入依次为太阳、月亮黄经，
+单位为有限度数，可包含整圈；调用方须保证同一时刻和坐标约定。类型非法（包括 bool）
+抛出 TypeError，非有限值抛出 ValueError。返回角度为 [0, 360) 内的浮点近似值。
+来源、边界约定及数值细节见 <a class="reference internal" href="summaries.html"><span class="doc">摘要指南</span></a>。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sun_longitude_deg</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>)</p></li>
+<li><p><strong>moon_longitude_deg</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#astrology.lunar_phase.LunarPhaseResult" title="astrology.lunar_phase.LunarPhaseResult"><em>LunarPhaseResult</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<p id="module-astrology.summaries">Equal-count sign statistics and lunar-phase composition from supplied chart values.</p>
+<p>从给定命盘值组合等权星座统计与月相，不重新计算天文。</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="astrology.summaries.SignDistribution">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">astrology.summaries.</span></span><span class="sig-name descname"><span class="pre">SignDistribution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">placements</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrology.summaries.SignDistribution" title="Link to this definition">¶</a></dt>
+<dd><p>An immutable, nonempty Placement snapshot; each distinct object contributes one count.</p>
+<p>Input sequences are copied to tuples; counts include zero for every category,
+and proportions are count/total. Objects and total derive from the snapshot.
+Invalid containers/members raise TypeError, empty or duplicate populations
+ValueError. The caller is responsible for common provenance of low-level
+placements; this record does not authenticate a chart or assign object weights.</p>
+<p>不可变且非空的 Placement 快照，每个不同对象计一次。输入序列复制成元组，计数包含各类的
+零值，比例为计数除以总数；对象及总数从快照推导。容器或成员类型非法抛出 TypeError，空集合或
+重复对象抛出 ValueError。调用方负责保证低层落点的共同来源；本记录不核实命盘来源或设置对象权重。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>placements</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#tuple" title="(in Python v3.11)"><em>tuple</em></a><em>[</em><a class="reference internal" href="#astrology.chart.Placement" title="astrology.chart.Placement"><em>Placement</em></a><em>, </em><em>...</em><em>]</em>)</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.summaries.SignDistribution.placements">
+<span class="sig-name descname"><span class="pre">placements</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#tuple" title="(in Python v3.11)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#astrology.chart.Placement" title="astrology.chart.Placement"><span class="pre">Placement</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#astrology.summaries.SignDistribution.placements" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="astrology.summaries.SignDistribution.objects">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">objects</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#tuple" title="(in Python v3.11)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#astrology.objects.Body" title="astrology.objects.Body"><span class="pre">Body</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.objects.LunarNode" title="astrology.objects.LunarNode"><span class="pre">LunarNode</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#astrology.summaries.SignDistribution.objects" title="Link to this definition">¶</a></dt>
+<dd><p>Return the counted identities in snapshot order. 返回按快照顺序排列的计数对象。</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="astrology.summaries.SignDistribution.total">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">total</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span><a class="headerlink" href="#astrology.summaries.SignDistribution.total" title="Link to this definition">¶</a></dt>
+<dd><p>Return the common nonzero denominator. 返回共同的非零分母。</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="astrology.summaries.SignDistribution.element_counts">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">element_counts</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/collections.abc.html#collections.abc.Mapping" title="(in Python v3.11)"><span class="pre">Mapping</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#astrology.zodiac.Element" title="astrology.zodiac.Element"><span class="pre">Element</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#astrology.summaries.SignDistribution.element_counts" title="Link to this definition">¶</a></dt>
+<dd><p>Return all four element counts, including zero. 返回四元素计数，包含零。</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="astrology.summaries.SignDistribution.modality_counts">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">modality_counts</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/collections.abc.html#collections.abc.Mapping" title="(in Python v3.11)"><span class="pre">Mapping</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#astrology.zodiac.Modality" title="astrology.zodiac.Modality"><span class="pre">Modality</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#astrology.summaries.SignDistribution.modality_counts" title="Link to this definition">¶</a></dt>
+<dd><p>Return all three modality counts, including zero. 返回三模式计数，包含零。</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="astrology.summaries.SignDistribution.element_proportions">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">element_proportions</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/collections.abc.html#collections.abc.Mapping" title="(in Python v3.11)"><span class="pre">Mapping</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#astrology.zodiac.Element" title="astrology.zodiac.Element"><span class="pre">Element</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#astrology.summaries.SignDistribution.element_proportions" title="Link to this definition">¶</a></dt>
+<dd><p>Return each element count divided by total. 返回各元素计数除以总数的比例。</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="astrology.summaries.SignDistribution.modality_proportions">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">modality_proportions</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/collections.abc.html#collections.abc.Mapping" title="(in Python v3.11)"><span class="pre">Mapping</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#astrology.zodiac.Modality" title="astrology.zodiac.Modality"><span class="pre">Modality</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#astrology.summaries.SignDistribution.modality_proportions" title="Link to this definition">¶</a></dt>
+<dd><p>Return each modality count divided by total. 返回各模式计数除以总数的比例。</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="astrology.summaries.sign_distribution">
+<span class="sig-prename descclassname"><span class="pre">astrology.summaries.</span></span><span class="sig-name descname"><span class="pre">sign_distribution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">placements</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrology.summaries.sign_distribution" title="Link to this definition">¶</a></dt>
+<dd><p>Count an explicit nonempty population, preserving its order; see SignDistribution’s checks.</p>
+<p>统计显式提供的非空落点集合，保留输入顺序；校验规则见 SignDistribution。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>placements</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.11)"><em>Sequence</em></a><em>[</em><a class="reference internal" href="#astrology.chart.Placement" title="astrology.chart.Placement"><em>Placement</em></a><em>]</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#astrology.summaries.SignDistribution" title="astrology.summaries.SignDistribution"><em>SignDistribution</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="astrology.summaries.chart_sign_distribution">
+<span class="sig-prename descclassname"><span class="pre">astrology.summaries.</span></span><span class="sig-name descname"><span class="pre">chart_sign_distribution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chart</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">objects</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrology.summaries.chart_sign_distribution" title="Link to this definition">¶</a></dt>
+<dd><p>Count explicitly selected existing placements in source-chart order, without astronomy.</p>
+<p>No default population is inferred. None, strings, wrong enums or invalid chart
+types raise TypeError; empty/duplicate selections or unavailable objects raise
+ValueError. The source chart is unchanged, and no missing object is calculated.</p>
+<p>按源盘顺序统计显式选择的已有落点，不调用天文库。不推断默认统计对象。None、字符串、其他枚举
+或错误的命盘类型抛出 TypeError；空选择、重复选择或缺失对象抛出 ValueError。源盘不变，不补算缺失对象。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>chart</strong> (<a class="reference internal" href="#astrology.chart.NatalChart" title="astrology.chart.NatalChart"><em>NatalChart</em></a>)</p></li>
+<li><p><strong>objects</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.11)"><em>Sequence</em></a><em>[</em><a class="reference internal" href="#astrology.objects.Body" title="astrology.objects.Body"><em>Body</em></a><em> | </em><a class="reference internal" href="#astrology.objects.LunarNode" title="astrology.objects.LunarNode"><em>LunarNode</em></a><em>]</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#astrology.summaries.SignDistribution" title="astrology.summaries.SignDistribution"><em>SignDistribution</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="astrology.summaries.natal_lunar_phase">
+<span class="sig-prename descclassname"><span class="pre">astrology.summaries.</span></span><span class="sig-name descname"><span class="pre">natal_lunar_phase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chart</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrology.summaries.natal_lunar_phase" title="Link to this definition">¶</a></dt>
+<dd><p>Compose lunar phase from this chart’s Sun/Moon in its shared frame, without astronomy.</p>
+<p>Wrong chart types raise TypeError; a missing Sun or Moon raises ValueError
+naming the absent objects. Nothing is recalculated or added to the source chart.</p>
+<p>用此盘共同坐标约定下的日月位置组合月相，不调用天文库。命盘类型错误抛出 TypeError；
+缺太阳或月亮时抛出 ValueError 并列出缺失对象。不重新计算，也不向源盘添加内容。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>chart</strong> (<a class="reference internal" href="#astrology.chart.NatalChart" title="astrology.chart.NatalChart"><em>NatalChart</em></a>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#astrology.lunar_phase.LunarPhaseResult" title="astrology.lunar_phase.LunarPhaseResult"><em>LunarPhaseResult</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="astrology.summaries.HouseRuler">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">astrology.summaries.</span></span><span class="sig-name descname"><span class="pre">HouseRuler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">house</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cusp_sign</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">placement</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrology.summaries.HouseRuler" title="Link to this definition">¶</a></dt>
+<dd><p>One house’s cusp sign and its traditional ruler’s placement, or None if unavailable.</p>
+<p>Wrong types raise TypeError; a house outside 1..12 or a mismatched placement
+identity raises ValueError. This low-level record does not authenticate a chart.</p>
+<p>单个宫位的宫头星座及传统宫主星落点；未计算落点时为 None。类型错误抛出 TypeError，宫号不在
+1..12 或落点身份不符时抛出 ValueError。本低层记录不核实命盘来源。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>house</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>)</p></li>
+<li><p><strong>cusp_sign</strong> (<a class="reference internal" href="#astrology.zodiac.Sign" title="astrology.zodiac.Sign"><em>Sign</em></a>)</p></li>
+<li><p><strong>placement</strong> (<a class="reference internal" href="#astrology.chart.Placement" title="astrology.chart.Placement"><em>Placement</em></a><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.summaries.HouseRuler.house">
+<span class="sig-name descname"><span class="pre">house</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span><a class="headerlink" href="#astrology.summaries.HouseRuler.house" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.summaries.HouseRuler.cusp_sign">
+<span class="sig-name descname"><span class="pre">cusp_sign</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#astrology.zodiac.Sign" title="astrology.zodiac.Sign"><span class="pre">Sign</span></a></span><a class="headerlink" href="#astrology.summaries.HouseRuler.cusp_sign" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.summaries.HouseRuler.placement">
+<span class="sig-name descname"><span class="pre">placement</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#astrology.chart.Placement" title="astrology.chart.Placement"><span class="pre">Placement</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/constants.html#None" title="(in Python v3.11)"><span class="pre">None</span></a></span><a class="headerlink" href="#astrology.summaries.HouseRuler.placement" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="astrology.summaries.HouseRuler.ruler">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ruler</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#astrology.objects.Body" title="astrology.objects.Body"><span class="pre">Body</span></a></span><a class="headerlink" href="#astrology.summaries.HouseRuler.ruler" title="Link to this definition">¶</a></dt>
+<dd><p>Return the ruler derived from the cusp sign. 返回从宫头星座推出的宫主星。</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="astrology.summaries.HouseRuler.statuses">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">statuses</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#tuple" title="(in Python v3.11)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#astrology.dignities.DignityStatus" title="astrology.dignities.DignityStatus"><span class="pre">DignityStatus</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/constants.html#None" title="(in Python v3.11)"><span class="pre">None</span></a></span><a class="headerlink" href="#astrology.summaries.HouseRuler.statuses" title="Link to this definition">¶</a></dt>
+<dd><p>Return all statuses, () for no match, or None for an unavailable placement.</p>
+<p>返回全部状态；() 表示无命中，None 表示落点未计算。</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="astrology.summaries.HouseRulers">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">astrology.summaries.</span></span><span class="sig-name descname"><span class="pre">HouseRulers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chart</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrology.summaries.HouseRulers" title="Link to this definition">¶</a></dt>
+<dd><p>Derive twelve house-ruler records from one retained NatalChart, without astronomy.</p>
+<p>Use actual cusps, not axes; keep repeated signs and missing ruler placements.
+A non-NatalChart raises TypeError. Repeated houses accesses return new records that compare equal;
+existing placements and the source chart are retained by identity.</p>
+<p>从保留的 NatalChart 推导十二宫主星记录，不调用天文库。使用实际宫头，不以轴代替；保留重复
+星座及缺失的宫主星落点。非 NatalChart 输入抛出 TypeError。两次读取 houses 所得元组相等，
+但其中的记录不是同一批对象；已有落点及源盘保留原对象。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>chart</strong> (<a class="reference internal" href="#astrology.chart.NatalChart" title="astrology.chart.NatalChart"><em>NatalChart</em></a>)</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.summaries.HouseRulers.chart">
+<span class="sig-name descname"><span class="pre">chart</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#astrology.chart.NatalChart" title="astrology.chart.NatalChart"><span class="pre">NatalChart</span></a></span><a class="headerlink" href="#astrology.summaries.HouseRulers.chart" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="astrology.summaries.HouseRulers.houses">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">houses</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#tuple" title="(in Python v3.11)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#astrology.summaries.HouseRuler" title="astrology.summaries.HouseRuler"><span class="pre">HouseRuler</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#astrology.summaries.HouseRulers.houses" title="Link to this definition">¶</a></dt>
+<dd><p>Return twelve records in cusp order, retaining available placements.</p>
+<p>按宫头顺序返回十二条记录，保留可用的原落点。</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="astrology.summaries.HouseRulers.rule_id">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">rule_id</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span><a class="headerlink" href="#astrology.summaries.HouseRulers.rule_id" title="Link to this definition">¶</a></dt>
+<dd><p>Return the named rulership/dignity rule. 返回具名的守护及尊贵规则。</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="traditional-rulership-and-dignities">
+<h2>Traditional rulership and dignities<a class="headerlink" href="#traditional-rulership-and-dignities" title="Link to this heading">¶</a></h2>
+<p>See <a class="reference internal" href="dignities.html"><span class="std std-doc">the dignity guide</span></a> for the named source, simultaneous statuses and missing placements.</p>
+<p id="module-astrology.dignities">William Lilly’s 1647 sign rulers and four statuses for seven classical planets.</p>
+<p>威廉·利利（William Lilly）1647 年版的星座守护及入庙、擢升、失势、落陷判断，
+适用于太阳、月亮、水星、金星、火星、木星和土星。</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="astrology.dignities.DignityStatus">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">astrology.dignities.</span></span><span class="sig-name descname"><span class="pre">DignityStatus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrology.dignities.DignityStatus" title="Link to this definition">¶</a></dt>
+<dd><p>The four assessed sign-level statuses, without scores. 所判断的四种星座级状态，不计分。</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.dignities.DignityStatus.DOMICILE">
+<span class="sig-name descname"><span class="pre">DOMICILE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'domicile'</span></span><a class="headerlink" href="#astrology.dignities.DignityStatus.DOMICILE" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.dignities.DignityStatus.EXALTATION">
+<span class="sig-name descname"><span class="pre">EXALTATION</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'exaltation'</span></span><a class="headerlink" href="#astrology.dignities.DignityStatus.EXALTATION" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.dignities.DignityStatus.DETRIMENT">
+<span class="sig-name descname"><span class="pre">DETRIMENT</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'detriment'</span></span><a class="headerlink" href="#astrology.dignities.DignityStatus.DETRIMENT" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.dignities.DignityStatus.FALL">
+<span class="sig-name descname"><span class="pre">FALL</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'fall'</span></span><a class="headerlink" href="#astrology.dignities.DignityStatus.FALL" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="astrology.dignities.sign_ruler">
+<span class="sig-prename descclassname"><span class="pre">astrology.dignities.</span></span><span class="sig-name descname"><span class="pre">sign_ruler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sign</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrology.dignities.sign_ruler" title="Link to this definition">¶</a></dt>
+<dd><p>Return the sign’s ruler in Lilly’s seven-planet set; a non-Sign raises TypeError.</p>
+<p>按 Lilly 的传统星座守护表返回守护星；非 Sign 输入抛出 TypeError。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sign</strong> (<a class="reference internal" href="#astrology.zodiac.Sign" title="astrology.zodiac.Sign"><em>Sign</em></a>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#astrology.objects.Body" title="astrology.objects.Body"><em>Body</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="astrology.dignities.essential_dignities">
+<span class="sig-prename descclassname"><span class="pre">astrology.dignities.</span></span><span class="sig-name descname"><span class="pre">essential_dignities</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">body</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sign</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrology.dignities.essential_dignities" title="Link to this definition">¶</a></dt>
+<dd><p>Return every match in domicile/exaltation/detriment/fall order, or () for none.</p>
+<p>Wrong enum types raise TypeError; an outer-planet Body raises ValueError.
+Assess the whole sign, not exaltation-degree proximity. See the dignity guide.</p>
+<p>按入庙、擢升、失势、落陷顺序返回全部命中，无命中则为 ()。枚举类型错误抛出 TypeError，
+外行星 Body 抛出 ValueError。判断整个星座，不看离擢升度数多近；详见尊贵指南。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>body</strong> (<a class="reference internal" href="#astrology.objects.Body" title="astrology.objects.Body"><em>Body</em></a>)</p></li>
+<li><p><strong>sign</strong> (<a class="reference internal" href="#astrology.zodiac.Sign" title="astrology.zodiac.Sign"><em>Sign</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#tuple" title="(in Python v3.11)">tuple</a>[<a class="reference internal" href="#astrology.dignities.DignityStatus" title="astrology.dignities.DignityStatus"><em>DignityStatus</em></a>, …]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1961,7 +2795,7 @@ Invalid types/references raise TypeError/ValueError; cross-record links are chec
 <li><p><strong>en_aliases</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.11)"><em>Sequence</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>]</em>)</p></li>
 <li><p><strong>zh_aliases</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.11)"><em>Sequence</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>]</em>)</p></li>
 <li><p><strong>related</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.11)"><em>Sequence</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>]</em>)</p></li>
-<li><p><strong>configuration</strong> (<a class="reference internal" href="#astrology.config.Body" title="astrology.config.Body"><em>Body</em></a><em> | </em><a class="reference internal" href="#astrology.config.HouseSystem" title="astrology.config.HouseSystem"><em>HouseSystem</em></a><em> | </em><a class="reference internal" href="#astrology.config.LunarNode" title="astrology.config.LunarNode"><em>LunarNode</em></a><em> | </em><a class="reference internal" href="#astrology.config.MajorAspect" title="astrology.config.MajorAspect"><em>MajorAspect</em></a><em> | </em><a class="reference internal" href="#astrology.config.NodeDefinition" title="astrology.config.NodeDefinition"><em>NodeDefinition</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>configuration</strong> (<a class="reference internal" href="#astrology.objects.Body" title="astrology.objects.Body"><em>Body</em></a><em> | </em><a class="reference internal" href="#astrology.objects.LunarNode" title="astrology.objects.LunarNode"><em>LunarNode</em></a><em> | </em><a class="reference internal" href="#astrology.objects.Axis" title="astrology.objects.Axis"><em>Axis</em></a><em> | </em><a class="reference internal" href="#astrology.config.HouseSystem" title="astrology.config.HouseSystem"><em>HouseSystem</em></a><em> | </em><a class="reference internal" href="#astrology.config.MajorAspect" title="astrology.config.MajorAspect"><em>MajorAspect</em></a><em> | </em><a class="reference internal" href="#astrology.objects.NodeDefinition" title="astrology.objects.NodeDefinition"><em>NodeDefinition</em></a><em> | </em><em>None</em>)</p></li>
 </ul>
 </dd>
 </dl>
@@ -2002,7 +2836,7 @@ Invalid types/references raise TypeError/ValueError; cross-record links are chec
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="astrology.knowledge.Concept.configuration">
-<span class="sig-name descname"><span class="pre">configuration</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#astrology.config.Body" title="astrology.config.Body"><span class="pre">Body</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.config.HouseSystem" title="astrology.config.HouseSystem"><span class="pre">HouseSystem</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.config.LunarNode" title="astrology.config.LunarNode"><span class="pre">LunarNode</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.config.MajorAspect" title="astrology.config.MajorAspect"><span class="pre">MajorAspect</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.config.NodeDefinition" title="astrology.config.NodeDefinition"><span class="pre">NodeDefinition</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/constants.html#None" title="(in Python v3.11)"><span class="pre">None</span></a></span><a class="headerlink" href="#astrology.knowledge.Concept.configuration" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">configuration</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#astrology.objects.Body" title="astrology.objects.Body"><span class="pre">Body</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.objects.LunarNode" title="astrology.objects.LunarNode"><span class="pre">LunarNode</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.objects.Axis" title="astrology.objects.Axis"><span class="pre">Axis</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.config.HouseSystem" title="astrology.config.HouseSystem"><span class="pre">HouseSystem</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.config.MajorAspect" title="astrology.config.MajorAspect"><span class="pre">MajorAspect</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.objects.NodeDefinition" title="astrology.objects.NodeDefinition"><span class="pre">NodeDefinition</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/constants.html#None" title="(in Python v3.11)"><span class="pre">None</span></a></span><a class="headerlink" href="#astrology.knowledge.Concept.configuration" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -2027,6 +2861,26 @@ Invalid types/references raise TypeError/ValueError; cross-record links are chec
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.knowledge.ConceptKind.ELEMENT">
+<span class="sig-name descname"><span class="pre">ELEMENT</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'element'</span></span><a class="headerlink" href="#astrology.knowledge.ConceptKind.ELEMENT" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.knowledge.ConceptKind.MODALITY">
+<span class="sig-name descname"><span class="pre">MODALITY</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'modality'</span></span><a class="headerlink" href="#astrology.knowledge.ConceptKind.MODALITY" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.knowledge.ConceptKind.LUNATION_TYPE">
+<span class="sig-name descname"><span class="pre">LUNATION_TYPE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'lunation_type'</span></span><a class="headerlink" href="#astrology.knowledge.ConceptKind.LUNATION_TYPE" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.knowledge.ConceptKind.DIGNITY_STATUS">
+<span class="sig-name descname"><span class="pre">DIGNITY_STATUS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'dignity_status'</span></span><a class="headerlink" href="#astrology.knowledge.ConceptKind.DIGNITY_STATUS" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="astrology.knowledge.ConceptKind.HOUSE_SYSTEM">
 <span class="sig-name descname"><span class="pre">HOUSE_SYSTEM</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'house_system'</span></span><a class="headerlink" href="#astrology.knowledge.ConceptKind.HOUSE_SYSTEM" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -2039,6 +2893,11 @@ Invalid types/references raise TypeError/ValueError; cross-record links are chec
 <dl class="py attribute">
 <dt class="sig sig-object py" id="astrology.knowledge.ConceptKind.LUNAR_NODE">
 <span class="sig-name descname"><span class="pre">LUNAR_NODE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'lunar_node'</span></span><a class="headerlink" href="#astrology.knowledge.ConceptKind.LUNAR_NODE" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrology.knowledge.ConceptKind.AXIS">
+<span class="sig-name descname"><span class="pre">AXIS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'axis'</span></span><a class="headerlink" href="#astrology.knowledge.ConceptKind.AXIS" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -2259,7 +3118,7 @@ or ValueError for invalid values. No formula, orb, default or chart evaluation i
 <li><p><strong>definition</strong> (<a class="reference internal" href="#astrology.knowledge.LocalizedText" title="astrology.knowledge.records.LocalizedText"><em>LocalizedText</em></a>)</p></li>
 <li><p><strong>tradition</strong> (<a class="reference internal" href="#astrology.knowledge.LocalizedText" title="astrology.knowledge.records.LocalizedText"><em>LocalizedText</em></a>)</p></li>
 <li><p><strong>limits</strong> (<a class="reference internal" href="#astrology.knowledge.LocalizedText" title="astrology.knowledge.records.LocalizedText"><em>LocalizedText</em></a>)</p></li>
-<li><p><strong>configuration</strong> (<a class="reference internal" href="#astrology.config.Body" title="astrology.config.Body"><em>Body</em></a><em> | </em><a class="reference internal" href="#astrology.config.HouseSystem" title="astrology.config.HouseSystem"><em>HouseSystem</em></a><em> | </em><a class="reference internal" href="#astrology.config.LunarNode" title="astrology.config.LunarNode"><em>LunarNode</em></a><em> | </em><a class="reference internal" href="#astrology.config.MajorAspect" title="astrology.config.MajorAspect"><em>MajorAspect</em></a><em> | </em><a class="reference internal" href="#astrology.config.NodeDefinition" title="astrology.config.NodeDefinition"><em>NodeDefinition</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>configuration</strong> (<a class="reference internal" href="#astrology.objects.Body" title="astrology.objects.Body"><em>Body</em></a><em> | </em><a class="reference internal" href="#astrology.objects.LunarNode" title="astrology.objects.LunarNode"><em>LunarNode</em></a><em> | </em><a class="reference internal" href="#astrology.objects.Axis" title="astrology.objects.Axis"><em>Axis</em></a><em> | </em><a class="reference internal" href="#astrology.config.HouseSystem" title="astrology.config.HouseSystem"><em>HouseSystem</em></a><em> | </em><a class="reference internal" href="#astrology.config.MajorAspect" title="astrology.config.MajorAspect"><em>MajorAspect</em></a><em> | </em><a class="reference internal" href="#astrology.objects.NodeDefinition" title="astrology.objects.NodeDefinition"><em>NodeDefinition</em></a><em> | </em><em>None</em>)</p></li>
 </ul>
 </dd>
 </dl>
@@ -2295,7 +3154,7 @@ or ValueError for invalid values. No formula, orb, default or chart evaluation i
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="astrology.knowledge.RuleVariant.configuration">
-<span class="sig-name descname"><span class="pre">configuration</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#astrology.config.Body" title="astrology.config.Body"><span class="pre">Body</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.config.HouseSystem" title="astrology.config.HouseSystem"><span class="pre">HouseSystem</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.config.LunarNode" title="astrology.config.LunarNode"><span class="pre">LunarNode</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.config.MajorAspect" title="astrology.config.MajorAspect"><span class="pre">MajorAspect</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.config.NodeDefinition" title="astrology.config.NodeDefinition"><span class="pre">NodeDefinition</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/constants.html#None" title="(in Python v3.11)"><span class="pre">None</span></a></span><a class="headerlink" href="#astrology.knowledge.RuleVariant.configuration" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">configuration</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#astrology.objects.Body" title="astrology.objects.Body"><span class="pre">Body</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.objects.LunarNode" title="astrology.objects.LunarNode"><span class="pre">LunarNode</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.objects.Axis" title="astrology.objects.Axis"><span class="pre">Axis</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.config.HouseSystem" title="astrology.config.HouseSystem"><span class="pre">HouseSystem</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.config.MajorAspect" title="astrology.config.MajorAspect"><span class="pre">MajorAspect</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#astrology.objects.NodeDefinition" title="astrology.objects.NodeDefinition"><span class="pre">NodeDefinition</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/constants.html#None" title="(in Python v3.11)"><span class="pre">None</span></a></span><a class="headerlink" href="#astrology.knowledge.RuleVariant.configuration" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -2467,7 +3326,9 @@ The returned catalog owns immutable snapshots, not the decoded containers.</p>
 <li class="toctree-l2"><a class="reference internal" href="configuration.html">Requested chart configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="chart.html">Natal charts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="aspects.html">Aspects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cross_aspects.html">Static cross-chart aspects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cross_aspects.html">Cross-chart aspects and house overlays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="summaries.html">Sign distributions and natal lunar phase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dignities.html">Traditional sign rulers and four statuses</a></li>
 <li class="toctree-l2"><a class="reference internal" href="records.html">Chart results and text</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Public API reference</a></li>
 <li class="toctree-l2"><a class="reference internal" href="architecture.html">Repository structure and calculation boundaries</a></li>

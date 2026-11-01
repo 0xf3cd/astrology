@@ -10,6 +10,8 @@ request asks for are in `chart.aspects`; the [aspect guide](aspects.md) explains
 
 ## Calculate one chart
 
+<!-- usage: chart.calculation -->
+
 Prepare the input first. A chart needs a known clock, an explicit timezone and
 a location; the [birth guide](birth.md) explains that preparation.
 
@@ -32,6 +34,8 @@ a location; the [birth guide](birth.md) explains that preparation.
 'placidus'
 ```
 
+<!-- /usage: chart.calculation -->
+
 Positions are apparent geocentric ecliptic longitudes and latitudes of date.
 The result keeps the unrounded values; the derived sign and house follow from
 them.
@@ -51,9 +55,9 @@ them.
 
 ## Keep the models and the conventions
 
-The requested configuration and the effective configuration are separate
-values. The adapter fixes the ΔT model; it is not a caller request, and the
-result names it anyway.
+`chart.requested` keeps the configuration you supplied; `chart.effective` records
+the settings actually used. For example, the adapter fixes the ΔT model, so you
+cannot select it in a request, but you can read its name from the result.
 
 The result also keeps the actual input in `chart.resolved` and the astrology
 package version in `chart.provenance.astrology_version`. See the [result guide](records.md)
@@ -157,9 +161,10 @@ True
 
 ## Fail explicitly
 
-The adapter rejects input it can judge before the astronomy library is asked,
-and reports an upstream failure without inventing a substitute. Nothing is
-returned partially, and the requested house system is never replaced.
+When input falls outside the calculation's requirements, `natal_chart` raises an
+error without returning a partial chart or switching house systems. The adapter
+checks known restrictions before calling the astronomy library; the library
+reports any remaining calculation failures.
 
 ```{doctest}
 >>> from astrology import ChartDomainError, MissingBirthDataError
@@ -198,9 +203,10 @@ as such.
 | Instant outside the supported ephemeris range | `ChartDomainError` with the upstream operation |
 | Requested geometry undefined at this latitude | `ChartDomainError` with the requested house system |
 
-The classification never depends on reading the upstream message. A failure
-raised before the library is called carries no upstream detail; a failure
-raised by the library carries the operation and the recording status.
+The error type is not determined by parsing the astronomy library's message text.
+Errors detected before calling that library carry no upstream details. Failures
+reported by it record the operation name (`operation`) and recording status
+(`recorded`), as below:
 
 ```{doctest}
 >>> high = prepare_natal_input(BirthRecord(
@@ -218,9 +224,11 @@ raised by the library carries the operation and the recording status.
 
 ## Select objects without widening the domain
 
-The astronomy library evaluates the fourteen-object snapshot and the house
-geometry together. Selecting fewer objects filters that output; it does not
-narrow the evaluated domain, and the result says so.
+The astronomy library calculates positions for fourteen objects together with the
+houses on every call. `objects` only selects which objects to return; it does not
+skip the other objects or the house calculation. Selecting fewer objects therefore
+does not widen the supported range of times or locations. `effective.evaluation`
+records this calculation method:
 
 ```{doctest}
 >>> one = natal_chart(resolved, ChartConfig(HouseSystem.WHOLE_SIGN, (Body.SUN,), ()))
@@ -232,30 +240,17 @@ narrow the evaluated domain, and the result says so.
 
 ## Check the result against an independent reference
 
-The reference cases in `tests/reference/natal_reference.json` compare two
-instants, one per hemisphere, with JPL Horizons. Under matched conventions the
-checks require agreement within 3 arcseconds for the Sun and the planets, 15 for
-the Moon, 1 arcsecond in latitude (3 for the Moon) and 0.001 degrees for the
-axes. The Placidus cusps 2, 3, 11 and 12 are held to the same 0.001 degrees
-against the Placidus definition, evaluated at the Horizons sidereal time. The
-node check reimplements the Meeus chapter 47 formulas that the library also
-uses, and the leap-second relation `JDE(TT) - JD(UTC)` is exact. The
-[contributing guide](contributing.md#correctness) records what each reference
-can and cannot detect.
-
-Separate complete-chart cases compare against Swiss states, rates and all twelve
-cusps, with independent derived placements/aspects. Their conventions, tolerances
-and limits are in the [result guide](records.md#verification-and-limits).
+Tests compare the calculated positions with JPL Horizons data and use Swiss
+Ephemeris results to check complete charts. These tests cover a limited set of
+instants and do not guarantee accuracy over the full supported range. See the
+[contributing guide](contributing.md#correctness) for methods, tolerances and reference-data limits.
 
 ## Limits
 
 - Requested aspects are judged among the participating objects; the
   [aspect guide](aspects.md) explains the rules and their limits.
-- The Horizons fixture itself has no external cusp values; its checks against the
-  Placidus definition can share a misreading with the library. The separate Swiss
-  fixture checks the complete geometry but has its own time-model differences.
 - The astronomy library supports civil years 1885 to 2099 and, for UTC input,
   instants from 1972-01-01; the ephemeris range is narrower than the civil
   range, and an instant outside it fails explicitly.
 - Installs need a platform with a celestial-calendar wheel; see
-  [contributing](contributing.md#run-the-checks).
+  [installation](../../README.md#install-a-release).

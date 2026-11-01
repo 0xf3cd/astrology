@@ -6,6 +6,8 @@
 
 ## 保留已知信息
 
+<!-- usage: birth.resolution -->
+
 `BirthRecord` 保存公历（proleptic Gregorian）`datetime.date`、可缺省的无时区 `datetime.time`、时区输入、地点、
 所声明的钟点精度及来源元数据。仅接纳 `calendar="gregorian"`，不执行历法转换，包括儒略历转换。
 未知钟点或地点保持为 `None`。
@@ -29,6 +31,8 @@ MissingBirthDataError
 
 `Location` 使用有限的角度：纬度 `[-90, 90]`、经度 `[-180, 180]`，北纬和东经为正。
 不对越界值取模。两极及经度两端都是有效的记录值，但不保证对应宫位几何可用。
+
+<!-- /usage: birth.resolution -->
 
 ## 选择有歧义的时刻
 

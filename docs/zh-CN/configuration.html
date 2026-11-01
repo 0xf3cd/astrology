@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>排盘请求配置 &#8212; celestial-astrology 0.2.0 documentation / 文档</title>
+    <title>排盘请求配置 &#8212; celestial-astrology 0.3.0 documentation / 文档</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
-    <script src="../../_static/documentation_options.js?v=938c9ccc"></script>
+    <script src="../../_static/documentation_options.js?v=e259d695"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/zh-CN/configuration.html" />
@@ -37,21 +37,23 @@
   <section id="id1">
 <h1>排盘请求配置<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h1>
 <p><a class="reference internal" href="../en/configuration.html"><span class="std std-doc">English</span></a> · <a class="reference internal" href="index.html"><span class="std std-doc">文档</span></a> · <a class="reference internal" href="reference.html"><span class="std std-doc">API 参考</span></a></p>
-<p><code class="docutils literal notranslate"><span class="pre">ChartConfig</span></code> 是不可变请求，不是已计算的命盘或已解析的天文元数据。
-仅接纳 <code class="docutils literal notranslate"><span class="pre">tropical</span></code> 和 <code class="docutils literal notranslate"><span class="pre">geocentric</span></code>。宫制、对象选择及相位规则均须显式提供。
-空相位序列表示未请求相位规则；对象选择不能为空。不提供宫制或容许度默认值。</p>
+<p><code class="docutils literal notranslate"><span class="pre">ChartConfig</span></code> 用来指定排盘时的宫制、要返回的天体或交点，以及相位规则，构造后不能修改。
+它只保存请求，不计算命盘；天文模型等实际计算信息保存在<a class="reference internal" href="records.html"><span class="std std-doc">排盘结果</span></a>中。
+目前只支持热带黄道（<code class="docutils literal notranslate"><span class="pre">tropical</span></code>）和地心位置（<code class="docutils literal notranslate"><span class="pre">geocentric</span></code>）。
+宫制、对象和相位规则都要明确传入：对象不能为空，不计算相位时传 <code class="docutils literal notranslate"><span class="pre">aspects=()</span></code>。
+本库不提供默认宫制或默认容许度。</p>
 <section id="id2">
-<h2>保留所选标识<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">HouseSystem</span></code> 接纳 Whole Sign、Equal 和 Placidus。本层保留该选择，不计算宫位几何，也不替换宫制。
-<a class="reference internal" href="chart.html"><span class="std std-doc">排盘指南</span></a>会显式报告请求的几何不可用。</p>
-<p><code class="docutils literal notranslate"><span class="pre">Body</span></code> 标识太阳、月亮至冥王星的十个物理天体。<code class="docutils literal notranslate"><span class="pre">LunarNode</span></code> 标识采用平均定义或
-Meeus 五项真交点定义的数学升降交点。定义是各交点标识的一部分，不是精度开关，也不是可互换的模型。
-同一请求可显式选择两种定义。</p>
-<p>这些是请求标识；<a class="reference internal" href="chart.html"><span class="std std-doc">排盘适配层</span></a>将对应到精确的天文定义和模型。
-本层不实现交点公式。</p>
+<h2>选择宫制与输出对象<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<!-- usage: configuration.objects -->
+<p>例如，要用整宫制计算太阳、月亮和平均升交点的位置，可以这样配置。
+<code class="docutils literal notranslate"><span class="pre">house_system</span></code> 指定宫制，<code class="docutils literal notranslate"><span class="pre">objects</span></code> 指定要返回哪些天体或交点，<code class="docutils literal notranslate"><span class="pre">aspects=()</span></code> 表示不计算相位：</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">astrology</span><span class="w"> </span><span class="kn">import</span> <span class="n">Body</span><span class="p">,</span> <span class="n">ChartConfig</span><span class="p">,</span> <span class="n">HouseSystem</span><span class="p">,</span> <span class="n">LunarNode</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">objects</span> <span class="o">=</span> <span class="p">[</span><span class="n">Body</span><span class="o">.</span><span class="n">SUN</span><span class="p">,</span> <span class="n">Body</span><span class="o">.</span><span class="n">MOON</span><span class="p">,</span> <span class="n">LunarNode</span><span class="o">.</span><span class="n">MEAN_ASCENDING</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">request</span> <span class="o">=</span> <span class="n">ChartConfig</span><span class="p">(</span><span class="n">HouseSystem</span><span class="o">.</span><span class="n">WHOLE_SIGN</span><span class="p">,</span> <span class="n">objects</span><span class="p">,</span> <span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">request</span> <span class="o">=</span> <span class="n">ChartConfig</span><span class="p">(</span>
+<span class="gp">... </span>  <span class="n">house_system</span><span class="o">=</span><span class="n">HouseSystem</span><span class="o">.</span><span class="n">WHOLE_SIGN</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">objects</span><span class="o">=</span><span class="n">objects</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">aspects</span><span class="o">=</span><span class="p">(),</span>
+<span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">objects</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">tuple</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">objects</span><span class="p">)</span>
 <span class="go">('sun', 'moon', 'mean_ascending_node')</span>
@@ -63,14 +65,21 @@ Meeus 五项真交点定义的数学升降交点。定义是各交点标识的�
 <span class="go">'meeus_five_term_true'</span>
 </pre></div>
 </div>
+<p><code class="docutils literal notranslate"><span class="pre">HouseSystem</span></code> 可选 Whole Sign（整宫制）、Equal（等宫制）和 Placidus。所选宫制在给定时刻或地点
+无法计算时，排盘会报错，不会换成另一种宫制；支持范围见<a class="reference internal" href="chart.html"><span class="std std-doc">排盘指南</span></a>。
+<code class="docutils literal notranslate"><span class="pre">Body</span></code> 包括太阳、月亮及水星至冥王星，共十个物理天体。月交点不是物理天体，用 <code class="docutils literal notranslate"><span class="pre">LunarNode</span></code> 选择。
+它提供平均交点和 Meeus 五项真交点两种定义，每种都区分升交点和降交点。
+选择哪种定义决定了计算哪个交点，不是切换精度；两种定义不能互相替代，也可以在同一请求中同时选择。
+排盘结果会记录实际使用的天文模型。</p>
 <p>对象和规则序列按原顺序复制为元组，调用方随后修改列表不会改变请求。
 重复对象或重复相位标识会被拒绝，不静默合并。<code class="docutils literal notranslate"><span class="pre">&quot;sun&quot;</span></code> 这样的枚举值字符串不是枚举实例，不作隐式转换。</p>
+<!-- /usage: configuration.objects -->
 </section>
 <section id="id3">
 <h2>请求相位<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">MajorAspect</span></code> 标识合相（conjunction）、六分相（sextile）、四分相（square）、三分相（trine）和对分相（opposition）。
-<code class="docutils literal notranslate"><span class="pre">AspectRule</span></code> 保存调用方提供的有限、非负 <code class="docutils literal notranslate"><span class="pre">orb_degrees</span></code>，单位为度。本层只保存请求，不计算相位，
-也不替调用方选择流派的容许度规则；如何计算相位，见<a class="reference internal" href="aspects.html"><span class="std std-doc">相位指南</span></a>。</p>
+用 <code class="docutils literal notranslate"><span class="pre">AspectRule</span></code> 为一种相位指定容许度 <code class="docutils literal notranslate"><span class="pre">orb_degrees</span></code>，单位为度，须为有限的非负数。
+配置本身不计算相位，也不替你选择某个流派的容许度；计算方法见<a class="reference internal" href="aspects.html"><span class="std std-doc">相位指南</span></a>。</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">astrology</span><span class="w"> </span><span class="kn">import</span> <span class="n">AspectRule</span><span class="p">,</span> <span class="n">MajorAspect</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">rules</span> <span class="o">=</span> <span class="p">[</span><span class="n">AspectRule</span><span class="p">(</span><span class="n">MajorAspect</span><span class="o">.</span><span class="n">CONJUNCTION</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">request</span> <span class="o">=</span> <span class="n">ChartConfig</span><span class="p">(</span><span class="n">HouseSystem</span><span class="o">.</span><span class="n">PLACIDUS</span><span class="p">,</span> <span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">SUN</span><span class="p">,</span> <span class="n">Body</span><span class="o">.</span><span class="n">MOON</span><span class="p">),</span> <span class="n">rules</span><span class="p">)</span>
@@ -84,11 +93,36 @@ Meeus 五项真交点定义的数学升降交点。定义是各交点标识的�
 <p>上例中的零容许度是为演示手动设置的，不是库的默认值或建议值。</p>
 </section>
 <section id="id4">
-<h2>给对象单独的容许度，并选择参与的对象<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h2>
+<h2>选择参与相位的对象<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h2>
+<!-- usage: configuration.participants -->
+<p>这个请求要求排盘返回太阳和月亮的位置，但只判断太阳与上升点的相位：</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">astrology</span><span class="w"> </span><span class="kn">import</span> <span class="n">AspectRule</span><span class="p">,</span> <span class="n">Axis</span><span class="p">,</span> <span class="n">Body</span><span class="p">,</span> <span class="n">ChartConfig</span><span class="p">,</span> <span class="n">HouseSystem</span><span class="p">,</span> <span class="n">MajorAspect</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">with_axes</span> <span class="o">=</span> <span class="n">ChartConfig</span><span class="p">(</span>
+<span class="gp">... </span>  <span class="n">HouseSystem</span><span class="o">.</span><span class="n">WHOLE_SIGN</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">objects</span><span class="o">=</span><span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">SUN</span><span class="p">,</span> <span class="n">Body</span><span class="o">.</span><span class="n">MOON</span><span class="p">),</span>
+<span class="gp">... </span>  <span class="n">aspects</span><span class="o">=</span><span class="p">(</span><span class="n">AspectRule</span><span class="p">(</span><span class="n">MajorAspect</span><span class="o">.</span><span class="n">SEXTILE</span><span class="p">,</span> <span class="mi">3</span><span class="p">),),</span>
+<span class="gp">... </span>  <span class="n">aspect_objects</span><span class="o">=</span><span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">SUN</span><span class="p">,</span> <span class="n">Axis</span><span class="o">.</span><span class="n">ASCENDANT</span><span class="p">),</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">value</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">with_axes</span><span class="o">.</span><span class="n">aspect_participants</span><span class="p">()]</span>
+<span class="go">['sun', 'ascendant']</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">value</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">with_axes</span><span class="o">.</span><span class="n">objects</span><span class="p">]</span>
+<span class="go">['sun', 'moon']</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">objects</span></code> 选择天文输出，只接纳 <code class="docutils literal notranslate"><span class="pre">Body</span></code> 和 <code class="docutils literal notranslate"><span class="pre">LunarNode</span></code>。<code class="docutils literal notranslate"><span class="pre">aspect_objects</span></code> 从这些天体或交点中
+选择相位参与者，也可显式加入四轴；月亮在上例中仍有位置，但不参与相位。不写 <code class="docutils literal notranslate"><span class="pre">aspect_objects</span></code>
+时，所有请求的天体和交点都参与，不加入四轴。</p>
+<p>天体和交点保留原请求顺序，所选四轴按上升、中天、下降、天底（ASC/MC/DSC/IC）顺序追加，不随选择参数的顺序改变。
+相位参与者也可只选四轴，但 <code class="docutils literal notranslate"><span class="pre">objects</span></code> 仍须至少含一个天体或交点。
+几何与配对政策见<a class="reference internal" href="aspects.html#axis-aspects-zh-cn"><span class="std std-ref">显式选择四轴</span></a>。</p>
+<!-- /usage: configuration.participants -->
+</section>
+<section id="id5">
+<h2>给对象单独的容许度<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h2>
+<!-- usage: configuration.orbs -->
 <p>用 <code class="docutils literal notranslate"><span class="pre">ObjectOrb</span></code> 为某个对象单独设置容许度；其他对象使用规则的 <code class="docutils literal notranslate"><span class="pre">orb_degrees</span></code>。
 只要有规则使用了 <code class="docutils literal notranslate"><span class="pre">ObjectOrb</span></code>，就必须指定 <code class="docutils literal notranslate"><span class="pre">orb_combination</span></code>，说明两个对象的容许度如何合成一个上限；
-没有规则使用时，就不能指定。<code class="docutils literal notranslate"><span class="pre">aspect_objects</span></code> 指定参与相位的对象，必须是 <code class="docutils literal notranslate"><span class="pre">objects</span></code> 的子集；
-不写时，所有请求的对象都参与。只能为参与相位的对象单独设置容许度。</p>
+没有规则使用时，就不能指定。只能为参与相位的天体、交点或四轴单独设置容许度。</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">astrology</span><span class="w"> </span><span class="kn">import</span> <span class="n">LunarNode</span><span class="p">,</span> <span class="n">ObjectOrb</span><span class="p">,</span> <span class="n">OrbCombination</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">rules</span> <span class="o">=</span> <span class="p">[</span><span class="n">AspectRule</span><span class="p">(</span><span class="n">MajorAspect</span><span class="o">.</span><span class="n">TRINE</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="p">[</span><span class="n">ObjectOrb</span><span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">MOON</span><span class="p">,</span> <span class="mi">13</span><span class="p">)])]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">objects</span> <span class="o">=</span> <span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">SUN</span><span class="p">,</span> <span class="n">Body</span><span class="o">.</span><span class="n">MOON</span><span class="p">,</span> <span class="n">LunarNode</span><span class="o">.</span><span class="n">MEAN_ASCENDING</span><span class="p">)</span>
@@ -108,9 +142,9 @@ Meeus 五项真交点定义的数学升降交点。定义是各交点标识的�
 </pre></div>
 </div>
 <p>NaN、无穷、负容许度、布尔值、不支持的模式及不一致的选择，在普通 Python 和 <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-O</span></code> 下都会报错。</p>
-<p>定义枚举和 API 合同见从实际定义生成的<a class="reference internal" href="reference.html"><span class="std std-doc">参考页</span></a>。实际天文模型、版本、时标和生效计算设置
-归排盘结果，本层不为凑齐元数据而虚构它们。<a class="reference internal" href="chart.html"><span class="std std-doc">排盘指南</span></a>说明请求如何变成该结果，
-<a class="reference internal" href="knowledge.html"><span class="std std-doc">知识指南</span></a>覆盖完全无需排盘的查询。</p>
+<!-- /usage: configuration.orbs -->
+<p>可用的枚举成员及参数、返回值说明见 <a class="reference internal" href="reference.html"><span class="std std-doc">API 参考</span></a>。实际天文模型、版本、时标和生效设置
+见<a class="reference internal" href="records.html"><span class="std std-doc">排盘结果</span></a>；不排盘的查询见<a class="reference internal" href="knowledge.html"><span class="std std-doc">知识指南</span></a>。</p>
 </section>
 </section>
 
@@ -148,7 +182,9 @@ Meeus 五项真交点定义的数学升降交点。定义是各交点标识的�
 <li class="toctree-l2 current"><a class="current reference internal" href="#">排盘请求配置</a></li>
 <li class="toctree-l2"><a class="reference internal" href="chart.html">本命盘</a></li>
 <li class="toctree-l2"><a class="reference internal" href="aspects.html">相位</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cross_aspects.html">静态双盘交叉相位</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cross_aspects.html">双盘相位与落宫</a></li>
+<li class="toctree-l2"><a class="reference internal" href="summaries.html">星座分布与出生月相</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dignities.html">传统星座守护与四种状态</a></li>
 <li class="toctree-l2"><a class="reference internal" href="records.html">命盘结果与文本显示</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference.html">公开 API 参考</a></li>
 <li class="toctree-l2"><a class="reference internal" href="architecture.html">仓库结构与计算边界</a></li>
