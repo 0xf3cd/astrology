@@ -302,6 +302,8 @@ def check_wheel(wheel: Path, expected_version: str) -> None:
       for name in names
     ):
       raise ValueError("Wheel contains withdrawn chart persistence")
+    if any(name == "astrology/svg.py" or name.startswith("astrology/svg/") for name in names):
+      raise ValueError("Wheel contains withdrawn SVG rendering")
     metadata_paths = [name for name in names if name.endswith(".dist-info/METADATA")]
     if len(metadata_paths) != 1:
       raise ValueError("Wheel must contain one METADATA file")
@@ -336,6 +338,13 @@ def check_sdist(sdist: Path) -> None:
     for name in names
   ):
     raise ValueError("Sdist contains withdrawn chart persistence")
+  if any(
+    name in ("src/astrology/svg.py", "tests/test_svg.py", "docs/en/svg.md", "docs/zh-CN/svg.md")
+    or name.startswith("src/astrology/svg/")
+    or name.startswith("docs/_static/svg-")
+    for name in names
+  ):
+    raise ValueError("Sdist contains withdrawn SVG rendering")
   expected = {"src/" + name for name in PACKAGE_FILES} | set(SDIST_FILES)
   if missing := expected - names:
     raise ValueError(f"Sdist is missing package resources: {sorted(missing)}")

@@ -70,8 +70,10 @@ See the [release notes](https://0xf3cd.github.io/astrology/docs/en/releases.html
 For the exact source
 revision used by the documentation, use the snapshot command on the
 [documentation home](https://0xf3cd.github.io/astrology/). To install your downloaded
-or cloned source checkout instead, run these commands from its root. Installation
-needs network access for build dependencies and the pinned runtime packages.
+or cloned source checkout instead, run these commands from its root. Use a freshly
+downloaded or cloned copy when switching revisions: files left in `build/` can
+otherwise reappear in the installed package. Installation needs network access for
+build dependencies and the pinned runtime packages.
 
 Linux/macOS (replace `python3.14` with your supported Python version):
 
