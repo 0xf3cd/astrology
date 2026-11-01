@@ -292,6 +292,7 @@ def test_distribution_keeps_dependency_install_and_both_consumer_modes(
   tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
   (tmp_path / "pyproject.toml").write_text('[project]\nversion = "0.0.0"\n', encoding="utf-8")
+  (tmp_path / "README.md").write_text("[Docs](https://example.org/)\n", encoding="utf-8")
   commands: list[tuple[str, ...]] = []
   contexts: list[tuple[Path, Mapping[str, str] | None]] = []
   validations: list[tuple[str, Path]] = []
@@ -314,6 +315,10 @@ def test_distribution_keeps_dependency_install_and_both_consumer_modes(
       with tarfile.open(artifacts / "astrology.tar.gz", "w:gz") as archive:
         for name in SDIST_PATHS:
           archive.addfile(tarfile.TarInfo("astrology/" + name), BytesIO())
+        content = b"Description-Content-Type: text/markdown\n\n[Docs](https://example.org/)\n"
+        member = tarfile.TarInfo("astrology/PKG-INFO")
+        member.size = len(content)
+        archive.addfile(member, BytesIO(content))
     if "--wheel" in command:
       artifacts = Path(command[-1])
       with ZipFile(artifacts / "astrology.whl", "w") as archive:
@@ -343,6 +348,9 @@ def test_distribution_keeps_dependency_install_and_both_consumer_modes(
   )
   monkeypatch.setattr(
     checker, "check_guide_content", lambda root: validations.append(("guide_content", root))
+  )
+  monkeypatch.setattr(
+    checker, "check_release_documents", lambda root: validations.append(("release_documents", root))
   )
 
   def examples(report: str, root: Path) -> None:
@@ -389,6 +397,7 @@ def test_distribution_keeps_dependency_install_and_both_consumer_modes(
   assert ("sdist", tmp_path / "artifacts/astrology.tar.gz") in validations
   assert ("documents", source) in validations
   assert ("guide_content", source) in validations
+  assert ("release_documents", source) in validations
   assert ("examples", source) in validations
   assert {name for name, path in validations if path == tmp_path / "source-html"} == {
     "api",
@@ -538,10 +547,16 @@ def test_sdist_resource_contents(tmp_path: Path, missing: str | None) -> None:
 
 
 @pytest.mark.parametrize(
-  "member", ["astrology/serialization.py", "astrology/serialization/__init__.py"]
+  ("member", "feature"),
+  [
+    ("astrology/serialization.py", "chart persistence"),
+    ("astrology/serialization/__init__.py", "chart persistence"),
+    ("astrology/svg.py", "SVG rendering"),
+    ("astrology/svg/__init__.py", "SVG rendering"),
+  ],
 )
 def test_wheel_rejects_withdrawn_module_even_if_relisted(
-  tmp_path: Path, monkeypatch: pytest.MonkeyPatch, member: str
+  tmp_path: Path, monkeypatch: pytest.MonkeyPatch, member: str, feature: str
 ) -> None:
   wheel = tmp_path / "package.whl"
   with ZipFile(wheel, "w") as archive:
@@ -557,21 +572,32 @@ def test_wheel_rejects_withdrawn_module_even_if_relisted(
   with ZipFile(wheel, "a") as archive:
     archive.writestr(member, "")
   monkeypatch.setattr(checker, "PACKAGE_FILES", (*PACKAGE_FILES, member))
-  with pytest.raises(ValueError, match="withdrawn chart persistence"):
+  with pytest.raises(ValueError, match=f"withdrawn {feature}"):
     check_wheel(wheel, "0.0.0")
 
 
 @pytest.mark.parametrize(
-  "member",
+  ("member", "feature"),
   [
-    "src/astrology/serialization.py",
-    "src/astrology/serialization/__init__.py",
-    "tests/test_serialization.py",
-    "tests/reference/chart_record_v1.json",
+    ("src/astrology/serialization.py", "chart persistence"),
+    ("src/astrology/serialization/__init__.py", "chart persistence"),
+    ("tests/test_serialization.py", "chart persistence"),
+    ("tests/reference/chart_record_v1.json", "chart persistence"),
+    ("src/astrology/svg.py", "SVG rendering"),
+    ("src/astrology/svg/__init__.py", "SVG rendering"),
+    ("tests/test_svg.py", "SVG rendering"),
+    ("docs/en/svg.md", "SVG rendering"),
+    ("docs/zh-CN/svg.md", "SVG rendering"),
+    ("docs/_static/svg-wheel-en.svg", "SVG rendering"),
+    ("docs/_static/svg-wheel-zh-CN.svg", "SVG rendering"),
+    ("docs/_static/svg-natal-en.svg", "SVG rendering"),
+    ("docs/_static/svg-natal-zh-CN.svg", "SVG rendering"),
+    ("docs/_static/svg-cross-en.svg", "SVG rendering"),
+    ("docs/_static/svg-cross-zh-CN.svg", "SVG rendering"),
   ],
 )
 def test_sdist_rejects_withdrawn_paths_even_if_relisted(
-  tmp_path: Path, monkeypatch: pytest.MonkeyPatch, member: str
+  tmp_path: Path, monkeypatch: pytest.MonkeyPatch, member: str, feature: str
 ) -> None:
   sdist = tmp_path / "package.tar.gz"
   with tarfile.open(sdist, "w:gz") as archive:
@@ -582,7 +608,7 @@ def test_sdist_rejects_withdrawn_paths_even_if_relisted(
   with tarfile.open(sdist, "w:gz") as archive:
     for name in (*SDIST_PATHS, member):
       archive.addfile(tarfile.TarInfo("astrology/" + name), BytesIO())
-  with pytest.raises(ValueError, match="withdrawn chart persistence"):
+  with pytest.raises(ValueError, match=f"withdrawn {feature}"):
     check_sdist(sdist)
 
 

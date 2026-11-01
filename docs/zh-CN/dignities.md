@@ -2,7 +2,7 @@
 
 [English](../en/dignities.md) · [API](reference.md) · [知识](knowledge.md)
 
-这些源码接口计划随 0.3.0 交付，已发布的 0.2.0 包尚不包含。采用 William Lilly（威廉·利利）的
+这些接口自 0.3.0 起提供；包索引可用性与源码安装见[安装说明](../../README.zh-CN.md#安装发行版)。采用 William Lilly（威廉·利利）的
 《Christian Astrology》（伦敦，1647）所载规则，适用于太阳、月亮、水星、金星、火星、木星和土星。
 这七颗星体在传统占星中称为 seven classical planets。
 

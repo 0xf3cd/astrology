@@ -67,6 +67,7 @@ def files(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> ReleaseFiles:
     b'[project]\nname="celestial-astrology"\nversion="0.1.0"\nrequires-python=">=3.11,<3.15"\n'
     b'dependencies=["celestial-calendar==0.8.0", "tzdata==2026.5"]\n'
   )
+  sources["README.md"] = METADATA.split(b"\n\n", 1)[1]
   for name, content in sources.items():
     path = root / name
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -136,6 +137,40 @@ def test_release_inputs_match_project_metadata(files: ReleaseFiles, event: str) 
   env["RELEASE_VERSION"] = "0.2.0"
   with pytest.raises(ValueError, match="differs from project"):
     release.release_identity(files.root, env)
+
+
+@pytest.mark.parametrize("archive", ["sdist", "wheel"])
+@pytest.mark.parametrize("defect", ["candidate", "chinese_candidate", "body", "content_type"])
+def test_retained_inspection_checks_actual_descriptions(
+  files: ReleaseFiles, archive: str, defect: str
+) -> None:
+  release.inspect_distributions(files.root, IDENTITY, files.directory)
+  if defect == "candidate":
+    content = METADATA + b"\nThis checkout prepares 0.1.0.\n"
+  elif defect == "chinese_candidate":
+    content = METADATA + "\n此候选尚未发布到 PyPI；\n".encode()
+  elif defect == "body":
+    content = METADATA + b"\nUnexpected description.\n"
+  else:
+    content = METADATA.replace(b"text/markdown", b"text/plain")
+  if archive == "sdist":
+    files.sdist_members["PKG-INFO"] = content
+  else:
+    files.wheel_members["celestial_astrology-0.1.0.dist-info/METADATA"] = content
+  files.write()
+  with pytest.raises(ValueError, match=r"candidate claim|description|Markdown content"):
+    release.inspect_distributions(files.root, IDENTITY, files.directory)
+
+
+def test_retained_descriptions_preserve_chinese(files: ReleaseFiles) -> None:
+  body = METADATA.split(b"\n\n", 1)[1] + "简体中文 / 源码文档快照\n".encode()
+  content = METADATA.split(b"\n\n", 1)[0] + b"\n\n" + body
+  (files.root / "README.md").write_bytes(body)
+  files.sdist_members["README.md"] = body
+  files.sdist_members["PKG-INFO"] = content
+  files.wheel_members["celestial_astrology-0.1.0.dist-info/METADATA"] = content
+  files.write()
+  release.inspect_distributions(files.root, IDENTITY, files.directory)
 
 
 @pytest.mark.parametrize(
@@ -450,7 +485,6 @@ def test_consumer_installs_only_retained_wheel_and_keeps_all_acceptance_modes(
       assert Path(command[command.index("--expected-cross-observations") + 1]).read_text() == (
         "runner-local-cross-result"
       )
-      assert Path(command[command.index("--expected-svg") + 1]).read_text() == "runner-local-svg"
 
   monkeypatch.setattr(checker, "run", capture)
   monkeypatch.setattr("tools.installed_check.acceptance_chart", lambda: None)
@@ -459,7 +493,6 @@ def test_consumer_installs_only_retained_wheel_and_keeps_all_acceptance_modes(
   )
   monkeypatch.setattr("tools.installed_check.acceptance_cross_aspects", lambda: None)
   monkeypatch.setattr("tools.installed_check.acceptance_house_overlays", lambda: None)
-  monkeypatch.setattr("tools.installed_check.svg_observations", lambda: "runner-local-svg")
   monkeypatch.setattr(
     "tools.installed_check.comparison_observations",
     lambda _aspects, _overlays, _catalog: "runner-local-cross-result",
@@ -484,7 +517,6 @@ def test_consumer_installs_only_retained_wheel_and_keeps_all_acceptance_modes(
   assert len(consumers) == 4
   assert ["--knowledge-only" in command for command in consumers] == [True, False, True, False]
   assert ["-O" in command for command in consumers] == [False, False, True, True]
-  assert ["--expected-svg" in command for command in consumers] == [False, True, False, True]
   assert ["--expected-cross-observations" in command for command in consumers] == [
     False,
     True,

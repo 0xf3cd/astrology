@@ -5,8 +5,6 @@
 `natal_chart` 返回内存中的不可变 `NatalChart`。可以直接查看结构化结果，或显式提供知识目录，
 交给 `format_chart` 显示。包不提供命盘存取接口或保存格式；接口撤回说明见[发行说明](releases.md)。
 
-生成本命轮或相位矩阵时，把同一结果传给 [SVG 函数](svg.md)。
-
 ## 一个完整例子
 
 <!-- usage: records.output -->

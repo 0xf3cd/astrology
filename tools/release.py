@@ -30,6 +30,7 @@ from tools.check import (
   check_sdist,
   check_wheel,
 )
+from tools.release_documents import check_description
 
 ROOT = Path(__file__).resolve().parents[1]
 NORMALIZED_NAME = DISTRIBUTION_NAME.replace("-", "_")
@@ -269,6 +270,9 @@ def inspect_distributions(
   project = _project(root)
   _check_metadata(sdist_members["PKG-INFO"], project)
   _check_metadata(wheel_members[dist_info + "METADATA"], project)
+  readme = _source_bytes(root, "README.md").decode("utf-8")
+  check_description(sdist_members["PKG-INFO"], readme)
+  check_description(wheel_members[dist_info + "METADATA"], readme)
   wheel_sources = {
     **package_sources,
     dist_info + "licenses/LICENSE": _source_bytes(root, "LICENSE"),

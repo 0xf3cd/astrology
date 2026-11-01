@@ -32,7 +32,7 @@ CI 在 Linux 3.11／3.14 和 macOS／Windows 3.14 上运行同一命令。
 生成的搜索索引及查询代码，以及 doctest 结果。
 
 安装包验证程序在源码树之外运行，检查出生输入、时区数据来源和配置，并将完整命盘数值、解析后输入、
-请求与实际配置、来源信息、双盘比较文本及 SVG，与同一源码修订直接运行的结果对照。
+请求与实际配置、来源信息和双盘比较文本，与同一源码修订直接运行的结果对照。
 它还运行请求 Placidus 失败的用例，并检查模块实际从哪里导入，包括显式加载后的原生适配层。
 另一份程序只查询知识目录，执行列举、名称查询、筛选及引用解析，不初始化时间或原生库。
 两份程序都使用隔离导入，分别在普通与优化模式下运行。wheel 和 sdist 还须包含实际的语料文件。
@@ -84,14 +84,14 @@ Sphinx 只发现根目录的两个 README 和 `docs/` 下的源文档。虚拟�
 
 <!-- usage: contributing.checks -->
 
-按上面的 `uv sync` 从本仓安装开发包，分发名／版本为 `celestial-astrology`／`0.2.0`，
+按上面的 `uv sync` 从本仓安装开发包，分发名／版本为 `celestial-astrology`／`0.3.0`，
 Python 导入名仍为 `astrology`。PyPI 的 `astrology` 是另一个无关项目，
 不是本库。可以这样确认装的是哪个包、哪个版本：
 
 ```{doctest}
 >>> from importlib.metadata import version
 >>> version("celestial-astrology")
-'0.2.0'
+'0.3.0'
 ```
 
 <!-- /usage: contributing.checks -->
