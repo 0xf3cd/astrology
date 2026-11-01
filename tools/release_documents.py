@@ -6,7 +6,6 @@ import re
 import tomllib
 from email.parser import Parser
 from pathlib import Path
-from xml.etree import ElementTree
 
 _VERSION = r"v?\d+\.\d+\.\d+"
 _CANDIDATE_CLAIMS = (
@@ -56,28 +55,6 @@ def check_readme_installation(text: str, version: str) -> None:
     raise ValueError("README has an inconsistent package-index installation pin")
 
 
-def check_svg_sample_versions(directory: Path, version: str) -> None:
-  """Require documentation SVG samples to name the documented package version.
-
-  要求文档 SVG 示例标明文档所用的包版本。
-  """
-  samples = tuple(sorted(directory.glob("svg-*.svg")))
-  if not samples:
-    raise ValueError("Documentation SVG samples are missing")
-  for sample in samples:
-    root = ElementTree.fromstring(sample.read_bytes())
-    labels = [" ".join(group.itertext()) for group in root.findall(".//*[@data-role='label']")]
-    versions = [
-      match.group(1)
-      for label in labels
-      if (
-        match := re.search(r"astrology\s*/\s*celestial-calendar:\s*[^/]+/\s*([^\s/]+)\s*/", label)
-      )
-    ]
-    if not versions or any(value != version for value in versions):
-      raise ValueError(f"{sample.name}: SVG sample version differs from the project version")
-
-
 def check_release_documents(root: Path) -> None:
   """Check source release claims, README pins and bilingual snapshot labels.
 
@@ -102,7 +79,6 @@ def check_release_documents(root: Path) -> None:
     text = (root / name).read_text(encoding="utf-8")
     if not all(label in text for label in ("Source documentation snapshot", "源码文档快照")):
       raise ValueError("Documentation must retain bilingual source-snapshot labels")
-  check_svg_sample_versions(root / "docs/_static", version)
 
 
 def check_description(content: bytes, readme: str) -> None:

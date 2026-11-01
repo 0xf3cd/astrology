@@ -13,7 +13,6 @@ from tools.release_documents import (
   check_readme_installation,
   check_release_claims,
   check_release_documents,
-  check_svg_sample_versions,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -83,10 +82,6 @@ def test_installation_pins_follow_project_version(
     next_version = f"{int(version.split('.')[0]) + 1}.0.0"
     for name in ("pyproject.toml", "README.md", "README.zh-CN.md"):
       path = documents / name
-      path.write_text(
-        path.read_text(encoding="utf-8").replace(version, next_version), encoding="utf-8"
-      )
-    for path in (documents / "docs/_static").glob("svg-*.svg"):
       path.write_text(
         path.read_text(encoding="utf-8").replace(version, next_version), encoding="utf-8"
       )
@@ -202,38 +197,3 @@ def test_duplicate_conflicting_index_command_is_rejected(quote: str, requirement
     check_readme_installation(
       text + f"\n.venv/bin/python -m pip install {quote}{requirement}{quote}", "0.3.0"
     )
-
-
-@pytest.mark.parametrize(
-  "sample", sorted((ROOT / "docs/_static").glob("svg-*.svg")), ids=lambda p: p.name
-)
-@pytest.mark.parametrize("defect", ["old_version", "missing_label"])
-def test_source_svg_sample_versions_are_checked(documents: Path, sample: Path, defect: str) -> None:
-  path = documents / "docs/_static" / sample.name
-  version = tomllib.loads((documents / "pyproject.toml").read_text(encoding="utf-8"))["project"][
-    "version"
-  ]
-  text = path.read_text(encoding="utf-8")
-  old, new = (version, "0.0.0") if defect == "old_version" else ("astrology", "other")
-  assert old in text
-  path.write_text(text.replace(old, new, 1 if defect == "old_version" else -1), encoding="utf-8")
-  with pytest.raises(ValueError, match="SVG sample version"):
-    check_release_documents(documents)
-
-
-def test_missing_svg_samples_are_rejected(tmp_path: Path) -> None:
-  with pytest.raises(ValueError, match="SVG samples are missing"):
-    check_svg_sample_versions(tmp_path, "0.3.0")
-
-
-@pytest.mark.parametrize("language", ["en", "zh-CN"])
-def test_both_cross_chart_svg_version_labels_are_checked(documents: Path, language: str) -> None:
-  path = documents / f"docs/_static/svg-cross-{language}.svg"
-  version = tomllib.loads((documents / "pyproject.toml").read_text(encoding="utf-8"))["project"][
-    "version"
-  ]
-  before, marker, after = path.read_text(encoding="utf-8").rpartition(version)
-  assert marker and version in before
-  path.write_text(before + "0.0.0" + after, encoding="utf-8")
-  with pytest.raises(ValueError, match="SVG sample version"):
-    check_release_documents(documents)

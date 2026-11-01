@@ -37,6 +37,20 @@ def test_packaging_and_installed_identity_agree_without_changing_import_name() -
   assert project["dependencies"] == ["celestial-calendar==0.8.0", "tzdata==2026.5"]
 
 
+def test_svg_rendering_is_not_a_public_or_importable_api() -> None:
+  removed = {"render_natal_wheel", "render_natal_matrix", "render_cross_matrix"}
+  assert not removed.intersection(astrology.__all__)
+  assert not any(hasattr(astrology, name) for name in removed)
+  assert find_spec("astrology.svg") is None
+
+
+def test_svg_guides_and_samples_are_absent() -> None:
+  root = Path(__file__).resolve().parents[1]
+  for language in ("en", "zh-CN"):
+    assert not (root / "docs" / language / "svg.md").exists()
+  assert not tuple((root / "docs/_static").glob("svg-*.svg"))
+
+
 def test_version_lookup_is_explicit_and_not_cached(monkeypatch: pytest.MonkeyPatch) -> None:
   calls: list[str] = []
 

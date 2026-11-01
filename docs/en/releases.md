@@ -4,7 +4,7 @@
 
 ## 0.3.0
 
-This version adds natal analysis and chart presentation. Check the
+This version adds natal analysis, axis aspect selection and cross-chart house overlays. Check the
 [installation instructions](../../README.md#install-a-release) for package-index
 availability and the source-install path; a version heading is not a publication record.
 
@@ -19,8 +19,9 @@ availability and the source-install path; a version heading is not a publication
   queries. Missing axis rates remain missing, not zero.
 - [Cross-chart house overlays and bilingual comparison text](cross_aspects.md)
   retain both source charts and distinguish left/right objects and host houses.
-- [SVG natal wheels and aspect matrices](svg.md) return SVG strings for caller
-  storage, including static cross-chart matrices.
+
+SVG rendering from earlier source snapshots has been removed. Chart calculation,
+structured results and bilingual text output remain available.
 
 The guides now organize first use, focused API examples and verification details
 separately. Release checks inspect package descriptions and rendered bilingual

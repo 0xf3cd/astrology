@@ -42,7 +42,7 @@ the API/catalog pages, generated search index and query code, and doctest result
 The installed-package test program checks birth inputs,
 timezone-data provenance and configuration outside the checkout. It compares the
 complete numeric chart, resolved input, requested/effective configuration,
-provenance, comparison text and SVG with source results from the same revision.
+provenance and comparison text with source results from the same revision.
 It also tests a failed Placidus request and checks where modules were imported
 from, including the explicitly loaded native adapter. A separate knowledge-only
 program lists, looks up, filters and resolves citations without time/native

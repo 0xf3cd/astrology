@@ -32,7 +32,6 @@ REQUIRED_TOPICS = frozenset(
     "summaries.lunar_phase",
     "records.output",
     "dignities.lookup",
-    "svg.rendering",
     "contributing.checks",
   }
 )

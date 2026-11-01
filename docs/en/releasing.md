@@ -48,8 +48,7 @@ installation and example pins in a separate reviewed change.
    They must match the accepted `README.md` and contain no
    stale candidate-only statements. README installation commands and example
    versions must agree with project metadata. Check the rendered English and
-   Chinese pages from both the checkout and the extracted sdist, including the
-   version labels in the SVG samples. Snapshot labels
+    Chinese pages from both the checkout and the extracted sdist. Snapshot labels
    are always checked; fixed-SHA source/archive links are checked when
    `ASTROLOGY_DOCS_SOURCE_SHA` identifies the build's source revision.
    The manifest records source

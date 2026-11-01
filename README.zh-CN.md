@@ -14,8 +14,7 @@
 此版本新增[元素／模式分布与出生月相](https://0xf3cd.github.io/astrology/docs/zh-CN/summaries.html)、
 [传统星座守护与四种状态](https://0xf3cd.github.io/astrology/docs/zh-CN/dignities.html)，
 本命及静态双盘查询的[显式选四轴参与相位](https://0xf3cd.github.io/astrology/docs/zh-CN/aspects.html#axis-aspects-zh-cn)，
-[双盘落宫和双语比较文本](https://0xf3cd.github.io/astrology/docs/zh-CN/cross_aspects.html)，
-以及 [SVG 本命轮和相位矩阵](https://0xf3cd.github.io/astrology/docs/zh-CN/svg.html)。
+以及[双盘落宫和双语比较文本](https://0xf3cd.github.io/astrology/docs/zh-CN/cross_aspects.html)。
 四轴（上升点、中天、下降点、天底）只有被显式选择后才参与相位。
 
 自 0.2.0 起提供：
@@ -140,7 +139,6 @@ moon: scorpio
 | 解析当地钟点，或选择重复时刻 | [出生输入](https://0xf3cd.github.io/astrology/docs/zh-CN/birth.html) |
 | 选择对象、相位参与者和容许度 | [配置](https://0xf3cd.github.io/astrology/docs/zh-CN/configuration.html) |
 | 比较两张命盘 | [双盘相位与落宫](https://0xf3cd.github.io/astrology/docs/zh-CN/cross_aspects.html) |
-| 绘制结果 | [SVG 轮盘与矩阵](https://0xf3cd.github.io/astrology/docs/zh-CN/svg.html) |
 
 ## 第一次查询知识
 

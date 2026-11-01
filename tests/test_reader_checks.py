@@ -113,13 +113,6 @@ def site(tmp_path: Path) -> tuple[Path, Path]:
       '<pre>.venv\\Scripts\\python.exe -m pip install "celestial-astrology==0.1.0"</pre>',
       encoding="utf-8",
     )
-  (output / "_images").mkdir()
-  for language in ("en", "zh-CN"):
-    (output / f"_images/svg-wheel-{language}.svg").write_text(
-      '<svg><g data-role="label"><text>Delta-T model / astrology / celestial-calendar: '
-      "algo5 / 0.1.0 / 0.8.0</text></g></svg>",
-      encoding="utf-8",
-    )
   return root, output
 
 
@@ -156,23 +149,6 @@ def test_non_readme_rendered_claims_are_rejected(site: tuple[Path, Path], langua
   with pytest.raises(ValueError, match="candidate claim") as caught:
     check_site_html(output, root=root)
   assert str(page.relative_to(output)) in str(caught.value)
-
-
-@pytest.mark.parametrize("language", ["en", "zh-CN"])
-def test_rendered_svg_versions_are_checked(site: tuple[Path, Path], language: str) -> None:
-  root, output = site
-  page = output / f"_images/svg-wheel-{language}.svg"
-  page.write_text(page.read_text(encoding="utf-8").replace("0.1.0", "0.0.0"), encoding="utf-8")
-  with pytest.raises(ValueError, match="SVG sample version"):
-    check_site_html(output, root=root)
-
-
-def test_rendered_svg_samples_cannot_all_be_missing(site: tuple[Path, Path]) -> None:
-  root, output = site
-  for page in (output / "_images").glob("*.svg"):
-    page.unlink()
-  with pytest.raises(ValueError, match="SVG samples are missing"):
-    check_site_html(output, root=root)
 
 
 @pytest.mark.parametrize("language", ["en", "zh-CN"])

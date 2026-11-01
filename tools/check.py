@@ -47,7 +47,6 @@ from tools.release_documents import (
   check_readme_installation,
   check_release_claims,
   check_release_documents,
-  check_svg_sample_versions,
   release_index_url,
 )
 
@@ -69,7 +68,6 @@ PACKAGE_FILES = (
   "astrology/lunar_phase.py",
   "astrology/objects.py",
   "astrology/summaries.py",
-  "astrology/svg.py",
   "astrology/text.py",
   "astrology/zodiac.py",
   "astrology/knowledge/__init__.py",
@@ -547,7 +545,6 @@ def check_site_html(directory: Path, *, root: Path = ROOT, source_revision: str 
     ):
       raise ValueError("Site root is missing its fixed source or bilingual snapshot installation")
   counterparts = {base + "README.html", base + "README.zh-CN.html"}
-  check_svg_sample_versions(directory / "_images", project["version"])
   for page in sorted(directory.rglob("*.html")):
     rendered = _CatalogHtml()
     rendered.feed(page.read_text(encoding="utf-8"))
@@ -691,7 +688,6 @@ def check_installed_wheel(source: Path, wheel: Path, version: str, directory: Pa
     acceptance_house_overlays,
     chart_observations,
     comparison_observations,
-    svg_observations,
   )
 
   environment = directory / "consumer"
@@ -708,8 +704,6 @@ def check_installed_wheel(source: Path, wheel: Path, version: str, directory: Pa
     encoding="utf-8",
   )
   script = source / "tools/installed_check.py"
-  svg_values = directory / "expected-svg.json"
-  svg_values.write_text(svg_observations(), encoding="utf-8")
   for mode in ((), ("-O",)):
     run(
       (str(python), *mode, "-I", str(script), version, corpus_version, "--knowledge-only"),
@@ -728,8 +722,6 @@ def check_installed_wheel(source: Path, wheel: Path, version: str, directory: Pa
         str(observations),
         "--expected-cross-observations",
         str(cross_values),
-        "--expected-svg",
-        str(svg_values),
       ),
       cwd=directory,
     )

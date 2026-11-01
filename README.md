@@ -17,8 +17,7 @@ for package-index availability and source installation. Its additions include
 phase](https://0xf3cd.github.io/astrology/docs/en/summaries.html),
 [traditional sign rulers and four statuses](https://0xf3cd.github.io/astrology/docs/en/dignities.html),
 [explicit axis aspects for natal and static cross-chart queries](https://0xf3cd.github.io/astrology/docs/en/aspects.html#select-axes-explicitly),
-[cross-chart house overlays and bilingual comparison text](https://0xf3cd.github.io/astrology/docs/en/cross_aspects.html),
-and [SVG natal wheels and aspect matrices](https://0xf3cd.github.io/astrology/docs/en/svg.html).
+and [cross-chart house overlays and bilingual comparison text](https://0xf3cd.github.io/astrology/docs/en/cross_aspects.html).
 Axes (Ascendant, Midheaven, Descendant and
 Imum Coeli) participate in aspects only when explicitly selected.
 
@@ -152,7 +151,6 @@ To calculate aspects, supply orb rules in `aspects` and select participants with
 | Resolve a local clock or select a repeated time | [Birth inputs](https://0xf3cd.github.io/astrology/docs/en/birth.html) |
 | Select objects, participants and orbs | [Configuration](https://0xf3cd.github.io/astrology/docs/en/configuration.html) |
 | Compare two charts | [Cross-chart aspects and house overlays](https://0xf3cd.github.io/astrology/docs/en/cross_aspects.html) |
-| Draw the result | [SVG wheels and matrices](https://0xf3cd.github.io/astrology/docs/en/svg.html) |
 
 ## First knowledge lookup
 
