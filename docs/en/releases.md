@@ -2,7 +2,7 @@
 
 [简体中文](../zh-CN/releases.md) · [Documentation](index.md) · [Release procedure](releasing.md)
 
-## Source changes
+## Source changes since 0.3.0
 
 ### Breaking change: catalog version removed
 

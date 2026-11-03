@@ -364,7 +364,10 @@ def _check_natal_chart(expected_observations: Path | None = None) -> None:
 def check_missing_metadata() -> None:
   """Check import, knowledge and calculation with project metadata hidden.
 
+  Script CLI: --missing-metadata alone, without CODE_VERSION.
+
   隐藏项目分发包元数据后，检查导入、知识查询和计算。
+  脚本 CLI：只传 --missing-metadata，不传 CODE_VERSION。
   """
   package = "celestial-astrology"
   _check_knowledge()
@@ -398,13 +401,11 @@ def main(
   CLI: CODE_VERSION [--knowledge-only] [--expected-observations PATH]
   [--expected-cross-observations PATH]. Observation files contain raw natal and
   comparison values, input/configuration/provenance, and bilingual comparison text.
-  Run --missing-metadata separately to check the missing project metadata error.
 
   检查安装包身份与隔离，并比较可选的源码检查值。
   CLI 参数：CODE_VERSION [--knowledge-only] [--expected-observations PATH]
   [--expected-cross-observations PATH]。检查文件包含本命及双盘的原始数值、输入、配置、
   来源，以及双语比较文本。
-  单独运行 --missing-metadata 检查项目元数据缺失的错误。
   """
   metadata = distribution("celestial-astrology")
   for module in (astrology, *(import_module("astrology." + name) for name in module_names())):

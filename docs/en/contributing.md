@@ -112,8 +112,8 @@ calculation; it does not import development checks. Feature PRs keep domain
 assertions in tests, not the installed-package check; packaging agreement uses
 source-to-wheel bytes and observation files.
 
-Fixed fresh-process inputs live in `tests/consumer_cases/`. Tests read their text
-into `python [-O] -c`, preserving the repository's import context.
+Fixed fresh-process inputs live in `tests/consumer_cases/`. Tests pass their text
+to `python [-O] -c` so the repository root stays on `sys.path` for imports from `tools`.
 
 Sphinx discovers only the two root READMEs and sources under `docs/`. Keep virtual
 environments outside `docs/`: sources anywhere under that directory are documentation

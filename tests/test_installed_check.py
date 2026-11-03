@@ -381,15 +381,9 @@ def test_knowledge_only_does_not_run_chart_consumers(
   monkeypatch.setattr(installed_check, "_check_natal_chart", forbidden)
   monkeypatch.setattr(installed_check, "_check_cross_chart", forbidden)
   monkeypatch.setattr(installed_check, "_check_knowledge", lambda: None)
-  monkeypatch.setattr(
-    sys,
-    "modules",
-    {
-      name: module
-      for name, module in sys.modules.items()
-      if not name.startswith(("tzdata", "zoneinfo", "celestial", "ctypes"))
-    },
-  )
+  for name in tuple(sys.modules):
+    if name.startswith(("tzdata", "zoneinfo", "celestial", "ctypes")):
+      monkeypatch.delitem(sys.modules, name)
   installed_check.main(version("celestial-astrology"), knowledge_only=True)
 
 
@@ -408,15 +402,9 @@ def test_cli_reads_flags_after_the_package_version(
     return consumer / "knowledge" if package == "astrology.knowledge" else original_files(package)
 
   monkeypatch.setattr(resources, "files", consumer_resource)
-  monkeypatch.setattr(
-    sys,
-    "modules",
-    {
-      name: module
-      for name, module in sys.modules.items()
-      if not name.startswith(("tzdata", "zoneinfo", "celestial", "ctypes"))
-    },
-  )
+  for name in tuple(sys.modules):
+    if name.startswith(("tzdata", "zoneinfo", "celestial", "ctypes")):
+      monkeypatch.delitem(sys.modules, name)
   arguments = ["installed_check.py", version("celestial-astrology"), flag]
   if flag == "--knowledge-only":
 
