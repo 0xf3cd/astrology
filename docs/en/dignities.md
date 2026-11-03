@@ -2,8 +2,7 @@
 
 [简体中文](../zh-CN/dignities.md) · [API](reference.md) · [Knowledge](knowledge.md)
 
-These APIs are introduced in 0.3.0; see the [installation instructions](../../README.md#install-a-release)
-for package-index availability and source installation. They use the rules recorded in William Lilly's *Christian
+These APIs use the rules recorded in William Lilly's *Christian
 Astrology* (London, 1647), for Sun, Moon, Mercury, Venus, Mars, Jupiter and Saturn,
 the seven classical planets in traditional astrology.
 
@@ -108,41 +107,31 @@ True
 ```
 
 `HouseRuler` is immutable. Its `ruler` and `statuses` derive from its fields and
-cannot be supplied separately. A wrong field type raises `TypeError`, including
-a boolean house number. A house outside 1–12 or a placement identifying a different
-ruler raises `ValueError`. A low-level record does not authenticate chart origin
-or bind a cusp sign to a house number; `HouseRulers(chart)` performs that composition.
-It rejects a non-`NatalChart` with `TypeError` and accepts no separate tuple of house records.
-Runtime checks also run under `python -O`.
+cannot be supplied separately. The individual record takes a cusp sign;
+use `HouseRulers(chart)` to derive that sign from a chart's numbered cusp.
+See the [summary API reference](reference.md#chart-summaries-and-lunar-phase) for field validation.
+
+### Formatting and errors
 
 `format_house_rulers` requires a supplied `Catalog` and current names in `en` or
-`zh-CN`. Invalid result/catalog types raise `TypeError`, invalid languages and
-missing/stale names `ValueError`. Missing sign/status IDs raise `KeyError`.
-If the catalog has no unique concept for a ruler or house system, formatting raises
-`ValueError`. Table delimiters and nonprinting characters in names are escaped.
-Formatting performs no resource I/O;
-pure queries and chart composition do not initialize native astronomy.
+`zh-CN`. Table delimiters and nonprinting characters in names are escaped.
+Unlike the [chart and comparison tables](records.md#display-does-not-change-classification),
+which truncate angles to whole arcseconds, the ruler's degree within its sign is
+shown as the stored decimal float. For example, `0.0` stays `0.0`, not `0°00'00"`.
+Status assessment still uses the sign alone.
+See the [text API reference](reference.md#chart-text) for formatter errors.
 
 ## Source and limits
 
-The {ref}`source record <catalog-en-source-lilly-christian-astrology-1647>` locates
-the inspected Wellcome scan, its 1647 imprint, image hashes and Public Domain Mark
-statement. Book I, chapters VIII–XIV provide the planet assignments; chapter XVIII,
-printed pp.102 and 104–105 explain sign-wide exaltation and the opposite-sign
-relations. Six detriments are explicit in the planet chapters; Saturn's is derived
-from its domiciles and the stated relation. The generated table is a project
-expansion of those assignments, not a transcription of every printed table cell.
-
-Three short English excerpts are distinguished from credited Chinese translations
-and project explanations. Their locators state the fragment boundaries; long-s,
-line breaks and astrological glyphs have the recorded normalization. A second
-scan corroborates readings of the same historical witness, not an independent
-tradition. Lilly calls his table Ptolemaic; Ptolemy's original was not inspected.
+See the {ref}`rule and generated table <catalog-en-rule-lilly1647-essential-dignities>`
+for the assignments and their derivation, and the
+{ref}`source record <catalog-en-source-lilly-christian-astrology-1647>` for the
+edition, scan, transcription conventions and research limits. The catalog keeps
+source excerpts, credited Chinese translations and project explanations distinct.
 
 This API does not assess exact exaltation degrees, sect, node dignities, triplicity,
 bounds/terms, faces, reception, aggregate scores or interpretation. Day/night
-domicile labels are not extra conditions on the four sign queries. Source
-verification records what the edition states, not empirical validity.
+domicile labels are not extra conditions on the four sign queries.
 
 Catalog status concepts have IDs `dignity_status.<value>` and no request-configuration
 link. `entry.essential_dignities` has complete query prerequisites but remains

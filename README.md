@@ -180,9 +180,7 @@ longitude only, without object latitude. The five major aspects use caller-suppl
 orbs; applying/separating describes local motion, not a future-event prediction.
 Results keep the four axes separately from the twelve house cusps.
 Immutable results retain the original input, resolved time scales, configuration,
-unrounded astronomy and named models. Chart persistence is removed in the current source; see the
-[release notes](https://0xf3cd.github.io/astrology/docs/en/releases.html) for the
-difference from the published v0.1.0 API.
+unrounded astronomy and named models.
 
 ## Design boundaries
 

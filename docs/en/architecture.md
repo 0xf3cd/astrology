@@ -41,10 +41,10 @@ docs/zh-CN/         Matching Chinese guides and explanations
 Executable definitions live with their domain. `chart.py` composes them and owns
 the success contract of a complete chart; it does not become the owner of every
 shared definition. Common values move to a shared module only when actual users
-need them. Package imports and knowledge queries must not initialize celestial.
+need them.
 
-`cross_aspects.py` calculates static aspects from two existing charts without
-calling the astronomy library. It shares the angle and orb calculations in
+`cross_aspects.py` calculates static aspects from two existing charts. It shares
+the angle and orb calculations in
 `aspects.py` with natal aspects, but `find_aspects` separately handles single-chart
 pair eligibility and local motion. `house_overlays.py` passes one chart's
 longitudes and the other chart's cusps to `house_of` to calculate placements in
@@ -61,6 +61,15 @@ cross-chart comparisons.
 Knowledge and calculation remain connected by stable identifiers, described in
 [Knowledge organization](knowledge.md). Additional UI applications can consume
 the result later without moving calculation into a frontend.
+
+### Effects boundary
+
+Package imports, knowledge queries, classifications, summaries and supplied-chart
+comparisons do not initialize native astronomy. Only `natal_chart` loads the
+astronomy adapter to calculate a chart. `resolve_birth_time` reads timezone data,
+and `load_catalog` reads packaged knowledge; formatters use a caller-supplied catalog
+without resource I/O. The [isolation checks](contributing.md#run-the-checks)
+exercise these boundaries.
 
 ## Birth data and time
 
@@ -117,8 +126,13 @@ Retain input and resolved configuration, actual models and versions, TT/UT1
 values, raw astronomy, and derived results. Defaults must resolve to named
 choices before being recorded.
 
-Results remain in memory; constructor checks verify pure derived-value consistency,
-not the claimed astronomical origin. A new natal calculation uses resolved UTC
+Results remain in memory. Constructors validate types, ranges and derived-value
+consistency; they do not authenticate supplied astronomical values, timezone choices
+or software-version labels, or establish that the values came from the stated
+instant and location. Cross-chart constructors check all derived hits or placements
+against their retained sources, under the same limitation.
+
+A new natal calculation uses resolved UTC
 and the requested configuration without re-resolving timezones. Structured results,
 provenance and text output are described in the [result guide](records.md).
 

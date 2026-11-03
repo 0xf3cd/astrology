@@ -1,6 +1,6 @@
-"""Tropical signs, elements, modalities and Ashmand's groups, without astronomy.
+"""Tropical signs, elements, modalities and Ashmand's groups.
 
-热带黄道星座、元素、模式与 Ashmand 分组，不涉及天文计算。
+热带黄道星座、元素、模式与 Ashmand 分组。
 """
 
 from __future__ import annotations
@@ -35,10 +35,9 @@ class AshmandSignGroup(StrEnum):
   """One of four sign groups in Ashmand's 1822 edition, Book I, chapter XIV.
 
   TROPICAL means the two solstitial signs, not the whole tropical zodiac.
-  A group label alone gives no chart interpretation or observed-season guarantee.
 
   Ashmand 1822 年版第一卷第 XIV 章的四种星座分组之一。TROPICAL 指两个至点星座，
-  不是整个热带黄道。组别本身不提供命盘解读，也不保证实际季节现象。
+  不是整个热带黄道。
   """
 
   TROPICAL = "tropical"
@@ -107,10 +106,10 @@ def element_of(sign: Sign) -> Element:
   """Return the sign's element under rule.zodiac.elements; accept only Sign members.
 
   Source: Astrodienst, The four Elements and the Signs (see the catalog).
-  Strings and other enums raise TypeError. No chart or astronomy is needed.
+  Strings and other enums raise TypeError.
 
   按 rule.zodiac.elements 返回星座元素，只接受 Sign 成员。来源为 Astrodienst 的
-  The four Elements and the Signs，书目见目录。字符串和其他枚举抛出 TypeError；不需命盘或天文计算。
+  The four Elements and the Signs，书目见目录。字符串和其他枚举抛出 TypeError。
   """
   if type(sign) is not Sign:
     raise TypeError("sign must be a Sign")
@@ -150,19 +149,13 @@ _ASHMAND_GROUPS = MappingProxyType(
 
 
 def ashmand_sign_group(sign: Sign) -> AshmandSignGroup:
-  """Return a sign's group in Ashmand 1822, without a chart or I/O.
+  """Return a sign's group under rule.ptolemy_ashmand.sign_groups.
 
   Accept a Sign member; raw strings and unrelated enums raise TypeError.
-  In zodiac order, fixed signs immediately follow tropical or equinoctial signs;
-  bicorporeal signs immediately follow fixed signs. This expands the source's
-  ordering, not a verbatim twelve-sign list. Source: Book I, chapter XIV,
-  printed pp. 34-35; knowledge rule: rule.ptolemy_ashmand.sign_groups.
+  Source: Ashmand 1822, Book I, chapter XIV, printed pp. 34-35.
 
-  返回星座在 Ashmand 1822 年版中的分组，不需命盘，也不执行 I/O。只接受 Sign 成员；
-  字符串或其他枚举抛出 TypeError。在黄道次序中，固定星座紧接至点星座或分点星座，
-  双体星座紧接固定星座。这是按原文次序展开的名单，不是原书逐项列出的十二星座表。
-  来源为第一卷第 XIV 章、印刷页 34-35；
-  知识规则标识为 rule.ptolemy_ashmand.sign_groups。
+  按 rule.ptolemy_ashmand.sign_groups 返回星座分组。只接受 Sign 成员；
+  字符串或其他枚举抛出 TypeError。来源为 Ashmand 1822 年版第一卷第 XIV 章、印刷页 34-35。
   """
   if type(sign) is not Sign:
     raise TypeError("sign must be a Sign")

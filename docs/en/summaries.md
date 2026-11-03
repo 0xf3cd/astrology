@@ -2,9 +2,8 @@
 
 [简体中文](../zh-CN/summaries.md) · [API](reference.md) · [Knowledge](knowledge.md)
 
-These APIs are introduced in 0.3.0; see the [installation instructions](../../README.md#install-a-release)
-for package-index availability and source installation. They classify supplied values without astronomy or source-chart
-changes. Formatters take a loaded catalog and do no resource I/O.
+Use these APIs to count selected placements by sign element or modality, or to
+classify a supplied Sun/Moon pair by lunar phase.
 
 ## Query signs and count an explicit population
 
@@ -53,13 +52,11 @@ giving that modality 100%. Every category is shown, including zero counts.
 Percentages use two decimal places alongside the counts and total. No planet
 weights or dominant scores are assigned.
 
-`sign_distribution` and `SignDistribution` copy sequences to immutable placement
-tuples, preserving input order. Empty or duplicate populations raise `ValueError`;
-`None`, iterators and non-`Placement` members raise `TypeError`. The caller must
-ensure that directly supplied placements share a common source; the function
-cannot verify their origin. Counts, proportions and total derive from the stored
-placements, so a different total cannot be supplied separately. `element_of` and `modality_of` accept only `Sign`,
-not strings or unrelated enums.
+Supply a nonempty sequence of `Placement` records with distinct identities and a
+common source. `SignDistribution` copies them into an immutable tuple in input
+order; counts, proportions and total derive from that snapshot. `element_of` and
+`modality_of` take `Sign` members. See the
+[summary API reference](reference.md#chart-summaries-and-lunar-phase) for validation errors.
 
 <!-- /usage: summaries.population -->
 
@@ -91,8 +88,7 @@ A type covers an interval, not an exact event; no illuminated fraction is calcul
 
 The oriented difference is `(Moon - Sun) mod 360`, in degrees. Finite longitudes may
 exceed one turn; the calculation removes whole turns.
-Booleans, strings and unrelated types raise `TypeError`; nonfinite values raise
-`ValueError`. Bare numbers carry no instant or coordinate convention, so the
+Bare numbers carry no instant or coordinate convention, so the
 scalar function cannot detect a frame mismatch.
 
 See the {ref}`generated intervals <catalog-en-rule-lunation-rudhyar1950>` and
@@ -115,8 +111,7 @@ rate-based forecast.
 
 First calculate a chart from synthetic data, then count selected objects with
 `chart_sign_distribution` and read its lunar phase with `natal_lunar_phase`. Those
-two functions only read the chart's existing positions and placements, without
-repeating astronomical calculations:
+two functions read the chart's existing positions and placements:
 
 ```{doctest}
 >>> from datetime import date, time, timedelta
@@ -135,14 +130,13 @@ True
 True
 ```
 
-`objects` is required and nonempty. `None`, strings and wrong identity types raise
-`TypeError`; duplicates or unavailable identities raise `ValueError`. Results
-follow source-chart order, not selection order. To count all requested objects,
+`objects` must be a nonempty selection of distinct bodies/nodes already in the chart.
+Results follow source-chart order, not selection order. To count all requested objects,
 explicitly pass `objects=chart.requested.objects`. No unselected body, node or axis
 is added. Axes are not placements and are rejected even when explicitly selected
-for these statistics. `natal_lunar_phase` requires Sun and Moon; missing positions raise
-`ValueError` naming absent identities, never a request to calculate them. Both
-wrappers reject non-`NatalChart` inputs with `TypeError`. Checks work under `python -O`.
+for these statistics. `natal_lunar_phase` requires Sun and Moon; missing positions
+raise an error naming the absent identities rather than calculating them. Full
+error contracts are in the [summary API reference](reference.md#chart-summaries-and-lunar-phase).
 
 Catalog entries remain `reference_only`, with stated prerequisites `complete` and
 chart applicability `not_assessed`. Verified source inspection does not make
@@ -163,6 +157,6 @@ not promised.
 The phase formatter prints the stored float without arcsecond truncation. Labels
 never come from rounded text. `format_sign_distribution` and `format_lunar_phase`
 require current catalog names in
-`en` or `zh-CN`; missing/stale names raise `ValueError`, missing IDs `KeyError`, and
-invalid result/catalog types `TypeError`. Names' table delimiters and nonprinting
-characters are escaped.
+`en` or `zh-CN`; missing or stale names cause an error instead of a language fallback.
+Names' table delimiters and nonprinting characters are escaped. See the
+[text API reference](reference.md#chart-text) for formatter errors.

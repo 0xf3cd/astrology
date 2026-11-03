@@ -1,6 +1,6 @@
-"""Render chart results using caller-supplied bilingual vocabulary, without I/O.
+"""Render chart results using caller-supplied bilingual vocabulary.
 
-用调用方提供的双语词汇显示命盘结果，不执行 I/O。
+用调用方提供的双语词汇显示命盘结果。
 """
 
 from __future__ import annotations
@@ -249,20 +249,20 @@ def _aspect_rule_lines(
 def format_chart(chart: NatalChart, catalog: Catalog, *, language: Language = "en") -> str:
   """Return a text table of chart positions, houses, aspects, configuration and provenance.
 
-  The caller supplies the loaded Catalog; rendering does no resource I/O or native
-  astronomy. Names must exist with current translations for en or zh-CN, otherwise
+  The caller supplies the loaded Catalog. Names must exist with current translations
+  for en or zh-CN, otherwise
   raise ValueError (KeyError for a missing sign ID). Angles use truncate_display's
   whole-arcsecond rule, without changing classifications, house or motion.
   Even a deviation displayed as zero retains its original motion label. Invalid
-  chart/catalog types raise TypeError. This table is not a lossless chart record.
+  chart/catalog types raise TypeError.
   Nonprinting characters, backslashes and table delimiters in supplied names and
   provenance are escaped for display; the chart values are unchanged.
 
   返回命盘位置、宫位、相位、配置及来源的文本表格。调用方须提供已加载的 Catalog；
-  显示不读取资源或调用原生天文库。en 或 zh-CN 的名称及译文必须齐备且为当前版本，
+  en 或 zh-CN 的名称及译文必须齐备且为当前版本，
   否则抛出 ValueError（缺少星座标识时为 KeyError）。角度沿用 truncate_display 的整角秒截断规则，
   不改分类、宫位或运动状态；偏差显示为零时也保留原运动标签。
-  chart/catalog 类型错误时抛出 TypeError。本表不是无损命盘记录。
+  chart/catalog 类型错误时抛出 TypeError。
   传入名称及来源中的非打印字符、反斜线和表格分隔符会转义显示，不改命盘中的值。
   """
   if type(chart) is not NatalChart or type(catalog) is not Catalog:
@@ -370,12 +370,12 @@ def format_sign_distribution(
   """Render counted identities, denominator and all category counts using the supplied catalog.
 
   Proportions display as percentages with two decimal places; exact count/total
-  remains visible. No I/O or astronomy. Invalid result/catalog types raise
+  remains visible. Invalid result/catalog types raise
   TypeError, invalid language or missing/stale names ValueError (missing IDs
   raise KeyError). Supplied names are escaped as in format_chart.
 
   用给定目录显示计数对象、分母和各类计数。比例显示为两位小数的百分比，同时保留精确的
-  计数 / 总数。不执行 I/O 或天文计算。结果或目录类型错误抛出 TypeError，语言非法或
+  计数 / 总数。结果或目录类型错误抛出 TypeError，语言非法或
   名称缺失或过期抛出 ValueError（标识缺失抛出 KeyError）。名称按 format_chart 的规则转义。
   """
   if type(result) is not SignDistribution or type(catalog) is not Catalog:
@@ -406,11 +406,11 @@ def format_lunar_phase(
   """Render the type and untruncated numerical angle using the supplied bilingual catalog.
 
   repr-style degree output preserves the stored float; direction and type never
-  come from display rounding. No I/O or astronomy. Type, language and name errors
+  come from display rounding. Type, language and name errors
   follow format_sign_distribution; supplied names are escaped as in format_chart.
 
   用给定双语目录显示类型及未经截断的数值角度。度数按 repr 形式保留存储的浮点值；方向和类型
-  不由显示舍入决定。不执行 I/O 或天文计算。类型、语言和名称错误沿用 format_sign_distribution，
+  不由显示舍入决定。类型、语言和名称错误沿用 format_sign_distribution，
   名称按 format_chart 的规则转义。
   """
   if type(result) is not LunarPhaseResult or type(catalog) is not Catalog:
@@ -434,10 +434,10 @@ def format_house_rulers(result: HouseRulers, catalog: Catalog, *, language: Lang
   """Show all twelve rulers, available placements and every assessed status.
 
   Distinguish uncalculated placements from no match among the four statuses.
-  Type, language and name errors follow format_sign_distribution; no I/O.
+  Type, language and name errors follow format_sign_distribution.
 
   显示十二宫主星、可用落点及全部命中状态，区分落点未计算与四项均未命中。
-  类型、语言及名称错误沿用 format_sign_distribution；不执行 I/O。
+  类型、语言及名称错误沿用 format_sign_distribution。
   """
   if type(result) is not HouseRulers or type(catalog) is not Catalog:
     raise TypeError("result and catalog must be HouseRulers and Catalog values")
@@ -502,16 +502,14 @@ def format_house_overlays(
 
   The table includes both charts' provenance, selected objects and every placement,
   distinguishing the chart the object comes from and the chart whose houses are used.
-  Names come from the supplied Catalog. No I/O, astronomy or time resolution is performed.
+  Names come from the supplied Catalog.
   Invalid result or catalog types raise TypeError. Invalid language, or missing or
-  stale displayed names, raises ValueError. Text is escaped as in format_chart;
-  the table cannot be used to restore the source charts without loss.
+  stale displayed names, raises ValueError. Text is escaped as in format_chart.
 
   将落宫结果排成表格，每条记录都标明对象来自哪张盘、使用哪张盘的宫位。
   表中包含两张盘的来源信息、所选对象和全部落宫，名称取自传入的 Catalog。
-  不执行 I/O、天文计算或时刻解析。结果或目录类型错误时抛出 TypeError；
-  语言非法，或所需名称缺失、过期时，抛出 ValueError。文字按 format_chart 的规则转义，
-  不能用这份表格无损恢复原盘。
+  结果或目录类型错误时抛出 TypeError；
+  语言非法，或所需名称缺失、过期时，抛出 ValueError。文字按 format_chart 的规则转义。
   """
   if type(result) is not CrossChartHouseOverlays or type(catalog) is not Catalog:
     raise TypeError("result and catalog must be CrossChartHouseOverlays and Catalog values")
@@ -544,8 +542,7 @@ def format_cross_aspects(
 
   Names come from the supplied Catalog; text is escaped as in format_house_overlays.
   Invalid result or catalog types raise TypeError. Invalid language, or missing or
-  stale displayed names, raises ValueError. No I/O, astronomy or time resolution
-  is performed. The table cannot be used to restore the source charts without loss.
+  stale displayed names, raises ValueError.
 
   将全部静态双盘相位及其规则排成表格。表中包含命盘来源信息和所选对象，不添加运动标签。
   分支、偏差和实际容许度上限以度计，按整角秒截断显示；偏差的绝对值等于上限时也算命中。
@@ -553,7 +550,6 @@ def format_cross_aspects(
 
   名称取自传入的 Catalog，文字按 format_house_overlays 的规则转义。
   结果或目录类型错误时抛出 TypeError；语言非法，或所需名称缺失、过期时，抛出 ValueError。
-  不执行 I/O、天文计算或时刻解析，不能用这份表格无损恢复原盘。
   """
   if type(result) is not CrossChartAspects or type(catalog) is not Catalog:
     raise TypeError("result and catalog must be CrossChartAspects and Catalog values")

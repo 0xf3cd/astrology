@@ -44,7 +44,7 @@ def _name_key(name: str) -> str:
 
 @dataclass(frozen=True, slots=True)
 class Catalog:
-  """Validated immutable records; construction performs no I/O or chart calculation.
+  """Validated immutable catalog records.
 
   Copy all record sequences. Reject duplicate IDs, dangling links, inconsistent
   config links and aliases shared by different concepts (TypeError/ValueError).
@@ -53,7 +53,7 @@ class Catalog:
   Malformed string IDs raise ValueError; non-string IDs raise TypeError.
   Unknown well-formed IDs raise KeyError.
 
-  经核验的不可变记录；构造不做 I/O 或排盘。复制全部记录序列；重复标识、悬空链接、
+  经核验的不可变目录记录。复制全部记录序列；重复标识、悬空链接、
   不一致的配置链接及不同概念共享别名均抛出 TypeError 或 ValueError。
   允许显示名称相同，查询返回所有命中的身份；缺译及旧译可保留，但不算当前译文。
   格式不合法的字符串标识抛出 ValueError，非字符串标识抛出 TypeError。
@@ -294,11 +294,11 @@ def load_catalog() -> Catalog:
   """Read and validate the packaged corpus on each explicit call; no cache or network.
 
   Resource/JSON errors propagate; invalid records/references raise TypeError,
-  ValueError or KeyError. Queries need no birth input, timezone data or astronomy.
+  ValueError or KeyError.
   The returned catalog owns immutable snapshots, not the decoded containers.
 
   每次显式调用均读取并核验包内语料，不使用缓存或网络。资源及 JSON 错误直接传播；
-  非法记录或引用抛出 TypeError、ValueError 或 KeyError。查询不需出生输入、时区数据或天文库。
+  非法记录或引用抛出 TypeError、ValueError 或 KeyError。
   返回目录持有不可变快照，不共享解码所得容器。
   """
   data = json.loads(

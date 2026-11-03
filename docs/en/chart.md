@@ -162,7 +162,7 @@ True
 ## Fail explicitly
 
 When input falls outside the calculation's requirements, `natal_chart` raises an
-error without returning a partial chart or switching house systems. The adapter
+error; see the [failure policy](architecture.md#composition-and-failures). The adapter
 checks known restrictions before calling the astronomy library; the library
 reports any remaining calculation failures.
 

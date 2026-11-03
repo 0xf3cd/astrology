@@ -95,8 +95,7 @@ the intervals between cusps that determine a longitude's house. House overlays u
 that same interval rule.
 
 The source record links to implementation code at a fixed commit, so you can
-check the algorithm. It does not verify where the input astronomical values came
-from or support relationship interpretation. The query above only reads explanations
+check the algorithm and its stated scope. The query above only reads explanations
 and citations; it does not calculate placements or assess a chart. To calculate
 placements between two charts, see the [house-overlay example](cross_aspects.md#find-houses-in-the-other-chart).
 
@@ -105,7 +104,7 @@ placements between two charts, see the [house-overlay example](cross_aspects.md#
 Each `load_catalog()` reads the packaged JSON file without network access or a
 cache. Record constructors copy input sequences into immutable tuples. Invalid
 record types, duplicate IDs, links to missing records and conflicting aliases
-raise `TypeError` or `ValueError`; these checks also run under `python -O`.
+raise `TypeError` or `ValueError`.
 
 `lookup()` normalizes NFC, trims and case-folds, then matches exact names/aliases.
 It returns an immutable tuple: `()` for no match, several distinct concepts for
@@ -156,6 +155,14 @@ True
 True
 ```
 
+To go the other way, pass a source ID to `filter_entries` to find entries citing it:
+
+```{doctest}
+>>> source = catalog.source("source.ptolemy.ashmand1822")
+>>> [item.identifier for item in catalog.filter_entries(source_id=source.identifier)]
+['entry.sign_vocabulary', 'entry.equinoctial_example', 'entry.ashmand_sign_groups']
+```
+
 The citation locates Book I, chapter XIV, printed pp. 34–35 (PDF pages 72–73)
 of Ashmand's English translation of the paraphrase attributed to Proclus. The
 {ref}`catalog example <catalog-en-entry-equinoctial-example>` preserves the complete
@@ -176,11 +183,10 @@ bearing an author's name does not mean the formulas in that author's book have
 been checked.
 
 Implementation source records stay pinned to the inspected commits instead of
-following the package version. The chart source record locates the node-comparison
-test in `tests/test_reference.py` at that same commit. The test calculates reference
-node longitudes from the formulas recorded there and compares them with upstream
-results. This does not verify Meeus's printed text, establish an error bound or show
-equivalence to an osculating node.
+following the package version. The
+{ref}`chart source record <catalog-en-source-astrology-chart-fc845fa>` locates its
+node-comparison test; the {ref}`node rule <catalog-en-rule-node-definition-meeus-five-term-true>`
+records the comparison's scope and unresolved source questions.
 
 The hand-written data below illustrates knowing only some of the conditions:
 the first is true, while the second remains unknown. The catalog does not read
@@ -215,14 +221,14 @@ True
 ('complete', 'reference_only', 'not_assessed')
 ```
 
-These queries need no chart or native astronomy. To calculate the geometry, see
+To calculate the geometry, see
 [explicit natal selection](aspects.md#select-axes-explicitly) and
 [independent cross-side selection](cross_aspects.md#select-axes-on-each-side).
 
 ## Ashmand 1822 sign groups
 
 These groups come from Ashmand's 1822 *Ptolemy's Tetrabiblos, or Quadripartite*.
-New in 0.2.0, `ashmand_sign_group` takes a `Sign` and returns its group:
+`ashmand_sign_group` takes a `Sign` and returns its group:
 
 ```{doctest}
 >>> from astrology import AshmandSignGroup, Sign, ashmand_sign_group
@@ -248,18 +254,13 @@ chart interpretation are a separate question.
 
 The four labels are **tropical**, **equinoctial**, **fixed** and **bicorporeal**.
 Tropical here means the two solstitial signs, not all twelve signs of the tropical
-zodiac. The source directly names the tropical and equinoctial pairs. In zodiac
-order, fixed signs immediately follow those signs, and bicorporeal signs
-immediately follow fixed signs. The
-{ref}`twelve-sign table <catalog-en-rule-ptolemy-ashmand-sign-groups>` is
-project-derived, not a verbatim source list.
+zodiac. The {ref}`rule record and twelve-sign table <catalog-en-rule-ptolemy-ashmand-sign-groups>`
+explain how the membership is derived from the source's ordering.
 
 The definitions appear in Book I, chapter XIV, printed pp. 34–35 (PDF pp. 72–73),
-recorded as `source.ptolemy.ashmand1822`. The catalog labels English excerpts,
+recorded in the {ref}`source record <catalog-en-source-ptolemy-ashmand1822>`. The catalog labels English excerpts,
 credited Chinese translations and project explanations separately, with the
-extent of each excerpt recorded in its citation. This classification follows
-Ashmand's edition; it does not establish agreement across traditions or predict
-actual weather or daylight.
+extent of each excerpt recorded in its citation.
 
 ## Elements, modalities and lunation types
 
@@ -271,8 +272,8 @@ interpretation, and reference tables read their definitions directly from calcul
 
 The {ref}`element <catalog-en-rule-zodiac-elements>` and
 {ref}`modality <catalog-en-rule-zodiac-modalities>` tables follow Astrodienst's
-undated editorial page, inspected through the recorded 2025-12-28 snapshot.
-Its `Sagitarius` spelling is recorded without changing `Sign.SAGITTARIUS`.
+editorial page; its snapshot and transcription notes are in the
+{ref}`source record <catalog-en-source-astrodienst-elements-signs>`.
 The modern modalities (`Modality`) and historical groups (`AshmandSignGroup`) are
 different classifications, although some groups contain the same signs. Their fixed
 groups agree; the modern mutable group matches Ashmand's bicorporeal group, and
@@ -283,10 +284,9 @@ Both `FIXED` members have the string value `"fixed"` and compare and hash equal
 as `StrEnum` members. To keep both in one mapping, use `(type(member), member.value)`
 keys or their distinct qualified catalog IDs.
 
-The lunation convention is Rudhyar's eight types in the inspected online
-transcription of *Your Lunation Birthday*, Part Four. The page reports first
-publication in *Horoscope Magazine*, January 1950; the original was not inspected.
-See the {ref}`intervals and source <catalog-en-rule-lunation-rudhyar1950>` and
+The lunation convention uses Rudhyar's eight types in *Your Lunation Birthday*,
+Part Four. See the {ref}`source record <catalog-en-source-rudhyar-lunation-birthday>`
+for the edition and research status, the {ref}`intervals <catalog-en-rule-lunation-rudhyar1950>` and
 the [usage guide](summaries.md#classify-a-supplied-sunmoon-pair) for how boundary
 angles are classified and waxing or waning is determined.
 

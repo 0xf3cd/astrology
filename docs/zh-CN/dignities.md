@@ -2,7 +2,7 @@
 
 [English](../en/dignities.md) · [API](reference.md) · [知识](knowledge.md)
 
-这些接口自 0.3.0 起提供；包索引可用性与源码安装见[安装说明](../../README.zh-CN.md#安装发行版)。采用 William Lilly（威廉·利利）的
+这些接口采用 William Lilly（威廉·利利）的
 《Christian Astrology》（伦敦，1647）所载规则，适用于太阳、月亮、水星、金星、火星、木星和土星。
 这七颗星体在传统占星中称为 seven classical planets。
 
@@ -97,32 +97,25 @@ True
 ```
 
 `HouseRuler` 不可变，`ruler` 和 `statuses` 从字段推导，不能单独传入。
-字段类型错误抛出 `TypeError`，包括把布尔值当宫号；宫号不在 1–12 或落点身份不等于所推导的
-宫主星时抛出 `ValueError`。低层记录不核实命盘来源，也不把宫头星座与宫号绑定；
-`HouseRulers(chart)` 完成这项组合。它拒绝非 `NatalChart` 输入，抛出 `TypeError`，
-且不接受另行传入宫记录元组。运行时检查在 `python -O` 下仍执行。
+单条记录接受宫头星座；若要从命盘的编号宫头推导这个星座，请用 `HouseRulers(chart)`。
+字段校验见[摘要 API 参考](reference.md#命盘摘要与月相)。
+
+### 格式化与错误
 
 `format_house_rulers` 要求传入 `Catalog` 及 `en` 或 `zh-CN` 的当前名称。
-结果或目录类型错误抛出 `TypeError`；语言非法、名称缺译或过期抛出 `ValueError`；
-星座或状态标识缺失抛出 `KeyError`；目录中某个宫主星或宫制没有唯一对应的概念时，格式化抛出 `ValueError`。
 名称中的表格分隔符及不可打印字符会转义。
-格式化不读取资源；纯查询和盘级组合不初始化原生天文库。
+[命盘和比较表格](records.md#显示不改分类)把角度截断到整角秒；宫主星表的星座内度数则显示为存储的十进制浮点值。
+例如，`0.0` 仍显示为 `0.0`，不是 `0°00'00"`。状态仍只依星座判断。
+格式化的错误行为见[文本 API 参考](reference.md#命盘文本)。
 
 ## 来源与限制
 
-{ref}`来源记录 <catalog-zh-cn-source-lilly-christian-astrology-1647>`定位已核的 Wellcome 扫描本、
-1647 年出版页、图像摘要及 Public Domain Mark 声明。第一卷第 VIII–XIV 章给出行星归属，
-第 XVIII 章及印刷页 102、104–105 说明擢升覆盖整个星座和相对星座关系。
-行星章节直接列出其中六颗星体的失势，土星失势由其入庙星座及所述关系推出。
-生成表由项目按这些归属展开，不是逐格转录整张印刷表。
-
-三段简短英文引文与署名中文译文、项目解释分别呈现。定位信息写明截取边界；
-长 s 字形、换行及占星符号按记录作了规范化。另一份扫描可旁证同一历史文本的字形，
-不构成独立传统。Lilly 称其表依据 Ptolemy；此处未核 Ptolemy 原文。
+归属及推导方式见{ref}`规则与生成表 <catalog-zh-cn-rule-lilly1647-essential-dignities>`；
+版本、扫描本、转录约定及研究限度见{ref}`来源记录 <catalog-zh-cn-source-lilly-christian-astrology-1647>`。
+目录分别标明原文摘录、署名中文译文和项目说明。
 
 接口不判断精确擢升度数、昼夜条件、交点尊贵、三分性、界、面、互容、综合评分或解读。
-原文的昼夜庙标签不作为四项星座查询的额外条件。来源核验只记录该版本说了什么，
-不确立实证有效性。
+原文的昼夜庙标签不作为四项星座查询的额外条件。
 
 目录状态概念使用 `dignity_status.<value>`，不链接请求配置。
 `entry.essential_dignities` 的查询前提完整，但仍为 `reference_only` 和 `not_assessed`。

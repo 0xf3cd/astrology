@@ -65,9 +65,9 @@ def acceptance_chart() -> astrology.NatalChart:
 
 
 def chart_observations(chart: astrology.NatalChart) -> str:
-  """Capture exact same-revision check values, without a chart restoration path.
+  """Capture exact same-revision check values.
 
-  取得同一源码修订的精确检查值，不提供恢复命盘的路径。
+  取得同一源码修订的精确检查值。
   """
   values = {
     "resolved": repr(chart.resolved),
@@ -198,9 +198,9 @@ def acceptance_house_overlays() -> astrology.CrossChartHouseOverlays:
 
 
 def acceptance_cross_aspects() -> astrology.CrossChartAspects:
-  """Compare two synthetic in-memory sources without astronomy or time resolution.
+  """Compare two synthetic in-memory sources.
 
-  比较两张合成内存源盘，不调用天文库或时刻解析。
+  比较两张合成内存源盘。
   """
   chart_left = _cross_source(
     2000,

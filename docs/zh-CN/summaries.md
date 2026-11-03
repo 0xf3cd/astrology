@@ -2,8 +2,7 @@
 
 [English](../en/summaries.md) · [API](reference.md) · [知识](knowledge.md)
 
-这些接口自 0.3.0 起提供；包索引可用性与源码安装见[安装说明](../../README.zh-CN.md#安装发行版)。它们对给定值分类，不调用天文库，
-也不改变源盘。格式化函数接受已加载的目录，不读取资源。
+这些接口可以按星座元素或模式统计所选落点，也可以对给定日月位置做月相分类。
 
 ## 查星座分类并统计所选对象
 
@@ -49,11 +48,9 @@ True
 所有类别都会列出，包括计数为零的类别。百分比显示为两位小数，同时保留计数和总数。
 这里不设置行星权重，也不计算主导评分。
 
-`sign_distribution` 与 `SignDistribution` 将序列复制为不可变的落点元组，保留输入顺序。
-空集合或重复身份抛出 `ValueError`；`None`、迭代器和非 `Placement` 成员抛出 `TypeError`。
-直接传入 `Placement` 时，请先确认这些落点的数据来源一致；函数本身不会核实来源。
-计数、比例和总数都由保存的落点推导，不能另传一个不同的总数。
-`element_of` 和 `modality_of` 只接受 `Sign`，不接受字符串或其他枚举。
+传入非空的 `Placement` 记录序列，各身份须不同，且数据来源一致。
+`SignDistribution` 按输入顺序将其复制为不可变元组，计数、比例和总数都由这个快照推导。
+`element_of` 和 `modality_of` 接受 `Sign` 成员。校验错误见[摘要 API 参考](reference.md#命盘摘要与月相)。
 
 <!-- /usage: summaries.population -->
 
@@ -82,7 +79,7 @@ True
 ```
 
 有向差为 `(月亮 - 太阳) mod 360`，单位为度。
-有限的黄经可以超出一圈，计算时会约去整圈。布尔值、字符串及其他类型抛出 `TypeError`，非有限值抛出 `ValueError`。
+有限的黄经可以超出一圈，计算时会约去整圈。
 传入的数值本身不带时刻或坐标信息，函数无法发现是否混用了不同的坐标约定。
 
 参见{ref}`生成区间表 <catalog-zh-cn-rule-lunation-rudhyar1950>`和[来源说明](knowledge.md#元素模式与月相类型)。
@@ -99,7 +96,7 @@ True
 ## 从已有本命盘组合
 
 下面先用合成资料排一张盘，再用 `chart_sign_distribution` 统计所选对象，
-用 `natal_lunar_phase` 读取出生月相。后两个函数只读取盘中已有的位置和落点，不重新计算天文值：
+用 `natal_lunar_phase` 读取出生月相。后两个函数读取盘中已有的位置和落点：
 
 ```{doctest}
 >>> from datetime import date, time, timedelta
@@ -118,12 +115,11 @@ True
 True
 ```
 
-`objects` 必填且非空。`None`、字符串或错误身份类型抛出 `TypeError`，重复或不可用身份抛出
-`ValueError`。结果按源盘顺序，而非选择顺序排列。统计全部请求对象时，须显式传
+`objects` 须为非空选择，只能选择盘中已有且身份不同的天体或交点。
+结果按源盘顺序，而非选择顺序排列。统计全部请求对象时，须显式传
 `objects=chart.requested.objects`。不加入未选天体、交点或四轴。四轴不是落点，即使显式选择也不能参与这项统计。
-`natal_lunar_phase` 要求日月齐备；
-缺位置抛出 `ValueError` 并列出缺失身份，不补算。两个入口对非 `NatalChart` 输入均抛出
-`TypeError`。这些检查在 `python -O` 下同样有效。
+`natal_lunar_phase` 要求日月齐备；缺位置时会报错并列出缺失身份，不补算。
+完整错误契约见[摘要 API 参考](reference.md#命盘摘要与月相)。
 
 目录条目仍是 `reference_only`，已声明完整前提 `complete`，而命盘适用性为 `not_assessed`。
 来源已核不代表目录查询会判断命盘。
@@ -137,6 +133,5 @@ True
 已经舍入输入，因此不保证结果逐位相同。
 
 月相格式化函数不截断到角秒，而是显示存储的浮点值。标签不从舍入文本推断。`format_sign_distribution` 和 `format_lunar_phase`
-都要求所选语言（`en` 或 `zh-CN`）的目录名称为当前版本。名称缺失或过期抛出 `ValueError`，
-标识缺失抛出 `KeyError`，结果或目录类型错误抛出 `TypeError`。名称的表格分隔符及非打印字符
-会转义显示。
+都要求所选语言（`en` 或 `zh-CN`）的目录名称为当前版本。名称缺失或过期时会报错，不改用另一语言。
+名称的表格分隔符及非打印字符会转义显示。格式化的错误行为见[文本 API 参考](reference.md#命盘文本)。

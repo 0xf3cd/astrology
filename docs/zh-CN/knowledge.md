@@ -83,15 +83,15 @@ True
 区分对象所属盘与宫位所属盘，并保留各自的宫制；`rule.project.cusp_ownership` 定义宫头之间的区间，
 决定黄经落在哪一宫。双盘落宫沿用这套区间规则。
 
-来源记录指向一个固定提交中的实现代码，可以据此核对算法，但不能据此确认输入天文值的来源，
-也不能推出关系解读。上面的查询只读取说明和出处，不计算落宫，也不判断某张命盘。
+来源记录指向一个固定提交中的实现代码，可以据此核对算法及其支持范围。
+上面的查询只读取说明和出处，不计算落宫，也不判断某张命盘。
 要对两张盘计算落宫，见[双盘落宫示例](cross_aspects.md#查询对象落入另一张盘的哪一宫)。
 
 ### 返回值与错误
 
 `load_catalog()` 每次都从包内 JSON 文件读取目录，不访问网络，也不使用缓存。
 构造记录时会把传入的序列复制为不可变元组。记录类型错误、标识重复、链接指向不存在的记录或别名冲突时，
-会抛出 `TypeError` 或 `ValueError`；这些检查在 `python -O` 下仍然执行。
+会抛出 `TypeError` 或 `ValueError`。
 
 `lookup()` 先做 NFC 规范化、去首尾空白及大小写折叠，再精确匹配名称与别名。
 结果为不可变元组：无匹配时返回 `()`，名称有歧义时返回多个不同的概念。
@@ -134,6 +134,14 @@ True
 True
 ```
 
+反过来，将来源标识传给 `filter_entries`，即可查找引用它的条目：
+
+```{doctest}
+>>> source = catalog.source("source.ptolemy.ashmand1822")
+>>> [item.identifier for item in catalog.filter_entries(source_id=source.identifier)]
+['entry.sign_vocabulary', 'entry.equinoctial_example', 'entry.ashmand_sign_groups']
+```
+
 引文定位至 Ashmand 对被归于 Proclus 的转述本所作英文译文：《第一卷》第 XIV 章，印刷页 34–35
 （PDF 第 72–73 页）。{ref}`目录例子 <catalog-zh-cn-entry-equinoctial-example>`保留完整英文句子及单独署名的项目中文译文。
 原文用昼夜等长解释这种命名；保留这段历史说明不表示程序保证实际日照时长。
@@ -145,9 +153,9 @@ True
 不附扫描图、水印或现代网站说明。同一本书的镜像和书目可以帮助确认版本，但不能当作多份独立依据。
 代码引用给出包版本及固定提交中的符号；程序中的定义用了某位作者的名字，不表示已经核对过其原书公式。
 
-项目实现来源记录保留已查核的提交，不跟随包版本改写。排盘来源记录还定位到同一提交中
-`tests/test_reference.py` 的交点对拍测试。测试按其中记录的公式计算交点参考黄经，再与上游
-结果比较。这不等于核验 Meeus 印刷原文、确立误差界或证明与密切轨道交点等价。
+项目实现来源记录保留已查核的提交，不跟随包版本改写。
+{ref}`排盘来源记录 <catalog-zh-cn-source-astrology-chart-fc845fa>`定位其交点对拍测试，
+{ref}`交点规则 <catalog-zh-cn-rule-node-definition-meeus-five-term-true>`记录对拍范围及待核的来源问题。
 
 下面用手工构造的数据表示“只知道部分条件”的情况：第一个条件为真，第二个仍未知。
 目录不会读取这个字典，也不会因此改变条目的命盘适用状态：
@@ -177,14 +185,14 @@ True
 ('complete', 'reference_only', 'not_assessed')
 ```
 
-这些查询不需要命盘或原生天文库。计算几何时，见{ref}`本命显式选择 <axis-aspects-zh-cn>`及
+计算几何时，见{ref}`本命显式选择 <axis-aspects-zh-cn>`及
 {ref}`双盘各侧独立选择 <cross-axis-aspects-zh-cn>`。
 
 (ashmand-sign-groups-zh-cn)=
 ## Ashmand 1822 年版星座分组
 
 这四组出自 Ashmand 的 1822 年英译本 *Ptolemy's Tetrabiblos, or Quadripartite*。
-0.2.0 新增 `ashmand_sign_group`，输入一个 `Sign`，即可查到它所属的组别：
+向 `ashmand_sign_group` 输入一个 `Sign`，即可查到它所属的组别：
 
 ```{doctest}
 >>> from astrology import AshmandSignGroup, Sign, ashmand_sign_group
@@ -207,13 +215,11 @@ True
 前面分点星座条目的 `unresolved` 仍然保留，因为那是关于命盘解读条件的另一个问题。
 
 四组中文名为**至点星座、分点星座、固定星座、双体星座**，对应 tropical、equinoctial、fixed、bicorporeal。
-这里的 tropical 只指两个至点星座，不是热带黄道的全部十二星座。原文直接点名至点与分点两对星座。
-在黄道次序中，固定星座分别紧接这些星座，双体星座分别紧接固定星座。因此
-{ref}`十二星座表 <catalog-zh-cn-rule-ptolemy-ashmand-sign-groups>`是项目推导，不是原文逐项列举。
+这里的 tropical 只指两个至点星座，不是热带黄道的全部十二星座。
+{ref}`规则记录与十二星座表 <catalog-zh-cn-rule-ptolemy-ashmand-sign-groups>`说明如何按原文次序推导成员归属。
 
-原文见第一卷第 XIV 章、印刷页 34–35（PDF 第 72–73 页），记录在 `source.ptolemy.ashmand1822` 中。
+原文见第一卷第 XIV 章、印刷页 34–35（PDF 第 72–73 页），定位见{ref}`来源记录 <catalog-zh-cn-source-ptolemy-ashmand1822>`。
 目录中的英文摘录、署名中文译文和项目说明分别标明，引用也注明了摘录范围。
-这里依据的是 Ashmand 的这一版本，不能据此认为各流派都采用相同分类，也不能用组名预测实际天气或日照。
 
 ## 元素、模式与月相类型
 
@@ -222,9 +228,9 @@ True
 它们用来描述结果，不是排盘配置项。分类不作性格解读，参考表直接读取计算代码中的定义。
 
 {ref}`元素 <catalog-zh-cn-rule-zodiac-elements>`及
-{ref}`模式 <catalog-zh-cn-rule-zodiac-modalities>`表依据 Astrodienst 无日期的编辑页面，
-按记录中的 2025-12-28 快照核验。来源中的 `Sagitarius` 拼写单独注明，程序中仍使用
-`Sign.SAGITTARIUS`。现代模式分类 `Modality` 与历史分组 `AshmandSignGroup` 是两套不同的分类，
+{ref}`模式 <catalog-zh-cn-rule-zodiac-modalities>`表依据 Astrodienst 的编辑页面；
+快照及转录说明见{ref}`来源记录 <catalog-zh-cn-source-astrodienst-elements-signs>`。
+现代模式分类 `Modality` 与历史分组 `AshmandSignGroup` 是两套不同的分类，
 虽然其中一些组包含相同的星座：两者的固定组相同，现代变动组与 Ashmand 双体组相同，
 Ashmand 的至点、分点两组合起来则对应现代基本模式。成员相同不表示名称和历史定义也相同。
 
@@ -232,9 +238,9 @@ Ashmand 的至点、分点两组合起来则对应现代基本模式。成员相
 hash 也相同。要在同一映射中保留二者，请用 `(type(member), member.value)` 作键，
 或使用各自带类别前缀的目录 ID。
 
-月相分类采用 Rudhyar 的八种类型，依据 *Your Lunation Birthday* 第四部分在线转录。
-页面称原文初刊于 *Horoscope Magazine* 1950 年 1 月；本项目未核对杂志原件。
-参见{ref}`区间及来源 <catalog-zh-cn-rule-lunation-rudhyar1950>`；区间端点如何归类、盈亏方向如何判断，见
+月相分类采用 Rudhyar 的 *Your Lunation Birthday* 第四部分中的八种类型。
+版本和研究状态见{ref}`来源记录 <catalog-zh-cn-source-rudhyar-lunation-birthday>`，
+区间见{ref}`规则表 <catalog-zh-cn-rule-lunation-rudhyar1950>`；区间端点如何归类、盈亏方向如何判断，见
 [用法指南](summaries.md#对给定日月位置分类)。
 
 ## 译文修订与搜索

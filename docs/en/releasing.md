@@ -32,8 +32,8 @@ is a blocker; do not switch to a token or weaken protection to continue.
 ## Prepare and inspect the candidate
 
 Before publishing a new version, prepare its version bump and matching
-documentation in a separate reviewed change. README commands install the latest
-release by package name; version-specific availability belongs in the release notes.
+documentation in a separate reviewed change. Release notes describe what shipped;
+actual package-index availability belongs in the release record.
 
 1. Review the source, matching bilingual notes and the acceptance criteria in
    the release tracker. Keep dependency policy, calculation conventions and

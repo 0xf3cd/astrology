@@ -73,9 +73,8 @@ Loading the catalog is explicit; formatting itself performs no resource I/O.
 
 Constructing `NatalChart` directly checks field types, ranges, and whether signs,
 house membership and aspects agree with the supplied positions, axes, cusps and rules.
-It does not recheck the supplied timezone choice, astronomical values or software
-version labels, or verify that those values correspond to the stated UTC instant and location.
-Use `natal_chart` to calculate values from resolved input.
+See the [validation boundary](architecture.md#reproducibility) for what these checks
+establish. Use `natal_chart` to calculate values from resolved input.
 
 Selected axis names in participants, orb overrides and hits come from the supplied
 catalog, just like body names. An old body/node-only request needs no axis concepts:
@@ -92,15 +91,19 @@ bitwise equality between trees.
 
 ## Display does not change classification
 
-Angles use the named `truncate_display` rule: truncate toward zero to whole
+`format_chart` angles use the named `truncate_display` rule: truncate toward zero to whole
 arcseconds. Aries 29.9999999° displays as Aries 29°59'59", not Taurus 0°00'00".
 House and aspect-motion labels come from the unrounded result. An object's
 displayed longitude can match a cusp's while its unrounded position is still in
 the preceding house; a nonzero deviation displayed as zero can still be applying
 or separating. In the positions table's last column, `R` means decreasing object
 longitude, `D` means increasing longitude and `S` means exactly zero rate, all
-judged from the unrounded rate. The text is a rounded
-presentation, not a lossless interchange format.
+judged from the unrounded rate.
+
+Formatted tables are for reading, not lossless interchange or restoration of the
+source charts. The [lunar-phase](summaries.md#numerical-angle-and-display) and
+[house-ruler](dignities.md#formatting-and-errors) formatters instead show their
+stored degree floats, as described in their guides.
 
 ## Verification and limits
 

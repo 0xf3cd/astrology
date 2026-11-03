@@ -1,6 +1,6 @@
-"""Static major aspects between two supplied natal results, without astronomy or motion.
+"""Static major aspects between two supplied natal results.
 
-对两张给定本命盘结果判断静态主要相位，不调用天文库，也不判断运动状态。
+对两张给定本命盘结果判断静态主要相位。
 """
 
 from __future__ import annotations
@@ -57,13 +57,11 @@ class CrossChartAspects:
   Sequences are isolated in tuples; selections follow their source's position order,
   then selected axes in ASC/MC/DSC/IC order.
   Construction recomputes all hits from the two sources, selections and rules and rejects any difference.
-  It does not authenticate the sources' astronomical values or provenance labels.
 
   不可变的双侧来源、实际参与对象、显式规则与全部静态交叉命中。`chart_left` 与 `chart_right`
   保留两张完整源盘，不改变它们。
   序列复制为元组；天体和交点按各自源盘的位置顺序排列，所选四轴按上升、中天、下降、天底顺序追加。
-  构造时按两侧来源、选择和规则重算全部命中，拒绝任何差异，
-  不认证源盘的天文值或来源标签是否真实。
+  构造时按两侧来源、选择和规则重算全部命中，拒绝任何差异。
   """
 
   chart_left: NatalChart
@@ -174,8 +172,7 @@ def cross_chart_aspects(
   zodiac, center and position frame. Their own-date tropical longitudes are
   compared without common-epoch conversion or a simultaneous spatial-angle claim.
   Different dates, locations, house systems, models and version labels are kept,
-  not automatically rejected. No I/O, time resolution, version lookup or native
-  astronomy is performed; source charts are retained unchanged.
+  not automatically rejected. Source charts are retained unchanged.
 
   将每个所选左盘位置与每个所选右盘位置比较，不判断运动状态。None 选该侧全部天体和交点，不加入四轴；
   显式选择可含该盘任一已存轴，即使未参与本命相位。直接读取轴字段，不使用宫头或合成对轴。
@@ -186,7 +183,7 @@ def cross_chart_aspects(
   返回全部命中分支，按左位置、右位置、相位角升序及负分支在前排序。容许度包含等号，
   带符号偏差和上限以度计。两盘的黄道、中心和位置坐标约定须一致；比较各自日期的热带黄经，
   不转换共同历元，也不声称是同时刻的空间角。保留不同日期、地点、宫制、模型和版本标签，
-  不因此自动拒绝。不执行 I/O、时刻解析、版本查询或原生天文；源盘保持不变。
+  不因此自动拒绝。源盘保持不变。
   """
   _require_comparable_sources(chart_left, chart_right)
   selected_left = _selection_for_chart(
