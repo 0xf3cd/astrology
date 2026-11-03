@@ -117,7 +117,7 @@ See the [summary API reference](reference.md#chart-summaries-and-lunar-phase) fo
 `zh-CN`. Table delimiters and nonprinting characters in names are escaped.
 Unlike the [chart and comparison tables](records.md#display-does-not-change-classification),
 which truncate angles to whole arcseconds, the ruler's degree within its sign is
-shown as the stored decimal float. For example, `0.0` stays `0.0`, not `0°00'00"`.
+shown as the stored decimal float; the example above abbreviates its digits with `...`.
 Status assessment still uses the sign alone.
 See the [text API reference](reference.md#chart-text) for formatter errors.
 

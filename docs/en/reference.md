@@ -8,6 +8,10 @@ See [birth inputs](birth.md), [requested configuration](configuration.md),
 [charts](chart.md), [aspects](aspects.md) and [chart results](records.md) for executed examples. The
 [knowledge guide](knowledge.md) covers chart-independent queries.
 
+Calculation boundaries: [initialization and I/O](architecture.md#effects-boundary),
+[constructor checks](architecture.md#reproducibility), and
+[house-system failures](architecture.md#composition-and-failures).
+
 ## Birth records and resolution
 
 ```{eval-rst}

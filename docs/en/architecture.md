@@ -62,7 +62,7 @@ Knowledge and calculation remain connected by stable identifiers, described in
 [Knowledge organization](knowledge.md). Additional UI applications can consume
 the result later without moving calculation into a frontend.
 
-### Effects boundary
+## Effects boundary
 
 Package imports, knowledge queries, classifications, summaries and supplied-chart
 comparisons do not initialize native astronomy. Only `natal_chart` loads the

@@ -6,6 +6,9 @@
 已执行的例子、校验行为和支持范围见[出生输入](birth.md)、[请求配置](configuration.md)、
 [排盘指南](chart.md)、[相位指南](aspects.md)及[命盘结果](records.md)。独立查询见[知识指南](knowledge.md)。
 
+计算边界：[初始化与 I/O](architecture.md#副作用边界)、[构造校验](architecture.md#可复现性)及
+[宫制失败](architecture.md#组合与失败)。
+
 ## 出生记录与时刻解析
 
 ```{eval-rst}
