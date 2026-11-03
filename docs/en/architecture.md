@@ -100,7 +100,7 @@ Represent positions, axes/house geometry, and astrological classifications
 separately. A complete natal calculation may require all requested components;
 future partial-chart entry points must state their own success contract.
 
-celestial 1.0.0 provides a strict fourteen-object snapshot with rates and houses.
+celestial-calendar provides a strict fourteen-object snapshot with rates and houses.
 The adapter uses it within its joint domain. Selecting seven output
 objects does not widen that domain. Independent position and house queries are
 also available upstream; this adapter continues to use the joint snapshot.

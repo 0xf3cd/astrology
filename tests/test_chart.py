@@ -200,6 +200,7 @@ def test_a_latitude_just_inside_the_pole_is_left_to_the_upstream_domain() -> Non
   # An upstream failure, not the pre-call rejection reserved for the poles.
   assert caught.value.operation is None
   assert caught.value.recorded is None
+  assert caught.value.upstream_message is not None
 
 
 def test_failures_are_classified_by_structure_and_not_by_message_text() -> None:
@@ -265,6 +266,8 @@ def test_upstream_domain_rejections_keep_only_supplied_diagnostics(
   assert caught.value.recorded is None
   assert caught.value.upstream_message == message
   assert caught.value.__cause__ is failure
+  assert "outside the supported domain" in str(caught.value)
+  assert message in str(caught.value)
 
 
 @pytest.mark.parametrize("recorded", [True, False])

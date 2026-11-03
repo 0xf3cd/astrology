@@ -19,8 +19,7 @@ uv sync --locked --python 3.14
 uv run --locked python tools/check.py
 ```
 
-Python 3.11–3.14 is supported. The lower bound matches celestial-calendar 1.0.0,
-which is a hard dependency of the package. CI runs the
+Python 3.11–3.14 is supported. CI runs the
 same command on Linux 3.11/3.14 and macOS/Windows 3.14. Use
 `uv sync --locked --python 3.11` to check the lower endpoint locally.
 Use a current patch release for development checks. Safe sdist extraction in these checks

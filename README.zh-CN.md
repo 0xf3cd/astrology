@@ -25,7 +25,7 @@
 
 ## 安装发行版
 
-本库依赖 celestial-calendar 1.0.0。它只发布 Linux x86_64 与 aarch64、
+本库依赖 celestial-calendar。它只发布 Linux x86_64 与 aarch64、
 macOS 14+ arm64、Windows amd64 的轮子，没有源码分发包。其他平台无法安装本包，
 连知识浏览也不可用。
 
@@ -51,7 +51,7 @@ py -3.14 -m venv .venv
 .venv\Scripts\python.exe -m pip install celestial-astrology
 ```
 
-运行依赖仍精确固定为 `celestial-calendar==1.0.0` 和 `tzdata==2026.5`，
+运行依赖均精确固定，
 可能与要求其他版本的应用发生依赖冲突。详见[发行说明](https://0xf3cd.github.io/astrology/docs/zh-CN/releases.html)。
 
 <a id="install-from-source-zh-cn"></a>
