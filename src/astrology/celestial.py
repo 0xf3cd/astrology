@@ -90,7 +90,7 @@ def _precheck(resolved: ResolvedBirth, config: ChartConfig) -> Location:
   native call; returns the validated location. The JDE(TT) upper bound inside 2099 is
   left to the native domain check; both surfaces raise ChartDomainError.
 
-  在计算命盘之前校验地点与民用时间限制：缺少地点；纬度不在
+  在调用原生库之前校验地点与民用时间限制：缺少地点；纬度不在
   ±90 的开区间内（出生记录允许取到端点，宫位几何不允许）；民用年超过 2099。通过时返回
   校验过的地点。2099 年内 JDE(TT) 的上界留给原生库自己的域检查；两处拒绝抛出的都是
   ChartDomainError。

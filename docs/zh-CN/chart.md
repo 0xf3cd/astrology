@@ -187,11 +187,11 @@ True
 | 纬度在两极 | `ChartDomainError`，不带上游细节 |
 | 民用年份 2100 及以后 | `ChartDomainError`，不带上游细节 |
 | 时刻超出支持的星历范围 | `ChartDomainError`，携带上游消息 |
-| 该纬度下请求的几何无定义 | `ChartDomainError`，携带请求的宫制 |
+| 该纬度下请求的几何无定义 | `ChartDomainError`，携带上游消息 |
 
-调用前的拒绝将 `upstream_message` 留为 None；天文库报告的失败在该字段保留异常文本，
-即使文本为空。`operation` 与 `recorded` 只在上游异常提供这两个字段时填写；域拒绝将
-两者留为 None。错误类型不靠解析消息文本决定。
+`house_system` 标明请求的宫制。调用前的拒绝将 `upstream_message` 留为 None；天文库报告的失败在该字段保留异常文本，
+即使文本为空。上游异常提供诊断字段时，`operation` 是上游的操作名，`recorded` 表示原生代码是否报告了已识别的错误类型。
+域拒绝将两者留为 None。错误类型不靠解析消息文本决定。
 
 ```{doctest}
 >>> high = prepare_natal_input(BirthRecord(
@@ -201,8 +201,8 @@ True
 >>> try:
 ...   natal_chart(high, ChartConfig(HouseSystem.PLACIDUS, (Body.SUN,), ()))
 ... except ChartDomainError as error:
-...   (error.house_system.value, error.operation, error.recorded)
-('placidus', None, None)
+...   (error.house_system.value, error.operation, error.recorded, error.upstream_message is not None)
+('placidus', None, None, True)
 >>> natal_chart(high, ChartConfig(HouseSystem.EQUAL, (Body.SUN,), ())).houses.system.value
 'equal'
 ```

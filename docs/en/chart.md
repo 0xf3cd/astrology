@@ -201,13 +201,14 @@ as such.
 | Latitude at a pole | `ChartDomainError`, no upstream detail |
 | Civil year 2100 or later | `ChartDomainError`, no upstream detail |
 | Instant outside the supported ephemeris range | `ChartDomainError` with the upstream message |
-| Requested geometry undefined at this latitude | `ChartDomainError` with the requested house system |
+| Requested geometry undefined at this latitude | `ChartDomainError` with the upstream message |
 
-`upstream_message` is None for pre-call rejections and contains the upstream
-exception text for failures reported by the astronomy library, even if that text
-is empty. `operation` and `recorded` are populated only when the upstream exception
-supplies them; domain rejections leave both as None. The error type is not
-determined by parsing the message text.
+`house_system` identifies the requested geometry. `upstream_message` is None for
+pre-call rejections and contains the upstream exception text for failures reported
+by the astronomy library, even if that text is empty. When supplied by the upstream
+exception, `operation` names the upstream operation and `recorded` indicates whether
+native code reported a recognized error kind. Domain rejections leave both as None.
+The error type is not determined by parsing the message text.
 
 ```{doctest}
 >>> high = prepare_natal_input(BirthRecord(
@@ -217,8 +218,8 @@ determined by parsing the message text.
 >>> try:
 ...   natal_chart(high, ChartConfig(HouseSystem.PLACIDUS, (Body.SUN,), ()))
 ... except ChartDomainError as error:
-...   (error.house_system.value, error.operation, error.recorded)
-('placidus', None, None)
+...   (error.house_system.value, error.operation, error.recorded, error.upstream_message is not None)
+('placidus', None, None, True)
 >>> natal_chart(high, ChartConfig(HouseSystem.EQUAL, (Body.SUN,), ())).houses.system.value
 'equal'
 ```
