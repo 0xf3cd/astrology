@@ -30,7 +30,7 @@ The library also provides:
 
 ## Install a release
 
-This library depends on celestial-calendar 0.8.0, which publishes
+This library depends on celestial-calendar 1.0.0, which publishes
 wheels for Linux x86_64 and aarch64, macOS 14+ arm64 and Windows amd64, and no source
 distribution. On any other platform this package cannot be installed, and
 knowledge browsing is not available either.
@@ -57,7 +57,7 @@ py -3.14 -m venv .venv
 .venv\Scripts\python.exe -m pip install celestial-astrology
 ```
 
-Runtime dependencies remain exactly pinned to `celestial-calendar==0.8.0` and
+Runtime dependencies remain exactly pinned to `celestial-calendar==1.0.0` and
 `tzdata==2026.5`. This can conflict with applications requiring another version.
 See the [release notes](https://0xf3cd.github.io/astrology/docs/en/releases.html).
 

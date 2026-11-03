@@ -14,34 +14,34 @@ reason to give the adapter its own result type.
 from __future__ import annotations
 
 import celestial_calendar as celestial
-from celestial_calendar import BodyState, ChartTarget
+from celestial_calendar import BodyState, Target
 
 from astrology.birth import Location, MissingBirthDataError, ResolvedBirth
 from astrology.chart import ChartDomainError, ChartHouses, ChartTimes, EclipticPosition
 from astrology.config import ChartConfig, HouseSystem
 from astrology.objects import AstronomicalObject, Body, LunarNode, _is_astronomical_object
 
-_BODY_TARGETS: dict[Body, ChartTarget] = {
-  Body.SUN: ChartTarget.SUN,
-  Body.MOON: ChartTarget.MOON,
-  Body.MERCURY: ChartTarget.MERCURY,
-  Body.VENUS: ChartTarget.VENUS,
-  Body.MARS: ChartTarget.MARS,
-  Body.JUPITER: ChartTarget.JUPITER,
-  Body.SATURN: ChartTarget.SATURN,
-  Body.URANUS: ChartTarget.URANUS,
-  Body.NEPTUNE: ChartTarget.NEPTUNE,
-  Body.PLUTO: ChartTarget.PLUTO,
+_BODY_TARGETS: dict[Body, Target] = {
+  Body.SUN: Target.SUN,
+  Body.MOON: Target.MOON,
+  Body.MERCURY: Target.MERCURY,
+  Body.VENUS: Target.VENUS,
+  Body.MARS: Target.MARS,
+  Body.JUPITER: Target.JUPITER,
+  Body.SATURN: Target.SATURN,
+  Body.URANUS: Target.URANUS,
+  Body.NEPTUNE: Target.NEPTUNE,
+  Body.PLUTO: Target.PLUTO,
 }
 
 # The upstream names it only "true node"; this project identifies it with the
 # Meeus five-term true node named in our config.
 # 上游只称它 true node；本项目把它认定为配置里具名的 Meeus 五项真交点。
-_NODE_TARGETS: dict[LunarNode, ChartTarget] = {
-  LunarNode.MEAN_ASCENDING: ChartTarget.MEAN_ASCENDING,
-  LunarNode.MEAN_DESCENDING: ChartTarget.MEAN_DESCENDING,
-  LunarNode.MEEUS_FIVE_TERM_TRUE_ASCENDING: ChartTarget.TRUE_ASCENDING,
-  LunarNode.MEEUS_FIVE_TERM_TRUE_DESCENDING: ChartTarget.TRUE_DESCENDING,
+_NODE_TARGETS: dict[LunarNode, Target] = {
+  LunarNode.MEAN_ASCENDING: Target.MEAN_ASCENDING,
+  LunarNode.MEAN_DESCENDING: Target.MEAN_DESCENDING,
+  LunarNode.MEEUS_FIVE_TERM_TRUE_ASCENDING: Target.TRUE_ASCENDING,
+  LunarNode.MEEUS_FIVE_TERM_TRUE_DESCENDING: Target.TRUE_DESCENDING,
 }
 
 _HOUSE_SYSTEMS: dict[HouseSystem, celestial.HouseSystem] = {
@@ -73,7 +73,7 @@ def delta_t_model_id() -> str:
   return _DELTA_T_MODEL.value
 
 
-def _target(identity: AstronomicalObject) -> ChartTarget:
+def _target(identity: AstronomicalObject) -> Target:
   """Map a requested identity to the fixed upstream roster. 把请求的标识映射到上游固定的名册。"""
   if not _is_astronomical_object(identity):
     raise TypeError("Native targets require a Body or LunarNode")
@@ -83,14 +83,14 @@ def _target(identity: AstronomicalObject) -> ChartTarget:
 
 
 def _precheck(resolved: ResolvedBirth, config: ChartConfig) -> Location:
-  """Reject input the upstream Python layer would otherwise reject as a bare ValueError.
+  """Validate location and civil limits before evaluating the chart.
 
   Requires a location, a latitude strictly inside ±90 (records admit the endpoints,
   geometry requires the open interval) and a civil year through 2099, all before any
   native call; returns the validated location. The JDE(TT) upper bound inside 2099 is
   left to the native domain check; both surfaces raise ChartDomainError.
 
-  在调用原生库之前，先拒绝上游 Python 层会用裸 ValueError 拒绝的输入：缺少地点；纬度不在
+  在计算命盘之前校验地点与民用时间限制：缺少地点；纬度不在
   ±90 的开区间内（出生记录允许取到端点，宫位几何不允许）；民用年超过 2099。通过时返回
   校验过的地点。2099 年内 JDE(TT) 的上界留给原生库自己的域检查；两处拒绝抛出的都是
   ChartDomainError。
@@ -148,17 +148,25 @@ def snapshot(
     resolved.utc.day,
     second_of_day / 86_400_000_000,
   )
+  native_location = celestial.GeoLocation(location.latitude, location.longitude)
+  native_system = _HOUSE_SYSTEMS[config.house_system]
   try:
     native = celestial.chart_snapshot(
       civil,
       celestial.CivilScale.UTC,
-      celestial.GeoLocation(location.latitude, location.longitude),
-      _HOUSE_SYSTEMS[config.house_system],
+      native_location,
+      native_system,
       _DELTA_T_MODEL,
     )
-  except celestial.CelestialError as exc:
+  except ValueError as exc:
     raise ChartDomainError(
       f"Requested {config.house_system.value} chart is outside the supported domain: {exc}",
+      house_system=config.house_system,
+      upstream_message=str(exc),
+    ) from exc
+  except celestial.CelestialError as exc:
+    raise ChartDomainError(
+      f"Requested {config.house_system.value} chart calculation failed: {exc}",
       house_system=config.house_system,
       operation=exc.operation,
       recorded=exc.recorded,
