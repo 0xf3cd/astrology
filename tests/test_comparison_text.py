@@ -7,6 +7,7 @@ import subprocess
 import sys
 from collections.abc import Callable
 from dataclasses import replace
+from pathlib import Path
 from typing import Any
 
 import pytest
@@ -197,7 +198,7 @@ def test_missing_catalog_bindings_are_not_replaced_with_builtin_names(
   formatter: Callable[..., str], factory: Callable[[], Any], language: Language
 ) -> None:
   with pytest.raises(ValueError, match="Expected one catalog concept"):
-    formatter(factory(), Catalog("empty", (), (), (), ()), language=language)
+    formatter(factory(), Catalog((), (), (), ()), language=language)
 
 
 @pytest.mark.parametrize(
@@ -370,47 +371,8 @@ def test_source_labels_cannot_forge_comparison_rows(
 def test_supplied_comparisons_and_text_block_effects_after_inputs_are_ready(
   mode: tuple[str, ...],
 ) -> None:
-  source = """
-import builtins
-import io
-import importlib.metadata as metadata
-import astrology
-import astrology.birth as birth
-import astrology.chart as chart
-import astrology._distribution as distribution
-import astrology.knowledge.catalog as catalog_module
-from tools.installed_check import acceptance_house_overlays, acceptance_cross_aspects
-overlays = acceptance_house_overlays()
-aspects = acceptance_cross_aspects()
-catalog = astrology.load_catalog()
-original_import = builtins.__import__
-def forbidden(*args, **kwargs):
-  raise RuntimeError('Supplied comparison crossed an effectful boundary')
-def guarded(name, *args, **kwargs):
-  if name == 'astrology.celestial' or name.startswith(('celestial_calendar', 'tzdata', 'zoneinfo')):
-    forbidden()
-  return original_import(name, *args, **kwargs)
-builtins.__import__ = guarded
-builtins.open = io.open = forbidden
-metadata.version = metadata.distribution = distribution.distribution = forbidden
-astrology.load_catalog = catalog_module.load_catalog = catalog_module.files = forbidden
-astrology.natal_chart = chart.natal_chart = forbidden
-astrology.prepare_natal_input = birth.prepare_natal_input = birth.resolve_birth_time = forbidden
-again = astrology.cross_chart_house_overlays(overlays.chart_left, overlays.chart_right,
-  left_objects=overlays.left_objects, right_objects=overlays.right_objects)
-if again != overlays:
-  raise RuntimeError('Supplied geometry changed')
-for language in ('en', 'zh-CN'):
-  if not astrology.format_house_overlays(again, catalog, language=language):
-    raise RuntimeError('Empty overlay output')
-  if not astrology.format_cross_aspects(aspects, catalog, language=language):
-    raise RuntimeError('Empty aspect output')
-try:
-  astrology.HouseOverlay('left', 'right', astrology.Body.SUN, True)
-except TypeError:
-  pass
-else:
-  raise RuntimeError('Optimized mode lost house validation')
-"""
+  source = (Path(__file__).parent / "consumer_cases/comparison_text_isolation.py").read_text(
+    encoding="utf-8"
+  )
   completed = subprocess.run([sys.executable, *mode, "-c", source], capture_output=True, text=True)
   assert completed.returncode == 0, completed.stdout + completed.stderr

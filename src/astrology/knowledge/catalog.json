@@ -1,5 +1,4 @@
 {
-  "version": "2026.10.30.1",
   "text_defaults": {"revision": 1, "zh_revision": 1, "translation_credit": "astrology contributors"},
   "concepts": [
     {"identifier": "axis.ascendant", "kind": "axis", "name": {"en": "Ascendant", "zh": "上升点"}, "en_aliases": ["ASC"], "zh_aliases": ["上升"], "description": {"en": "The chart's stored Ascendant longitude, distinct from its first house cusp. Explicitly selectable for aspects and cross-chart house overlays; not a native-output body or node.", "zh": "命盘保存的上升点黄经，与第一宫头区分。可显式选择参与相位和双盘落宫，不是天文输出的天体或交点。", "revision": 2, "zh_revision": 2}, "configuration": {"enum": "Axis", "member": "ASCENDANT"}},

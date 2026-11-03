@@ -14,7 +14,6 @@ from zipfile import ZipFile
 
 import pytest
 
-from astrology.knowledge import load_catalog
 from tools import check as checker
 from tools import installed_check
 from tools.check import (
@@ -173,7 +172,7 @@ def test_incomplete_wheel(tmp_path: Path, missing: str) -> None:
         archive.writestr(path, "")
     archive.writestr("a.dist-info/METADATA", "Name: celestial-astrology\nVersion: 0.0.0\n")
   with pytest.raises(ValueError, match="missing"):
-    check_wheel(wheel, "0.0.0")
+    check_wheel(wheel, "0.0.0", source_root=tmp_path)
 
 
 @pytest.mark.parametrize(
@@ -187,7 +186,7 @@ def test_wrong_wheel_identity(tmp_path: Path, name: str, version: str) -> None:
       archive.writestr(path, "")
     archive.writestr("a.dist-info/METADATA", f"Name: {name}\nVersion: {version}\n")
   with pytest.raises(ValueError, match="identity"):
-    check_wheel(wheel, "0.0.0")
+    check_wheel(wheel, "0.0.0", source_root=tmp_path)
 
 
 @pytest.mark.parametrize("count", [0, 2])
@@ -197,7 +196,74 @@ def test_wheel_metadata_count(tmp_path: Path, count: int) -> None:
     for index in range(count):
       archive.writestr(f"{index}.dist-info/METADATA", "Name: celestial-astrology\nVersion: 0.0.0\n")
   with pytest.raises(ValueError, match="one METADATA"):
-    check_wheel(wheel, "0.0.0")
+    check_wheel(wheel, "0.0.0", source_root=tmp_path)
+
+
+@pytest.fixture
+def wheel_sources(tmp_path: Path) -> tuple[Path, Path]:
+  source = tmp_path / "source"
+  wheel = tmp_path / "package.whl"
+  with ZipFile(wheel, "w") as archive:
+    for name in PACKAGE_FILES:
+      content = b"source:" + name.encode()
+      path = source / "src" / name
+      path.parent.mkdir(parents=True, exist_ok=True)
+      path.write_bytes(content)
+      archive.writestr(name, content)
+    archive.writestr("a.dist-info/licenses/LICENSE", "MIT")
+    archive.writestr(
+      "a.dist-info/METADATA",
+      "Name: celestial-astrology\nVersion: 0.0.0\n"
+      "Description-Content-Type: text/markdown\n\n[Docs](https://example.org/)\n",
+    )
+  return source, wheel
+
+
+@pytest.mark.parametrize("member", PACKAGE_FILES)
+def test_wheel_rejects_changed_package_bytes(wheel_sources: tuple[Path, Path], member: str) -> None:
+  source, wheel = wheel_sources
+  check_wheel(wheel, "0.0.0", source_root=source)
+  with ZipFile(wheel) as archive:
+    members = {name: archive.read(name) for name in archive.namelist()}
+  members[member] += b"\nchanged"
+  with ZipFile(wheel, "w") as archive:
+    for name, content in members.items():
+      archive.writestr(name, content)
+  with pytest.raises(ValueError, match="Wheel package member differs from the source") as caught:
+    check_wheel(wheel, "0.0.0", source_root=source)
+  assert member in str(caught.value)
+
+
+def test_wheel_uses_supplied_source_not_the_checkers_checkout(
+  wheel_sources: tuple[Path, Path], tmp_path: Path
+) -> None:
+  source, wheel = wheel_sources
+  check_wheel(wheel, "0.0.0", source_root=source)
+  other = tmp_path / "other"
+  _package_tree(other, PACKAGE_FILES)
+  with pytest.raises(ValueError, match="Wheel package member differs from the source"):
+    check_wheel(wheel, "0.0.0", source_root=other)
+
+
+@pytest.mark.parametrize(
+  "member",
+  ["astrology/stale_module.py", "astrology/knowledge/stale.json", "astrology/stale/__init__.py"],
+)
+def test_wheel_rejects_extra_package_members(wheel_sources: tuple[Path, Path], member: str) -> None:
+  source, wheel = wheel_sources
+  with ZipFile(wheel, "a") as archive:
+    archive.writestr(member, "stale package content")
+  with pytest.raises(ValueError, match="unexpected package resources") as caught:
+    check_wheel(wheel, "0.0.0", source_root=source)
+  assert member in str(caught.value)
+
+
+def test_wheel_allows_directory_entries(wheel_sources: tuple[Path, Path]) -> None:
+  source, wheel = wheel_sources
+  with ZipFile(wheel, "a") as archive:
+    archive.writestr("astrology/", "")
+    archive.writestr("astrology/knowledge/", "")
+  check_wheel(wheel, "0.0.0", source_root=source)
 
 
 @pytest.mark.parametrize(("retain", "existing"), [(False, False), (True, False), (True, True)])
@@ -288,9 +354,11 @@ def test_main_keeps_required_validation_stages(
   assert ("distribution",) in commands
 
 
+@pytest.mark.parametrize("sdist_drift", [False, True])
 def test_distribution_keeps_dependency_install_and_both_consumer_modes(
-  tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+  tmp_path: Path, monkeypatch: pytest.MonkeyPatch, sdist_drift: bool
 ) -> None:
+  _package_tree(tmp_path, PACKAGE_FILES)
   (tmp_path / "pyproject.toml").write_text('[project]\nversion = "0.0.0"\n', encoding="utf-8")
   (tmp_path / "README.md").write_text("[Docs](https://example.org/)\n", encoding="utf-8")
   commands: list[tuple[str, ...]] = []
@@ -314,7 +382,12 @@ def test_distribution_keeps_dependency_install_and_both_consumer_modes(
       artifacts.mkdir(parents=True)
       with tarfile.open(artifacts / "astrology.tar.gz", "w:gz") as archive:
         for name in SDIST_PATHS:
-          archive.addfile(tarfile.TarInfo("astrology/" + name), BytesIO())
+          content = (
+            b"changed downstream" if sdist_drift and name == "src/astrology/dignities.py" else b""
+          )
+          member = tarfile.TarInfo("astrology/" + name)
+          member.size = len(content)
+          archive.addfile(member, BytesIO(content))
         content = b"Description-Content-Type: text/markdown\n\n[Docs](https://example.org/)\n"
         member = tarfile.TarInfo("astrology/PKG-INFO")
         member.size = len(content)
@@ -323,7 +396,10 @@ def test_distribution_keeps_dependency_install_and_both_consumer_modes(
       artifacts = Path(command[-1])
       with ZipFile(artifacts / "astrology.whl", "w") as archive:
         for name in (*PACKAGE_FILES, "a.dist-info/licenses/LICENSE"):
-          archive.writestr(name, "")
+          content = (
+            b"changed downstream" if sdist_drift and name == "astrology/dignities.py" else b""
+          )
+          archive.writestr(name, content)
         archive.writestr(
           "a.dist-info/METADATA",
           "Name: celestial-astrology\nVersion: 0.0.0\n"
@@ -343,6 +419,14 @@ def test_distribution_keeps_dependency_install_and_both_consumer_modes(
     validations.append(("sdist", sdist))
 
   monkeypatch.setattr(checker, "check_sdist", validate_sdist)
+  original_check_wheel = checker.check_wheel
+
+  def validate_wheel(wheel: Path, expected_version: str, *, source_root: Path) -> None:
+    assert source_root == tmp_path
+    validations.append(("wheel", source_root))
+    original_check_wheel(wheel, expected_version, source_root=source_root)
+
+  monkeypatch.setattr(checker, "check_wheel", validate_wheel)
   monkeypatch.setattr(
     checker, "check_documents", lambda root: validations.append(("documents", root))
   )
@@ -376,6 +460,11 @@ def test_distribution_keeps_dependency_install_and_both_consumer_modes(
     "check_missing_metadata",
     lambda environment, python, script: metadata_calls.append((environment, python, script)),
   )
+  if sdist_drift:
+    with pytest.raises(ValueError, match="Wheel package member differs from the source"):
+      checker.check_distribution(tmp_path)
+    assert ("wheel", tmp_path) in validations
+    return
   checker.check_distribution(tmp_path)
   source = tmp_path / "source/astrology"
   wheel_index = next(index for index, command in enumerate(commands) if "--wheel" in command)
@@ -422,7 +511,7 @@ def test_distribution_keeps_dependency_install_and_both_consumer_modes(
   assert len(consumers) == 4
   assert all(command[0] == str(python) for command in consumers)
   assert all("-I" in command and "0.0.0" in command for command in consumers)
-  assert all(load_catalog().version in command for command in consumers)
+  assert all(command[command.index("0.0.0") + 1].startswith("--") for command in consumers)
   assert ["-O" in command for command in consumers] == [False, False, True, True]
   assert ["--knowledge-only" in command for command in consumers] == [True, False, True, False]
   assert ["--expected-observations" in command for command in consumers] == [
@@ -558,6 +647,7 @@ def test_sdist_resource_contents(tmp_path: Path, missing: str | None) -> None:
 def test_wheel_rejects_withdrawn_module_even_if_relisted(
   tmp_path: Path, monkeypatch: pytest.MonkeyPatch, member: str, feature: str
 ) -> None:
+  _package_tree(tmp_path, PACKAGE_FILES)
   wheel = tmp_path / "package.whl"
   with ZipFile(wheel, "w") as archive:
     for name in PACKAGE_FILES:
@@ -568,12 +658,12 @@ def test_wheel_rejects_withdrawn_module_even_if_relisted(
       "Name: celestial-astrology\nVersion: 0.0.0\n"
       "Description-Content-Type: text/markdown\n\n[Docs](https://example.org/)\n",
     )
-  check_wheel(wheel, "0.0.0")
+  check_wheel(wheel, "0.0.0", source_root=tmp_path)
   with ZipFile(wheel, "a") as archive:
     archive.writestr(member, "")
   monkeypatch.setattr(checker, "PACKAGE_FILES", (*PACKAGE_FILES, member))
   with pytest.raises(ValueError, match=f"withdrawn {feature}"):
-    check_wheel(wheel, "0.0.0")
+    check_wheel(wheel, "0.0.0", source_root=tmp_path)
 
 
 @pytest.mark.parametrize(

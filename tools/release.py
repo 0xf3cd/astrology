@@ -23,7 +23,6 @@ from zipfile import ZipFile
 if __package__ in (None, ""):
   sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-import astrology
 from astrology._distribution import DISTRIBUTION_NAME
 from tools.check import (
   check_installed_wheel,
@@ -236,7 +235,7 @@ def inspect_distributions(
   packages = _packages(directory, identity)
   sdist, wheel = packages / identity.sdist_name, packages / identity.wheel_name
   check_sdist(sdist)
-  check_wheel(wheel, identity.version)
+  check_wheel(wheel, identity.version, source_root=root)
   tracked = _git(root, "ls-files", "-z").split("\0")
   sources: dict[str, bytes] = {}
   sdist_members = _sdist_members(sdist, identity)
@@ -290,7 +289,6 @@ def inspect_distributions(
     "distribution": DISTRIBUTION_NAME,
     "version": identity.version,
     "source_sha": identity.source_sha,
-    "corpus_version": astrology.load_catalog().version,
     "requires_python": project["requires-python"],
     "dependencies": project["dependencies"],
     "artifacts": {

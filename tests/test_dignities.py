@@ -6,6 +6,7 @@ import sys
 from dataclasses import FrozenInstanceError, replace
 from datetime import date, time, timedelta
 from enum import StrEnum
+from pathlib import Path
 from typing import Any
 
 import pytest
@@ -35,7 +36,6 @@ from astrology import (
 )
 from astrology.knowledge import ConceptKind, LocalizedText
 from astrology.knowledge.records import Language
-from tools import installed_check
 from tools.catalog_docs import check_catalog_data, dignity_rows, render_catalog
 from tools.installed_check import _cross_source
 
@@ -360,49 +360,11 @@ def test_catalog_identity_source_and_reference_statuses() -> None:
 
 @pytest.mark.parametrize("mode", [[], ["-O"]])
 def test_dignities_and_composition_without_native_imports(mode: list[str]) -> None:
-  code = """
-import sys
-from astrology import *
-from tools.installed_check import _cross_source
-chart = _cross_source(2000, 'pure', ((Body.MERCURY, 150), (Body.SUN, 30)))
-result = HouseRulers(chart)
-format_house_rulers(result, load_catalog(), language='zh-CN')
-if result.chart is not chart or result.houses[5].statuses != (DignityStatus.DOMICILE, DignityStatus.EXALTATION):
-  raise RuntimeError('lost chart or status')
-if any(n.startswith(('celestial', 'ctypes')) for n in sys.modules):
-  raise RuntimeError('native import')
-for call, error in (
-  (lambda: sign_ruler('aries'), TypeError),
-  (lambda: essential_dignities(LunarNode.MEAN_ASCENDING, Sign.ARIES), TypeError),
-  (lambda: essential_dignities(Body.PLUTO, Sign.ARIES), ValueError),
-  (lambda: HouseRuler(True, Sign.ARIES, None), TypeError),
-  (lambda: HouseRuler(0, Sign.ARIES, None), ValueError),
-  (lambda: HouseRuler(1, Sign.ARIES, Placement(Body.SUN, Sign.LEO, 0, 1)), ValueError),
-  (lambda: HouseRulers(None), TypeError),
-):
-  try: call()
-  except error: pass
-  else: raise RuntimeError('missing public check')
-"""
+  code = (Path(__file__).parent / "consumer_cases/dignities_isolation.py").read_text(
+    encoding="utf-8"
+  )
   run = subprocess.run([sys.executable, *mode, "-c", code], capture_output=True, text=True)
   assert run.returncode == 0, run.stdout + run.stderr
-
-
-@pytest.mark.parametrize(
-  "target", ["sign_ruler", "essential_dignities", "HouseRulers", "format_house_rulers"]
-)
-def test_installed_consumer_detects_defects(monkeypatch: pytest.MonkeyPatch, target: str) -> None:
-  import astrology
-
-  replacements: dict[str, Any] = {
-    "sign_ruler": lambda sign: Body.PLUTO,
-    "essential_dignities": lambda body, sign: (),
-    "HouseRulers": lambda chart: HouseRulers(replace(chart, placements=chart.placements)),
-    "format_house_rulers": lambda *args, **kwargs: "incomplete",
-  }
-  monkeypatch.setattr(astrology, target, replacements[target])
-  with pytest.raises(ValueError, match="Installed"):
-    installed_check._check_dignities()
 
 
 def test_domain_tables_are_immutable() -> None:

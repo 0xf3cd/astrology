@@ -32,7 +32,6 @@ from astrology import (
 )
 from astrology.knowledge import ConceptKind, LocalizedText
 from astrology.knowledge.records import CONFIGURATION_TYPES, Language
-from tools import installed_check
 from tools.catalog_docs import check_catalog_data, render_catalog
 from tools.installed_check import _cross_source
 
@@ -356,22 +355,3 @@ for action in (lambda: sign_distribution([]), lambda: lunar_phase(True, 0)):
 """
   result = subprocess.run([sys.executable, *mode, "-c", code], capture_output=True, text=True)
   assert result.returncode == 0, result.stdout + result.stderr
-
-
-@pytest.mark.parametrize(
-  "target", ["element_of", "natal_lunar_phase", "format_sign_distribution", "format_lunar_phase"]
-)
-def test_installed_summary_check_rejects_representative_defects(
-  monkeypatch: pytest.MonkeyPatch, target: str
-) -> None:
-  import astrology
-
-  replacements: dict[str, Any] = {
-    "element_of": lambda sign: Element.WATER,
-    "natal_lunar_phase": lambda chart: lunar_phase(0, 10),
-    "format_sign_distribution": lambda *args, **kwargs: "incomplete",
-    "format_lunar_phase": lambda *args, **kwargs: "incomplete",
-  }
-  monkeypatch.setattr(astrology, target, replacements[target])
-  with pytest.raises(ValueError, match="Installed"):
-    installed_check._check_summaries()

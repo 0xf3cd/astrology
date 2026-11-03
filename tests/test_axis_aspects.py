@@ -47,7 +47,7 @@ from astrology.knowledge import ConceptKind
 from astrology.knowledge.records import CONFIGURATION_TYPES, Language
 from astrology.objects import AstronomicalObject, ChartObject
 from tools.catalog_docs import check_catalog_data
-from tools.installed_check import _check_axes, _cross_source
+from tools.installed_check import _cross_source
 
 _AXES = (10.5, 100.25, 202.75, 301.125)
 _OTHER_AXES = (50.25, 140.0, 230.5, 320.75)
@@ -532,10 +532,6 @@ def test_whole_sign_axes_are_not_cusps_and_nonzero_roundoff_is_not_exact() -> No
   )
   assert opposite.deviation_deg != 0
   assert opposite.motion is AspectMotion.INDETERMINATE
-
-
-def test_installed_axis_checks_exercise_the_pure_consumer() -> None:
-  _check_axes()
 
 
 def test_axis_entry_has_a_fixed_implementation_source_and_no_chart_assessment() -> None:

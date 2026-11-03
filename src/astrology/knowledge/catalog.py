@@ -60,14 +60,12 @@ class Catalog:
   格式正确但未知的标识抛出 KeyError。
   """
 
-  version: str
   concepts: Sequence[Concept]
   variants: Sequence[RuleVariant]
   sources: Sequence[Source]
   entries: Sequence[Entry]
 
   def __post_init__(self) -> None:
-    _text(self.version)
     for name, expected in (
       ("concepts", Concept),
       ("variants", RuleVariant),
@@ -387,7 +385,7 @@ def load_catalog() -> Catalog:
     )
     for row in data["entries"]
   )
-  catalog = Catalog(data["version"], concepts, variants, sources, entries)
+  catalog = Catalog(concepts, variants, sources, entries)
   sign_concepts = tuple(_sign_concept(catalog, sign) for sign in Sign)
   if set(catalog.list_concepts(kind=ConceptKind.SIGN)) != set(sign_concepts):
     raise ValueError("The built-in catalog must map exactly the twelve Sign identities")

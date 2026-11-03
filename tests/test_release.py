@@ -13,7 +13,6 @@ from zipfile import ZipFile, ZipInfo
 
 import pytest
 
-import astrology
 from tools import check as checker
 from tools import release
 from tools.check import PACKAGE_FILES, SDIST_FILES
@@ -231,7 +230,7 @@ def test_prepare_retains_complete_inventory_and_independent_digests(files: Relea
   assert manifest["source_sha"] == SHA
   assert manifest["version"] == "0.1.0"
   assert manifest["schema_version"] == 1
-  assert manifest["corpus_version"] == astrology.load_catalog().version
+  assert "corpus_version" not in manifest
   assert manifest["requires_python"] == ">=3.11,<3.15"
   assert manifest["dependencies"] == ["celestial-calendar==0.8.0", "tzdata==2026.5"]
   for name, variable in (

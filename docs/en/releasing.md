@@ -53,7 +53,7 @@ release by package name; version-specific availability belongs in the release no
    are always checked; fixed-SHA source/archive links are checked when
    `ASTROLOGY_DOCS_SOURCE_SHA` identifies the build's source revision.
    The manifest records source
-   commit, corpus version, Python/dependency requirements, the two artifact digests
+   commit, Python/dependency requirements, the two artifact digests
    and every archived file's path/size/digest. Unexpected members, changed source bytes or
    changed runtime requirements fail inspection.
 4. Verify representative rejection cases for the new release checks. Every new
@@ -99,29 +99,14 @@ manual requirement into a claim of automatic enforcement.
 
 ### Rehearse without uploading
 
-Use the checked distributions and a disposable local directory. In that directory,
-keep a rehearsal record with the version, source SHA, index availability and
-upload/GitHub Release/Pages states. These are simulated states, not the actual
-release record. Do not dispatch the publishing workflow or contact an upload endpoint.
-
-1. Prepare the manifest once and save both file digests. Verify the retained
-   distributions using those digests and the accepted source.
-2. Set index availability to absent in the rehearsal record, then follow the
-   README's source-install instructions. Verify that its package descriptions and
-   rendered pages make no claim of index availability.
-3. Change only index availability in that record to listed.
-   The same descriptions and pages must still pass, without editing package bytes.
-4. In the same local record, mark the upload as simulated complete and GitHub
-   Release and Pages as pending. Reverify the
-   original manifest/files and finish only the simulated missing steps. Do not
-   rerun preparation over its existing manifest or substitute rebuilt packages.
-5. Compare the original and final file digests. Record commands, actual exit
-   statuses and incomplete operations. A content correction requires a new
-   reviewed version, not a replacement under the simulated existing version.
-
-This exercises the acceptance instructions and recovery choices. It does not
-prove OIDC credentials, PyPI upload or live deployment; those need separately
-authorized publication and post-publication checks.
+Use a no-upload rehearsal when changes to the release procedure or workflows leave
+a failure path untested by the normal pre-publication checks. To check instructions,
+run the affected steps locally with the retained wheel and sdist; to check changed
+build/consumer steps, use a pull-request workflow run. Record the gap, exact wheel
+and sdist filenames/digests, commands and results. A routine release can use the
+formal workflow's build and same-wheel consumers before manual approval without
+a separate rehearsal. A no-upload run does not verify OIDC credentials, PyPI upload
+or live deployment; those require authorized publication and post-publication checks.
 
 ## Authorize and run publication
 

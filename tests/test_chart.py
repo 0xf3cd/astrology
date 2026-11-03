@@ -9,6 +9,7 @@ import sys
 from dataclasses import FrozenInstanceError, replace
 from datetime import date, datetime, time, timedelta
 from importlib.metadata import PackageNotFoundError, version
+from pathlib import Path
 from typing import NoReturn
 
 import pytest
@@ -609,64 +610,12 @@ def test_wrong_argument_types_are_rejected(arguments: tuple[object, object]) -> 
 
 
 def test_importing_the_package_does_not_initialize_astronomy() -> None:
-  code = """
-import sys
-import astrology
-loaded = [
-    name
-    for name in sys.modules
-    if name in ('celestial_calendar', 'astrology.celestial')
-    or name.startswith('celestial_calendar.')
-    or name.startswith('ctypes')
-]
-if loaded:
-    raise RuntimeError(f'package import initialized native machinery: {loaded}')
-from datetime import date, time, timedelta
-from astrology import (
-    Body, BirthRecord, ChartConfig, FixedOffset, HouseSystem, Location, TimePrecision,
-    natal_chart, prepare_natal_input,
-)
-record = BirthRecord(
-    date(2003, 7, 17), time(12, 0), FixedOffset(timedelta(0)),
-    Location(40.0, 0.0), TimePrecision.SECOND, {'record': 'synthetic'},
-)
-resolved = prepare_natal_input(record)
-natal_chart(resolved, ChartConfig(HouseSystem.WHOLE_SIGN, (Body.SUN,), ()))
-if 'astrology.celestial' not in sys.modules:
-    raise RuntimeError('chart calculation did not load the astronomy adapter')
-"""
+  code = (Path(__file__).parent / "consumer_cases/import_isolation.py").read_text(encoding="utf-8")
   subprocess.run([sys.executable, "-c", code], check=True)
 
 
 def test_entry_checks_run_in_optimized_mode() -> None:
-  code = """
-from datetime import date, time, timedelta
-from astrology import (
-    Body, BirthRecord, ChartConfig, FixedOffset, HouseSystem, Location, TimePrecision,
-    natal_chart, prepare_natal_input, resolve_birth_time,
-)
-config = ChartConfig(HouseSystem.WHOLE_SIGN, (Body.SUN,), ())
-record = BirthRecord(
-    date(2003, 7, 17), time(5, 37, 13), FixedOffset(timedelta(0)),
-    Location(90.0, 0.0), TimePrecision.SECOND, {'record': 'synthetic'},
-)
-try:
-    natal_chart(prepare_natal_input(record), config)
-except ValueError:
-    pass
-else:
-    raise RuntimeError('optimized mode skipped the latitude domain check')
-without_location = BirthRecord(
-    date(2003, 7, 17), time(5, 37, 13), FixedOffset(timedelta(0)), None,
-    TimePrecision.SECOND, {'record': 'synthetic'},
-)
-try:
-    natal_chart(resolve_birth_time(without_location), config)
-except ValueError:
-    pass
-else:
-    raise RuntimeError('optimized mode skipped the missing location check')
-"""
+  code = (Path(__file__).parent / "consumer_cases/chart_validation.py").read_text(encoding="utf-8")
   for mode in ((), ("-O",)):
     result = subprocess.run([sys.executable, *mode, "-c", code], text=True, capture_output=True)
     assert result.returncode == 0, result.stdout + result.stderr

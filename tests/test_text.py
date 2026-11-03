@@ -425,7 +425,7 @@ def test_unusable_catalog_fails(recorded_chart: NatalChart, defect: str) -> None
   catalog = load_catalog()
   sun = catalog.concept("body.sun")
   if defect == "missing":
-    incomplete = Catalog("test", (), (), (), ())
+    incomplete = Catalog((), (), (), ())
   elif defect == "stale":
     changed = replace(sun, name=replace(sun.name, revision=2))
     incomplete = replace(
@@ -475,7 +475,7 @@ def test_all_sign_names_use_the_catalog_relationship(
   catalog = load_catalog()
   assert _name(identity, catalog, "en") == english
   assert _name(identity, catalog, "zh-CN") == chinese
-  missing = Catalog("custom", (), (), (), ())
+  missing = Catalog((), (), (), ())
   with pytest.raises(KeyError):
     _name(identity, missing, "en")
 

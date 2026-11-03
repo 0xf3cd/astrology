@@ -247,6 +247,10 @@ def test_both_reader_paths_reject_defects(
 )
 def test_wheel_checks_actual_long_description(tmp_path: Path, body: str) -> None:
   wheel = tmp_path / "package.whl"
+  for name in PACKAGE_FILES:
+    path = tmp_path / "src" / name
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.touch()
   for content_type, description in (
     ("text/markdown", "[Docs](https://example.org/)"),
     ("text/plain", body),
@@ -260,10 +264,10 @@ def test_wheel_checks_actual_long_description(tmp_path: Path, body: str) -> None
         f"Name: celestial-astrology\nVersion: 0.1.0\nDescription-Content-Type: {content_type}\n\n{description}\n",
       )
     if description == "[Docs](https://example.org/)":
-      check_wheel(wheel, "0.1.0")
+      check_wheel(wheel, "0.1.0", source_root=tmp_path)
     else:
       with pytest.raises(ValueError, match=r"Markdown content|absolute HTTP|candidate claim"):
-        check_wheel(wheel, "0.1.0")
+        check_wheel(wheel, "0.1.0", source_root=tmp_path)
 
 
 def _scripts(code: str = "print('太阳')", expected: str = "太阳") -> str:

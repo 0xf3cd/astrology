@@ -2,6 +2,16 @@
 
 [English](../en/releases.md) · [文档](index.md) · [发行流程](releasing.md)
 
+## 0.3.0 之后的源码变化
+
+### 不兼容变化：删除目录版本
+
+源码 API 删除 `Catalog.version` 及其构造参数。自定义目录改用
+`Catalog(concepts, variants, sources, entries)`，省去原来的首个版本参数。
+目录 JSON 的 `version` 键和发行清单的 `corpus_version` 键也已删除，不提供替代的独立目录版本。
+若需查询已安装包的版本，使用 `importlib.metadata` 的 `version("celestial-astrology")`。
+这是一次 0.x 兼容性变化；源码修订、文献版次及命盘来源信息仍保留。
+
 ## 0.3.0
 
 此版本增加本命分析、四轴相位选择和双盘落宫功能。
