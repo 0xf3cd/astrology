@@ -16,7 +16,7 @@ uv sync --locked --python 3.14
 uv run --locked python tools/check.py
 ```
 
-支持 Python 3.11–3.14，下限与 celestial-calendar 0.8.0 一致；该库是本包的硬依赖。
+支持 Python 3.11–3.14。
 CI 在 Linux 3.11／3.14 和 macOS／Windows 3.14 上运行同一命令。
 本地验证下限时使用 `uv sync --locked --python 3.11`。
 开发检查使用当前补丁版。检查中的 sdist 安全解压要求 Python 3.11.4 或更高版本；

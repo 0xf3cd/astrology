@@ -9,6 +9,7 @@ import sys
 from dataclasses import FrozenInstanceError, replace
 from datetime import date, datetime, time, timedelta
 from importlib.metadata import PackageNotFoundError, version
+from typing import NoReturn
 
 import pytest
 
@@ -148,8 +149,8 @@ def test_the_upper_jde_bound_is_reported_as_a_domain_error() -> None:
   with pytest.raises(ChartDomainError) as caught:
     natal_chart(resolved_at(date(2099, 12, 31), time(16, 0), 0.0), config_for())
   assert caught.value.house_system is HouseSystem.WHOLE_SIGN
-  assert caught.value.operation == "chart_snapshot"
-  assert caught.value.recorded is True
+  assert caught.value.operation is None
+  assert caught.value.recorded is None
   assert caught.value.upstream_message
 
 
@@ -158,8 +159,8 @@ def test_a_high_latitude_placidus_failure_is_reported_without_substitution() -> 
   with pytest.raises(ChartDomainError) as caught:
     natal_chart(resolved, config_for(HouseSystem.PLACIDUS))
   assert caught.value.house_system is HouseSystem.PLACIDUS
-  assert caught.value.operation == "chart_snapshot"
-  assert caught.value.recorded is True
+  assert caught.value.operation is None
+  assert caught.value.recorded is None
   assert caught.value.upstream_message
   # The same instant succeeds with the other systems, so the failure above was
   # the requested geometry and not the instant.
@@ -179,8 +180,8 @@ def test_an_undefined_ascendant_direction_fails_under_every_house_system(
   with pytest.raises(ChartDomainError) as caught:
     natal_chart(resolved, config_for(system))
   assert caught.value.house_system is system
-  assert caught.value.operation == "chart_snapshot"
-  assert caught.value.recorded is True
+  assert caught.value.operation is None
+  assert caught.value.recorded is None
   assert caught.value.upstream_message
 
 
@@ -197,21 +198,23 @@ def test_a_latitude_just_inside_the_pole_is_left_to_the_upstream_domain() -> Non
   with pytest.raises(ChartDomainError) as caught:
     natal_chart(resolved, config_for(HouseSystem.PLACIDUS))
   # An upstream failure, not the pre-call rejection reserved for the poles.
-  assert caught.value.operation == "chart_snapshot"
-  assert caught.value.recorded is True
+  assert caught.value.operation is None
+  assert caught.value.recorded is None
+  assert caught.value.upstream_message is not None
 
 
 def test_failures_are_classified_by_structure_and_not_by_message_text() -> None:
-  # A pre-call rejection carries no upstream detail; an upstream failure
-  # carries the operation and recording status. Neither is decided by reading
-  # the message. 调用前的拒绝不带上游细节；上游的失败带有操作和记录状态；分类不靠解析消息文本。
+  # Only upstream rejections carry upstream_message; its text does not decide the error type.
+  # 只有上游拒绝才携带 upstream_message；错误类型不靠解析消息文本决定。
   with pytest.raises(ChartDomainError) as rejected:
     natal_chart(resolved_at(date(2100, 1, 1), time(12, 0), 0.0), config_for())
   assert rejected.value.operation is None
+  assert rejected.value.upstream_message is None
   with pytest.raises(ChartDomainError) as reported:
     natal_chart(resolved_at(date(1990, 6, 21), time(0, 0), 69.65), config_for(HouseSystem.PLACIDUS))
-  assert reported.value.operation == "chart_snapshot"
-  assert reported.value.recorded is True
+  assert reported.value.operation is None
+  assert reported.value.recorded is None
+  assert reported.value.upstream_message is not None
 
 
 def test_the_delta_t_model_and_the_astronomy_version_are_recorded() -> None:
@@ -220,6 +223,89 @@ def test_the_delta_t_model_and_the_astronomy_version_are_recorded() -> None:
   assert chart.provenance.celestial_version == version("celestial-calendar")
   assert chart.provenance.astrology_version == version("celestial-astrology")
   assert chart.provenance.ut1_derivation == "delta_t_model_from_civil_utc"
+
+
+@pytest.mark.parametrize("stage", ["precheck", "CivilDateTime", "GeoLocation"])
+def test_argument_construction_errors_are_not_wrapped(
+  stage: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+  import celestial_calendar as celestial
+
+  import astrology.celestial as adapter
+
+  failure = ValueError("invalid adapter argument")
+
+  def reject(*arguments: object) -> NoReturn:
+    raise failure
+
+  if stage == "precheck":
+    monkeypatch.setattr(adapter, "_precheck", reject)
+  else:
+    monkeypatch.setattr(celestial, stage, reject)
+  with pytest.raises(ValueError) as caught:
+    natal_chart(resolved_at(*_NORTH[:2], *_NORTH[2:]), config_for())
+  assert caught.value is failure
+
+
+@pytest.mark.parametrize("message", ["", "calculation rejected"])
+def test_upstream_domain_rejections_keep_only_supplied_diagnostics(
+  message: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+  import celestial_calendar as celestial
+
+  failure = ValueError(message)
+
+  def reject(*arguments: object) -> NoReturn:
+    raise failure
+
+  monkeypatch.setattr(celestial, "chart_snapshot", reject)
+  with pytest.raises(ChartDomainError) as caught:
+    natal_chart(resolved_at(*_NORTH[:2], *_NORTH[2:]), config_for(HouseSystem.PLACIDUS))
+  assert caught.value.house_system is HouseSystem.PLACIDUS
+  assert caught.value.operation is None
+  assert caught.value.recorded is None
+  assert caught.value.upstream_message == message
+  assert caught.value.__cause__ is failure
+  assert "outside the supported domain" in str(caught.value)
+  assert message in str(caught.value)
+
+
+@pytest.mark.parametrize("recorded", [True, False])
+@pytest.mark.parametrize("message", ["", "injected calculation failure"])
+def test_upstream_computation_failures_preserve_their_diagnostics(
+  recorded: bool, message: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+  import celestial_calendar as celestial
+
+  failure = celestial.CelestialError("chart_snapshot", message, recorded=recorded)
+
+  def reject(*arguments: object) -> NoReturn:
+    raise failure
+
+  monkeypatch.setattr(celestial, "chart_snapshot", reject)
+  with pytest.raises(ChartDomainError) as caught:
+    natal_chart(resolved_at(*_NORTH[:2], *_NORTH[2:]), config_for(HouseSystem.EQUAL))
+  assert caught.value.house_system is HouseSystem.EQUAL
+  assert caught.value.operation == failure.operation
+  assert caught.value.recorded is recorded
+  assert caught.value.upstream_message == str(failure)
+  assert caught.value.__cause__ is failure
+  assert "chart calculation failed" in str(caught.value)
+
+
+@pytest.mark.parametrize("failure", [TypeError("invalid binding type"), KeyError("binding key")])
+def test_other_upstream_argument_errors_propagate_unchanged(
+  failure: Exception, monkeypatch: pytest.MonkeyPatch
+) -> None:
+  import celestial_calendar as celestial
+
+  def reject(*arguments: object) -> NoReturn:
+    raise failure
+
+  monkeypatch.setattr(celestial, "chart_snapshot", reject)
+  with pytest.raises(type(failure)) as caught:
+    natal_chart(resolved_at(*_NORTH[:2], *_NORTH[2:]), config_for())
+  assert caught.value is failure
 
 
 def test_the_coordinate_convention_is_recorded() -> None:
@@ -327,21 +413,21 @@ def test_the_descendant_and_the_imum_coeli_oppose_the_ascendant_and_the_midheave
 def test_each_identity_binds_to_its_upstream_target() -> None:
   import celestial_calendar as celestial
 
-  expected: dict[Body | LunarNode, celestial.ChartTarget] = {
-    Body.SUN: celestial.ChartTarget.SUN,
-    Body.MOON: celestial.ChartTarget.MOON,
-    Body.MERCURY: celestial.ChartTarget.MERCURY,
-    Body.VENUS: celestial.ChartTarget.VENUS,
-    Body.MARS: celestial.ChartTarget.MARS,
-    Body.JUPITER: celestial.ChartTarget.JUPITER,
-    Body.SATURN: celestial.ChartTarget.SATURN,
-    Body.URANUS: celestial.ChartTarget.URANUS,
-    Body.NEPTUNE: celestial.ChartTarget.NEPTUNE,
-    Body.PLUTO: celestial.ChartTarget.PLUTO,
-    LunarNode.MEAN_ASCENDING: celestial.ChartTarget.MEAN_ASCENDING,
-    LunarNode.MEAN_DESCENDING: celestial.ChartTarget.MEAN_DESCENDING,
-    LunarNode.MEEUS_FIVE_TERM_TRUE_ASCENDING: celestial.ChartTarget.TRUE_ASCENDING,
-    LunarNode.MEEUS_FIVE_TERM_TRUE_DESCENDING: celestial.ChartTarget.TRUE_DESCENDING,
+  expected: dict[Body | LunarNode, celestial.Target] = {
+    Body.SUN: celestial.Target.SUN,
+    Body.MOON: celestial.Target.MOON,
+    Body.MERCURY: celestial.Target.MERCURY,
+    Body.VENUS: celestial.Target.VENUS,
+    Body.MARS: celestial.Target.MARS,
+    Body.JUPITER: celestial.Target.JUPITER,
+    Body.SATURN: celestial.Target.SATURN,
+    Body.URANUS: celestial.Target.URANUS,
+    Body.NEPTUNE: celestial.Target.NEPTUNE,
+    Body.PLUTO: celestial.Target.PLUTO,
+    LunarNode.MEAN_ASCENDING: celestial.Target.MEAN_ASCENDING,
+    LunarNode.MEAN_DESCENDING: celestial.Target.MEAN_DESCENDING,
+    LunarNode.MEEUS_FIVE_TERM_TRUE_ASCENDING: celestial.Target.TRUE_ASCENDING,
+    LunarNode.MEEUS_FIVE_TERM_TRUE_DESCENDING: celestial.Target.TRUE_DESCENDING,
   }
   day, clock, latitude, longitude = _NORTH
   chart = natal_chart(

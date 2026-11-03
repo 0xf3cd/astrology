@@ -42,16 +42,16 @@ _AXIS_FIELDS: dict[Axis, str] = {
 
 
 class ChartDomainError(ValueError):
-  """The request asks for a chart outside the supported computation domain.
+  """The chart request was rejected or its calculation failed.
 
-  Pre-call rejections (latitude at a pole, civil year 2100 or later) carry no
-  upstream detail. Failures reported by the astronomy library carry the
-  requested house system and the upstream operation, recording status and
-  message. No partial chart is ever returned and no substitution occurs.
+  `house_system` identifies the requested geometry. Pre-call rejections leave
+  `upstream_message` as None; upstream failures retain the exception text, even
+  if empty. `operation` and `recorded` retain diagnostics supplied by the upstream
+  exception; both are None for a domain rejection reported as ValueError.
 
-  请求的命盘超出了支持的计算范围。调用前就拒绝的情形（纬度在极点、民用年为 2100 年或更晚）
-  不带上游细节；天文库报告的失败则带有请求的宫制，以及上游的操作、记录状态和消息。
-  从不返回部分命盘，也不做任何替换。
+  命盘请求被拒绝，或计算失败。`house_system` 标明请求的宫制。调用前的拒绝将
+  `upstream_message` 留为 None；上游失败保留异常文本，即使文本为空。`operation` 与
+  `recorded` 保留上游异常提供的诊断；以 ValueError 报告的域拒绝将这两个字段留为 None。
   """
 
   def __init__(

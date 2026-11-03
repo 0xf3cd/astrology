@@ -60,7 +60,7 @@
 >>> chart.effective.evaluation
 'fixed_fourteen_object_joint_snapshot'
 >>> chart.provenance.celestial_version
-'0.8.0'
+'1.0.0'
 >>> chart.provenance.position_frame
 'apparent_geocentric_true_ecliptic_of_date'
 >>> chart.provenance.ut1_derivation
@@ -186,11 +186,12 @@ True
 | 记录没有地点 | `MissingBirthDataError` |
 | 纬度在两极 | `ChartDomainError`，不带上游细节 |
 | 民用年份 2100 及以后 | `ChartDomainError`，不带上游细节 |
-| 时刻超出支持的星历范围 | `ChartDomainError`，携带上游操作 |
-| 该纬度下请求的几何无定义 | `ChartDomainError`，携带请求的宫制 |
+| 时刻超出支持的星历范围 | `ChartDomainError`，携带上游消息 |
+| 该纬度下请求的几何无定义 | `ChartDomainError`，携带上游消息 |
 
-错误类型不靠解析天文库的消息文本来判断。在调用天文库前发现的问题不带上游细节；
-由天文库报告的失败会记录操作名 `operation` 及记录状态 `recorded`，如下例：
+`house_system` 标明请求的宫制。调用前的拒绝将 `upstream_message` 留为 None；天文库报告的失败在该字段保留异常文本，
+即使文本为空。上游异常提供诊断字段时，`operation` 是上游的操作名，`recorded` 表示原生代码是否报告了已识别的错误类别。
+域拒绝将两者留为 None。错误类型不靠解析消息文本决定。
 
 ```{doctest}
 >>> high = prepare_natal_input(BirthRecord(
@@ -200,8 +201,8 @@ True
 >>> try:
 ...   natal_chart(high, ChartConfig(HouseSystem.PLACIDUS, (Body.SUN,), ()))
 ... except ChartDomainError as error:
-...   (error.house_system.value, error.operation, error.recorded)
-('placidus', 'chart_snapshot', True)
+...   (error.house_system.value, error.operation, error.recorded, error.upstream_message is not None)
+('placidus', None, None, True)
 >>> natal_chart(high, ChartConfig(HouseSystem.EQUAL, (Body.SUN,), ())).houses.system.value
 'equal'
 ```

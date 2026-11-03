@@ -69,7 +69,7 @@ for structured results and bilingual text output.
 >>> chart.effective.evaluation
 'fixed_fourteen_object_joint_snapshot'
 >>> chart.provenance.celestial_version
-'0.8.0'
+'1.0.0'
 >>> chart.provenance.position_frame
 'apparent_geocentric_true_ecliptic_of_date'
 >>> chart.provenance.ut1_derivation
@@ -200,13 +200,15 @@ as such.
 | No location on the record | `MissingBirthDataError` |
 | Latitude at a pole | `ChartDomainError`, no upstream detail |
 | Civil year 2100 or later | `ChartDomainError`, no upstream detail |
-| Instant outside the supported ephemeris range | `ChartDomainError` with the upstream operation |
-| Requested geometry undefined at this latitude | `ChartDomainError` with the requested house system |
+| Instant outside the supported ephemeris range | `ChartDomainError` with the upstream message |
+| Requested geometry undefined at this latitude | `ChartDomainError` with the upstream message |
 
-The error type is not determined by parsing the astronomy library's message text.
-Errors detected before calling that library carry no upstream details. Failures
-reported by it record the operation name (`operation`) and recording status
-(`recorded`), as below:
+`house_system` identifies the requested geometry. `upstream_message` is None for
+pre-call rejections and contains the upstream exception text for failures reported
+by the astronomy library, even if that text is empty. When supplied by the upstream
+exception, `operation` names the upstream operation and `recorded` indicates whether
+native code reported a recognized error kind. Domain rejections leave both as None.
+The error type is not determined by parsing the message text.
 
 ```{doctest}
 >>> high = prepare_natal_input(BirthRecord(
@@ -216,8 +218,8 @@ reported by it record the operation name (`operation`) and recording status
 >>> try:
 ...   natal_chart(high, ChartConfig(HouseSystem.PLACIDUS, (Body.SUN,), ()))
 ... except ChartDomainError as error:
-...   (error.house_system.value, error.operation, error.recorded)
-('placidus', 'chart_snapshot', True)
+...   (error.house_system.value, error.operation, error.recorded, error.upstream_message is not None)
+('placidus', None, None, True)
 >>> natal_chart(high, ChartConfig(HouseSystem.EQUAL, (Body.SUN,), ())).houses.system.value
 'equal'
 ```
