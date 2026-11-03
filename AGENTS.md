@@ -72,6 +72,9 @@ bilingual paths above. Create source modules only when they contain functionalit
 
 ## Verification and delivery
 
+Feature PRs keep domain assertions in tests, not the installed consumer; packaging
+agreement uses source-to-wheel bytes and observation files.
+
 Test domain boundaries and independently sourced reference cases with explicit
 configuration and tolerances. Source/install comparisons check packaging agreement;
 independently sourced references check numerical correctness.

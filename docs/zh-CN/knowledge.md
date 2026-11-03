@@ -30,8 +30,6 @@ True
 'entry.body_requests'
 >>> len(catalog.filter_sources(verification=SourceVerification.VERIFIED))
 10
->>> bool(catalog.version)
-True
 >>> print(catalog.entry("entry.cross_aspect_evaluation").statement.text("zh-CN"))
 静态主要交叉相位比较两张给定本命盘结果，区分左右端点并保留双侧完整来源，不设运动字段。
 >>> print(catalog.variant("rule.project.cusp_ownership").definition.text("zh-CN"))
@@ -320,7 +318,7 @@ hash 也相同。要在同一映射中保留二者，请用 `(type(member), memb
 - 每个概念／条目只有一个语义身份，附带各语言文本。记录译文对应的语义修订；
   缺译或过期须可见，不能静默换成另一语言并当作翻译完成。
 - 原文保留原语言，读者选择译文后仍能找到原文。
-- 生成的[目录](catalog.md)标明代码与语料版本。
+- 生成的[目录](catalog.md)标明分发包版本。
   检查及语义审阅见[参与开发](contributing.md)。
 
 显示语言不能改变计算。不同定义不能因为中文译名相同就合成一个对象。

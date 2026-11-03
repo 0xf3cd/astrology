@@ -32,8 +32,6 @@ True
 'entry.body_requests'
 >>> len(catalog.filter_sources(verification=SourceVerification.VERIFIED))
 10
->>> bool(catalog.version)
-True
 >>> print(catalog.entry("entry.cross_aspect_evaluation").statement.text("en"))
 Static major cross aspects compare two supplied natal results with distinct left/right endpoints and preserve both complete sources, without a motion field.
 >>> print(catalog.variant("rule.project.cusp_ownership").definition.text("en"))
@@ -399,7 +397,7 @@ Related design: [bazi](https://github.com/0xf3cd/bazi).
   than silently replaced with text in another language.
 - Original excerpts remain in their source language. A reader may choose a
   translation without losing access to that original.
-- The generated [catalog](catalog.md) identifies its code and corpus versions.
+- The generated [catalog](catalog.md) identifies its package version.
   Checks and semantic review are described in [contributing](contributing.md).
 
 Language labels must not change calculation. Distinct definitions must not be

@@ -129,7 +129,7 @@ def test_query_contracts(catalog: Catalog) -> None:
   assert catalog.filter_sources(verification=SourceVerification.UNVERIFIED) == ()
   assert catalog.variant("rule.house.whole_sign") in catalog.variants
   with pytest.raises(FrozenInstanceError):
-    catalog.version = "mutated"  # type: ignore[misc]
+    catalog.concepts = ()  # type: ignore[misc]
 
 
 def test_complete_owning_configuration_coverage(catalog: Catalog) -> None:
@@ -243,7 +243,7 @@ def test_container_ownership(catalog: Catalog) -> None:
   variants = list(catalog.variants)
   sources = list(catalog.sources)
   entries = list(catalog.entries)
-  copy = Catalog("snapshot", concepts, variants, sources, entries)
+  copy = Catalog(concepts, variants, sources, entries)
   aliases.clear()
   related.clear()
   concepts.clear()
@@ -289,21 +289,21 @@ def test_conflicting_aliases_and_equal_display_names(
   if reverse:
     values.reverse()
   with pytest.raises(ValueError, match="Conflicting"):
-    Catalog("test", values, (), (), ())
+    Catalog(values, (), (), ())
   first = replace(first, en_aliases=(), zh_aliases=())
   second = replace(second, en_aliases=(), zh_aliases=())
-  same_name = Catalog("test", (first, second), (), (), ())
+  same_name = Catalog((first, second), (), (), ())
   assert {value.identifier for value in same_name.lookup("太阳")} == {
     first.identifier,
     second.identifier,
   }
   with pytest.raises(ValueError, match="Conflicting"):
-    Catalog("test", (first, replace(second, en_aliases=(first.name.en,))), (), (), ())
+    Catalog((first, replace(second, en_aliases=(first.name.en,))), (), (), ())
 
 
 def test_unicode_normalization() -> None:
   first = Concept("test.one", ConceptKind.SIGN, LocalizedText("é"), LocalizedText("test"))
-  assert Catalog("test", (first,), (), (), ()).lookup("e\u0301") == (first,)
+  assert Catalog((first,), (), (), ()).lookup("e\u0301") == (first,)
 
 
 @pytest.mark.parametrize(
@@ -455,36 +455,9 @@ def test_invalid_and_unknown_queries(catalog: Catalog) -> None:
 
 
 def test_loading_is_explicit_uncached_and_import_is_pure() -> None:
-  source = """
-import importlib.resources
-import sys
-original = importlib.resources.files
-calls = []
-def observed(*args, **kwargs):
-  calls.append(args)
-  return original(*args, **kwargs)
-importlib.resources.files = observed
-from astrology.knowledge import load_catalog
-if calls:
-  raise RuntimeError('import read a corpus resource')
-first = load_catalog()
-second = load_catalog()
-if first != second or first is second or len(calls) != 2:
-  raise RuntimeError('unexpected catalog cache or nondeterminism')
-first.lookup('日轮')
-first.citations('entry.equinoctial_example')
-from astrology import AshmandSignGroup, Sign, ashmand_sign_group
-if {ashmand_sign_group(sign) for sign in Sign} != set(AshmandSignGroup):
-  raise RuntimeError('historical lookup lost a group')
-first.citations('entry.ashmand_sign_groups')
-overlay = first.entry('entry.cross_house_overlays')
-if overlay.chart_applicability != 'not_assessed':
-  raise RuntimeError('overlay retrieval claimed chart applicability')
-first.citations(overlay.identifier)
-first.list_variants(concept_id='axis.ascendant')
-if any(name.startswith(('celestial', 'tzdata', 'zoneinfo', 'ctypes')) for name in sys.modules):
-  raise RuntimeError('knowledge initialized time or native machinery')
-"""
+  source = (Path(__file__).parent / "consumer_cases/knowledge_isolation.py").read_text(
+    encoding="utf-8"
+  )
   for mode in ((), ("-O",)):
     result = subprocess.run([sys.executable, *mode, "-c", source], text=True, capture_output=True)
     assert result.returncode == 0, result.stdout + result.stderr
@@ -494,7 +467,6 @@ def test_resource_is_real_json() -> None:
   data = json.loads(
     files("astrology.knowledge").joinpath("catalog.json").read_text(encoding="utf-8")
   )
-  assert data["version"] == load_catalog().version
   assert len(data["entries"]) == len(load_catalog().entries)
 
 
@@ -515,7 +487,7 @@ def test_cross_language_alias_conflicts(catalog: Catalog, reverse: bool, collisi
     second = replace(second, en_aliases=(first.name.zh or "",))
   values = (second, first) if reverse else (first, second)
   with pytest.raises(ValueError, match="Conflicting alias"):
-    Catalog("test", values, (), (), ())
+    Catalog(values, (), (), ())
 
 
 @pytest.mark.parametrize("name,error", [("", ValueError), ("  ", ValueError), (3, TypeError)])

@@ -6,6 +6,7 @@ import subprocess
 import sys
 from collections.abc import Iterator
 from dataclasses import FrozenInstanceError, fields, replace
+from pathlib import Path
 from typing import Any, cast
 
 import pytest
@@ -538,37 +539,8 @@ def test_result_snapshots_each_sequence_once(field: str) -> None:
 def test_fresh_process_comparison_blocks_native_time_and_metadata_calls(
   mode: tuple[str, ...],
 ) -> None:
-  source = """
-import builtins
-import importlib.metadata as metadata
-import sys
-original_import = builtins.__import__
-def forbidden(*args, **kwargs):
-  raise RuntimeError('Pure cross comparison reached an effectful boundary')
-def guarded(name, *args, **kwargs):
-  if name == 'astrology.celestial' or name.startswith(('celestial_calendar', 'tzdata', 'zoneinfo')):
-    forbidden()
-  return original_import(name, *args, **kwargs)
-builtins.__import__ = guarded
-metadata.version = metadata.distribution = forbidden
-import astrology
-import astrology.birth as birth
-birth.resolve_birth_time = birth.prepare_natal_input = forbidden
-astrology.natal_chart = forbidden
-from tools.installed_check import acceptance_cross_aspects, _check_cross_chart
-result = acceptance_cross_aspects()
-_check_cross_chart()
-if len(result.hits) != 5 or any(hasattr(h, 'motion') for h in result.hits):
-  raise RuntimeError('Static result changed')
-try:
-  astrology.cross_chart_aspects(chart_left=result.chart_left, chart_right=result.chart_right,
-    rules=[result.rules[0], result.rules[0]])
-except ValueError:
-  pass
-else:
-  raise RuntimeError('Duplicate rule validation disappeared')
-if any(n.startswith(('celestial_calendar', 'astrology.celestial', 'tzdata', 'zoneinfo')) for n in sys.modules):
-  raise RuntimeError('Pure comparison initialized machinery')
-"""
+  source = (Path(__file__).parent / "consumer_cases/cross_aspects_isolation.py").read_text(
+    encoding="utf-8"
+  )
   result = subprocess.run([sys.executable, *mode, "-c", source], capture_output=True, text=True)
   assert result.returncode == 0, result.stdout + result.stderr

@@ -2,6 +2,15 @@
 
 [English](../en/releases.md) · [文档](index.md) · [发行流程](releasing.md)
 
+## 源码变化
+
+### 不兼容变化：删除目录版本
+
+源码 API 删除 `Catalog.version` 及其构造参数。自定义目录改用
+`Catalog(concepts, variants, sources, entries)`，省去原来的首个版本参数。
+包内 JSON 和发行清单也不再携带独立的语料版本。这是一次 0.x 兼容性变化；
+分发包版本、源码修订、文献版次及命盘来源信息仍保留。
+
 ## 0.3.0
 
 此版本增加本命分析、四轴相位选择和双盘落宫功能。

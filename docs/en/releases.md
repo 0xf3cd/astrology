@@ -2,6 +2,16 @@
 
 [简体中文](../zh-CN/releases.md) · [Documentation](index.md) · [Release procedure](releasing.md)
 
+## Source changes
+
+### Breaking change: catalog version removed
+
+The source API removes `Catalog.version` and its constructor argument. Custom
+catalogs now use `Catalog(concepts, variants, sources, entries)`, omitting the
+former first version argument. The packaged JSON and release manifest no longer
+carry a separate corpus version. This is a 0.x compatibility change; package
+versions, source revisions, bibliographic editions and chart provenance remain.
+
 ## 0.3.0
 
 This version adds natal analysis, axis aspect selection and cross-chart house overlays.

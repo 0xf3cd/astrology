@@ -95,7 +95,7 @@ def test_anchor_normalization_collision_is_rejected() -> None:
 def test_generation_covers_every_record(language: Language) -> None:
   catalog = load_catalog()
   rendered = render_catalog(catalog, language, "code-test")
-  assert "code=code-test" in rendered and f"corpus={catalog.version}" in rendered
+  assert "code=code-test" in rendered
   for group in (catalog.concepts, catalog.variants, catalog.sources, catalog.entries):
     for record in group:
       assert f"({catalog_anchor(record.identifier, language)})=" in rendered
@@ -208,9 +208,7 @@ def catalog_html(tmp_path: Path) -> Path:
     directory.mkdir(parents=True)
     (directory / "catalog.html").write_text(
       f'<html lang="{language}"><a href="../{other}/catalog.html">Other</a>'
-      f"<p>code={version('celestial-astrology')} corpus={catalog.version}</p>"
-      + "".join(blocks)
-      + "</html>",
+      f"<p>code={version('celestial-astrology')}</p>" + "".join(blocks) + "</html>",
       encoding="utf-8",
     )
   return tmp_path
@@ -329,7 +327,7 @@ def test_catalog_artifact_defects(catalog_html: Path, language: Language, defect
     "alias": ("Sol", "omitted"),
     "locator": ("complete equinoctial-sign sentence", "omitted"),
     "condition": ("makes the day and night equal.", "omitted"),
-    "version": ("corpus=", "omitted="),
+    "version": ("code=", "omitted="),
     "language": (f'lang="{language}"', 'lang="fr"'),
     "navigation": ("/catalog.html", "/other.html"),
     "link": ("</html>", '<a href="#catalog-lost">lost</a></html>'),

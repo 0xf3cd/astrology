@@ -175,7 +175,7 @@ def render_catalog(catalog: Catalog, language: Language, code_version: str) -> s
 
   渲染全部接纳记录及稳定链接，显式显示缺失或过期的译文。
   """
-  lines = [f"`code={code_version}` · `corpus={catalog.version}`", ""]
+  lines = [f"`code={code_version}`", ""]
   identifiers = [
     item.identifier
     for group in (catalog.concepts, catalog.variants, catalog.sources, catalog.entries)
