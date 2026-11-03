@@ -190,7 +190,7 @@ True
 | 该纬度下请求的几何无定义 | `ChartDomainError`，携带上游消息 |
 
 `house_system` 标明请求的宫制。调用前的拒绝将 `upstream_message` 留为 None；天文库报告的失败在该字段保留异常文本，
-即使文本为空。上游异常提供诊断字段时，`operation` 是上游的操作名，`recorded` 表示原生代码是否报告了已识别的错误类型。
+即使文本为空。上游异常提供诊断字段时，`operation` 是上游的操作名，`recorded` 表示原生代码是否报告了已识别的错误类别。
 域拒绝将两者留为 None。错误类型不靠解析消息文本决定。
 
 ```{doctest}
