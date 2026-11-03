@@ -2,12 +2,14 @@
 
 import builtins
 import json
+import runpy
 import sys
 from collections.abc import Iterator
 from dataclasses import fields, replace
-from importlib import import_module
+from importlib import import_module, resources
 from importlib.metadata import PackageNotFoundError, version
 from importlib.resources import files
+from importlib.resources.abc import Traversable
 from pathlib import Path
 from types import ModuleType
 from typing import Literal
@@ -389,6 +391,55 @@ def test_knowledge_only_does_not_run_chart_consumers(
     },
   )
   installed_check.main(version("celestial-astrology"), knowledge_only=True)
+
+
+@pytest.mark.parametrize(
+  "flag", ["--knowledge-only", "--expected-observations", "--expected-cross-observations"]
+)
+def test_cli_reads_flags_after_the_package_version(
+  consumer: Path,
+  monkeypatch: pytest.MonkeyPatch,
+  capsys: pytest.CaptureFixture[str],
+  flag: str,
+) -> None:
+  original_files = resources.files
+
+  def consumer_resource(package: str) -> Traversable:
+    return consumer / "knowledge" if package == "astrology.knowledge" else original_files(package)
+
+  monkeypatch.setattr(resources, "files", consumer_resource)
+  monkeypatch.setattr(
+    sys,
+    "modules",
+    {
+      name: module
+      for name, module in sys.modules.items()
+      if not name.startswith(("tzdata", "zoneinfo", "celestial", "ctypes"))
+    },
+  )
+  arguments = ["installed_check.py", version("celestial-astrology"), flag]
+  if flag == "--knowledge-only":
+
+    def forbidden(*args: object, **kwargs: object) -> None:
+      pytest.fail("Knowledge-only CLI reached chart calculation")
+
+    monkeypatch.setattr(astrology, "natal_chart", forbidden)
+  else:
+    expected = consumer.parent / "wrong-observations.json"
+    expected.write_text("{}", encoding="utf-8")
+    arguments.append(str(expected))
+  monkeypatch.setattr(sys, "argv", arguments)
+  if flag == "--knowledge-only":
+    runpy.run_path(str(Path(installed_check.__file__)), run_name="__main__")
+    assert "Installed knowledge corpus" in capsys.readouterr().out
+  else:
+    message = (
+      "Installed chart differs"
+      if flag == "--expected-observations"
+      else "comparison observations differ"
+    )
+    with pytest.raises(ValueError, match=message):
+      runpy.run_path(str(Path(installed_check.__file__)), run_name="__main__")
 
 
 def test_cross_consumer_rejects_native_initialization(monkeypatch: pytest.MonkeyPatch) -> None:

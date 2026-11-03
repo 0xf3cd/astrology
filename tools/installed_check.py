@@ -398,11 +398,13 @@ def main(
   CLI: CODE_VERSION [--knowledge-only] [--expected-observations PATH]
   [--expected-cross-observations PATH]. Observation files contain raw natal and
   comparison values, input/configuration/provenance, and bilingual comparison text.
+  Run --missing-metadata separately to check the missing project metadata error.
 
   检查安装包身份与隔离，并比较可选的源码检查值。
   CLI 参数：CODE_VERSION [--knowledge-only] [--expected-observations PATH]
   [--expected-cross-observations PATH]。检查文件包含本命及双盘的原始数值、输入、配置、
   来源，以及双语比较文本。
+  单独运行 --missing-metadata 检查项目元数据缺失的错误。
   """
   metadata = distribution("celestial-astrology")
   for module in (astrology, *(import_module("astrology." + name) for name in module_names())):

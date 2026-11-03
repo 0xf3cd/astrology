@@ -300,7 +300,10 @@ def check_package_files(root: Path = ROOT) -> None:
 def check_wheel(wheel: Path, expected_version: str, *, source_root: Path) -> None:
   """Validate wheel metadata and package bytes against source_root/src.
 
+  Supply the checkout being verified, not the wheel's extracted-sdist build tree.
+
   校验 wheel 元数据，并逐字节对照 source_root/src 下的包文件。
+  传入要核验的 checkout，不要传入构建该 wheel 所用的解压后 sdist 目录。
   """
   from email.parser import Parser
 
@@ -321,6 +324,11 @@ def check_wheel(wheel: Path, expected_version: str, *, source_root: Path) -> Non
       raise ValueError("Wheel identity differs from project metadata")
     if missing := set(PACKAGE_FILES) - set(names):
       raise ValueError(f"Wheel is missing package resources: {sorted(missing)}")
+    package_members = {
+      name for name in names if name.startswith("astrology/") and not name.endswith("/")
+    }
+    if extra := package_members - set(PACKAGE_FILES):
+      raise ValueError(f"Wheel has unexpected package resources: {sorted(extra)}")
     if not any(name.endswith(".dist-info/licenses/LICENSE") for name in names):
       raise ValueError("Wheel is missing its license")
     if (metadata["Description-Content-Type"] or "").split(";", 1)[0].strip() != "text/markdown":
@@ -451,8 +459,11 @@ def check_catalog_html(directory: Path) -> None:
     if parser.language != language or f"../{counterpart}/catalog.html" not in parser.links:
       raise ValueError(f"Incorrect catalog language or counterpart navigation: {language}")
     text = content("".join(parser.text))
-    if f"code={code_version}" not in text:
-      raise ValueError("Missing code version in generated catalog")
+    header = (
+      f"Package version: {code_version}" if language == "en" else f"分发包版本：{code_version}"
+    )
+    if header not in text:
+      raise ValueError("Missing package version in generated catalog")
     for group in (catalog.concepts, catalog.variants, catalog.sources, catalog.entries):
       for record in group:
         anchor = catalog_anchor(record.identifier, language)

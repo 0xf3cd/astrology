@@ -28,19 +28,27 @@ if result.chart is not chart or result.houses[5].statuses != (
   raise RuntimeError("lost chart or status")
 if any(name.startswith(("celestial", "ctypes")) for name in sys.modules):
   raise RuntimeError("native import")
-checks: tuple[tuple[Callable[[], object], type[Exception]], ...] = (
-  (lambda: sign_ruler("aries"), TypeError),  # type: ignore[arg-type]
-  (lambda: essential_dignities(LunarNode.MEAN_ASCENDING, Sign.ARIES), TypeError),  # type: ignore[arg-type]
-  (lambda: essential_dignities(Body.PLUTO, Sign.ARIES), ValueError),
-  (lambda: HouseRuler(True, Sign.ARIES, None), TypeError),
-  (lambda: HouseRuler(0, Sign.ARIES, None), ValueError),
-  (lambda: HouseRuler(1, Sign.ARIES, Placement(Body.SUN, Sign.LEO, 0, 1)), ValueError),
-  (lambda: HouseRulers(None), TypeError),  # type: ignore[arg-type]
+checks: tuple[tuple[str, Callable[[], object], type[Exception]], ...] = (
+  ("sign-ruler type", lambda: sign_ruler("aries"), TypeError),  # type: ignore[arg-type]
+  (
+    "dignity body type",
+    lambda: essential_dignities(LunarNode.MEAN_ASCENDING, Sign.ARIES),  # type: ignore[arg-type]
+    TypeError,
+  ),
+  ("unsupported planet", lambda: essential_dignities(Body.PLUTO, Sign.ARIES), ValueError),
+  ("boolean house", lambda: HouseRuler(True, Sign.ARIES, None), TypeError),
+  ("house range", lambda: HouseRuler(0, Sign.ARIES, None), ValueError),
+  (
+    "ruler identity",
+    lambda: HouseRuler(1, Sign.ARIES, Placement(Body.SUN, Sign.LEO, 0, 1)),
+    ValueError,
+  ),
+  ("chart type", lambda: HouseRulers(None), TypeError),  # type: ignore[arg-type]
 )
-for call, error in checks:
+for label, call, error in checks:
   try:
     call()
   except error:
     pass
   else:
-    raise RuntimeError("missing public check")
+    raise RuntimeError(f"missing public check: {label}")

@@ -1,4 +1,7 @@
-"""Block effects after preparing supplied inputs. 准备给定输入后阻止副作用。"""
+"""Supplied comparisons/text avoid I/O, metadata and native calls.
+
+给定命盘的比较和文本不访问 I/O、元数据或原生库。
+"""
 
 import builtins
 import importlib.metadata as metadata

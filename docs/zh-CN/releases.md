@@ -8,8 +8,9 @@
 
 源码 API 删除 `Catalog.version` 及其构造参数。自定义目录改用
 `Catalog(concepts, variants, sources, entries)`，省去原来的首个版本参数。
-包内 JSON 和发行清单也不再携带独立的语料版本。这是一次 0.x 兼容性变化；
-分发包版本、源码修订、文献版次及命盘来源信息仍保留。
+目录 JSON 的 `version` 键和发行清单的 `corpus_version` 键也已删除，不提供替代的独立目录版本。
+若需查询已安装包的版本，使用 `importlib.metadata` 的 `version("celestial-astrology")`。
+这是一次 0.x 兼容性变化；源码修订、文献版次及命盘来源信息仍保留。
 
 ## 0.3.0
 

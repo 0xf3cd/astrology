@@ -245,6 +245,27 @@ def test_wheel_uses_supplied_source_not_the_checkers_checkout(
     check_wheel(wheel, "0.0.0", source_root=other)
 
 
+@pytest.mark.parametrize(
+  "member",
+  ["astrology/stale_module.py", "astrology/knowledge/stale.json", "astrology/stale/__init__.py"],
+)
+def test_wheel_rejects_extra_package_members(wheel_sources: tuple[Path, Path], member: str) -> None:
+  source, wheel = wheel_sources
+  with ZipFile(wheel, "a") as archive:
+    archive.writestr(member, "stale package content")
+  with pytest.raises(ValueError, match="unexpected package resources") as caught:
+    check_wheel(wheel, "0.0.0", source_root=source)
+  assert member in str(caught.value)
+
+
+def test_wheel_allows_directory_entries(wheel_sources: tuple[Path, Path]) -> None:
+  source, wheel = wheel_sources
+  with ZipFile(wheel, "a") as archive:
+    archive.writestr("astrology/", "")
+    archive.writestr("astrology/knowledge/", "")
+  check_wheel(wheel, "0.0.0", source_root=source)
+
+
 @pytest.mark.parametrize(("retain", "existing"), [(False, False), (True, False), (True, True)])
 def test_main_keeps_required_validation_stages(
   monkeypatch: pytest.MonkeyPatch, tmp_path: Path, retain: bool, existing: bool

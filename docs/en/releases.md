@@ -8,9 +8,12 @@
 
 The source API removes `Catalog.version` and its constructor argument. Custom
 catalogs now use `Catalog(concepts, variants, sources, entries)`, omitting the
-former first version argument. The packaged JSON and release manifest no longer
-carry a separate corpus version. This is a 0.x compatibility change; package
-versions, source revisions, bibliographic editions and chart provenance remain.
+former first version argument. The catalog JSON's `version` key and release
+manifest's `corpus_version` key are also removed, with no separate catalog version
+to replace them. For the installed package version, use
+`version("celestial-astrology")` from `importlib.metadata`. This is a 0.x
+compatibility change; source revisions, bibliographic editions and chart
+provenance remain.
 
 ## 0.3.0
 

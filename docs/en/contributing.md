@@ -38,16 +38,17 @@ runs `python -m build --wheel` inside the extracted tree. Strict HTML/doctest bu
 also run there and import the extracted package sources. The check then validates
 the API/catalog pages, generated search index and query code, and doctest results.
 
-The installed-package program checks distribution identity, module origins and
+The installed-package check verifies distribution identity, module origins and
 `py.typed` outside the checkout, including the adapter's origin after calculation.
-It checks that imports, knowledge queries and supplied-chart comparisons do not
-initialize native astronomy; knowledge-only use must also avoid time machinery.
+Imports must not initialize native astronomy. Knowledge queries and supplied-chart
+comparisons must not initialize astronomy or time data; the knowledge-only mode
+also rejects `ctypes` modules.
 It compares complete natal and cross-chart observations, including input,
-configuration, provenance and bilingual comparison text, with source results from
-the same revision. Chart provenance versions must match installed metadata.
+configuration, provenance and bilingual comparison text, with same-revision source
+results saved in JSON observation files. Chart provenance versions must match installed metadata.
 Knowledge resource location, loading, name lookup and citation access are exercised
 without a chart. Normal and optimized modes both run with isolated imports, and
-the missing-metadata consumer checks the calculation failure described below.
+the `--missing-metadata` mode checks the calculation failure described below.
 
 Temporary HTML, doctest reports,
 distributions, and consumer environments use `SCRATCH` when set, otherwise the
@@ -105,11 +106,14 @@ or its translation accurate; both still need to be read and checked.
 `PACKAGE_FILES` in `tools/check.py` lists the source files expected in distributions.
 The checks independently scan the source tree for unlisted files, require every
 listed path in the wheel/sdist and compare wheel package bytes with the original
-checkout, including `catalog.json` and `py.typed`. The installed consumer discovers
+checkout, including `catalog.json` and `py.typed`. The installed-package check discovers
 and imports each actual Python module, deferring the astronomy adapter until
 calculation; it does not import development checks. Feature PRs keep domain
-assertions in tests, not the installed consumer; packaging agreement uses
+assertions in tests, not the installed-package check; packaging agreement uses
 source-to-wheel bytes and observation files.
+
+Fixed fresh-process inputs live in `tests/consumer_cases/`. Tests read their text
+into `python [-O] -c`, preserving the repository's import context.
 
 Sphinx discovers only the two root READMEs and sources under `docs/`. Keep virtual
 environments outside `docs/`: sources anywhere under that directory are documentation

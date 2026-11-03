@@ -1,4 +1,7 @@
-"""Guard imports and metadata before comparison. 比较前保护导入与元数据边界。"""
+"""Compare supplied charts without native/time/metadata calls.
+
+比较给定命盘时不调用原生库、时间解析或元数据。
+"""
 
 import builtins
 import importlib.metadata as metadata

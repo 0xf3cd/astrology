@@ -1,4 +1,4 @@
-"""Exercise public chart checks in a fresh process. 在新进程中执行公开命盘校验。"""
+"""Keep public chart validation active under python -O. 在 python -O 下保留公开命盘校验。"""
 
 from datetime import date, time, timedelta
 

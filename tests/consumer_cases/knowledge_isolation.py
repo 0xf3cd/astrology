@@ -15,8 +15,8 @@ def observed(*args: Any, **kwargs: Any) -> Any:
 
 importlib.resources.files = observed
 
-# The first import must be observed before any corpus resource read.
-# 首次导入必须在读取任何语料资源之前被观察。
+# Install the observer before the first import so reads during import are counted.
+# 先安装观察函数，再首次导入，才能统计导入时发生的资源读取。
 from astrology.knowledge import load_catalog  # noqa: E402
 
 if calls:

@@ -99,9 +99,11 @@ manual requirement into a claim of automatic enforcement.
 
 ### Rehearse without uploading
 
-Use a no-upload rehearsal when changed release instructions or workflows leave a
-failure path untested by the normal pre-publication checks. Record the specific
-gap, the checked files and the actual results. A routine release can use the
+Use a no-upload rehearsal when changes to the release procedure or workflows leave
+a failure path untested by the normal pre-publication checks. To check instructions,
+run the affected steps locally with the retained wheel and sdist; to check changed
+build/consumer steps, use a pull-request workflow run. Record the gap, exact wheel
+and sdist filenames/digests, commands and results. A routine release can use the
 formal workflow's build and same-wheel consumers before manual approval without
 a separate rehearsal. A no-upload run does not verify OIDC credentials, PyPI upload
 or live deployment; those require authorized publication and post-publication checks.
