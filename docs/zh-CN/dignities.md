@@ -72,8 +72,8 @@ True
 规则: rule.lilly1647.essential_dignities
 宫位 | 宫头星座 | 宫主星 | 宫主星落点 | 状态
 1 | 白羊座 | 火星 | 未计算 | 未计算
->>> text.splitlines()[6].endswith("这四项均未命中")
-True
+>>> print(text.splitlines()[6])  # doctest: +ELLIPSIS
+3 | 双子座 | 水星 | 摩羯座 1.889...° / 宫位 10 | 这四项均未命中
 ```
 
 `HouseRulers` 只保存给定的 `NatalChart`。每次读取 `houses`，按宫号顺序生成十二条新记录；

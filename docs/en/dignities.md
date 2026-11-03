@@ -77,8 +77,8 @@ House system: Whole Sign
 Rule: rule.lilly1647.essential_dignities
 House | Cusp sign | Ruler | Ruler placement | Statuses
 1 | Aries | Mars | Not calculated | Not calculated
->>> text.splitlines()[6].endswith("None of these four")
-True
+>>> print(text.splitlines()[6])  # doctest: +ELLIPSIS
+3 | Gemini | Mercury | Capricorn 1.889...° / House 10 | None of these four
 ```
 
 `HouseRulers` retains only the supplied `NatalChart`. Each `houses` access builds

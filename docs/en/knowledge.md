@@ -155,14 +155,6 @@ True
 True
 ```
 
-To go the other way, pass a source ID to `filter_entries` to find entries citing it:
-
-```{doctest}
->>> source = catalog.source("source.ptolemy.ashmand1822")
->>> [item.identifier for item in catalog.filter_entries(source_id=source.identifier)]
-['entry.sign_vocabulary', 'entry.equinoctial_example', 'entry.ashmand_sign_groups']
-```
-
 The citation locates Book I, chapter XIV, printed pp. 34–35 (PDF pages 72–73)
 of Ashmand's English translation of the paraphrase attributed to Proclus. The
 {ref}`catalog example <catalog-en-entry-equinoctial-example>` preserves the complete
@@ -173,6 +165,14 @@ checked (`verified`), but the entry's prerequisites for chart interpretation rem
 unclear (`unresolved`). The entry is marked `reference_only`, for consultation
 rather than chart conclusions. The entry's statements,
 definitions and limits are project explanations, separate from the quotation.
+
+To go the other way, pass a source ID to `filter_entries` to find entries citing it:
+
+```{doctest}
+>>> source = catalog.source("source.ptolemy.ashmand1822")
+>>> [item.identifier for item in catalog.filter_entries(source_id=source.identifier)]
+['entry.sign_vocabulary', 'entry.equinoctial_example', 'entry.ashmand_sign_groups']
+```
 
 Source records give the edition, scan hash, transcription changes and reproduction
 terms. The package includes limited definition excerpts, not scan images,

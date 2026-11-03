@@ -134,6 +134,13 @@ True
 True
 ```
 
+引文定位至 Ashmand 对被归于 Proclus 的转述本所作英文译文：《第一卷》第 XIV 章，印刷页 34–35
+（PDF 第 72–73 页）。{ref}`目录例子 <catalog-zh-cn-entry-equinoctial-example>`保留完整英文句子及单独署名的项目中文译文。
+原文用昼夜等长解释这种命名；保留这段历史说明不表示程序保证实际日照时长。
+来源已经核实（`verified`），但条目用于命盘解读时需要哪些条件仍未明确（`unresolved`）。
+该条目标为 `reference_only`，供查阅，不作为命盘结论。
+条目的陈述、定义和限制是项目撰写的说明，与引文分开。
+
 反过来，将来源标识传给 `filter_entries`，即可查找引用它的条目：
 
 ```{doctest}
@@ -141,13 +148,6 @@ True
 >>> [item.identifier for item in catalog.filter_entries(source_id=source.identifier)]
 ['entry.sign_vocabulary', 'entry.equinoctial_example', 'entry.ashmand_sign_groups']
 ```
-
-引文定位至 Ashmand 对被归于 Proclus 的转述本所作英文译文：《第一卷》第 XIV 章，印刷页 34–35
-（PDF 第 72–73 页）。{ref}`目录例子 <catalog-zh-cn-entry-equinoctial-example>`保留完整英文句子及单独署名的项目中文译文。
-原文用昼夜等长解释这种命名；保留这段历史说明不表示程序保证实际日照时长。
-来源已经核实（`verified`），但条目用于命盘解读时需要哪些条件仍未明确（`unresolved`）。
-该条目标为 `reference_only`，供查阅，不作为命盘结论。
-条目的陈述、定义和限制是项目撰写的说明，与引文分开。
 
 来源记录给出版本、扫描文件哈希、转录时的文字处理和转载条件。包内只收录有限的定义摘录，
 不附扫描图、水印或现代网站说明。同一本书的镜像和书目可以帮助确认版本，但不能当作多份独立依据。

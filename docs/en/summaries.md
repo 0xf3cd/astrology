@@ -52,8 +52,10 @@ giving that modality 100%. Every category is shown, including zero counts.
 Percentages use two decimal places alongside the counts and total. No planet
 weights or dominant scores are assigned.
 
-Supply a nonempty sequence of `Placement` records with distinct identities and a
-common source. `SignDistribution` copies them into an immutable tuple in input
+Supply a nonempty sequence of `Placement` records with distinct identities from a
+common source, such as one chart. Choosing a consistent source is your responsibility;
+see the [validation boundary](architecture.md#reproducibility).
+`SignDistribution` copies them into an immutable tuple in input
 order; counts, proportions and total derive from that snapshot. `element_of` and
 `modality_of` take `Sign` members. See the
 [summary API reference](reference.md#chart-summaries-and-lunar-phase) for validation errors.
