@@ -1,8 +1,8 @@
-# 传统星座守护与四种状态
+# 传统守护、尊贵状态与定位星链
 
 [English](../en/dignities.md) · [API](reference.md) · [知识](knowledge.md)
 
-这些接口采用 William Lilly（威廉·利利）的
+`sign_ruler` 和 `essential_dignities` 采用 William Lilly（威廉·利利）的
 《Christian Astrology》（伦敦，1647）所载规则，适用于太阳、月亮、水星、金星、火星、木星和土星。
 这七颗星体在传统占星中称为 seven classical planets。
 
@@ -98,7 +98,7 @@ True
 
 `HouseRuler` 不可变，`ruler` 和 `statuses` 从字段推导，不能单独传入。
 单条记录接受宫头星座；若要从命盘的编号宫头推导这个星座，请用 `HouseRulers(chart)`。
-字段校验见[摘要 API 参考](reference.md#命盘摘要与月相)。
+字段校验见[守护 API 参考](reference.md#传统守护与本质尊贵)。
 
 ### 格式化与错误
 
@@ -108,13 +108,84 @@ True
 上面的示例用 `...` 省略了部分数字，实际输出会保留完整的浮点值。状态仍只依星座判断。
 格式化的错误行为见[文本 API 参考](reference.md#命盘文本)。
 
+## 跟随定位星链
+
+<!-- usage: dignities.dispositors -->
+
+一个落点的定位星（dispositor）是它所在星座的传统守护星。用 `chart_dispositors`
+继续查询这颗守护星的落点，直到路径到达自环、循环，或命盘中缺少的守护星。
+
+下面的完整合成示例计算十颗天体，但只选太阳和月亮作为起点：
+
+```{doctest}
+>>> from datetime import date, time, timedelta
+>>> from astrology import (BirthRecord, Body, ChartConfig, FixedOffset, HouseSystem,
+...     Location, natal_chart, prepare_natal_input, chart_dispositors)
+>>> birth = prepare_natal_input(BirthRecord(date(2000, 1, 1), time(12),
+...     FixedOffset(timedelta(0)), Location(0, 0)))
+>>> chart = natal_chart(birth, ChartConfig(HouseSystem.WHOLE_SIGN, tuple(Body), ()))
+>>> paths = chart_dispositors(chart, objects=(Body.MOON, Body.SUN))
+>>> paths.chart is chart, tuple(body.value for body in paths.objects)
+(True, ('sun', 'moon'))
+>>> tuple(body.value for body in paths.chains[Body.SUN])
+('sun', 'saturn', 'venus', 'jupiter', 'mars')
+>>> paths.edges[Body.MARS] is Body.SATURN
+True
+>>> tuple(tuple(body.value for body in cycle) for cycle in paths.cycles)
+(('venus', 'jupiter', 'mars', 'saturn'),)
+>>> paths.final_dispositors, dict(paths.missing_rulers)
+((), {})
+```
+
+太阳在摩羯座，指向土星，再经过金星、木星、火星。火星又指回土星：`edges`
+保留这条闭环边，`chains[Body.SUN]` 则在土星重复前停止。太阳是通往四星循环的前缀，
+不是循环成员。月亮也到达同一循环，因此 `cycles` 只列一次。
+土星、金星、木星和火星虽未选作根，其已有落点仍可用于遍历。
+
+<!-- /usage: dignities.dispositors -->
+
+其他终点这样读取：
+
+- `final_dispositors` 列出已到达且位于自身守护星座的星体。`edges` 保留其自环边，
+  各条路径只列一次终点。
+- `cycles` 中的两星循环表示本规则下基于入庙守护的互容。示例这样的较长循环不称为互容。
+- `missing_rulers[root]` 给出该根缺失的下一颗守护星。路径止于最后一个已有对象，
+  指向缺失守护星的边仍保留。
+
+例如，只含这颗太阳的命盘无法继续到土星：
+
+```{doctest}
+>>> sparse = natal_chart(birth, ChartConfig(HouseSystem.WHOLE_SIGN, (Body.SUN,), ()))
+>>> incomplete = chart_dispositors(sparse, objects=(Body.SUN,))
+>>> incomplete.chains[Body.SUN], incomplete.missing_rulers[Body.SUN]
+((<Body.SUN: 'sun'>,), <Body.SATURN: 'saturn'>)
+```
+
+接口不补算缺失位置，只报告从选定根到达的部分。多个根可以有不同的最终定位星或循环。
+复数 `final_dispositors` 不表示已确立唯一的全盘主星。
+
+`Dispositors(chart, objects)` 可直接构造相同的不可变结果。选择会复制并按命盘落点顺序排列，
+不沿用参数顺序。`edges` 的键、根对象及最终定位星均按源盘顺序排列。
+每个循环保留边的方向，以源盘中最早的成员起头；多个循环也按各自的首成员排列。
+全部映射只读，路径、循环及终点列表均为元组。
+
+须显式传入非空序列，成员为已有落点的 `Body` 或 `LunarNode`。
+外行星及具名交点可以起头，后继仍用七颗传统星体的星座守护关系。
+四轴及宫头不作根。错误命盘类型、非序列、字符串或错误身份类型抛出 `TypeError`；
+空、重复或不可用的根抛出 `ValueError`。不可用的根属于输入错误，与有效链中缺失后继区分。
+
+`paths.rule_id` 为 `rule.project.dispositor_chains`。
+{ref}`项目规则 <catalog-zh-cn-rule-project-dispositor-chains>`在不变的 Lilly 星座守护表之上
+定义遍历及结果顺序；{ref}`知识条目 <catalog-zh-cn-entry-dispositor-chains>`记录来源边界及
+入庙互容的限度。不提供评分、解读、现代共同守护星或专用格式化函数。
+
 ## 来源与限制
 
 归属及推导方式见{ref}`规则与生成表 <catalog-zh-cn-rule-lilly1647-essential-dignities>`；
 版本、扫描本、转录约定及研究限度见{ref}`来源记录 <catalog-zh-cn-source-lilly-christian-astrology-1647>`。
 目录分别标明原文摘录、署名中文译文和项目说明。
 
-接口不判断精确擢升度数、昼夜条件、交点尊贵、三分性、界、面、互容、综合评分或解读。
+四种状态查询不判断精确擢升度数、昼夜条件、交点尊贵、三分性、界、面、互容、综合评分或解读。
 原文的昼夜庙标签不作为四项星座查询的额外条件。
 
 目录状态概念使用 `dignity_status.<value>`，不链接请求配置。

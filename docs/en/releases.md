@@ -4,6 +4,25 @@
 
 ## Source changes since 0.3.0
 
+### Dispositor chains and rulership ownership
+
+[`chart_dispositors(chart, objects=...)`](dignities.md#follow-dispositor-chains)
+returns immutable `Dispositors`: ruler edges, paths from selected roots, reached
+cycles and final dispositors, and missing successor rulers. It uses Lilly's
+unchanged traditional sign rulers. The traversal is a project rule, with no
+scoring or interpretation.
+
+`HouseRuler` and `HouseRulers` move from `astrology.summaries` to
+`astrology.dignities`. Update direct module imports; the old module has no aliases.
+Imports from the package root (`from astrology import HouseRulers`) remain valid.
+This is a 0.x source-path compatibility change. Chart calculations, dignity
+assignments and existing text output are unchanged.
+
+The knowledge catalog records inspected Meeus node terms, external definitions
+of aspects and house systems, corrected Lilly scan locators, and retention or
+access limits. Source inspection does not change chart applicability or default
+output eligibility; model choices, orbs and numerical algorithms are unchanged.
+
 ### Breaking change: catalog version removed
 
 The source API removes `Catalog.version` and its constructor argument. Custom

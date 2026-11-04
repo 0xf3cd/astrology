@@ -25,7 +25,7 @@ True
 >>> catalog.concept("body.sun").configuration.name
 'SUN'
 >>> [rule.identifier for rule in catalog.list_variants(concept_id="body.sun")]
-['rule.lilly1647.essential_dignities']
+['rule.lilly1647.essential_dignities', 'rule.project.dispositor_chains']
 >>> catalog.filter_entries(concept_id="body.sun")[0].identifier
 'entry.body_requests'
 >>> len(catalog.filter_sources(verification=SourceVerification.VERIFIED))

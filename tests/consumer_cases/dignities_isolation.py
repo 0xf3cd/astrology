@@ -6,11 +6,13 @@ from collections.abc import Callable
 from astrology import (
   Body,
   DignityStatus,
+  Dispositors,
   HouseRuler,
   HouseRulers,
   LunarNode,
   Placement,
   Sign,
+  chart_dispositors,
   essential_dignities,
   format_house_rulers,
   load_catalog,
@@ -20,6 +22,11 @@ from tools.installed_check import _cross_source
 
 chart = _cross_source(2000, "pure", ((Body.MERCURY, 150), (Body.SUN, 30)))
 result = HouseRulers(chart)
+chain = chart_dispositors(chart, objects=(Body.MERCURY,))
+if chain.chart is not chart or chain.final_dispositors != (Body.MERCURY,):
+  raise RuntimeError("lost dispositor chart or self-loop")
+if chain.chains[Body.MERCURY] != (Body.MERCURY,):
+  raise RuntimeError("invalid dispositor path")
 format_house_rulers(result, load_catalog(), language="zh-CN")
 if result.chart is not chart or result.houses[5].statuses != (
   DignityStatus.DOMICILE,
@@ -44,6 +51,12 @@ checks: tuple[tuple[str, Callable[[], object], type[Exception]], ...] = (
     ValueError,
   ),
   ("chart type", lambda: HouseRulers(None), TypeError),  # type: ignore[arg-type]
+  ("dispositor chart type", lambda: Dispositors(None, (Body.SUN,)), TypeError),  # type: ignore[arg-type]
+  ("empty roots", lambda: chart_dispositors(chart, objects=()), ValueError),
+  ("duplicate roots", lambda: Dispositors(chart, (Body.SUN, Body.SUN)), ValueError),
+  ("missing root", lambda: Dispositors(chart, (Body.SATURN,)), ValueError),
+  ("wrong root", lambda: Dispositors(chart, ("sun",)), TypeError),  # type: ignore[arg-type]
+  ("string selection", lambda: Dispositors(chart, "sun"), TypeError),  # type: ignore[arg-type]
 )
 for label, call, error in checks:
   try:

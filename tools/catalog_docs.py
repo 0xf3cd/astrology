@@ -10,8 +10,14 @@ from dataclasses import fields, is_dataclass
 from typing import get_args
 
 from astrology.aspects import aspect_angle
-from astrology.config import HouseSystem, LunarNode, MajorAspect, NodeDefinition
-from astrology.dignities import _DOMICILES, DignityStatus, essential_dignities, sign_ruler
+from astrology.config import Body, HouseSystem, LunarNode, MajorAspect, NodeDefinition
+from astrology.dignities import (
+  _DISPOSITOR_RULE_ID,
+  _DOMICILES,
+  DignityStatus,
+  essential_dignities,
+  sign_ruler,
+)
 from astrology.dignities import _RULE_ID as _DIGNITY_RULE_ID
 from astrology.knowledge import Catalog, Concept, ConceptKind, LocalizedText, TranslationStatus
 from astrology.knowledge.records import CONFIGURATION_TYPES, ConfigurationIdentity, Language
@@ -131,6 +137,20 @@ def check_catalog_data(catalog: Catalog) -> None:
     or rule.configuration is not None
   ):
     raise ValueError("Incomplete dignity rule or entry linkage")
+  chain_ids = {
+    concept.identifier
+    for concept in catalog.concepts
+    if isinstance(concept.configuration, (Body, LunarNode))
+  }
+  rule, entry = catalog.variant(_DISPOSITOR_RULE_ID), catalog.entry("entry.dispositor_chains")
+  if (
+    set(rule.concept_ids) != chain_ids
+    or set(entry.concept_ids) != chain_ids
+    or entry.rule_ids != (_DISPOSITOR_RULE_ID,)
+    or rule.configuration is not None
+    or not any(c.source_id == "source.lilly.christian-astrology-1647" for c in entry.citations)
+  ):
+    raise ValueError("Incomplete dispositor rule or entry linkage")
 
 
 def dignity_rows(catalog: Catalog, language: Language) -> Iterator[tuple[str, ...]]:

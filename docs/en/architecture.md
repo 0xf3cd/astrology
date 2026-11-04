@@ -26,10 +26,11 @@ src/astrology/
   houses.py         House-placement rules over supplied geometry
   aspects.py        Aspect definitions, orbs, and local motion
   chart.py          Composition and immutable chart results
+  _comparison.py    Shared coordinate and selection checks for comparisons
   cross_aspects.py  Static comparison of supplied charts, retaining both sources
   house_overlays.py Directional house placement between supplied charts
   lunar_phase.py    Oriented solar/lunar arc and named lunation types
-  dignities.py      Traditional sign rulers and domicile/exaltation/detriment/fall
+  dignities.py      Traditional dignities, house rulers and dispositor chains
   summaries.py      Explicit-population statistics and supplied-chart summaries
   text.py           Result tables with supplied vocabulary
   knowledge/        Concepts, sources, entries, and independent queries
@@ -55,8 +56,12 @@ types from the types that also include axes, used by aspects and house overlays.
 The astronomy adapter maps these identities to calculation targets; the text
 module looks up names in the supplied catalog. `chart.py` extracts the selected
 stored longitudes for natal aspects, static cross-chart aspects and house
-overlays. It also checks coordinate compatibility and object selections for
-cross-chart comparisons.
+overlays. `_comparison.py` checks coordinate compatibility and object selections
+for both cross-chart consumers.
+
+`dignities.py` owns the sign-ruler table and the house-ruler and dispositor results
+derived from it. These supplied-chart operations use existing placements without
+initializing astronomy. `summaries.py` keeps sign distributions and natal lunar phase.
 
 Knowledge and calculation remain connected by stable identifiers, described in
 [Knowledge organization](knowledge.md). Additional UI applications can consume

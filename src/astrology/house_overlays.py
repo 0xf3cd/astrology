@@ -9,12 +9,8 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Literal
 
-from astrology.chart import (
-  NatalChart,
-  _require_comparable_sources,
-  _selected_longitudes,
-  _selection_for_chart,
-)
+from astrology._comparison import _require_comparable_sources, _selection_for_chart
+from astrology.chart import NatalChart, _selected_longitudes
 from astrology.houses import _require_house_number, house_of
 from astrology.objects import ChartObject, _is_chart_object
 

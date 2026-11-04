@@ -13,6 +13,7 @@ from astrology.birth import Location
 from astrology.chart import NatalChart
 from astrology.config import AspectRule, HouseSystem, MajorAspect
 from astrology.cross_aspects import CrossChartAspects
+from astrology.dignities import HouseRulers
 from astrology.house_overlays import CrossChartHouseOverlays
 from astrology.knowledge import Catalog, Concept
 from astrology.knowledge.catalog import _configuration_name
@@ -20,7 +21,7 @@ from astrology.knowledge.catalog import _current_name as _raw_current_name
 from astrology.knowledge.records import _LANGUAGES, Language
 from astrology.lunar_phase import LunarPhaseResult
 from astrology.objects import Axis, ChartObject
-from astrology.summaries import HouseRulers, SignDistribution
+from astrology.summaries import SignDistribution
 from astrology.zodiac import (
   _ELEMENT_RULE_ID,
   _MODALITY_RULE_ID,

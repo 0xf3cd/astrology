@@ -124,18 +124,18 @@ The [dignity guide](dignities.md) covers the house-ruler records.
 
 ```{eval-rst}
 .. automodule:: astrology.summaries
-   :members: SignDistribution, sign_distribution, chart_sign_distribution, natal_lunar_phase, HouseRuler, HouseRulers
+   :members: SignDistribution, sign_distribution, chart_sign_distribution, natal_lunar_phase
    :undoc-members:
    :member-order: bysource
 ```
 
 ## Traditional rulership and dignities
 
-See [the dignity guide](dignities.md) for the named source, simultaneous statuses and missing placements.
+See [the dignity guide](dignities.md) for sign queries, house rulers and dispositor chains.
 
 ```{eval-rst}
 .. automodule:: astrology.dignities
-   :members: DignityStatus, sign_ruler, essential_dignities
+   :members: DignityStatus, sign_ruler, essential_dignities, HouseRuler, HouseRulers, Dispositors, chart_dispositors
    :undoc-members:
    :member-order: bysource
 ```
