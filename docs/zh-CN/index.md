@@ -11,7 +11,7 @@
 | 计算并读取命盘 | [本命盘](chart.md)及[结果／文本](records.md) |
 | 比较两张命盘 | [双盘相位与落宫](cross_aspects.md) |
 | 统计元素、模式分布或判断月相类型 | [星座分布与出生月相](summaries.md) |
-| 查传统星座守护与尊贵状态 | [传统守护与四种状态](dignities.md) |
+| 查传统守护、尊贵状态与定位星链 | [守护与尊贵](dignities.md) |
 | 不排盘，查名称、规则和出处 | [知识查询](knowledge.md)及[目录](catalog.md) |
 
 [API 参考](reference.md)给出类型和函数的约定，[结构设计](architecture.md)说明计算边界。

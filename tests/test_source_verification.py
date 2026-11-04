@@ -74,7 +74,7 @@ def test_scan_locators_and_unavailable_originals_remain_distinct() -> None:
   catalog = load_catalog()
   lilly = catalog.source("source.lilly.christian-astrology-1647")
   assert "137-139 for pp.103-105" in lilly.lineage.en.replace("\N{EN DASH}", "-")
-  assert "p.104 spells Ptolomy" in lilly.scope.en
+  assert "p.104 table spells Ptolomy" in lilly.scope.en
   citations = catalog.entry("entry.essential_dignities").citations
   assert "p.105 / Wellcome leaf139" in citations[-2].locator
   ashmand = catalog.source("source.ptolemy.ashmand1822")
@@ -83,6 +83,28 @@ def test_scan_locators_and_unavailable_originals_remain_distinct() -> None:
     assert lineage is not None
     assert "HTTP429" in lineage and "1896" in lineage
     assert "8ab3073b2200ba85b3dd812acc0b2edd2d2757f196cc641de42e9a46293189cb" in lineage
+
+
+def test_source_addenda_keep_attribution_and_locators_bounded() -> None:
+  catalog = load_catalog()
+  meeus = catalog.source("source.meeus.astronomical-algorithms-1998")
+  for language in ("en", "zh-CN"):
+    lineage = meeus.lineage.text(language)
+    assert lineage is not None
+    assert "98 99 00 01 02 03 04 05 06" in lineage
+    assert "9 8 7 6 5 4 3 2 1" in lineage
+  faq = catalog.source("source.astrodienst.hellenistic-style-faq")
+  assert "orb and node-exclusion settings" in faq.scope.en
+  assert "Chris Brennan" in faq.scope.en and "Chris Brennan" in (faq.scope.zh or "")
+  lilly = catalog.source("source.lilly.christian-astrology-1647")
+  assert "handwritten 104" in lilly.lineage.en
+  assert "PDF page146" in lilly.lineage.en
+  assert "Sun-in-Aries/Mars-in-Leo" in lilly.scope.en
+  citations = catalog.entry("entry.dispositor_chains").citations
+  assert len(citations) == 2
+  assert "p.104" in citations[0].locator and "leaf138" in citations[0].locator
+  assert "p.112" in citations[1].locator and "leaf146" in citations[1].locator
+  assert "label only" in citations[1].locator
 
 
 def test_verified_definitions_render_in_both_catalogs() -> None:

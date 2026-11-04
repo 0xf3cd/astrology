@@ -6,7 +6,7 @@ Lilly 1647 星座守护、四种尊贵状态及给定命盘的守护关系结果
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import StrEnum
 from types import MappingProxyType
 from typing import Final, cast
@@ -187,15 +187,17 @@ class Dispositors:
   chart: NatalChart
   objects: tuple[AstronomicalObject, ...]
   #: Reached object-to-ruler edges, including absent targets. 已到达对象到守护星的边，含缺失目标。
-  edges: Mapping[AstronomicalObject, Body]
+  edges: Mapping[AstronomicalObject, Body] = field(init=False, hash=False)
   #: Distinct available objects per root, before repetition or absence. 各根的可用对象路径，在重复或缺失前停止。
-  chains: Mapping[AstronomicalObject, tuple[AstronomicalObject, ...]]
+  chains: Mapping[AstronomicalObject, tuple[AstronomicalObject, ...]] = field(
+    init=False, hash=False
+  )
   #: Reached nontrivial cycles, rotated and ordered by source order. 已到达的非自环循环，按源盘顺序规范起点及排列。
-  cycles: tuple[tuple[Body, ...], ...]
+  cycles: tuple[tuple[Body, ...], ...] = field(init=False, hash=False)
   #: Reached self-loop endpoints in source order. 按源盘顺序列出的已到达自环终点。
-  final_dispositors: tuple[Body, ...]
+  final_dispositors: tuple[Body, ...] = field(init=False, hash=False)
   #: Each affected root's absent next ruler. 各受影响根对象缺失的下一颗守护星。
-  missing_rulers: Mapping[AstronomicalObject, Body]
+  missing_rulers: Mapping[AstronomicalObject, Body] = field(init=False, hash=False)
 
   def __init__(self, chart: NatalChart, objects: Sequence[AstronomicalObject]) -> None:
     if type(chart) is not NatalChart:

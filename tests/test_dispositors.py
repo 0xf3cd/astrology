@@ -1,7 +1,9 @@
 """Hand-worked rulership paths and supplied-chart boundaries. 手算守护路径及给定命盘边界。"""
 
-from dataclasses import FrozenInstanceError
+import ast
+from dataclasses import FrozenInstanceError, replace
 from enum import StrEnum
+from pathlib import Path
 from typing import Any
 
 import pytest
@@ -264,6 +266,137 @@ def test_root_exports_follow_the_defining_domain() -> None:
   assert dignities.Dispositors is Dispositors
   assert dignities.chart_dispositors is chart_dispositors
   assert not hasattr(summaries, "HouseRulers") and not hasattr(summaries, "HouseRuler")
+
+
+def test_derived_views_support_hashing_and_dataclass_replacement() -> None:
+  chart = _chart((Body.SUN, Sign.CANCER), (Body.MOON, Sign.CANCER))
+  result = chart_dispositors(chart, objects=(Body.MOON, Body.SUN))
+  same = Dispositors(chart, (Body.SUN, Body.MOON))
+  assert result == same and hash(result) == hash(same)
+  assert len({result, same}) == 1
+  assert replace(result) == result
+  moon_only = replace(result, objects=(Body.MOON,))
+  assert moon_only.objects == (Body.MOON,)
+  assert moon_only.chains == {Body.MOON: (Body.MOON,)}
+  assert moon_only.edges == {Body.MOON: Body.MOON}
+  assert moon_only.final_dispositors == (Body.MOON,)
+  with pytest.raises((TypeError, ValueError), match="init=False"):
+    replace(result, edges={})
+
+
+def test_entry_point_requires_keyword_only_objects() -> None:
+  with pytest.raises(TypeError):
+    chart_dispositors(_chart((Body.SUN, Sign.LEO)), (Body.SUN,))  # type: ignore[call-arg]
+
+
+@pytest.mark.parametrize("root", [Body.PLUTO, LunarNode.MEAN_ASCENDING])
+def test_nonclassical_root_reaches_an_available_final_dispositor(root: AstronomicalObject) -> None:
+  result = chart_dispositors(_chart((root, Sign.CANCER), (Body.MOON, Sign.CANCER)), objects=(root,))
+  assert result.chains == {root: (root, Body.MOON)}
+  assert result.edges == {root: Body.MOON, Body.MOON: Body.MOON}
+  assert result.final_dispositors == (Body.MOON,)
+  assert result.cycles == () and result.missing_rulers == {}
+
+
+def test_package_root_surface() -> None:
+  import astrology
+
+  expected = {
+    "AmbiguousBirthTimeError",
+    "AshmandSignGroup",
+    "AspectHit",
+    "AspectMotion",
+    "AspectObject",
+    "AspectRule",
+    "Axis",
+    "BirthRecord",
+    "Body",
+    "Catalog",
+    "ChartConfig",
+    "ChartDomainError",
+    "ChartHouses",
+    "ChartProvenance",
+    "ChartTimes",
+    "CrossAspectHit",
+    "CrossChartAspects",
+    "CrossChartHouseOverlays",
+    "DignityStatus",
+    "Dispositors",
+    "EclipticPosition",
+    "EffectiveConfiguration",
+    "Element",
+    "FixedOffset",
+    "HistoricalTimeError",
+    "HouseOverlay",
+    "HouseRuler",
+    "HouseRulers",
+    "HouseSystem",
+    "IanaTimezone",
+    "Location",
+    "LunarNode",
+    "LunarPhaseResult",
+    "LunationType",
+    "MajorAspect",
+    "MissingBirthDataError",
+    "Modality",
+    "NatalChart",
+    "NodeDefinition",
+    "NonexistentBirthTimeError",
+    "ObjectOrb",
+    "OrbCombination",
+    "Placement",
+    "ResolvedBirth",
+    "Sign",
+    "SignDistribution",
+    "TimePrecision",
+    "ashmand_sign_group",
+    "aspect_angle",
+    "chart_dispositors",
+    "chart_sign_distribution",
+    "cross_chart_aspects",
+    "cross_chart_house_overlays",
+    "element_of",
+    "essential_dignities",
+    "find_aspects",
+    "format_chart",
+    "format_cross_aspects",
+    "format_house_overlays",
+    "format_house_rulers",
+    "format_lunar_phase",
+    "format_sign_distribution",
+    "house_of",
+    "load_catalog",
+    "lunar_phase",
+    "modality_of",
+    "natal_chart",
+    "natal_lunar_phase",
+    "prepare_natal_input",
+    "resolve_birth_time",
+    "sign_degree",
+    "sign_distribution",
+    "sign_of",
+    "sign_ruler",
+    "truncate_display",
+  }
+  assert set(astrology.__all__) == expected
+  assert len(astrology.__all__) == len(expected)
+
+
+def test_comparison_admission_belongs_to_its_shared_boundary() -> None:
+  from astrology import _comparison, chart
+
+  for name in ("_require_comparable_sources", "_selection_for_chart"):
+    assert getattr(_comparison, name).__module__ == "astrology._comparison"
+    assert not hasattr(chart, name)
+  assert chart.__file__ is not None
+  imports = []
+  for node in ast.walk(ast.parse(Path(chart.__file__).read_text(encoding="utf-8"))):
+    if isinstance(node, ast.ImportFrom):
+      imports.append(node.module or "")
+      imports.extend(f"{node.module}.{alias.name}" for alias in node.names)
+    elif isinstance(node, ast.Import):
+      imports.extend(alias.name for alias in node.names)
+  assert all("_comparison" not in name.split(".") for name in imports)
 
 
 def test_project_rule_links_roots_without_claiming_a_chart_conclusion() -> None:

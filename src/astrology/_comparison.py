@@ -7,7 +7,10 @@ from astrology.objects import Axis, ChartObject, _is_chart_object
 
 
 def _require_comparable_sources(chart_left: NatalChart, chart_right: NatalChart) -> None:
-  """Require matching zodiac, center and position frame. 要求黄道、中心及位置坐标约定一致。"""
+  """Keep this boundary check even while public constructors admit one convention.
+
+  即使公开构造器目前只接纳一种坐标约定，也保留比较入口处的校验。
+  """
   if type(chart_left) is not NatalChart or type(chart_right) is not NatalChart:
     raise TypeError("chart_left and chart_right must be NatalChart values")
   if (

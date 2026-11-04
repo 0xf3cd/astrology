@@ -164,7 +164,8 @@ remain available for traversal.
 Read the other endings as follows:
 
 - `final_dispositors` lists reached planets that rule their own signs. Their
-  self-loop edges remain in `edges`; each path lists the endpoint once.
+  self-loop edges remain in `edges`. For a root that reaches such a planet,
+  `chains[root]` lists that planet once.
 - A two-planet item in `cycles` is domicile-based mutual reception under this
   rule. Longer cycles, such as the example, are not labeled mutual reception.
 - `missing_rulers[root]` gives the absent next ruler for that root. The path
@@ -186,8 +187,8 @@ The plural `final_dispositors` does not assert a unique ruler of the whole chart
 `Dispositors(chart, objects)` constructs the same immutable result directly.
 Selections are copied and ordered by the chart's placements, not argument order.
 `edges` keys, roots and final dispositors follow source-chart order. Each cycle
-preserves edge direction, starts with its earliest member in source order, and
-is ordered against other cycles by that member. All mappings are read-only;
+preserves edge direction and starts with its earliest member in source order.
+The cycles are ordered by those first members in source order. All mappings are read-only;
 paths, cycles and endpoint lists are tuples.
 
 Pass an explicit, nonempty sequence of available `Body` or `LunarNode` members.
