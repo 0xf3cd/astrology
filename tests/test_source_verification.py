@@ -1,0 +1,98 @@
+"""Inspected source links and their editorial limits. 已核来源链接及其整理限度。"""
+
+import re
+
+import pytest
+
+from astrology.knowledge import (
+  OutputEligibility,
+  PrerequisiteStatus,
+  SourceVerification,
+  load_catalog,
+)
+from tools.catalog_docs import check_catalog_data, render_catalog
+
+
+@pytest.mark.parametrize(
+  ("entry_id", "source_id", "status"),
+  [
+    (
+      "entry.node_definitions",
+      "source.meeus.astronomical-algorithms-1998",
+      PrerequisiteStatus.UNRESOLVED,
+    ),
+    (
+      "entry.house_requests",
+      "source.astrodienst.swisseph-house-definitions",
+      PrerequisiteStatus.COMPLETE,
+    ),
+    (
+      "entry.aspect_requests",
+      "source.lilly.christian-astrology-1647",
+      PrerequisiteStatus.COMPLETE,
+    ),
+    (
+      "entry.aspect_requests",
+      "source.astrodienst.hellenistic-style-faq",
+      PrerequisiteStatus.COMPLETE,
+    ),
+  ],
+)
+def test_external_definitions_do_not_promote_chart_conclusions(
+  entry_id: str, source_id: str, status: PrerequisiteStatus
+) -> None:
+  catalog = load_catalog()
+  entry = catalog.entry(entry_id)
+  assert source_id in {citation.source_id for citation in entry.citations}
+  assert catalog.source(source_id).verification is SourceVerification.VERIFIED
+  assert entry.prerequisite_status is status
+  assert entry.output_eligibility is OutputEligibility.REFERENCE_ONLY
+  assert entry.chart_applicability == "not_assessed"
+
+
+@pytest.mark.parametrize(
+  "source_id",
+  [
+    "source.meeus.astronomical-algorithms-1998",
+    "source.astrodienst.swisseph-house-definitions",
+    "source.astrodienst.hellenistic-style-faq",
+    "source.lilly.christian-astrology-1647",
+    "source.astrodienst.elements-signs",
+    "source.rudhyar.lunation-birthday",
+  ],
+)
+def test_retained_sources_have_bilingual_receipts(source_id: str) -> None:
+  source = load_catalog().source(source_id)
+  for language in ("en", "zh-CN"):
+    lineage = source.lineage.text(language)
+    assert lineage is not None
+    assert re.search(r"SHA-256(?: 为)? [a-f0-9]{64}", lineage)
+    assert source.scope.text(language)
+
+
+def test_scan_locators_and_unavailable_originals_remain_distinct() -> None:
+  catalog = load_catalog()
+  lilly = catalog.source("source.lilly.christian-astrology-1647")
+  assert "137-139 for pp.103-105" in lilly.lineage.en.replace("\N{EN DASH}", "-")
+  assert "p.104 spells Ptolomy" in lilly.scope.en
+  citations = catalog.entry("entry.essential_dignities").citations
+  assert "p.105 / Wellcome leaf139" in citations[-2].locator
+  ashmand = catalog.source("source.ptolemy.ashmand1822")
+  for language in ("en", "zh-CN"):
+    lineage = ashmand.lineage.text(language)
+    assert lineage is not None
+    assert "HTTP429" in lineage and "1896" in lineage
+    assert "8ab3073b2200ba85b3dd812acc0b2edd2d2757f196cc641de42e9a46293189cb" in lineage
+
+
+def test_verified_definitions_render_in_both_catalogs() -> None:
+  catalog = load_catalog()
+  check_catalog_data(catalog)
+  for language in ("en", "zh-CN"):
+    rendered = render_catalog(catalog, language, "test")
+    for identifier in (
+      "source.meeus.astronomical-algorithms-1998",
+      "source.astrodienst.swisseph-house-definitions",
+      "source.astrodienst.hellenistic-style-faq",
+    ):
+      assert identifier in rendered

@@ -1,6 +1,7 @@
 """Knowledge identity, isolation and editorial boundaries. 知识身份、隔离与整理边界。"""
 
 import json
+import re
 import subprocess
 import sys
 from dataclasses import FrozenInstanceError, replace
@@ -643,7 +644,7 @@ def test_retained_rule_ids_and_order(catalog: Catalog) -> None:
     assert variant.definition != concept.description
     assert variant.configuration is configuration
     if isinstance(configuration, (HouseSystem, NodeDefinition)):
-      assert "orb" not in variant.limits.en.lower()
+      assert re.search(r"\borbs?\b", variant.limits.en, re.IGNORECASE) is None
 
 
 def test_cross_policy_is_independently_retrievable_without_chart_applicability(
