@@ -2,16 +2,12 @@
 
 [简体中文](../zh-CN/cross_aspects.md) · [Documentation](index.md) · [API](reference.md)
 
-Given two `NatalChart` results, use `cross_chart_aspects` to find static major
+For synastry with two `NatalChart` results, use `cross_chart_aspects` to find static major
 aspects between them, or `cross_chart_house_overlays` to find which houses in one
 chart contain the other chart's objects. The result distinguishes the left
 chart's Sun from the right chart's Sun without renaming objects or merging charts.
 Both operations use the stored longitudes; check the
 [coordinate requirements](#source-compatibility-and-calculation-boundaries) before comparing charts.
-
-Static cross-chart aspects are available from 0.2.0. House overlays and comparison
-text are introduced in 0.3.0; see the [installation instructions](../../README.md#install-a-release)
-for package-index availability and source installation.
 
 ## Compare two example charts
 
@@ -173,7 +169,7 @@ body override.
 False
 ```
 
-The comparison reads the stored axes without repeating native astronomy, and
+The comparison reads the stored axes and
 does not add distance or motion fields to them.
 See [natal axis selection](aspects.md#select-axes-explicitly) for single-chart aspects.
 
@@ -216,7 +212,8 @@ Truncation affects only the display; it does not re-evaluate aspects or discard
 records. Required names and translations must be present and current in the
 catalog. Missing, stale or ambiguous names raise `ValueError`; there is no fallback
 to another language. The tables escape nonprinting characters and table delimiters.
-They are for reading, not for restoring a chart without loss.
+See the [display boundary](records.md#display-does-not-change-classification) for
+how tables differ from structured results.
 
 ## Read static geometry
 
@@ -248,14 +245,13 @@ The charts may have different dates, locations, house systems, models and softwa
 labels. These are retained and do not by themselves cause rejection. Constructing
 a cross-aspect result recomputes all hits from the charts, selections and rules;
 constructing an overlay result recomputes all placements from the charts and
-selections. Any difference from the supplied records is rejected. These checks do
-not authenticate the supplied astronomical values or provenance labels.
+selections. Any difference from the supplied records is rejected. See the
+[validation boundary](architecture.md#reproducibility) for what these checks establish.
 
 House overlays likewise compare each object's stored longitude at its own date
 with the other chart's cusps. They do not convert to a common epoch or use object
 latitude for three-dimensional placement. Both operations validate requests even
-when output is empty. Neither performs astronomy, timezone resolution, version
-lookup or resource I/O; the formatters use the caller's catalog.
+when output is empty. The formatters use the caller's catalog.
 
 Composite/Davison charts, transit searches and interpretation remain outside
 these operations.

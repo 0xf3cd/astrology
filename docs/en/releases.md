@@ -18,8 +18,7 @@ provenance remain.
 ## 0.3.0
 
 This version adds natal analysis, axis aspect selection and cross-chart house overlays.
-Check [PyPI](https://pypi.org/project/celestial-astrology/0.3.0/) for this version;
-if it is not listed, [install from source](../../README.md#install-from-source).
+Package index: [PyPI](https://pypi.org/project/celestial-astrology/0.3.0/).
 
 - [Element and modality distributions](summaries.md) count explicitly selected
   objects equally and retain zero-count categories, counts and proportions.

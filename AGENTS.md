@@ -18,10 +18,11 @@ variants, chart composition, and text output.
 - Distinguish physical objects, mathematical points, and constructed chart points.
   Name node and apogee definitions rather than using an ambiguous accuracy switch.
 - Keep astronomical values separate from signs, house placement, and aspects.
-- Record resolved models, versions, and configuration. A failed requested house
-  system must not silently become another system.
-- Cite the sources and applicability of astrological rules. Represent conflicting
-  traditions as named variants; confirm unresolved definitions before encoding them.
+- Record resolved models, versions, and configuration. House-system failures follow
+  the [calculation boundary](docs/en/architecture.md#composition-and-failures).
+- Record astrological sources, applicability, and limits in the knowledge catalog;
+  docstrings describe behavior and point to the entry ID or the work and chapter.
+  Represent conflicting traditions as named variants; confirm unresolved definitions before encoding them.
 - Begin with a concrete celestial adapter. Add shared abstractions only when
   actual implementations or callers need them.
 

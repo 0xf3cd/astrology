@@ -1,6 +1,6 @@
 """Equal-count sign statistics and lunar-phase composition from supplied chart values.
 
-从给定命盘值组合等权星座统计与月相，不重新计算天文。
+从给定命盘值组合等权星座统计与月相。
 """
 
 from __future__ import annotations
@@ -26,11 +26,11 @@ class SignDistribution:
   and proportions are count/total. Objects and total derive from the snapshot.
   Invalid containers/members raise TypeError, empty or duplicate populations
   ValueError. The caller is responsible for common provenance of low-level
-  placements; this record does not authenticate a chart or assign object weights.
+  placements. Each object has equal weight.
 
   不可变且非空的 Placement 快照，每个不同对象计一次。输入序列复制成元组，计数包含各类的
   零值，比例为计数除以总数；对象及总数从快照推导。容器或成员类型非法抛出 TypeError，空集合或
-  重复对象抛出 ValueError。调用方负责保证低层落点的共同来源；本记录不核实命盘来源或设置对象权重。
+  重复对象抛出 ValueError。调用方负责保证低层落点的共同来源；每个对象的权重相同。
   """
 
   placements: tuple[Placement, ...]
@@ -97,13 +97,13 @@ def sign_distribution(placements: Sequence[Placement]) -> SignDistribution:
 def chart_sign_distribution(
   chart: NatalChart, *, objects: Sequence[AstronomicalObject]
 ) -> SignDistribution:
-  """Count explicitly selected existing placements in source-chart order, without astronomy.
+  """Count explicitly selected existing placements in source-chart order.
 
   No default population is inferred. None, strings, wrong enums or invalid chart
   types raise TypeError; empty/duplicate selections or unavailable objects raise
   ValueError. The source chart is unchanged, and no missing object is calculated.
 
-  按源盘顺序统计显式选择的已有落点，不调用天文库。不推断默认统计对象。None、字符串、其他枚举
+  按源盘顺序统计显式选择的已有落点。不推断默认统计对象。None、字符串、其他枚举
   或错误的命盘类型抛出 TypeError；空选择、重复选择或缺失对象抛出 ValueError。源盘不变，不补算缺失对象。
   """
   if type(chart) is not NatalChart:
@@ -123,12 +123,12 @@ def chart_sign_distribution(
 
 
 def natal_lunar_phase(chart: NatalChart) -> LunarPhaseResult:
-  """Compose lunar phase from this chart's Sun/Moon in its shared frame, without astronomy.
+  """Compose lunar phase from this chart's Sun/Moon in its shared frame.
 
   Wrong chart types raise TypeError; a missing Sun or Moon raises ValueError
   naming the absent objects. Nothing is recalculated or added to the source chart.
 
-  用此盘共同坐标约定下的日月位置组合月相，不调用天文库。命盘类型错误抛出 TypeError；
+  用此盘共同坐标约定下的日月位置组合月相。命盘类型错误抛出 TypeError；
   缺太阳或月亮时抛出 ValueError 并列出缺失对象。不重新计算，也不向源盘添加内容。
   """
   if type(chart) is not NatalChart:
@@ -145,10 +145,10 @@ class HouseRuler:
   """One house's cusp sign and its traditional ruler's placement, or None if unavailable.
 
   Wrong types raise TypeError; a house outside 1..12 or a mismatched placement
-  identity raises ValueError. This low-level record does not authenticate a chart.
+  identity raises ValueError.
 
   单个宫位的宫头星座及传统宫主星落点；未计算落点时为 None。类型错误抛出 TypeError，宫号不在
-  1..12 或落点身份不符时抛出 ValueError。本低层记录不核实命盘来源。
+  1..12 或落点身份不符时抛出 ValueError。
   """
 
   house: int
@@ -183,13 +183,13 @@ class HouseRuler:
 
 @dataclass(frozen=True, slots=True)
 class HouseRulers:
-  """Derive twelve house-ruler records from one retained NatalChart, without astronomy.
+  """Derive twelve house-ruler records from one retained NatalChart.
 
   Use actual cusps, not axes; keep repeated signs and missing ruler placements.
   A non-NatalChart raises TypeError. Repeated houses accesses return new records that compare equal;
   existing placements and the source chart are retained by identity.
 
-  从保留的 NatalChart 推导十二宫主星记录，不调用天文库。使用实际宫头，不以轴代替；保留重复
+  从保留的 NatalChart 推导十二宫主星记录。使用实际宫头，不以轴代替；保留重复
   星座及缺失的宫主星落点。非 NatalChart 输入抛出 TypeError。两次读取 houses 所得元组相等，
   但其中的记录不是同一批对象；已有落点及源盘保留原对象。
   """

@@ -36,9 +36,9 @@ Sun, Moon and mean ascending node. `house_system` selects the house system,
 'meeus_five_term_true'
 ```
 
-`HouseSystem` supports Whole Sign, Equal and Placidus. If the selected system cannot
-be calculated at the given time or location, calculation fails without switching
-systems; see the [chart guide](chart.md) for the supported range.
+`HouseSystem` supports Whole Sign, Equal and Placidus. See the
+[chart guide](chart.md) for the supported range and the
+[failure policy](architecture.md#composition-and-failures) for unavailable geometry.
 `Body` includes ten physical bodies: the Sun, Moon, and Mercury through Pluto.
 Lunar nodes are mathematical points, selected with `LunarNode`. It offers mean and
 Meeus five-term true definitions, each with ascending and descending nodes.
@@ -136,7 +136,7 @@ ValueError: orb_combination is required when aspect rules have object orbs
 ```
 
 NaN, infinity, negative orbs, booleans, unsupported modes, and inconsistent
-selections fail under normal Python and `python -O`.
+selections fail validation.
 
 <!-- /usage: configuration.orbs -->
 

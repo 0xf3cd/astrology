@@ -4,11 +4,11 @@ Each result records the angle measured from the first object to the second, the
 exact aspect angle used for comparison (the branch), and the signed difference.
 The motion status tells whether the magnitude of that difference is shrinking or growing.
 It does not predict later changes in motion or whether the aspect will become
-exact. This module needs no chart and does not call the astronomy library.
+exact.
 
 根据同一时刻的黄经和速率判断主要相位。每条结果记录从第一个对象到第二个对象的角度、
 用来对照的精确相位角（分支），以及两者的带符号偏差。运动状态说明偏差的绝对值此刻在缩小还是增大，
-不预测之后的运动变化，也不预测相位之后会不会变得精确。本模块不需要命盘，也不调用天文库。
+不预测之后的运动变化，也不预测相位之后会不会变得精确。
 """
 
 from __future__ import annotations

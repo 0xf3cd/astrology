@@ -1,6 +1,6 @@
-"""Immutable requested chart choices, without astronomy or rule evaluation.
+"""Immutable requested chart choices.
 
-不可变的排盘请求配置，不执行天文计算或规则求值。
+不可变的排盘请求配置。
 """
 
 from __future__ import annotations
@@ -24,9 +24,9 @@ from astrology.objects import NodeDefinition as NodeDefinition
 
 
 class HouseSystem(StrEnum):
-  """Requested house identity; unavailable geometry must not be substituted.
+  """The requested house system: Whole Sign, Equal or Placidus.
 
-  请求的宫制标识；几何不可用时不得静默替换。
+  请求的宫制：Whole Sign、Equal 或 Placidus。
   """
 
   WHOLE_SIGN = "whole_sign"
@@ -133,16 +133,14 @@ class ChartConfig:
   it means all requested bodies/nodes and no axes. Axes are not native outputs.
   `orb_combination` is required exactly when some rule has per-object orbs, and a
   per-object orb may name only a participating object. Only tropical/geocentric is
-  admitted. No orb or house defaults, effective-model claims, computation, or
-  fallback are supplied.
+  admitted. The caller must supply the house system and every orb.
 
   只保存排盘请求。对象和相位规则按原顺序复制为不可变元组，不受调用方后续修改列表的影响。
   必须指定宫制和至少一个对象，对象不能重复；相位规则也不能重复，但可以为空。
   `aspect_objects` 从请求的天体或交点中选择参与者，也可显式加入已存四轴；省略时所有请求的
   天体或交点都参与，不加入四轴。四轴不是天文输出对象。
   只要有规则为对象单独设置容许度，就必须给出 `orb_combination`，否则不能给。
-  单独设置容许度的对象必须参与相位。仅支持热带黄道和地心，不提供默认容许度或默认宫制，
-  不记录实际计算模型，也不执行计算或提供替代策略。
+  单独设置容许度的对象必须参与相位。仅支持热带黄道和地心；调用方必须指定宫制及每条容许度。
   """
 
   house_system: HouseSystem

@@ -62,12 +62,12 @@ class CrossChartHouseOverlays:
   bodies and nodes follow each chart's position order, then selected axes follow
   in ASC/MC/DSC/IC order. Placements list left objects in right houses, then right
   objects in left houses. Construction recomputes the complete placement sequence
-  and rejects any difference; it does not authenticate the charts' astronomical origin.
+  and rejects any difference.
 
   不可变的结果，包含两张命盘、所选对象和全部落宫记录。两张盘保持不变，传入的序列复制为元组。
   所选天体和交点按各盘的位置记录顺序排列，所选四轴随后按上升、中天、下降、天底排列。
   落宫记录先列左盘对象在右盘的落宫，再列右盘对象在左盘的落宫。
-  构造时会重新计算完整落宫序列，拒绝与它不同的记录；这些检查不证明命盘的天文来源真实。
+  构造时会重新计算完整落宫序列，拒绝与它不同的记录。
   """
 
   chart_left: NatalChart
@@ -143,8 +143,7 @@ def cross_chart_house_overlays(
   three-dimensional placement.
 
   Invalid types raise TypeError. Duplicate or unavailable selections and incompatible
-  coordinates raise ValueError. No astronomy, time resolution, version lookup or I/O
-  is performed.
+  coordinates raise ValueError.
 
   查询每个所选对象落入另一张盘的哪一宫。left_objects 和 right_objects 分别选择左右盘的对象。
   None 表示该盘的全部天体和交点，不含四轴，也不沿用本命相位的对象选择。显式选择可以包含已存轴，
@@ -161,7 +160,6 @@ def cross_chart_house_overlays(
   不同日期、宫制、模型和版本均保留，不转换到共同历元，也不计算三维落宫。
 
   类型错误抛出 TypeError；重复选择、选择盘中没有的对象或坐标约定不一致时，抛出 ValueError。
-  不执行天文计算、时刻解析、版本查询或 I/O。
   """
   _require_comparable_sources(chart_left, chart_right)
   selected_left = _selection_for_chart(

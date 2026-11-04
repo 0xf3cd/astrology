@@ -130,13 +130,11 @@ def snapshot(
   The snapshot always evaluates all fourteen upstream objects and the requested house
   geometry together; selecting a subset of `config.objects` only filters its output and
   does not narrow the evaluated domain. ΔT model Algo5 is passed explicitly and recorded
-  by the caller. Failures raise ChartDomainError with the requested house system and never
-  a partial result or a substituted geometry.
+  by the caller. Failures raise ChartDomainError with the requested house system.
 
   为已解析的时刻和请求的配置计算上游的联合快照。快照总是把上游十四个对象和请求的宫几何
   一起求值；`config.objects` 只选一部分时，只是从结果里筛出这些，求值域不会缩小。ΔT 模型
-  固定为 Algo5 并显式传入，由调用方记录。失败时抛出带有请求宫制的 ChartDomainError，
-  绝不返回部分结果，也绝不换用别的宫几何。
+  固定为 Algo5 并显式传入，由调用方记录。失败时抛出带有请求宫制的 ChartDomainError。
   """
   location = _precheck(resolved, config)
   second_of_day = (

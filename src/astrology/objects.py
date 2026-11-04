@@ -1,6 +1,6 @@
-"""Object identities and the families admitted by their consumers, without astronomy.
+"""Object identities and the families admitted by their consumers.
 
-对象身份及各使用方接纳的对象类别，不调用天文库。
+对象身份及各使用方接纳的对象类别。
 """
 
 from enum import StrEnum

@@ -1,6 +1,6 @@
-"""Oriented longitude difference and Rudhyar's eight lunation types, without astronomy.
+"""Oriented longitude difference and Rudhyar's eight lunation types.
 
-有向黄经差与 Rudhyar 八种月相类型，不调用天文库。
+有向黄经差与 Rudhyar 八种月相类型。
 """
 
 from __future__ import annotations

@@ -176,7 +176,7 @@ class Placement:
 
 @dataclass(frozen=True, slots=True)
 class EffectiveConfiguration:
-  """The resolved choices actually used; a requested system never appears here as another one.
+  """The resolved choices actually used in the calculation.
 
   `delta_t_model` is the upstream ΔT model member value the adapter fixed for
   this calculation, not a caller request. `evaluation` names the joint
@@ -188,7 +188,7 @@ class EffectiveConfiguration:
   `orb_combination` repeats the requested rule, or None when no rule has
   per-object orbs.
 
-  实际采用的已确定选择。请求的宫制不会在这里变成另一种宫制。`delta_t_model` 是适配层为
+  计算实际采用的已确定选择。`delta_t_model` 是适配层为
   这次计算固定下来的上游 ΔT 模型取值，不是调用方的请求；`evaluation` 说明位置来自哪种
   联合求值：只选一部分对象时，只是筛选输出，不缩小求值域。`aspect_objects` 是判断相位时
   所用的对象，天体和交点按请求顺序排列，所选四轴按上升、中天、下降、天底顺序追加；
@@ -255,15 +255,14 @@ class NatalChart:
   positions, placements and aspects are copied into tuples, so lists given by the
   caller are not aliased.
 
-  Construction checks field types, ranges and pure derived-value consistency. It
-  does not verify that the astronomical values were calculated from the claimed input.
+  Construction checks field types, ranges and pure derived-value consistency.
   Equality includes the resolved input; hashing excludes it because its source
   mapping is unhashable.
 
   完整且不可变的本命盘结果；对象按请求的顺序排列。按 `requested.aspects` 中的规则，
   在 `effective.aspect_objects` 所列对象之间计算相位，结果顺序见 `find_aspects`。
   位置、落宫和相位会复制成元组，不会引用调用方传入的列表。
-  构造时检查字段类型、范围及纯规则推导结果的一致性，不核实天文值是否确实由所称输入算得。
+  构造时检查字段类型、范围及纯规则推导结果的一致性。
   相等判断包括已解析输入；哈希不包括它，因为其中的来源映射不可哈希。
   """
 
@@ -409,7 +408,7 @@ def natal_chart(resolved: ResolvedBirth, config: ChartConfig) -> NatalChart:
   preparation. The astronomy adapter is imported here, not at package import, so
   importing astrology or querying knowledge never initializes native astronomy.
   A requested geometry outside the joint upstream domain raises
-  `ChartDomainError` and never falls back to another house system. Requested
+  `ChartDomainError`. Requested
   aspect rules are judged among the objects of `config.aspect_objects`, or among
   all requested bodies/nodes when it is unset. Explicitly selected axes use the
   stored axis fields, not cusps, and have no supplied rate. Their non-exact hits
@@ -420,7 +419,7 @@ def natal_chart(resolved: ResolvedBirth, config: ChartConfig) -> NatalChart:
   为已解析的出生时刻计算热带地心本命盘。出生记录必须带地点；时间未知的记录在准备阶段
   就已被拒绝。天文适配层在这个函数里才导入，不在导入包时导入，所以导入 astrology 或查询
   知识都不会初始化原生天文库。请求的几何超出上游的联合求值域时，抛出
-  `ChartDomainError`，不会改用别的宫制。根据这次计算的位置和黄经速率，
+  `ChartDomainError`。根据这次计算的位置和黄经速率，
   在 `config.aspect_objects` 指定的对象之间计算相位；未设置时，所有请求的天体和交点都参与。
   显式所选四轴直接使用已存轴字段，不使用宫头，也不提供速率；其非精确命中为 INDETERMINATE，
   偏差恰为零时仍为 EXACT。不把四轴加入原始位置或落点。

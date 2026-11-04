@@ -15,8 +15,7 @@
 ## 0.3.0
 
 此版本增加本命分析、四轴相位选择和双盘落宫功能。
-已发布文件见 [PyPI](https://pypi.org/project/celestial-astrology/0.3.0/)；
-若尚未列出此版本，请[从源码安装](../../README.zh-CN.md#从源码安装)。
+包索引：[PyPI](https://pypi.org/project/celestial-astrology/0.3.0/)。
 
 - [元素／模式分布](summaries.md)：等权统计明确选择的对象，保留零计数类别、计数及比例。
 - [出生月相](summaries.md)：按具名的 Rudhyar 规则及本项目说明的区间边界，对日月黄经角度分类。
