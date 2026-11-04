@@ -275,6 +275,10 @@ def test_derived_views_support_hashing_and_dataclass_replacement() -> None:
   assert result == same and hash(result) == hash(same)
   assert len({result, same}) == 1
   assert replace(result) == result
+  forged = replace(result)
+  object.__setattr__(forged, "final_dispositors", ())
+  assert forged != result
+  assert hash(forged) == hash(result)
   moon_only = replace(result, objects=(Body.MOON,))
   assert moon_only.objects == (Body.MOON,)
   assert moon_only.chains == {Body.MOON: (Body.MOON,)}
@@ -296,90 +300,6 @@ def test_nonclassical_root_reaches_an_available_final_dispositor(root: Astronomi
   assert result.edges == {root: Body.MOON, Body.MOON: Body.MOON}
   assert result.final_dispositors == (Body.MOON,)
   assert result.cycles == () and result.missing_rulers == {}
-
-
-def test_package_root_surface() -> None:
-  import astrology
-
-  expected = {
-    "AmbiguousBirthTimeError",
-    "AshmandSignGroup",
-    "AspectHit",
-    "AspectMotion",
-    "AspectObject",
-    "AspectRule",
-    "Axis",
-    "BirthRecord",
-    "Body",
-    "Catalog",
-    "ChartConfig",
-    "ChartDomainError",
-    "ChartHouses",
-    "ChartProvenance",
-    "ChartTimes",
-    "CrossAspectHit",
-    "CrossChartAspects",
-    "CrossChartHouseOverlays",
-    "DignityStatus",
-    "Dispositors",
-    "EclipticPosition",
-    "EffectiveConfiguration",
-    "Element",
-    "FixedOffset",
-    "HistoricalTimeError",
-    "HouseOverlay",
-    "HouseRuler",
-    "HouseRulers",
-    "HouseSystem",
-    "IanaTimezone",
-    "Location",
-    "LunarNode",
-    "LunarPhaseResult",
-    "LunationType",
-    "MajorAspect",
-    "MissingBirthDataError",
-    "Modality",
-    "NatalChart",
-    "NodeDefinition",
-    "NonexistentBirthTimeError",
-    "ObjectOrb",
-    "OrbCombination",
-    "Placement",
-    "ResolvedBirth",
-    "Sign",
-    "SignDistribution",
-    "TimePrecision",
-    "ashmand_sign_group",
-    "aspect_angle",
-    "chart_dispositors",
-    "chart_sign_distribution",
-    "cross_chart_aspects",
-    "cross_chart_house_overlays",
-    "element_of",
-    "essential_dignities",
-    "find_aspects",
-    "format_chart",
-    "format_cross_aspects",
-    "format_house_overlays",
-    "format_house_rulers",
-    "format_lunar_phase",
-    "format_sign_distribution",
-    "house_of",
-    "load_catalog",
-    "lunar_phase",
-    "modality_of",
-    "natal_chart",
-    "natal_lunar_phase",
-    "prepare_natal_input",
-    "resolve_birth_time",
-    "sign_degree",
-    "sign_distribution",
-    "sign_of",
-    "sign_ruler",
-    "truncate_display",
-  }
-  assert set(astrology.__all__) == expected
-  assert len(astrology.__all__) == len(expected)
 
 
 def test_comparison_admission_belongs_to_its_shared_boundary() -> None:

@@ -100,6 +100,16 @@ def test_source_addenda_keep_attribution_and_locators_bounded() -> None:
   assert "handwritten 104" in lilly.lineage.en
   assert "PDF page146" in lilly.lineage.en
   assert "Sun-in-Aries/Mars-in-Leo" in lilly.scope.en
+  assert "domicile-based mutual reception" in lilly.scope.en
+  assert "基于入庙守护的互容标签" in (lilly.scope.zh or "")
+  assert "太阳在白羊座、火星在狮子座" in (lilly.scope.zh or "")
+  assert "reception by Houses" in lilly.scope.en
+  assert "reception by Houses" in (lilly.scope.zh or "")
+  assert "手写" in (lilly.lineage.zh or "")
+  assert "PDF第146页" in "".join((lilly.lineage.zh or "").split())
+  tradition = catalog.variant("rule.lilly1647.essential_dignities").tradition
+  assert "printed p.104" not in tradition.en
+  assert "印刷第104页" not in "".join((tradition.zh or "").split())
   citations = catalog.entry("entry.dispositor_chains").citations
   assert len(citations) == 2
   assert "p.104" in citations[0].locator and "leaf138" in citations[0].locator
