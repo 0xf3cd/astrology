@@ -1,0 +1,418 @@
+{
+  "generated_utc": "2026-11-05T07:50:00.757969+00:00",
+  "source": {
+    "pyswisseph_version": "2.10.3.2",
+    "library_version": "2.10.03",
+    "ephemeris": "Moshier analytical, explicitly selected; not Swiss/JPL data files",
+    "requested_flags": 260,
+    "returned_flags": 260,
+    "coordinates": "apparent geocentric tropical longitude, true equinox/ecliptic of date",
+    "time_scale": "TT",
+    "manual": "https://www.astro.com/swisseph/swephprg.htm",
+    "node_reference": "tests.test_reference._meeus_nodes: Meeus ch.47 plus ch.22 low-accuracy nutation",
+    "recipe_sha256": "e8c94f9cbb22f7041b34c48266661378ae609929b9b776f48e6c684574120c98"
+  },
+  "calibration": {
+    "native_version": "1.1.1",
+    "sample_count": 1830,
+    "interval": "2021-01-01 through 2022-12-30, every fourth TT day",
+    "maximum_difference_deg": {
+      "sun": 2.710092178404011e-05,
+      "moon": 0.002398874468553913,
+      "mercury": 0.00010239433814263066,
+      "venus": 0.00010841158058383371,
+      "mars": 7.107264733008378e-05,
+      "jupiter": 9.608804128902193e-05,
+      "saturn": 0.00015967210248390984,
+      "uranus": 0.00036757675059106987,
+      "neptune": 0.00045679157119593583,
+      "pluto": 0.0001896560578416029
+    },
+    "angular_tolerance_deg": {
+      "sun": 0.0002,
+      "moon": 0.004798,
+      "mercury": 0.0002,
+      "venus": 0.000217,
+      "mars": 0.000143,
+      "jupiter": 0.000193,
+      "saturn": 0.00032,
+      "uranus": 0.000736,
+      "neptune": 0.000914,
+      "pluto": 0.00038
+    },
+    "rows_sha256": "a6d6d099e356b1ba595fc137f4cdb2a841fd556a2aefa2c8bf7c2789b48a980d",
+    "time_tolerance": "max(2 seconds, 2 * angular_tolerance_deg / abs(reference_rate) * 86400)"
+  },
+  "cases": [
+    {
+      "name": "sun_regular_2024",
+      "moving_object": "sun",
+      "query_longitude_deg": 294.31,
+      "start_jde_tt": 2460314.5,
+      "end_jde_tt": 2460334.5,
+      "angular_tolerance_deg": 0.0002,
+      "hits": [
+        {
+          "jde_tt": 2460324.50154279,
+          "longitude_deg": 294.30999999973807,
+          "longitude_rate_deg_per_tt_day": 1.0188975771436033,
+          "direction": "increasing",
+          "bracket_jde_tt": [
+            2460324.5,
+            2460324.5625
+          ]
+        }
+      ]
+    },
+    {
+      "name": "moon_regular_2024",
+      "moving_object": "moon",
+      "query_longitude_deg": 40.62,
+      "start_jde_tt": 2460619.5,
+      "end_jde_tt": 2460639.5,
+      "angular_tolerance_deg": 0.004798,
+      "hits": [
+        {
+          "jde_tt": 2460629.500136856,
+          "longitude_deg": 40.61999999864967,
+          "longitude_rate_deg_per_tt_day": 14.992145118969336,
+          "direction": "increasing",
+          "bracket_jde_tt": [
+            2460629.5,
+            2460629.5625
+          ]
+        }
+      ]
+    },
+    {
+      "name": "mercury_regular_2024",
+      "moving_object": "mercury",
+      "query_longitude_deg": 84.78,
+      "start_jde_tt": 2460466.5,
+      "end_jde_tt": 2460486.5,
+      "angular_tolerance_deg": 0.0002,
+      "hits": [
+        {
+          "jde_tt": 2460476.498466908,
+          "longitude_deg": 84.77999999971385,
+          "longitude_rate_deg_per_tt_day": 2.199268062059827,
+          "direction": "increasing",
+          "bracket_jde_tt": [
+            2460476.4375,
+            2460476.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "venus_regular_2024",
+      "moving_object": "venus",
+      "query_longitude_deg": 333.82,
+      "start_jde_tt": 2460374.5,
+      "end_jde_tt": 2460394.5,
+      "angular_tolerance_deg": 0.000217,
+      "hits": [
+        {
+          "jde_tt": 2460384.497054685,
+          "longitude_deg": 333.82000000020054,
+          "longitude_rate_deg_per_tt_day": 1.2376383457095674,
+          "direction": "increasing",
+          "bracket_jde_tt": [
+            2460384.4375,
+            2460384.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "mars_regular_2024",
+      "moving_object": "mars",
+      "query_longitude_deg": 323.78,
+      "start_jde_tt": 2460374.5,
+      "end_jde_tt": 2460394.5,
+      "angular_tolerance_deg": 0.000143,
+      "hits": [
+        {
+          "jde_tt": 2460384.4952333644,
+          "longitude_deg": 323.779999999709,
+          "longitude_rate_deg_per_tt_day": 0.7774897296044682,
+          "direction": "increasing",
+          "bracket_jde_tt": [
+            2460384.4375,
+            2460384.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "jupiter_regular_2024",
+      "moving_object": "jupiter",
+      "query_longitude_deg": 57.41,
+      "start_jde_tt": 2460435.5,
+      "end_jde_tt": 2460455.5,
+      "angular_tolerance_deg": 0.000193,
+      "hits": [
+        {
+          "jde_tt": 2460445.4827253474,
+          "longitude_deg": 57.410000000030166,
+          "longitude_rate_deg_per_tt_day": 0.2359874492173531,
+          "direction": "increasing",
+          "bracket_jde_tt": [
+            2460445.4375,
+            2460445.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "saturn_regular_2024",
+      "moving_object": "saturn",
+      "query_longitude_deg": 338.09,
+      "start_jde_tt": 2460345.5,
+      "end_jde_tt": 2460365.5,
+      "angular_tolerance_deg": 0.00032,
+      "hits": [
+        {
+          "jde_tt": 2460355.504687777,
+          "longitude_deg": 338.08999999995285,
+          "longitude_rate_deg_per_tt_day": 0.1203242006477818,
+          "direction": "increasing",
+          "bracket_jde_tt": [
+            2460355.5,
+            2460355.5625
+          ]
+        }
+      ]
+    },
+    {
+      "name": "uranus_regular_2024",
+      "moving_object": "uranus",
+      "query_longitude_deg": 53.2,
+      "start_jde_tt": 2460435.5,
+      "end_jde_tt": 2460455.5,
+      "angular_tolerance_deg": 0.000736,
+      "hits": [
+        {
+          "jde_tt": 2460445.545357609,
+          "longitude_deg": 53.20000000000427,
+          "longitude_rate_deg_per_tt_day": 0.0581249232138782,
+          "direction": "increasing",
+          "bracket_jde_tt": [
+            2460445.5,
+            2460445.5625
+          ]
+        }
+      ]
+    },
+    {
+      "name": "neptune_regular_2024",
+      "moving_object": "neptune",
+      "query_longitude_deg": 357.27,
+      "start_jde_tt": 2460374.5,
+      "end_jde_tt": 2460394.5,
+      "angular_tolerance_deg": 0.000914,
+      "hits": [
+        {
+          "jde_tt": 2460384.6185431937,
+          "longitude_deg": 357.27000000002164,
+          "longitude_rate_deg_per_tt_day": 0.037965558742001144,
+          "direction": "increasing",
+          "bracket_jde_tt": [
+            2460384.5625,
+            2460384.625
+          ]
+        }
+      ]
+    },
+    {
+      "name": "pluto_regular_2024",
+      "moving_object": "pluto",
+      "query_longitude_deg": 299.8,
+      "start_jde_tt": 2460314.5,
+      "end_jde_tt": 2460334.5,
+      "angular_tolerance_deg": 0.00038,
+      "hits": [
+        {
+          "jde_tt": 2460324.385442489,
+          "longitude_deg": 299.8000000005251,
+          "longitude_rate_deg_per_tt_day": 0.03240545809529999,
+          "direction": "increasing",
+          "bracket_jde_tt": [
+            2460324.375,
+            2460324.4375
+          ]
+        }
+      ]
+    },
+    {
+      "name": "mercury_triple_2024",
+      "moving_object": "mercury",
+      "query_longitude_deg": 20,
+      "start_jde_tt": 2460370.5,
+      "end_jde_tt": 2460462.5,
+      "angular_tolerance_deg": 0.0002,
+      "hits": [
+        {
+          "jde_tt": 2460391.498340857,
+          "longitude_deg": 20.00000000048692,
+          "longitude_rate_deg_per_tt_day": 1.28184162724512,
+          "direction": "increasing",
+          "bracket_jde_tt": [
+            2460391.4375,
+            2460391.5
+          ]
+        },
+        {
+          "jde_tt": 2460415.8748225225,
+          "longitude_deg": 19.999999999828876,
+          "longitude_rate_deg_per_tt_day": -0.710489257491949,
+          "direction": "decreasing",
+          "bracket_jde_tt": [
+            2460415.8125,
+            2460415.875
+          ]
+        },
+        {
+          "jde_tt": 2460436.277470788,
+          "longitude_deg": 19.999999999821224,
+          "longitude_rate_deg_per_tt_day": 0.7431786451925928,
+          "direction": "increasing",
+          "bracket_jde_tt": [
+            2460436.25,
+            2460436.3125
+          ]
+        }
+      ]
+    },
+    {
+      "name": "mercury_near_station_2024",
+      "moving_object": "mercury",
+      "query_longitude_deg": 27.208617833041146,
+      "start_jde_tt": 2460401.427581883,
+      "end_jde_tt": 2460403.427581883,
+      "angular_tolerance_deg": 0.0002,
+      "hits": [
+        {
+          "jde_tt": 2460402.0170673104,
+          "longitude_deg": 27.20861783302893,
+          "longitude_rate_deg_per_tt_day": 0.04883398446203536,
+          "direction": "increasing",
+          "bracket_jde_tt": [
+            2460401.990081883,
+            2460402.052581883
+          ]
+        },
+        {
+          "jde_tt": 2460402.8398750545,
+          "longitude_deg": 27.208617833015463,
+          "longitude_rate_deg_per_tt_day": -0.04837810180402206,
+          "direction": "decreasing",
+          "bracket_jde_tt": [
+            2460402.802581883,
+            2460402.865081883
+          ]
+        }
+      ]
+    },
+    {
+      "name": "sun_wrap_2025",
+      "moving_object": "sun",
+      "query_longitude_deg": 0,
+      "start_jde_tt": 2460749.5,
+      "end_jde_tt": 2460759.5,
+      "angular_tolerance_deg": 0.0002,
+      "hits": [
+        {
+          "jde_tt": 2460754.8768326333,
+          "longitude_deg": 2.3236171113968687e-10,
+          "longitude_rate_deg_per_tt_day": 0.9935077229836178,
+          "direction": "increasing",
+          "bracket_jde_tt": [
+            2460754.875,
+            2460754.9375
+          ]
+        }
+      ]
+    },
+    {
+      "name": "mean_ascending",
+      "moving_object": "mean_ascending_node",
+      "query_longitude_deg": 60,
+      "start_jde_tt": 2459215.5,
+      "end_jde_tt": 2459945.5,
+      "angular_tolerance_deg": 0.0002777777777777778,
+      "hits": [
+        {
+          "jde_tt": 2459571.636876734,
+          "longitude_deg": 60.00000000000468,
+          "longitude_rate_deg_per_tt_day": -0.05294447323933582,
+          "direction": "decreasing",
+          "bracket_jde_tt": [
+            2459571.625,
+            2459571.6875
+          ]
+        }
+      ]
+    },
+    {
+      "name": "mean_descending",
+      "moving_object": "mean_descending_node",
+      "query_longitude_deg": 240,
+      "start_jde_tt": 2459215.5,
+      "end_jde_tt": 2459945.5,
+      "angular_tolerance_deg": 0.0002777777777777778,
+      "hits": [
+        {
+          "jde_tt": 2459571.636876734,
+          "longitude_deg": 240.0000000000047,
+          "longitude_rate_deg_per_tt_day": -0.052944473225124966,
+          "direction": "decreasing",
+          "bracket_jde_tt": [
+            2459571.625,
+            2459571.6875
+          ]
+        }
+      ]
+    },
+    {
+      "name": "meeus_five_term_true_ascending",
+      "moving_object": "meeus_five_term_true_ascending_node",
+      "query_longitude_deg": 60,
+      "start_jde_tt": 2459215.5,
+      "end_jde_tt": 2459945.5,
+      "angular_tolerance_deg": 0.0002777777777777778,
+      "hits": [
+        {
+          "jde_tt": 2459597.846569203,
+          "longitude_deg": 60.00000000000167,
+          "longitude_rate_deg_per_tt_day": -0.16889682653697946,
+          "direction": "decreasing",
+          "bracket_jde_tt": [
+            2459597.8125,
+            2459597.875
+          ]
+        }
+      ]
+    },
+    {
+      "name": "meeus_five_term_true_descending",
+      "moving_object": "meeus_five_term_true_descending_node",
+      "query_longitude_deg": 240,
+      "start_jde_tt": 2459215.5,
+      "end_jde_tt": 2459945.5,
+      "angular_tolerance_deg": 0.0002777777777777778,
+      "hits": [
+        {
+          "jde_tt": 2459597.846569203,
+          "longitude_deg": 240.00000000000168,
+          "longitude_rate_deg_per_tt_day": -0.16889682653697946,
+          "direction": "decreasing",
+          "bracket_jde_tt": [
+            2459597.8125,
+            2459597.875
+          ]
+        }
+      ]
+    }
+  ]
+}

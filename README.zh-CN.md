@@ -19,15 +19,17 @@
 此外还提供：
 
 - 两张本命盘之间的[静态交叉相位](https://0xf3cd.github.io/astrology/docs/zh-CN/cross_aspects.html)，保留两张源盘并区分左右对象，不标入相／离相。
+- UTC 区间内的[精确行运命中](https://0xf3cd.github.io/astrology/docs/zh-CN/transits.html)，保留逆行造成的多次命中及原生速率、方向。
 - 用 `ashmand_sign_group(Sign.ARIES)` 查询十二星座在 Ashmand 1822 年版中的四组归属。见[来源及查询示例](https://0xf3cd.github.io/astrology/docs/zh-CN/knowledge.html#ashmand-sign-groups-zh-cn)。
 
 <a id="install-a-release-zh-cn"></a>
 
 ## 安装发行版
 
-本库依赖 celestial-calendar。它只发布 Linux x86_64 与 aarch64、
-macOS 14+ arm64、Windows amd64 的轮子，没有源码分发包。其他平台无法安装本包，
+当前源码依赖 celestial-calendar。它只发布 Linux x86_64 与 aarch64、
+macOS 15+ arm64、Windows amd64 的轮子，没有源码分发包。其他平台无法安装本包，
 连知识浏览也不可用。
+旧发行版的平台要求见[发行说明](https://0xf3cd.github.io/astrology/docs/zh-CN/releases.html)。
 
 分发包名是 `celestial-astrology`，Python 导入名仍是 `astrology`。
 请勿安装 PyPI 上另一个无关的 `astrology` 项目。
@@ -175,7 +177,7 @@ body.sun
 
 ## 后续方向
 
-- [技术与展示](https://github.com/0xf3cd/astrology/milestone/2)：行运与返照、关系盘、
+- [技术与展示](https://github.com/0xf3cd/astrology/milestone/2)：固定时刻行运、容许度窗口与返照、关系盘、
   流派规则、更多对象，以及星盘视图。
 - [进阶技术与历史研究](https://github.com/0xf3cd/astrology/milestone/3)：主限、推运、
   不确定出生时间、历史输入、空间落宫与有来源的解释知识。

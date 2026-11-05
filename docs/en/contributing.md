@@ -175,6 +175,18 @@ silent substitutions, and factories whose return type depends on hidden state.
 
 ## Correctness
 
+Transit fixtures in `tests/reference/transit_reference.json` use explicitly selected
+Moshier ephemeris calculations through `pyswisseph==2.10.3.2`, not Swiss/JPL data
+files. The optional generator `tools/fetch_transit_reference.py --output <path>`
+runs in a separate reference environment with that package, the project's locked
+dependencies, and the repository root and `src/` on `PYTHONPATH`. It requires
+celestial-calendar 1.1.1 for calibration, but its crossing expectations come from
+Moshier or the existing independent Meeus node formulas. This adds no runtime
+dependency. The fixture records 1,830 calibration samples over 2021–2022, per-body
+angular bounds, a rate-scaled time bound and later held-out cases. Compare counts,
+directions and angular residuals as well as event times; exact native tangencies
+and endpoint ownership have separate controlled/native tests.
+
 Test the domain boundary as well as representative values: non-finite numbers,
 time ambiguity, coordinate wrap, exact endpoints, missing information, and
 unsupported combinations. Public validation must still run under `python -O`.

@@ -162,7 +162,9 @@ def test_complete_constructed_geometry_table(
     recorded_chart,
     resolved=prepare_natal_input(record, fold=0),
     times=ChartTimes(2461135.1145838792, 2461135.115384074),
-    provenance=replace(recorded_chart.provenance, astrology_version="0.0.0"),
+    provenance=replace(
+      recorded_chart.provenance, astrology_version="0.0.0", celestial_version="1.0.0"
+    ),
   )
   chart = display_case(
     base,

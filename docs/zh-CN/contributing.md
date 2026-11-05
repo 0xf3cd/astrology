@@ -132,6 +132,14 @@ doctrees、缓存及其他构建控制文件不进入站点成品。检查所有
 
 ## 正确性
 
+`tests/reference/transit_reference.json` 的行运夹具通过 `pyswisseph==2.10.3.2` 显式选择
+Moshier 星历，不使用 Swiss/JPL 数据文件。可选生成器
+`tools/fetch_transit_reference.py --output <path>` 在单独参考环境中运行，需安装该包及项目的
+锁定依赖，并把仓根与 `src/` 加入 `PYTHONPATH`。校准使用 celestial-calendar 1.1.1，
+穿越期望则来自 Moshier 或已有的独立 Meeus 交点公式，不增加运行时依赖。夹具记录
+2021–2022 年的 1,830 个校准点、各天体角度界、按速率缩放的时间界及后取的新案例。
+除时刻外还比较次数、方向及角度残差；精确原生相切与端点归属另用受控或原生测试检查。
+
 除代表值外，还要测试领域边界：非有限数、时间歧义、坐标回绕、精确端点、缺失信息与不支持的组合。
 公开输入校验在 `python -O` 下也必须有效。
 

@@ -69,7 +69,7 @@ for structured results and bilingual text output.
 >>> chart.effective.evaluation
 'fixed_fourteen_object_joint_snapshot'
 >>> chart.provenance.celestial_version
-'1.0.0'
+'1.1.1'
 >>> chart.provenance.position_frame
 'apparent_geocentric_true_ecliptic_of_date'
 >>> chart.provenance.ut1_derivation

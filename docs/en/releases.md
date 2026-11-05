@@ -4,6 +4,21 @@
 
 ## Source changes since 0.3.0
 
+### Exact transit hits and UTC input
+
+[`transit_hits`](transits.md) searches an explicit modern UTC interval for exact
+moving-to-fixed-natal major aspects. `TransitHits` retains the source chart,
+selections, TT interval, effective models and every native hit's rate/direction,
+including retrograde repetitions and tangent contacts. No moving-side birth
+record or place is required. Fixed-instant transit charts, orb windows and
+returns remain outside this operation.
+
+The source pins celestial-calendar 1.1.1 for its released UTC conversion API.
+The macOS arm64 minimum rises from 14 to **15**; other platform minimums and
+Python 3.11–3.14 support are unchanged. Existing natal calculations and text
+formats are unchanged. Historical fixture/version labels retain their original
+meaning; the chart guide's current calculation now reports upstream 1.1.1.
+
 ### Dispositor chains and rulership ownership
 
 [`chart_dispositors(chart, objects=...)`](dignities.md#follow-dispositor-chains)

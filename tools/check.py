@@ -70,6 +70,7 @@ PACKAGE_FILES = (
   "astrology/objects.py",
   "astrology/summaries.py",
   "astrology/text.py",
+  "astrology/transits.py",
   "astrology/zodiac.py",
   "astrology/knowledge/__init__.py",
   "astrology/knowledge/records.py",

@@ -98,6 +98,17 @@ See [cross-chart aspects and house overlays](cross_aspects.md) for usage and the
    :member-order: bysource
 ```
 
+## Exact transit hits
+
+See [exact transit hits](transits.md) for a UTC-interval search and result fields.
+
+```{eval-rst}
+.. automodule:: astrology.transits
+   :members: TransitDirection, TransitDomainError, TransitSource, TransitHit, TransitHits, transit_hits
+   :undoc-members:
+   :member-order: bysource
+```
+
 ## Cross-chart house overlays
 
 See the [house-overlay example](cross_aspects.md#find-houses-in-the-other-chart)

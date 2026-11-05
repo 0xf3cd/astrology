@@ -33,7 +33,7 @@ True
 >>> catalog.filter_entries(concept_id="body.sun")[0].identifier
 'entry.body_requests'
 >>> len(catalog.filter_sources(verification=SourceVerification.VERIFIED))
-13
+14
 >>> print(catalog.entry("entry.cross_aspect_evaluation").statement.text("en"))
 Static major cross aspects compare two supplied natal results with distinct left/right endpoints and preserve both complete sources, without a motion field.
 >>> print(catalog.variant("rule.project.cusp_ownership").definition.text("en"))

@@ -79,6 +79,14 @@ from astrology.text import (
   format_lunar_phase,
   format_sign_distribution,
 )
+from astrology.transits import (
+  TransitDirection,
+  TransitDomainError,
+  TransitHit,
+  TransitHits,
+  TransitSource,
+  transit_hits,
+)
 from astrology.zodiac import (
   AshmandSignGroup,
   Element,
@@ -140,6 +148,11 @@ __all__ = [
   "Sign",
   "SignDistribution",
   "TimePrecision",
+  "TransitDirection",
+  "TransitDomainError",
+  "TransitHit",
+  "TransitHits",
+  "TransitSource",
   "ashmand_sign_group",
   "aspect_angle",
   "chart_dispositors",
@@ -167,5 +180,6 @@ __all__ = [
   "sign_distribution",
   "sign_of",
   "sign_ruler",
+  "transit_hits",
   "truncate_display",
 ]
