@@ -26,10 +26,10 @@
 
 ## 安装发行版
 
-当前源码依赖 celestial-calendar。它只发布 Linux x86_64 与 aarch64、
-macOS 15+ arm64、Windows amd64 的轮子，没有源码分发包。其他平台无法安装本包，
+依赖 celestial-calendar 只发布 Linux x86_64 与 aarch64、
+macOS arm64、Windows amd64 的轮子，没有源码分发包。其他平台无法安装本包，
 连知识浏览也不可用。
-旧发行版的平台要求见[发行说明](https://0xf3cd.github.io/astrology/docs/zh-CN/releases.html)。
+各发行版的最低操作系统版本见[发行说明](https://0xf3cd.github.io/astrology/docs/zh-CN/releases.html)。
 
 分发包名是 `celestial-astrology`，Python 导入名仍是 `astrology`。
 请勿安装 PyPI 上另一个无关的 `astrology` 项目。
@@ -59,6 +59,8 @@ py -3.14 -m venv .venv
 <a id="install-from-source-zh-cn"></a>
 
 ## 从源码安装
+
+当前源码在 macOS arm64 上要求 **15+**；上面列出的其他平台不变。
 
 若要安装文档对应的固定源码版本，使用[文档首页](https://0xf3cd.github.io/astrology/)标明提交号的快照安装命令。
 若已下载或克隆所需源码，则在其根目录运行以下命令。安装需要联网下载构建依赖和精确钉版的运行依赖。

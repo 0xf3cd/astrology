@@ -46,9 +46,10 @@ be exactly zero.
 
 To display a UTC date, import `jde_to_utc` from `celestial_calendar` and call
 `jde_to_utc(hit.jde_tt)`. It returns UTC civil fields (`year`, `month`, `day`,
-`fraction`), where `fraction` is the fraction of the UTC day. Retain `jde_tt` as the event
-time: the upstream conversion does not promise an exact inverse at leap seconds
-or the 1972 model boundary, and retains the last known offset after the last leap-second entry.
+`fraction`), where `fraction` is the elapsed fraction of that UTC day. Retain `jde_tt` as the event
+time: a UTC-to-TT-to-UTC round trip need not recover the original civil fields at
+leap seconds or the 1972 model boundary. After the last leap-second entry, the
+converter retains the last known offset.
 
 <!-- /usage: transits.hits -->
 
@@ -121,7 +122,9 @@ for the checks performed on caller-supplied results.
 
 The search interval is **half-open**, including its TT start and excluding its TT
 end. Its maximum duration is **3660 TT days**, and every selected moving source
-must admit the whole interval. This is separate from the natal snapshot's joint
+must admit the whole interval. The limit applies after UTC-to-TT conversion:
+leap-second changes can make a civil interval of 3660 days exceed the TT cap.
+This is separate from the natal snapshot's joint
 domain: selecting the Sun alone can search dates unavailable to Pluto. UTC
 conversion uses the upstream's fixed leap-second table, so its final offset is
 retained after the last entry; it does not predict future leap seconds. A known

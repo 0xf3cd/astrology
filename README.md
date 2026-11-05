@@ -32,11 +32,11 @@ The library also provides:
 
 ## Install a release
 
-This source revision depends on celestial-calendar, which publishes
-wheels for Linux x86_64 and aarch64, macOS 15+ arm64 and Windows amd64, and no source
+The celestial-calendar dependency publishes wheels for Linux x86_64 and aarch64,
+macOS arm64 and Windows amd64, and no source
 distribution. On any other platform this package cannot be installed, and
 knowledge browsing is not available either.
-Platform requirements for older published distributions are recorded in the
+Release-specific minimum operating-system versions are recorded in the
 [release notes](https://0xf3cd.github.io/astrology/docs/en/releases.html).
 
 `celestial-astrology` is the distribution name; the Python import is `astrology`.
@@ -66,6 +66,9 @@ requiring another version.
 See the [release notes](https://0xf3cd.github.io/astrology/docs/en/releases.html).
 
 ## Install from source
+
+This source checkout requires macOS **15+** on arm64; the other platforms listed
+above are unchanged.
 
 For the exact source
 revision used by the documentation, use the snapshot command on the
