@@ -8,13 +8,9 @@ from __future__ import annotations
 from collections.abc import Sequence
 from dataclasses import dataclass
 
+from astrology._comparison import _require_comparable_sources, _selection_for_chart
 from astrology.aspects import _geometry_values, _pair_geometry, aspect_angle
-from astrology.chart import (
-  NatalChart,
-  _aspect_positions,
-  _require_comparable_sources,
-  _selection_for_chart,
-)
+from astrology.chart import NatalChart, _aspect_positions
 from astrology.config import AspectRule, MajorAspect, OrbCombination
 from astrology.objects import ChartObject, _is_chart_object
 

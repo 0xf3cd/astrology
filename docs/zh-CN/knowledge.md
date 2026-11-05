@@ -25,11 +25,13 @@ True
 >>> catalog.concept("body.sun").configuration.name
 'SUN'
 >>> [rule.identifier for rule in catalog.list_variants(concept_id="body.sun")]
-['rule.lilly1647.essential_dignities']
+['rule.lilly1647.essential_dignities', 'rule.project.dispositor_chains']
+>>> [rule.identifier for rule in catalog.list_variants(concept_id="body.uranus")]
+['rule.project.dispositor_chains']
 >>> catalog.filter_entries(concept_id="body.sun")[0].identifier
 'entry.body_requests'
 >>> len(catalog.filter_sources(verification=SourceVerification.VERIFIED))
-10
+13
 >>> print(catalog.entry("entry.cross_aspect_evaluation").statement.text("zh-CN"))
 静态主要交叉相位比较两张给定本命盘结果，区分左右端点并保留双侧完整来源，不设运动字段。
 >>> print(catalog.variant("rule.project.cusp_ownership").definition.text("zh-CN"))
@@ -41,10 +43,11 @@ True
 
 同一个概念可以有多个名称，但只有一个标识。例如，`Sun`、`Sol` 和“日轮”都指向 `body.sun`。
 规则变体记录某套具体定义，例如采用哪种宫制或月交点算法；仅记录天体名称或交点方向时，不另建规则。
-上例用 `list_variants(concept_id="body.sun")` 查到 `rule.lilly1647.essential_dignities` 这条规则，
-这条规则说明太阳等星体在哪些星座入庙、擢升、失势或落陷，出处是 Lilly 的著作。
-例如，`list_variants(concept_id="body.uranus")` 返回空元组，表示目录中没有与天王星关联的规则。
-但用 `concept("body.uranus")` 或 `lookup("Uranus")` 仍能查到天王星的名称记录。
+上例查询太阳时得到两条规则。`rule.lilly1647.essential_dignities` 说明太阳等传统星体
+在哪些星座入庙、擢升、失势或落陷，出处是 Lilly 的著作。
+`rule.project.dispositor_chains` 定义沿传统星座守护关系遍历的路径，见[定位星示例](dignities.md#跟随定位星链)。
+天王星只关联定位星链规则，因为它可以作为路径起点，但不作四种状态判断。
+用 `concept("body.uranus")` 或 `lookup("Uranus")` 可读取其名称记录。
 
 <!-- /usage: knowledge.lookup -->
 

@@ -1,6 +1,7 @@
 """Knowledge identity, isolation and editorial boundaries. 知识身份、隔离与整理边界。"""
 
 import json
+import re
 import subprocess
 import sys
 from dataclasses import FrozenInstanceError, replace
@@ -76,7 +77,8 @@ def test_query_contracts(catalog: Catalog) -> None:
     "rule.ptolemy_ashmand.sign_groups",
   ]
   assert [v.identifier for v in catalog.list_variants(concept_id="body.sun")] == [
-    "rule.lilly1647.essential_dignities"
+    "rule.lilly1647.essential_dignities",
+    "rule.project.dispositor_chains",
   ]
   vocabulary = catalog.entry("entry.sign_vocabulary")
   assert "rule.ptolemy_ashmand.sign_groups" in vocabulary.rule_ids
@@ -119,6 +121,7 @@ def test_query_contracts(catalog: Catalog) -> None:
     "entry.sign_modalities",
     "entry.lunation_types",
     "entry.essential_dignities",
+    "entry.dispositor_chains",
   }
   assert all(
     entry.prerequisite_status is PrerequisiteStatus.UNRESOLVED
@@ -585,11 +588,15 @@ def test_retired_identity_variants_keep_their_concepts(catalog: Catalog, identif
   concept = catalog.concept(concept_id)
   assert concept.configuration is not None
   assert catalog.lookup(concept.name.en) == (concept,)
-  assert tuple(v.identifier for v in catalog.list_variants(concept_id=concept_id)) == (
+  expected = (
     ("rule.lilly1647.essential_dignities",)
     if concept.configuration
     in (Body.SUN, Body.MOON, Body.MERCURY, Body.VENUS, Body.MARS, Body.JUPITER, Body.SATURN)
     else ()
+  )
+  assert tuple(v.identifier for v in catalog.list_variants(concept_id=concept_id)) == (
+    *expected,
+    "rule.project.dispositor_chains",
   )
   assert catalog.filter_entries(concept_id=concept_id)[0].rule_ids == ()
   entry = catalog.filter_entries(concept_id=concept_id)[0]
@@ -635,6 +642,7 @@ def test_retained_rule_ids_and_order(catalog: Catalog) -> None:
     "rule.project.orb_mean_of_orbs",
     "rule.project.cross_aspect_evaluation",
     "rule.project.cross_house_overlays",
+    "rule.project.dispositor_chains",
   ]
   for identifier, configuration in expected:
     variant = catalog.variant(identifier)
@@ -643,7 +651,7 @@ def test_retained_rule_ids_and_order(catalog: Catalog) -> None:
     assert variant.definition != concept.description
     assert variant.configuration is configuration
     if isinstance(configuration, (HouseSystem, NodeDefinition)):
-      assert "orb" not in variant.limits.en.lower()
+      assert re.search(r"\borbs?\b", variant.limits.en, re.IGNORECASE) is None
 
 
 def test_cross_policy_is_independently_retrievable_without_chart_applicability(

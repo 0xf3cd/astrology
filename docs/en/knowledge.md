@@ -27,11 +27,13 @@ True
 >>> catalog.concept("body.sun").configuration.name
 'SUN'
 >>> [rule.identifier for rule in catalog.list_variants(concept_id="body.sun")]
-['rule.lilly1647.essential_dignities']
+['rule.lilly1647.essential_dignities', 'rule.project.dispositor_chains']
+>>> [rule.identifier for rule in catalog.list_variants(concept_id="body.uranus")]
+['rule.project.dispositor_chains']
 >>> catalog.filter_entries(concept_id="body.sun")[0].identifier
 'entry.body_requests'
 >>> len(catalog.filter_sources(verification=SourceVerification.VERIFIED))
-10
+13
 >>> print(catalog.entry("entry.cross_aspect_evaluation").statement.text("en"))
 Static major cross aspects compare two supplied natal results with distinct left/right endpoints and preserve both complete sources, without a motion field.
 >>> print(catalog.variant("rule.project.cusp_ownership").definition.text("en"))
@@ -45,12 +47,13 @@ print those texts in English; use `"zh-CN"` for Chinese.
 Several names can identify one concept: `Sun`, `Sol` and `日轮` all refer to
 `body.sun`. A rule variant records a particular definition, such as a house
 system or lunar-node algorithm. A record that only names a body or a node direction
-does not need a separate rule. Above, `list_variants(concept_id="body.sun")` finds
-the rule `rule.lilly1647.essential_dignities`. This rule records the signs of domicile,
-exaltation, detriment and fall for the Sun and other classical planets, citing Lilly's work.
-For example, `list_variants(concept_id="body.uranus")` returns an empty tuple:
-the catalog has no rule linked to Uranus. You can still retrieve its name record
-with `concept("body.uranus")` or `lookup("Uranus")`.
+does not need a separate rule. Above, the Sun lookup finds two rules.
+`rule.lilly1647.essential_dignities` records the signs of domicile, exaltation,
+detriment and fall for the Sun and other classical planets, citing Lilly's work.
+`rule.project.dispositor_chains` defines paths following traditional sign rulers;
+see the [dispositor example](dignities.md#follow-dispositor-chains).
+Uranus links only the chain rule, since it can start a path but has no four-status
+assessment. Retrieve its name record with `concept("body.uranus")` or `lookup("Uranus")`.
 
 <!-- /usage: knowledge.lookup -->
 

@@ -129,7 +129,7 @@
 
 ```{eval-rst}
 .. automodule:: astrology.summaries
-   :members: SignDistribution, sign_distribution, chart_sign_distribution, natal_lunar_phase, HouseRuler, HouseRulers
+   :members: SignDistribution, sign_distribution, chart_sign_distribution, natal_lunar_phase
    :undoc-members:
    :member-order: bysource
    :no-index:
@@ -137,11 +137,11 @@
 
 ## 传统守护与本质尊贵
 
-具名来源、同时命中和缺失落点见[尊贵指南](dignities.md)。
+星座查询、宫主星及定位星链见[尊贵指南](dignities.md)。
 
 ```{eval-rst}
 .. automodule:: astrology.dignities
-   :members: DignityStatus, sign_ruler, essential_dignities
+   :members: DignityStatus, sign_ruler, essential_dignities, HouseRuler, HouseRulers, Dispositors, chart_dispositors
    :undoc-members:
    :member-order: bysource
    :no-index:

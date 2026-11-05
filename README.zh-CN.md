@@ -11,7 +11,7 @@
 [API 参考](https://0xf3cd.github.io/astrology/docs/zh-CN/reference.html)。
 
 功能包括[元素／模式分布与出生月相](https://0xf3cd.github.io/astrology/docs/zh-CN/summaries.html)、
-[传统星座守护与四种状态](https://0xf3cd.github.io/astrology/docs/zh-CN/dignities.html)，
+[传统星座守护、四种状态与定位星链](https://0xf3cd.github.io/astrology/docs/zh-CN/dignities.html)，
 本命及静态双盘查询的[显式选四轴参与相位](https://0xf3cd.github.io/astrology/docs/zh-CN/aspects.html#axis-aspects-zh-cn)，
 以及[双盘落宫和双语比较文本](https://0xf3cd.github.io/astrology/docs/zh-CN/cross_aspects.html)。
 四轴（上升点、中天、下降点、天底）只有被显式选择后才参与相位。

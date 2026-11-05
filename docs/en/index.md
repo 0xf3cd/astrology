@@ -12,7 +12,7 @@ task you need:
 | Calculate and read a chart | [Natal charts](chart.md) and [results/text](records.md) |
 | Compare two charts | [Cross-chart aspects and house overlays](cross_aspects.md) |
 | Count elements/modalities or classify lunar phase | [Sign distributions and natal lunar phase](summaries.md) |
-| Query traditional sign rulers and dignity statuses | [Traditional rulers and four statuses](dignities.md) |
+| Query traditional rulers, dignity statuses and dispositor chains | [Rulership and dignities](dignities.md) |
 | Look up names, rules and sources without a chart | [Knowledge queries](knowledge.md) and [catalog](catalog.md) |
 
 [API reference](reference.md) gives type/function contracts. [Architecture](architecture.md)

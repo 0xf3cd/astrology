@@ -52,6 +52,7 @@ from tools.release_documents import (
 
 ROOT = Path(__file__).resolve().parents[1]
 PACKAGE_FILES = (
+  "astrology/_comparison.py",
   "astrology/__init__.py",
   "astrology/_distribution.py",
   "astrology/_validation.py",

@@ -38,6 +38,7 @@ owning boundary. Avoid global mutable configuration and silent substitutions.
 Definitions belong to their domain; entry points compose them. Add shared
 abstractions only for concrete callers. Names and types carry meaning; comments
 explain reasons or constraints. Public input checks must work under `python -O`.
+Import private names across modules from their semantic owner for actual shared callers; keep consumer-specific policy with its consumer.
 
 Python 3.11–3.14 is supported. Use `uv sync --locked`, then
 `uv run --locked python tools/check.py` for the same checks as CI. Configuration

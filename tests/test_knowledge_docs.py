@@ -490,3 +490,35 @@ def test_generated_aspect_angles_come_from_executable_rules() -> None:
     rendered = render_catalog(load_catalog(), language, "0")
     for angle in (0, 60, 90, 120, 180):
       assert f"Exact angle / 精确角度：{angle}°" in rendered
+
+
+@pytest.mark.parametrize(
+  "defect", ["rule_root", "entry_root", "entry_rule", "source", "configuration"]
+)
+def test_dispositor_catalog_links_cannot_drift_from_the_domain(defect: str) -> None:
+  from astrology import HouseSystem
+
+  catalog = load_catalog()
+  rule = catalog.variant("rule.project.dispositor_chains")
+  entry = catalog.entry("entry.dispositor_chains")
+  if defect == "rule_root":
+    rule = replace(rule, concept_ids=rule.concept_ids[1:])
+  elif defect == "configuration":
+    rule = replace(
+      rule,
+      concept_ids=(*rule.concept_ids, "house.equal"),
+      configuration=HouseSystem.EQUAL,
+    )
+  elif defect == "entry_root":
+    entry = replace(entry, concept_ids=entry.concept_ids[:-1])
+  elif defect == "entry_rule":
+    entry = replace(entry, rule_ids=("rule.lilly1647.essential_dignities",))
+  else:
+    entry = replace(entry, citations=(catalog.entry("entry.node_definitions").citations[0],))
+  changed = replace(
+    catalog,
+    variants=tuple(rule if r.identifier == rule.identifier else r for r in catalog.variants),
+    entries=tuple(entry if e.identifier == entry.identifier else e for e in catalog.entries),
+  )
+  with pytest.raises(ValueError, match=r"rule-bearing configuration|dispositor"):
+    check_catalog_data(changed)

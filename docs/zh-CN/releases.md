@@ -4,6 +4,20 @@
 
 ## 0.3.0 之后的源码变化
 
+### 定位星链与守护关系归属
+
+[`chart_dispositors(chart, objects=...)`](dignities.md#跟随定位星链)
+返回不可变的 `Dispositors`，包含守护边、各选定根的路径、已到达的循环及最终定位星，
+以及缺失的后继守护星。使用不变的 Lilly 传统星座守护表；遍历由项目定义，不提供评分或解读。
+
+`HouseRuler` 和 `HouseRulers` 从 `astrology.summaries` 移至 `astrology.dignities`。
+直接从模块导入的代码须更新路径，旧模块不留别名。
+包根导入（`from astrology import HouseRulers`）仍有效。
+这是一次 0.x 源码路径兼容性变化；命盘计算、尊贵归属及已有文本输出不变。
+
+知识目录记录已核的 Meeus 交点项、相位及宫制的外部定义、修正后的 Lilly 扫描定位，
+以及原件保留或访问限度。来源核查不改变命盘适用性或默认输出资格；模型选择、容许度及数值算法不变。
+
 ### 不兼容变化：删除目录版本
 
 源码 API 删除 `Catalog.version` 及其构造参数。自定义目录改用

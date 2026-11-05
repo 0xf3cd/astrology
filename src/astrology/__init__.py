@@ -47,7 +47,15 @@ from astrology.config import (
   OrbCombination,
 )
 from astrology.cross_aspects import CrossAspectHit, CrossChartAspects, cross_chart_aspects
-from astrology.dignities import DignityStatus, essential_dignities, sign_ruler
+from astrology.dignities import (
+  DignityStatus,
+  Dispositors,
+  HouseRuler,
+  HouseRulers,
+  chart_dispositors,
+  essential_dignities,
+  sign_ruler,
+)
 from astrology.house_overlays import (
   CrossChartHouseOverlays,
   HouseOverlay,
@@ -58,8 +66,6 @@ from astrology.knowledge import Catalog, load_catalog
 from astrology.lunar_phase import LunarPhaseResult, LunationType, lunar_phase
 from astrology.objects import Axis
 from astrology.summaries import (
-  HouseRuler,
-  HouseRulers,
   SignDistribution,
   chart_sign_distribution,
   natal_lunar_phase,
@@ -106,6 +112,7 @@ __all__ = [
   "CrossChartAspects",
   "CrossChartHouseOverlays",
   "DignityStatus",
+  "Dispositors",
   "EclipticPosition",
   "EffectiveConfiguration",
   "Element",
@@ -135,6 +142,7 @@ __all__ = [
   "TimePrecision",
   "ashmand_sign_group",
   "aspect_angle",
+  "chart_dispositors",
   "chart_sign_distribution",
   "cross_chart_aspects",
   "cross_chart_house_overlays",
