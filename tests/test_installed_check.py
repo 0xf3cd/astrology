@@ -453,7 +453,7 @@ def test_cli_reads_flags_after_the_package_version(
     assert "Installed knowledge corpus" in capsys.readouterr().out
   else:
     message = (
-      "Installed chart differs"
+      "Installed calculation differs"
       if flag == "--expected-observations"
       else "comparison observations differ"
     )

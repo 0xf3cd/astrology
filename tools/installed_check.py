@@ -389,7 +389,7 @@ def _check_natal_chart(expected_observations: Path | None = None) -> None:
   if expected_observations is not None and calculation_observations(
     chart, transits
   ) != expected_observations.read_text(encoding="utf-8"):
-    raise ValueError("Installed chart differs from the development entry point")
+    raise ValueError("Installed calculation differs from the development entry point")
 
 
 def check_missing_metadata() -> None:

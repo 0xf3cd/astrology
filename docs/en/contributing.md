@@ -43,7 +43,7 @@ The installed-package check verifies distribution identity, module origins and
 Imports must not initialize native astronomy. Knowledge queries and supplied-chart
 comparisons must not initialize astronomy or time data; the knowledge-only mode
 also rejects `ctypes` modules.
-It compares complete natal and cross-chart observations, including input,
+It compares complete natal, transit and cross-chart observations, including input,
 configuration, provenance and bilingual comparison text, with same-revision source
 results saved in JSON observation files. Chart provenance versions must match installed metadata.
 Knowledge resource location, loading, name lookup and citation access are exercised
