@@ -242,11 +242,12 @@ def test_installed_comparison_keeps_raw_values_and_metadata(
   consumer: Path, monkeypatch: pytest.MonkeyPatch, field: str, changed: bool
 ) -> None:
   expected = consumer.parent / "expected-observations.json"
-  original = installed_check.chart_observations
+  original = installed_check.calculation_observations
 
-  def observe(chart: astrology.NatalChart) -> str:
-    packed = original(chart)
-    values = json.loads(packed)
+  def observe(chart: astrology.NatalChart, transits: astrology.TransitHits) -> str:
+    packed = original(chart, transits)
+    envelope = json.loads(packed)
+    values = envelope["chart"]
     assert set(values) == {field.name for field in fields(chart)}
     for name in ("resolved", "requested", "effective", "provenance"):
       assert values[name] == repr(getattr(chart, name))
@@ -271,15 +272,45 @@ def test_installed_comparison_keeps_raw_values_and_metadata(
         )
       else:
         values[field] = "different"
-    expected.write_text(json.dumps(values, sort_keys=True, allow_nan=False), encoding="utf-8")
+    expected.write_text(json.dumps(envelope, sort_keys=True, allow_nan=False), encoding="utf-8")
     return packed
 
-  monkeypatch.setattr(installed_check, "chart_observations", observe)
+  monkeypatch.setattr(installed_check, "calculation_observations", observe)
   if changed:
     with pytest.raises(ValueError, match="differs from the development"):
       installed_check.main(version("celestial-astrology"), expected_observations=expected)
   else:
     installed_check.main(version("celestial-astrology"), expected_observations=expected)
+
+
+@pytest.mark.parametrize("changed", [False, True])
+def test_installed_consumer_executes_and_compares_transit_values(
+  consumer: Path,
+  monkeypatch: pytest.MonkeyPatch,
+  changed: bool,
+) -> None:
+  expected = consumer.parent / "expected-calculations.json"
+  original = installed_check.calculation_observations
+  calls: list[astrology.TransitHits] = []
+
+  def observe(chart: astrology.NatalChart, transits: astrology.TransitHits) -> str:
+    calls.append(transits)
+    packed = original(chart, transits)
+    values = json.loads(packed)
+    assert values["transits"] == repr(transits)
+    assert transits.chart is chart
+    if changed:
+      values["transits"] = "different transit observations"
+    expected.write_text(json.dumps(values, sort_keys=True, allow_nan=False), encoding="utf-8")
+    return packed
+
+  monkeypatch.setattr(installed_check, "calculation_observations", observe)
+  if changed:
+    with pytest.raises(ValueError, match="differs from the development"):
+      installed_check.main(version("celestial-astrology"), expected_observations=expected)
+  else:
+    installed_check.main(version("celestial-astrology"), expected_observations=expected)
+  assert len(calls) == 1 and calls[0].hits
 
 
 def test_raw_observations_distinguish_identical_text(recorded_chart: astrology.NatalChart) -> None:

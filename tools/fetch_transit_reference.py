@@ -214,6 +214,9 @@ def _generate(swe: _Swiss) -> dict[str, object]:
       "time_scale": "TT",
       "manual": "https://www.astro.com/swisseph/swephprg.htm",
       "node_reference": "tests.test_reference._meeus_nodes: Meeus ch.47 plus ch.22 low-accuracy nutation",
+      "node_reference_sha256": hashlib.sha256(
+        (Path(__file__).parents[1] / "tests/test_reference.py").read_bytes()
+      ).hexdigest(),
       "recipe_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
     },
     "calibration": calibration,

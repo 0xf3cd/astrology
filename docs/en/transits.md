@@ -54,7 +54,8 @@ an exact contact with the queried level and does not promise a bitwise-zero rate
   Ascendant, Midheaven, Descendant and Imum Coeli. Axes use their own stored fields.
 - `aspects` selects `MajorAspect` identities, not `AspectRule` orbs. Nothing is
   inherited from the natal chart's aspect rules. Each selection must be nonempty
-  and duplicate-free; unavailable natal objects are rejected.
+  and duplicate-free; unavailable natal objects are rejected. Retained aspects
+  are normalized to ascending angle order.
 
 For example, `natal_objects=(Axis.ASCENDANT,)` searches the source chart's stored
 Ascendant degree instead of its Sun. Import `Axis` from `astrology`. A natal
@@ -66,6 +67,10 @@ that query; `hit.longitude_deg` preserves the raw event longitude, including the
 opposite side of a 360° cut and small numerical residuals. It need not equal the
 queried level bit for bit. See the {ref}`rule and coordinate limits
 <catalog-en-rule-project-exact-transit-hits>` for the own-date longitude convention.
+
+Each moving object, natal target and oriented aspect branch requires a separate
+upstream interval scan. Start with the selections you need; expanding all three
+selections multiplies the work.
 
 ## Read and retain the result
 
@@ -83,7 +88,9 @@ True
 `start_jde_tt` and `end_jde_tt` retain the converted search interval. Each
 `TransitSource` identifies the effective moving model, its event-domain bounds,
 maximum span and upstream descriptions. The result also retains the astrology
-version and explicit time, position-frame and epoch policies.
+version and explicit time, position-frame and epoch policies. These versions
+describe the current transit calculation; `result.chart.provenance` describes
+the original natal calculation and may record different versions.
 
 Hits are sorted by TT time, moving selection order, natal source order, ascending
 aspect angle and then negative before positive branch. Different identities at

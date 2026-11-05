@@ -27,7 +27,7 @@ src/astrology/
   houses.py         House-placement rules over supplied geometry
   aspects.py        Aspect definitions, orbs, and local motion
   chart.py          Composition and immutable chart results
-  _comparison.py    Shared coordinate and selection checks for comparisons
+  _comparison.py    Source compatibility and stored-chart object selection
   cross_aspects.py  Static comparison of supplied charts, retaining both sources
   transits.py       Exact moving-to-fixed-natal interval events
   house_overlays.py Directional house placement between supplied charts

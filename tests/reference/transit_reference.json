@@ -10,7 +10,8 @@
     "time_scale": "TT",
     "manual": "https://www.astro.com/swisseph/swephprg.htm",
     "node_reference": "tests.test_reference._meeus_nodes: Meeus ch.47 plus ch.22 low-accuracy nutation",
-    "recipe_sha256": "e8c94f9cbb22f7041b34c48266661378ae609929b9b776f48e6c684574120c98"
+    "node_reference_sha256": "5a68f341f176b15401b9be7f58203b14f5b1e92401e367ca641e6a22d931bfe0",
+    "recipe_sha256": "cedc67c1dd0e6dc2b80d6cde349a9da917bba495c77cda650ac41c57b1ad8caa"
   },
   "calibration": {
     "native_version": "1.1.1",

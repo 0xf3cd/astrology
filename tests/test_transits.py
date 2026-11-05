@@ -58,11 +58,12 @@ def _search(chart: NatalChart | None = None, **overrides: Any) -> TransitHits:
 @pytest.fixture
 def controlled_events(monkeypatch: pytest.MonkeyPatch) -> list[tuple[AstronomicalObject, float]]:
   calls: list[tuple[AstronomicalObject, float]] = []
+  identities = {adapter._target(identity): identity for identity in (*Body, *LunarNode)}
 
   def events(
-    identity: AstronomicalObject, level: float, start: float, end: float
+    target: native.Target, level: float, start: float, end: float
   ) -> tuple[native.LongitudeEvent, ...]:
-    calls.append((identity, level))
+    calls.append((identities[target], level))
     return (
       native.LongitudeEvent(
         start + 1,
@@ -75,7 +76,7 @@ def controlled_events(monkeypatch: pytest.MonkeyPatch) -> list[tuple[Astronomica
       ),
     )
 
-  monkeypatch.setattr(adapter, "transit_events", events)
+  monkeypatch.setattr(native, "longitude_events", events)
   return calls
 
 
@@ -292,6 +293,10 @@ def test_sources_and_input_sequences_are_isolated_without_native_recomputation(
     ("epoch_policy", "j2000"),
     ("celestial_version", ""),
     ("sources", ()),
+    ("moving_objects", ()),
+    ("moving_objects", (Axis.ASCENDANT,)),
+    ("aspects", ()),
+    ("aspects", ("conjunction",)),
   ],
 )
 def test_aggregate_tampering(
@@ -317,6 +322,7 @@ def test_interval_membership_query_geometry_and_order_are_checked(
     replace(first, query_longitude_deg=11),
     replace(first, moving_object=Body.PLUTO),
     replace(first, natal_object=Axis.ASCENDANT),
+    replace(first, aspect=MajorAspect.TRINE, branch_deg=120, query_longitude_deg=130),
   ):
     with pytest.raises(ValueError):
       replace(result, hits=(changed,))
@@ -328,6 +334,18 @@ def test_interval_membership_query_geometry_and_order_are_checked(
   )
 
 
+def test_source_identities_and_order_must_match_the_moving_selection(
+  controlled_events: list[tuple[AstronomicalObject, float]],
+) -> None:
+  result = _search(moving_objects=(Body.SUN, Body.MERCURY))
+  with pytest.raises(ValueError, match="sources must match"):
+    replace(result, sources=tuple(reversed(result.sources)))
+  with pytest.raises(ValueError, match="sources must match"):
+    replace(
+      result, sources=(replace(result.sources[0], moving_object=Body.MARS), result.sources[1])
+    )
+
+
 @pytest.mark.parametrize(
   "field,value",
   [
@@ -337,6 +355,8 @@ def test_interval_membership_query_geometry_and_order_are_checked(
     ("branch_deg", 180),
     ("query_longitude_deg", 360),
     ("direction", "tangent"),
+    ("moving_object", Axis.ASCENDANT),
+    ("natal_object", "sun"),
   ],
 )
 def test_hit_tampering(
@@ -354,6 +374,8 @@ def test_real_selected_domains_and_tt_span_policy() -> None:
     "end_utc": datetime(2200, 2, 1, tzinfo=UTC),
   }
   assert len(_search(**future).hits) <= 1
+  inclusive = _search(end_utc=START + timedelta(days=3660))
+  assert inclusive.end_jde_tt - inclusive.start_jde_tt == inclusive.sources[0].maximum_span_tt_days
   with pytest.raises(TransitDomainError, match="domain"):
     _search(moving_objects=(Body.SUN, Body.PLUTO), **future)
   with pytest.raises(TransitDomainError, match="3660"):
@@ -461,6 +483,42 @@ def test_reference_provenance_and_recipe_are_pinned() -> None:
   recipe = Path(__file__).parents[1] / "tools" / "fetch_transit_reference.py"
   assert hashlib.sha256(recipe.read_bytes()).hexdigest() == fixture["source"]["recipe_sha256"]
   assert len(fixture["cases"]) == 17
+  node_reference = Path(__file__).with_name("test_reference.py")
+  assert (
+    hashlib.sha256(node_reference.read_bytes()).hexdigest()
+    == fixture["source"]["node_reference_sha256"]
+  )
+
+
+def test_stored_node_and_axis_degrees_stay_fixed(
+  controlled_events: list[tuple[AstronomicalObject, float]],
+) -> None:
+  chart = _cross_source(
+    2000,
+    "distinct-fixed-targets",
+    ((Body.SUN, 10), (LunarNode.MEAN_ASCENDING, 44.5)),
+    axes=(100, 110, 120, 130),
+  )
+  result = _search(chart, natal_objects=(Axis.ASCENDANT, LunarNode.MEAN_ASCENDING))
+  assert controlled_events == [(Body.SUN, 44.5), (Body.SUN, 100)]
+  assert chart.positions[1].longitude_rate_deg_per_tt_day != 0
+  assert {hit.query_longitude_deg for hit in result.hits} == {44.5, 100}
+
+
+def test_transit_versions_describe_the_new_calculation_not_the_natal_source(
+  controlled_events: list[tuple[AstronomicalObject, float]],
+) -> None:
+  chart = _chart()
+  chart = replace(
+    chart,
+    provenance=replace(
+      chart.provenance, celestial_version="earlier-native", astrology_version="earlier-package"
+    ),
+  )
+  result = _search(chart)
+  assert result.chart is chart
+  assert result.celestial_version == "1.1.1" != chart.provenance.celestial_version
+  assert result.astrology_version != chart.provenance.astrology_version
 
 
 @pytest.mark.parametrize("mode", [(), ("-O",)])

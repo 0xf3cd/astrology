@@ -9,13 +9,14 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime, timezone
 from enum import StrEnum
+from typing import Final, Literal, get_args
 
 from astrology._comparison import _selection_for_chart
 from astrology._distribution import installed_version
 from astrology._validation import finite_number
 from astrology.aspects import _branches, aspect_angle
 from astrology.birth import _require_modern_utc
-from astrology.chart import _POSITION_FRAME, NatalChart, _selected_longitudes
+from astrology.chart import _POSITION_FRAME, NatalChart, _PositionFrame, _selected_longitudes
 from astrology.config import MajorAspect
 from astrology.objects import (
   AstronomicalObject,
@@ -26,8 +27,10 @@ from astrology.objects import (
   _is_chart_object,
 )
 
-_TIME_POLICY = "modern_utc_frozen_leap_offsets"
-_EPOCH_POLICY = "fixed_natal_degree_against_moving_of_date_longitude"
+_TimePolicy = Literal["modern_utc_frozen_leap_offsets"]
+_EpochPolicy = Literal["fixed_natal_degree_against_moving_of_date_longitude"]
+_TIME_POLICY: Final[_TimePolicy] = get_args(_TimePolicy)[0]
+_EPOCH_POLICY: Final[_EpochPolicy] = get_args(_EpochPolicy)[0]
 
 
 class TransitDirection(StrEnum):
@@ -39,6 +42,16 @@ class TransitDirection(StrEnum):
   INCREASING = "increasing"
   DECREASING = "decreasing"
   TANGENT = "tangent"
+
+
+@dataclass(frozen=True, slots=True)
+class _TransitEvent:
+  """Adapter-copied event values without query identity. 由适配层复制、不含查询身份的事件值。"""
+
+  jde_tt: float
+  longitude_deg: float
+  longitude_rate_deg_per_tt_day: float
+  direction: TransitDirection
 
 
 class TransitDomainError(ValueError):
@@ -112,12 +125,12 @@ def _text(value: str, name: str) -> None:
 
 @dataclass(frozen=True, slots=True)
 class TransitSource:
-  """One moving object's effective model and operation-specific event window.
+  """One moving object's effective model and bounded event window.
 
   Bounds and maximum span are in JDE(TT) and TT days. Descriptions are copied from
   the upstream; these implementation windows are not astronomical accuracy bounds.
 
-  一个移动对象实际使用的模型及事件求值窗口。端点为 JDE(TT)，最长区间以 TT 日计。
+  一个移动对象实际使用的模型及有界事件求值窗口。端点为 JDE(TT)，最长区间以 TT 日计。
   说明文字复制自上游；实现求值窗口不是天文精度界。
   """
 
@@ -212,9 +225,9 @@ class TransitHits:
   hits: tuple[TransitHit, ...]
   celestial_version: str
   astrology_version: str
-  position_frame: str = _POSITION_FRAME
-  time_policy: str = _TIME_POLICY
-  epoch_policy: str = _EPOCH_POLICY
+  position_frame: _PositionFrame = _POSITION_FRAME
+  time_policy: _TimePolicy = _TIME_POLICY
+  epoch_policy: _EpochPolicy = _EPOCH_POLICY
 
   def __post_init__(self) -> None:
     if type(self.chart) is not NatalChart:
@@ -349,36 +362,38 @@ def transit_hits(
 
   start_tt, end_tt = transit_interval(start, end)
   sources = tuple(transit_source(identity) for identity in moving)
-  hits = tuple(
-    TransitHit(
-      identity,
-      natal_object,
-      aspect,
-      branch,
-      level,
-      event.jde_tt,
-      event.longitude_deg,
-      event.longitude_rate_deg_per_tt_day,
-      TransitDirection(event.direction.value),
-    )
-    for identity in moving
-    for natal_object, longitude in _selected_longitudes(chart.positions, chart.houses, natal)
-    for aspect in selected_aspects
-    for branch in _branches(aspect_angle(aspect))
-    for level in ((longitude + branch) % 360,)
-    for event in transit_events(identity, level, start_tt, end_tt)
-  )
+  natal_longitudes = _selected_longitudes(chart.positions, chart.houses, natal)
+  hits = []
+  for identity in moving:
+    for natal_object, longitude in natal_longitudes:
+      for aspect in selected_aspects:
+        for branch in _branches(aspect_angle(aspect)):
+          level = (longitude + branch) % 360
+          for event in transit_events(identity, level, start_tt, end_tt):
+            hits.append(
+              TransitHit(
+                identity,
+                natal_object,
+                aspect,
+                branch,
+                level,
+                event.jde_tt,
+                event.longitude_deg,
+                event.longitude_rate_deg_per_tt_day,
+                event.direction,
+              )
+            )
   return TransitHits(
-    chart,
-    start,
-    end,
-    start_tt,
-    end_tt,
-    moving,
-    natal,
-    selected_aspects,
-    sources,
-    _ordered(hits, moving, natal),
-    celestial_version(),
-    installed_version(),
+    chart=chart,
+    start_utc=start,
+    end_utc=end,
+    start_jde_tt=start_tt,
+    end_jde_tt=end_tt,
+    moving_objects=moving,
+    natal_objects=natal,
+    aspects=selected_aspects,
+    sources=sources,
+    hits=_ordered(hits, moving, natal),
+    celestial_version=celestial_version(),
+    astrology_version=installed_version(),
   )

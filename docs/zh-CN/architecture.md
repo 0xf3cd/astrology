@@ -23,7 +23,7 @@ src/astrology/
   houses.py         基于给定宫位几何的落宫规则
   aspects.py        相位定义、容许度与局部运动
   chart.py          组合与不可变命盘结果
-  _comparison.py    双盘比较共用的坐标及选择检查
+  _comparison.py    来源兼容性与已存命盘对象选择
   cross_aspects.py  静态比较给定命盘，保留双侧来源
   transits.py       移动对固定本命的精确区间事件
   house_overlays.py 给定命盘之间的双向落宫

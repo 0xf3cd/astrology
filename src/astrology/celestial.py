@@ -1,6 +1,10 @@
 """Concrete celestial-calendar calls for natal snapshots and transit event searches.
 
+Copy native records into chart/transit domain values. Calculation entries import
+this adapter lazily; importing the public value types does not load it.
+
 为本命快照与行运事件搜索提供 celestial-calendar 的具体调用。
+将原生记录复制为命盘或行运领域值；计算入口延迟导入本层，导入公开值类型不会加载它。
 """
 
 from __future__ import annotations
@@ -14,7 +18,7 @@ from astrology.birth import Location, MissingBirthDataError, ResolvedBirth
 from astrology.chart import ChartDomainError, ChartHouses, ChartTimes, EclipticPosition
 from astrology.config import ChartConfig, HouseSystem
 from astrology.objects import AstronomicalObject, Body, LunarNode, _is_astronomical_object
-from astrology.transits import TransitDomainError, TransitSource
+from astrology.transits import TransitDirection, TransitDomainError, TransitSource, _TransitEvent
 
 _BODY_TARGETS: dict[Body, Target] = {
   Body.SUN: Target.SUN,
@@ -43,6 +47,12 @@ _HOUSE_SYSTEMS: dict[HouseSystem, celestial.HouseSystem] = {
   HouseSystem.WHOLE_SIGN: celestial.HouseSystem.WHOLE_SIGN,
   HouseSystem.EQUAL: celestial.HouseSystem.EQUAL,
   HouseSystem.PLACIDUS: celestial.HouseSystem.PLACIDUS,
+}
+
+_EVENT_DIRECTIONS: dict[celestial.EventDirection, TransitDirection] = {
+  celestial.EventDirection.INCREASING: TransitDirection.INCREASING,
+  celestial.EventDirection.DECREASING: TransitDirection.DECREASING,
+  celestial.EventDirection.TANGENT: TransitDirection.TANGENT,
 }
 
 # The ΔT model is fixed here, not requested by the caller, and is passed
@@ -213,14 +223,14 @@ def transit_source(identity: AstronomicalObject) -> TransitSource:
 
 def transit_events(
   identity: AstronomicalObject, longitude_deg: float, start_jde_tt: float, end_jde_tt: float
-) -> tuple[celestial.LongitudeEvent, ...]:
+) -> tuple[_TransitEvent, ...]:
   """Search one level; preserve computation failures and wrap domain rejections.
 
   搜索一个黄经；保留计算失败的原异常，为域拒绝附上行运查询信息。
   """
   target = _target(identity)
   try:
-    return celestial.longitude_events(target, longitude_deg, start_jde_tt, end_jde_tt)
+    events = celestial.longitude_events(target, longitude_deg, start_jde_tt, end_jde_tt)
   except ValueError as exc:
     raise TransitDomainError(
       str(exc),
@@ -230,3 +240,12 @@ def transit_events(
       end_jde_tt=end_jde_tt,
       upstream_message=str(exc),
     ) from exc
+  return tuple(
+    _TransitEvent(
+      event.jde_tt,
+      event.longitude_deg,
+      event.longitude_rate_deg_per_tt_day,
+      _EVENT_DIRECTIONS[event.direction],
+    )
+    for event in events
+  )
