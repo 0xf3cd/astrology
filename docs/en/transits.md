@@ -44,10 +44,11 @@ Rates are degrees per TT day, copied from the upstream event. A `tangent` event
 touches the requested longitude without crossing it; its reported rate need not
 be exactly zero.
 
-To display a UTC date, use `celestial_calendar.jde_to_utc(hit.jde_tt)`, which returns
-UTC civil fields (`year`, `month`, `day`, `fraction`). Retain `jde_tt` as the event
+To display a UTC date, import `jde_to_utc` from `celestial_calendar` and call
+`jde_to_utc(hit.jde_tt)`. It returns UTC civil fields (`year`, `month`, `day`,
+`fraction`), where `fraction` is the fraction of the UTC day. Retain `jde_tt` as the event
 time: the upstream conversion does not promise an exact inverse at leap seconds
-or the 1972 model boundary, and retains the last known offset beyond its table.
+or the 1972 model boundary, and retains the last known offset after the last leap-second entry.
 
 <!-- /usage: transits.hits -->
 
@@ -138,12 +139,13 @@ leap step can make the TT duration differ from the civil elapsed duration.
 `TransitDomainError` is a `ValueError` with `operation`, the moving identity and
 TT endpoints when available, `upstream_message`, and the original exception as
 its cause. A failed provider aborts the whole call; no partial list is returned.
-An empty successful hit tuple means
-the complete selected search found no event.
+An empty successful hit tuple means the complete selected search found no event.
 
 An endpoint uses the offset returned by its `datetime.utcoffset()`, including its
 `fold` setting. This function does not detect or reject nonexistent or ambiguous
 local clock readings. Resolve daylight-saving gaps or overlaps before supplying
-an endpoint; see the [birth-time explanation](birth.md). This operation finds
+an endpoint; see the [birth-time explanation](birth.md).
+
+This operation finds
 exact moving-to-fixed hits. It does not calculate a fixed-instant transit chart,
 orb-entry windows, returns, moving-to-moving events or interpretation.

@@ -40,9 +40,10 @@
 速率单位为度/TT 日，直接保留上游事件值。`tangent` 表示到达查询黄经后相切而未穿越，
 报告的速率不必恰为零。
 
-如需显示 UTC 日期，可调用 `celestial_calendar.jde_to_utc(hit.jde_tt)`，取得 UTC 民用字段
-`year`、`month`、`day`、`fraction`。仍应保留原始 `jde_tt` 作为事件时刻：上游不保证在闰秒及
-1972 年模型交界处精确往返，表尾之后也只保留最后已知偏移。
+如需显示 UTC 日期，从 `celestial_calendar` 导入 `jde_to_utc`，调用 `jde_to_utc(hit.jde_tt)`，
+取得 UTC 民用字段 `year`、`month`、`day`、`fraction`；`fraction` 是当天已过时间占 UTC 日的比例。
+仍应保留原始 `jde_tt` 作为事件时刻：上游不保证在闰秒及 1972 年模型交界处精确往返，
+最后一条闰秒记录之后也只保留最后已知偏移。
 
 <!-- /usage: transits.hits -->
 
@@ -117,5 +118,6 @@ True
 
 端点使用 `datetime.utcoffset()` 返回的偏移，包括其 `fold` 设置。此函数不检测或拒绝不存在或有歧义的本地钟点。
 传入端点前，先处理夏令时空缺或重叠；相关说明见[出生时间准备](birth.md)。
+
 本操作搜索精确的移动对固定命中，不计算固定时刻行运盘、容许度进出窗口、返照、
 两颗移动对象间的事件或解读。
