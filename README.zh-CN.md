@@ -138,6 +138,7 @@ moon: scorpio
 | 解析当地钟点，或选择重复时刻 | [出生输入](https://0xf3cd.github.io/astrology/docs/zh-CN/birth.html) |
 | 选择对象、相位参与者和容许度 | [配置](https://0xf3cd.github.io/astrology/docs/zh-CN/configuration.html) |
 | 比较两张命盘 | [双盘相位与落宫](https://0xf3cd.github.io/astrology/docs/zh-CN/cross_aspects.html) |
+| 搜索区间内的精确行运 | [精确行运命中](https://0xf3cd.github.io/astrology/docs/zh-CN/transits.html) |
 
 ## 第一次查询知识
 

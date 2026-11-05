@@ -40,8 +40,14 @@ Both endpoints must be aware built-in `datetime` values at or after
 
 Mercury reaches the fixed natal Sun degree three times: once while its longitude
 increases, once during retrograde motion, and once after it increases again.
-Rates are degrees per TT day, copied from the upstream event. `tangent` denotes
-an exact contact with the queried level and does not promise a bitwise-zero rate.
+Rates are degrees per TT day, copied from the upstream event. A `tangent` event
+touches the requested longitude without crossing it; its reported rate need not
+be exactly zero.
+
+To display a UTC date, use `celestial_calendar.jde_to_utc(hit.jde_tt)`, which returns
+UTC civil fields (`year`, `month`, `day`, `fraction`). Retain `jde_tt` as the event
+time: the upstream conversion does not promise an exact inverse at leap seconds
+or the 1972 model boundary, and retains the last known offset beyond its table.
 
 <!-- /usage: transits.hits -->
 
@@ -58,14 +64,19 @@ an exact contact with the queried level and does not promise a bitwise-zero rate
   are normalized to ascending angle order.
 
 For example, `natal_objects=(Axis.ASCENDANT,)` searches the source chart's stored
-Ascendant degree instead of its Sun. Import `Axis` from `astrology`. A natal
-target stays fixed even when its original record includes a longitude rate.
+Ascendant degree instead of its Sun. Import `Axis` from `astrology` and replace
+the `natal_objects` argument in the call above. Every `NatalChart` stores its axes,
+regardless of the selected bodies; this example's axis query returns no hits in
+the displayed interval. A natal target stays fixed even when its stored position
+includes a longitude rate.
 
 Conjunction and opposition each have one branch. The other major aspects search
-both oriented branches. `hit.branch_deg` and `hit.query_longitude_deg` identify
-that query; `hit.longitude_deg` preserves the raw event longitude, including the
-opposite side of a 360° cut and small numerical residuals. It need not equal the
-queried level bit for bit. See the {ref}`rule and coordinate limits
+both oriented branches. `hit.branch_deg` is the signed angle added to the natal
+degree: 0° for conjunction, 180° for opposition, and ± the aspect angle for the
+others. `hit.query_longitude_deg` is that sum reduced to [0°, 360°), the moving
+longitude the search solves for. `hit.longitude_deg` preserves the raw event
+longitude, which can differ by a small numerical residual or lie on the other
+side of 0°/360°. See the {ref}`rule and coordinate limits
 <catalog-en-rule-project-exact-transit-hits>` for the own-date longitude convention.
 
 Each moving object, natal target and oriented aspect branch requires a separate
@@ -85,6 +96,9 @@ True
 '1.1.1'
 ```
 
+`('position_source', 3)` is the effective upstream model key for this Mercury
+search; `result.sources[0].model_description` gives its name and description.
+
 `start_jde_tt` and `end_jde_tt` retain the converted search interval. Each
 `TransitSource` identifies the effective moving model, its event-domain bounds,
 maximum span and upstream descriptions. The result also retains the astrology
@@ -95,13 +109,12 @@ the original natal calculation and may record different versions.
 Hits are sorted by TT time, moving selection order, natal source order, ascending
 aspect angle and then negative before positive branch. Different identities at
 the same time remain separate. Close crossings are not merged by a tolerance.
-Times retain the native 2^-30-day reporting lattice; that numerical resolution
-is not an astronomical accuracy bound.
+Timestamps are reported as multiples of 2^-30 day; that numerical resolution is
+not an astronomical accuracy bound.
 
 Sequences are isolated as immutable tuples. Constructing or reading a supplied
-result does not load native astronomy. Constructors check types, ranges, selected
-identities, query levels and order; they do not authenticate supplied astronomy,
-UTC/TT correspondence or the completeness of a supplied hit list.
+result does not load native astronomy. See the [constructor validation contract](architecture.md#reproducibility)
+for the checks performed on caller-supplied results.
 
 ## Limits and failures
 
@@ -120,14 +133,17 @@ leap step can make the TT duration differ from the civil elapsed duration.
 | Normalized UTC before 1972 | `HistoricalTimeError` |
 | UTC conversion, converted TT span or selected rate domain rejected upstream | `TransitDomainError` |
 | Native computation/resource/internal failure | Upstream `CelestialError`, unchanged |
+| Missing installed distribution metadata | `importlib.metadata.PackageNotFoundError` |
 
 `TransitDomainError` is a `ValueError` with `operation`, the moving identity and
 TT endpoints when available, `upstream_message`, and the original exception as
-its cause. It does not carry a fictitious house system. A failed provider aborts
-the whole call; no partial list is returned. An empty successful hit tuple means
+its cause. A failed provider aborts the whole call; no partial list is returned.
+An empty successful hit tuple means
 the complete selected search found no event.
 
-Resolve birth records through [birth preparation](birth.md); attaching a timezone
-to a wall-clock value does not resolve its gap or fold here. This operation finds
+An endpoint uses the offset returned by its `datetime.utcoffset()`, including its
+`fold` setting. This function does not detect or reject nonexistent or ambiguous
+local clock readings. Resolve daylight-saving gaps or overlaps before supplying
+an endpoint; see the [birth-time explanation](birth.md). This operation finds
 exact moving-to-fixed hits. It does not calculate a fixed-instant transit chart,
 orb-entry windows, returns, moving-to-moving events or interpretation.

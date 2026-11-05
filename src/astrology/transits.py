@@ -163,11 +163,13 @@ class TransitHit:
   """One queried aspect branch and its unchanged native event values.
 
   Time is JDE(TT); angles are degrees and rate is degrees per TT day.
-  query_longitude_deg identifies the root level. longitude_deg is raw and may
+  query_longitude_deg is the natal degree plus branch_deg, reduced to [0, 360).
+  longitude_deg is raw and may
   differ from that level across a wrap. Tangent does not imply a bitwise-zero rate.
 
   一条查询相位分支及未经改写的原生事件值。时刻为 JDE(TT)，角度为度，速率为度/TT 日。
-  query_longitude_deg 标明求根黄经；longitude_deg 保留原值，环绕处可能位于另一侧。
+  query_longitude_deg 是本命度数加 branch_deg 后归入 [0, 360) 的黄经；
+  longitude_deg 保留原值，环绕处可能位于另一侧。
   tangent 不意味着速率的位模式恰为零。
   """
 
@@ -206,11 +208,12 @@ class TransitHits:
 
   Sequences are isolated as tuples. Construction checks supplied consistency,
   not the astronomical origin or completeness of a caller-supplied hit list.
-  It performs no native calls. See entry.transit_hits for coordinate/source limits.
+  It performs no native calls. Coordinate and source details are in
+  rule.project.exact_transit_hits and entry.transit_hits.
 
   不可变的本命来源、搜索配置、模型溯源及已排序命中。序列复制为元组；构造时检查给定数据的
   一致性，不认证天文来源或调用方所给命中列表的完整性，也不调用原生天文库。
-  坐标及来源限度见 entry.transit_hits。
+  坐标及来源详情分别见 rule.project.exact_transit_hits 和 entry.transit_hits。
   """
 
   chart: NatalChart
@@ -330,8 +333,9 @@ def transit_hits(
   propagate unchanged. Native astronomy is loaded only by this calculation call.
   Hits are ordered by TT time, moving order, natal source order, aspect angle,
   then negative before positive branch. Raw event values, including tangent rates,
-  are preserved on the native 2^-30-day reporting lattice. Source/epoch limits:
-  entry.transit_hits. Missing installed distribution metadata is not replaced.
+  are preserved, with times reported as multiples of 2^-30 day. Coordinate/source
+  details: rule.project.exact_transit_hits and entry.transit_hits. Missing installed
+  distribution metadata raises importlib.metadata.PackageNotFoundError.
 
   搜索 [start_utc, end_utc) 内所选移动对象与本命黄经的全部精确分支。
   端点须为有时区的内建 datetime，归一为 UTC 后不早于 1972-01-01。对象及相位须显式、非空且
@@ -339,8 +343,9 @@ def transit_hits(
   上游将 UTC 转为 TT；半开搜索区间最长 3660 TT 日，并受每个所选事件来源的域限制。
   任一查询失败即整次失败。域或区间拒绝抛 TransitDomainError；原生计算失败保持原异常。
   只有此计算调用才加载原生天文。按 TT 时刻、移动对象顺序、本命源盘顺序、相位角升序及
-  负分支在前排序。保留原生 2^-30 日报告网格上的原值，包括相切速率。
-  来源与历元限度见 entry.transit_hits；分发包元数据缺失时不编造版本。
+  负分支在前排序。保留原值，包括相切速率；报告时刻为 2^-30 日的整数倍。
+  坐标及来源详情分别见 rule.project.exact_transit_hits 和 entry.transit_hits；
+  已安装分发包元数据缺失时抛出 importlib.metadata.PackageNotFoundError。
   """
   if type(chart) is not NatalChart:
     raise TypeError("chart must be a NatalChart")
