@@ -17,11 +17,13 @@ including retrograde repetitions and tangent contacts. No moving-side birth
 record or place is required. Fixed-instant transit charts, orb windows and
 returns remain outside this operation.
 
+### Dependencies and platforms
+
 Runtime dependencies are exactly `celestial-calendar==1.1.1` and `tzdata==2026.5`.
 The astronomy dependency provides the UTC conversion API used by transit searches.
 The macOS arm64 minimum rises from 14 to **15**; other platform minimums and
 Python 3.11–3.14 support are unchanged. Existing natal calculations and text
-formats are unchanged. The chart guide's current calculation now reports upstream 1.1.1.
+formats are unchanged.
 
 ### Dispositor chains and rulership ownership
 
