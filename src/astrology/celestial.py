@@ -1,17 +1,15 @@
-"""The concrete adapter between resolved birth input and celestial-calendar.
+"""Concrete celestial-calendar calls for natal snapshots and transit event searches.
 
-It produces the chart module's own result values and raises its `ChartDomainError`,
-so it depends on `chart`; `chart` imports it only inside `natal_chart`. That is
-deliberate while `natal_chart` is the only consumer: a second one would be the
-reason to give the adapter its own result type.
+Copy native records into chart/transit domain values. Calculation entries import
+this adapter lazily; importing the public value types does not load it.
 
-已解析的出生输入与 celestial-calendar 之间的具体适配层。它直接产出 `chart` 模块的结果值，
-并抛出该模块的 `ChartDomainError`，所以依赖 `chart`；`chart` 只在 `natal_chart` 内部才导入
-它。目前 `natal_chart` 是唯一的使用方，这样做是有意的；出现第二个使用方时，才有理由给
-适配层单独定义结果类型。
+为本命快照与行运事件搜索提供 celestial-calendar 的具体调用。
+将原生记录复制为命盘或行运领域值；计算入口延迟导入本层，导入公开值类型不会加载它。
 """
 
 from __future__ import annotations
+
+from datetime import datetime
 
 import celestial_calendar as celestial
 from celestial_calendar import BodyState, Target
@@ -20,6 +18,7 @@ from astrology.birth import Location, MissingBirthDataError, ResolvedBirth
 from astrology.chart import ChartDomainError, ChartHouses, ChartTimes, EclipticPosition
 from astrology.config import ChartConfig, HouseSystem
 from astrology.objects import AstronomicalObject, Body, LunarNode, _is_astronomical_object
+from astrology.transits import TransitDirection, TransitDomainError, TransitSource, _TransitEvent
 
 _BODY_TARGETS: dict[Body, Target] = {
   Body.SUN: Target.SUN,
@@ -48,6 +47,12 @@ _HOUSE_SYSTEMS: dict[HouseSystem, celestial.HouseSystem] = {
   HouseSystem.WHOLE_SIGN: celestial.HouseSystem.WHOLE_SIGN,
   HouseSystem.EQUAL: celestial.HouseSystem.EQUAL,
   HouseSystem.PLACIDUS: celestial.HouseSystem.PLACIDUS,
+}
+
+_EVENT_DIRECTIONS: dict[celestial.EventDirection, TransitDirection] = {
+  celestial.EventDirection.INCREASING: TransitDirection.INCREASING,
+  celestial.EventDirection.DECREASING: TransitDirection.DECREASING,
+  celestial.EventDirection.TANGENT: TransitDirection.TANGENT,
 }
 
 # The ΔT model is fixed here, not requested by the caller, and is passed
@@ -122,6 +127,16 @@ def _position(identity: AstronomicalObject, body: BodyState) -> EclipticPosition
   )
 
 
+def _civil(instant: datetime) -> celestial.CivilDateTime:
+  """Copy a validated UTC instant to upstream civil fields. 将已校验的 UTC 时刻复制为上游民用字段。"""
+  second_of_day = (
+    instant.hour * 3600 + instant.minute * 60 + instant.second
+  ) * 1_000_000 + instant.microsecond
+  return celestial.CivilDateTime(
+    instant.year, instant.month, instant.day, second_of_day / 86_400_000_000
+  )
+
+
 def snapshot(
   resolved: ResolvedBirth, config: ChartConfig
 ) -> tuple[ChartTimes, tuple[EclipticPosition, ...], ChartHouses]:
@@ -137,15 +152,7 @@ def snapshot(
   固定为 Algo5 并显式传入，由调用方记录。失败时抛出带有请求宫制的 ChartDomainError。
   """
   location = _precheck(resolved, config)
-  second_of_day = (
-    resolved.utc.hour * 3600 + resolved.utc.minute * 60 + resolved.utc.second
-  ) * 1_000_000 + resolved.utc.microsecond
-  civil = celestial.CivilDateTime(
-    resolved.utc.year,
-    resolved.utc.month,
-    resolved.utc.day,
-    second_of_day / 86_400_000_000,
-  )
+  civil = _civil(resolved.utc)
   native_location = celestial.GeoLocation(location.latitude, location.longitude)
   native_system = _HOUSE_SYSTEMS[config.house_system]
   try:
@@ -185,3 +192,60 @@ def snapshot(
   )
   times = ChartTimes(native.times.jd_ut1, native.times.jde_tt)
   return times, positions, houses
+
+
+def transit_interval(start: datetime, end: datetime) -> tuple[float, float]:
+  """Convert validated UTC endpoints to TT. 把已校验的 UTC 端点转为 TT。"""
+  try:
+    return celestial.utc_to_jde(_civil(start)), celestial.utc_to_jde(_civil(end))
+  except ValueError as exc:
+    raise TransitDomainError(str(exc), operation="utc_to_jde", upstream_message=str(exc)) from exc
+
+
+def transit_source(identity: AstronomicalObject) -> TransitSource:
+  """Copy one selected target's effective event model and window. 复制所选目标的实际事件模型与窗口。"""
+  target = _target(identity)
+  capabilities = celestial.capabilities(celestial.CapabilityOperation.EVENTS, target)
+  if len(capabilities) != 1:
+    raise RuntimeError("Expected one effective event capability for the selected target")
+  capability = capabilities[0]
+  return TransitSource(
+    identity,
+    capability.source.kind.value,
+    capability.source.identity,
+    celestial.model_identity_text(capability.source),
+    capability.domain_start_jde_tt,
+    capability.domain_end_jde_tt,
+    capability.maximum_span_tt_days,
+    celestial.capability_text(celestial.CapabilityOperation.EVENTS, target),
+  )
+
+
+def transit_events(
+  identity: AstronomicalObject, longitude_deg: float, start_jde_tt: float, end_jde_tt: float
+) -> tuple[_TransitEvent, ...]:
+  """Search one level; preserve computation failures and wrap domain rejections.
+
+  搜索一个黄经；保留计算失败的原异常，为域拒绝附上行运查询信息。
+  """
+  target = _target(identity)
+  try:
+    events = celestial.longitude_events(target, longitude_deg, start_jde_tt, end_jde_tt)
+  except ValueError as exc:
+    raise TransitDomainError(
+      str(exc),
+      operation="longitude_events",
+      moving_object=identity,
+      start_jde_tt=start_jde_tt,
+      end_jde_tt=end_jde_tt,
+      upstream_message=str(exc),
+    ) from exc
+  return tuple(
+    _TransitEvent(
+      event.jde_tt,
+      event.longitude_deg,
+      event.longitude_rate_deg_per_tt_day,
+      _EVENT_DIRECTIONS[event.direction],
+    )
+    for event in events
+  )

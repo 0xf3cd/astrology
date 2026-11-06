@@ -34,7 +34,7 @@ def test_packaging_and_installed_identity_agree_without_changing_import_name() -
   assert project["version"] == "0.3.0"
   assert project["name"] == _distribution.DISTRIBUTION_NAME
   assert version("celestial-astrology") == project["version"]
-  assert project["dependencies"] == ["celestial-calendar==1.0.0", "tzdata==2026.5"]
+  assert project["dependencies"] == ["celestial-calendar==1.1.1", "tzdata==2026.5"]
 
 
 def test_svg_rendering_is_not_a_public_or_importable_api() -> None:

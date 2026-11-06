@@ -141,9 +141,29 @@
       "definition": {"en": "From each explicitly selected body/node placement, follow the ruler of its sign under rule.lilly1647.essential_dignities. Continue through all available ruler placements, including unselected intermediates. A self-loop is a final dispositor; a two-planet cycle is domicile-based mutual reception; longer cycles remain distinct. If the next ruler is absent, report its identity for that root. Edges include closing links and absent targets, while each root's path contains only distinct available objects. Canonical cycles start with their earliest member in source order and are deduplicated across roots; final dispositors are reached self-loops in source order.", "zh": "从显式选定的天体／交点落点出发，按 rule.lilly1647.essential_dignities 遍历其星座守护星。经过所有已有的守护星落点，包括未选作根的中间对象。自环表示最终定位星；两星循环表示基于入庙守护的互容；较长循环另列。下一颗守护星缺失时，为该根报告其身份。边包含闭环连线及缺失目标，各根路径则只含不重复的已有对象。循环以源盘顺序最早的成员起头并跨根去重，最终定位星按源盘顺序列出已到达的自环。"},
       "tradition": {"en": "Project traversal and result conventions over Lilly's sign-ruler table; Lilly is not credited with the graph algorithm.", "zh": "项目基于 Lilly 星座守护表定义的遍历及结果约定；不将图算法归于 Lilly。"},
       "limits": {"en": "Bodies and named lunar nodes can be roots; every successor is one of the seven classical rulers. Axes and cusps are not roots. An unavailable root is rejected rather than reported as an absent successor. No missing position is calculated, and only reached components are reported. Domicile-based mutual reception here does not assess aspects, exaltation reception or other traditions' conditions. Several endpoints do not establish a unique chart-wide ruler. No scoring, interpretation or modern co-rulers are supplied.", "zh": "天体及具名月交点可作根，后继均为七颗传统守护星之一。四轴及宫头不作根。不可用的根直接拒绝，不当作缺失的后继报告。不补算缺失位置，只报告已到达的连通部分。此处基于入庙守护的互容不判断相位、擢升互容或其他传统的条件。多个终点不确立唯一的全盘主星。不提供评分、解读或现代共同守护星。"}
+    },
+    {
+      "identifier": "rule.project.exact_transit_hits",
+      "name": {"en": "Exact transit-to-natal hits", "zh": "精确行运与本命相位命中"},
+      "concept_ids": ["aspect.conjunction", "aspect.sextile", "aspect.square", "aspect.trine", "aspect.opposition"],
+      "definition": {"en": "Hold the selected natal longitude fixed with zero derivative. For each major-aspect angle from astrology.aspects.aspect_angle, search the moving apparent longitude at the natal degree plus each oriented branch, modulo one turn. Coincident conjunction/opposition branches are searched once. astrology.transits.transit_hits composes the native events and retains their moving rate and contact direction.", "zh": "将所选本命黄经固定，导数为零。对 astrology.aspects.aspect_angle 定义的主要相位角，将本命度数加各有向分支角并归入一周，搜索移动视黄经达到该度数的时刻。合相与对分相的重合分支各只搜索一次。astrology.transits.transit_hits 组合原生事件，保留其移动速率及接触方向。"},
+      "tradition": {"en": "Project-defined composition of exact longitude aspects; no interpretive tradition is selected.", "zh": "项目对精确黄经相位的组合定义，不选择解读传统。"},
+      "limits": {"en": "Natal and moving tropical degrees retain their own dates, without a common-epoch transformation or a simultaneous spatial-angle claim. A natal axis is a stored house-geometry point, not an apparent geocentric body position. Named mean and Meeus five-term nodes retain their definitions, not an osculating-node substitute. Exact means the native numerical root/contact contract, not an astronomical accuracy guarantee or a bitwise-zero tangent rate. No orb window, applying/separating label or interpretation follows from an exact hit.", "zh": "本命与移动热带度数保留各自日期，不转换共同历元，也不声称是同时刻的空间角。本命轴是已存宫位几何点，不是地心视天体位置。具名平交点及 Meeus 五项交点保留其定义，不替换为密切轨道交点。精确指原生数值求根或接触合同，不是天文精度保证，也不要求相切速率的位模式为零。精确命中本身不推出容许度窗口、入相出相标签或解读。"}
     }
   ],
   "sources": [
+    {
+      "identifier": "source.celestial-calendar.events.1.1.1",
+      "title": "celestial-calendar longitude events and UTC conversion",
+      "author": "celestial-calendar contributors",
+      "edition": "Released Python package 1.1.1: events.py, utc_to_jde, longitude_events and model/capability interfaces",
+      "language": "en",
+      "lineage": {"en": "Released Python binding definitions and native model/capability descriptions, inspected with the published 1.1.1 package. The event search and UTC conversion are upstream operations; composing them with fixed natal targets is this project's rule.", "zh": "已核公开发行的 1.1.1 Python 绑定定义及原生模型、能力说明。事件搜索及 UTC 转换是上游操作；与固定本命目标组合是本项目规则。"},
+      "rights": {"en": "Upstream code is MIT licensed. This record contains project-authored summaries, not a redistributed implementation.", "zh": "上游代码采用 MIT 许可证。此记录为项目自写摘要，不再分发上游实现。"},
+      "scope": {"en": "Documents apparent geocentric longitude crossings/contacts, JDE(TT) event times on a 2^-30-day reporting lattice, the published seven-point rate operator, increasing/decreasing/tangent codes, half-open intervals, the 3660-TT-day span limit and target-specific rate domains. UTC conversion uses a fixed leap table, retaining its last offset afterward; it does not predict future leap seconds. Its historical UT1 substitute is not exposed by this project's modern transit input. The source establishes an interface/model contract, not independent numerical truth or astrological interpretation.", "zh": "记录地心视黄经穿越或接触、2^-30 日报告网格上的 JDE(TT) 事件时刻、已公布的七点速率算子、increasing／decreasing／tangent 方向码、半开区间、3660 TT 日长度上限及目标各自的速率求值域。UTC 转换使用固定闰秒表，在表尾之后保留最后偏移，不预测未来闰秒。本项目的现代行运输入不开放其历史 UT1 替代。此来源确立接口及模型合同，不是独立数值真值或占星解读。"},
+      "verification": "verified",
+      "url": "https://github.com/0xf3cd/celestial-calendar/tree/v1.1.1"
+    },
     {
       "identifier": "source.meeus.astronomical-algorithms-1998",
       "title": "Astronomical Algorithms",
@@ -258,6 +278,17 @@
     }
   ],
   "entries": [
+    {
+      "identifier": "entry.transit_hits",
+      "statement": {"en": "Exact transit hits compare moving apparent longitudes with selected fixed natal degrees and retain every native crossing/contact with its rate and direction.", "zh": "精确行运命中将移动视黄经与所选固定本命度数比较，保留每次原生穿越或接触及其速率、方向。"},
+      "concept_ids": ["aspect.conjunction", "aspect.sextile", "aspect.square", "aspect.trine", "aspect.opposition"],
+      "rule_ids": ["rule.project.exact_transit_hits", "rule.project.aspect_deviation"],
+      "citations": [{"source_id": "source.celestial-calendar.events.1.1.1", "locator": "longitude_events and LongitudeEvent contracts; EVENTS capabilities and model identity descriptions; utc_to_jde"}, {"source_id": "source.lilly.christian-astrology-1647", "locator": "Book I, chapter I, p.26: exact longitude angles only, not this project's time search, participant policy or interpretation"}],
+      "prerequisites": [{"en": "A supplied NatalChart, explicit available natal targets, moving body/node identities, major-aspect identities and a modern UTC interval admitted by every selected event source.", "zh": "给定 NatalChart、显式且可用的本命目标、移动天体或交点身份、主要相位身份，以及每个所选事件来源均接纳的现代 UTC 区间。"}],
+      "exceptions": {"en": "Retrograde loops can produce repeated hits. Tangent is an exact numerical contact, not a promise of a zero rate. Simultaneous different endpoint identities remain separate.", "zh": "逆行回环可产生多次命中。tangent 是精确数值接触，不承诺速率为零。同一时刻的不同端点身份仍分别保留。"},
+      "limits": {"en": "The composition and own-date fixed-target convention are project definitions, not attributed to Lilly. The upstream contract is not an independent accuracy reference. Scope and coordinate limits are in rule.project.exact_transit_hits; catalog retrieval performs no event search or chart-applicability judgment. This is reference information, not an eligible default interpretation.", "zh": "组合及自身日期固定目标约定由项目定义，不归于 Lilly。上游合同不是独立精度参考。范围及坐标限度见 rule.project.exact_transit_hits；目录检索不搜索事件，也不判断命盘适用性。此为参考信息，不用于默认解读输出。"},
+      "prerequisite_status": "complete", "output_eligibility": "reference_only"
+    },
     {
       "identifier": "entry.sign_elements",
       "statement": {"en": "Each Sign has one element. The executable mapping supplies the reference table, and an explicit population can be summarized by equal counts.", "zh": "每个 Sign 归入一个元素。参考表读取可执行映射；显式选定的对象集合可按等权计数汇总。"},

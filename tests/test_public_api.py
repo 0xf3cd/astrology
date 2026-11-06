@@ -52,6 +52,11 @@ def test_package_root_surface() -> None:
     "Sign",
     "SignDistribution",
     "TimePrecision",
+    "TransitDirection",
+    "TransitDomainError",
+    "TransitHit",
+    "TransitHits",
+    "TransitSource",
     "ashmand_sign_group",
     "aspect_angle",
     "chart_dispositors",
@@ -80,6 +85,7 @@ def test_package_root_surface() -> None:
     "sign_of",
     "sign_ruler",
     "truncate_display",
+    "transit_hits",
   }
   assert set(astrology.__all__) == expected
   assert len(astrology.__all__) == len(expected)

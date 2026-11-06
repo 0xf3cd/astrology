@@ -112,6 +112,36 @@ def chart_observations(chart: astrology.NatalChart) -> str:
   return json.dumps(values, sort_keys=True, allow_nan=False)
 
 
+def acceptance_transits(chart: astrology.NatalChart) -> astrology.TransitHits:
+  """Calculate the same selected transit search in both environments.
+
+  在两个环境中执行同一组所选行运搜索。
+  """
+  return astrology.transit_hits(
+    chart,
+    start_utc=datetime(2024, 4, 1, tzinfo=UTC),
+    end_utc=datetime(2024, 4, 10, tzinfo=UTC),
+    moving_objects=(astrology.Body.SUN,),
+    natal_objects=(astrology.Body.SUN, astrology.Axis.ASCENDANT),
+    aspects=(astrology.MajorAspect.CONJUNCTION, astrology.MajorAspect.SQUARE),
+  )
+
+
+def calculation_observations(
+  chart: astrology.NatalChart,
+  transits: astrology.TransitHits,
+) -> str:
+  """Capture supplied natal and transit values without recalculating them.
+
+  记录给定的本命及行运值，不重新计算。
+  """
+  return json.dumps(
+    {"chart": json.loads(chart_observations(chart)), "transits": repr(transits)},
+    sort_keys=True,
+    allow_nan=False,
+  )
+
+
 def _cross_source(
   year: int,
   label: str,
@@ -338,12 +368,12 @@ def _check_knowledge() -> None:
 
 
 def _check_natal_chart(expected_observations: Path | None = None) -> None:
-  """Calculate one synthetic natal chart in the installed environment.
+  """Calculate a synthetic natal chart and transits in the installed environment.
 
   The chart is calculated after the isolation checks, so it also shows that the
   adapter is loaded by the calculation and not by the import.
 
-  在已安装的环境里计算一张合成本命盘。这一步排在隔离检查之后，因此也能说明适配层是由
+  在已安装的环境里计算合成本命盘及行运。这一步排在隔离检查之后，因此也能说明适配层是由
   计算加载的，而不是由导入加载的。
   """
   _check_native_isolation()
@@ -355,10 +385,11 @@ def _check_natal_chart(expected_observations: Path | None = None) -> None:
   adapter = Path(str(import_module("astrology.celestial").__file__)).resolve()
   if not adapter.is_relative_to(Path(sys.prefix).resolve()):
     raise ValueError("Imported astrology.celestial from outside the consumer environment")
-  if expected_observations is not None and chart_observations(
-    chart
+  transits = acceptance_transits(chart)
+  if expected_observations is not None and calculation_observations(
+    chart, transits
   ) != expected_observations.read_text(encoding="utf-8"):
-    raise ValueError("Installed chart differs from the development entry point")
+    raise ValueError("Installed calculation differs from the development entry point")
 
 
 def check_missing_metadata() -> None:

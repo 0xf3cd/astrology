@@ -6,7 +6,8 @@ Birth records, modern time resolution, requested configuration, the tropical
 natal chart, major aspects, text output and independent knowledge are implemented; their
 usage and constraints are in the [birth](birth.md), [configuration](configuration.md),
 [chart](chart.md), [aspect](aspects.md), [cross-chart](cross_aspects.md), [result](records.md)
-and [knowledge](knowledge.md) guides.
+and [knowledge](knowledge.md) guides. [Exact transit hits](transits.md) search
+moving objects against fixed natal degrees over a UTC interval.
 The current chart is
 a reproducible modern tropical, geocentric natal chart, with independent access
 to its underlying knowledge.
@@ -26,8 +27,9 @@ src/astrology/
   houses.py         House-placement rules over supplied geometry
   aspects.py        Aspect definitions, orbs, and local motion
   chart.py          Composition and immutable chart results
-  _comparison.py    Shared coordinate and selection checks for comparisons
+  _comparison.py    Source compatibility and stored-chart object selection
   cross_aspects.py  Static comparison of supplied charts, retaining both sources
+  transits.py       Exact moving-to-fixed-natal interval events
   house_overlays.py Directional house placement between supplied charts
   lunar_phase.py    Oriented solar/lunar arc and named lunation types
   dignities.py      Traditional dignities, house rulers and dispositor chains
@@ -57,7 +59,11 @@ The astronomy adapter maps these identities to calculation targets; the text
 module looks up names in the supplied catalog. `chart.py` extracts the selected
 stored longitudes for natal aspects, static cross-chart aspects and house
 overlays. `_comparison.py` checks coordinate compatibility and object selections
-for both cross-chart consumers.
+for both cross-chart consumers and validates natal target selections for transits.
+
+`transits.py` composes the adapter's independent longitude-event queries with
+selected natal degrees and the aspect branches in `aspects.py`. It retains the
+source chart without creating a moving-side birth record or house geometry.
 
 `dignities.py` owns the sign-ruler table and the house-ruler and dispositor results
 derived from it. These supplied-chart operations use existing placements without
@@ -70,8 +76,8 @@ the result later without moving calculation into a frontend.
 ## Effects boundary
 
 Package imports, knowledge queries, classifications, summaries and supplied-chart
-comparisons do not initialize native astronomy. Only `natal_chart` loads the
-astronomy adapter to calculate a chart. `resolve_birth_time` reads timezone data,
+comparisons do not initialize native astronomy. `natal_chart` and `transit_hits`
+load the astronomy adapter only when called. `resolve_birth_time` reads timezone data,
 and `load_catalog` reads packaged knowledge; formatters use a caller-supplied catalog
 without resource I/O. The [isolation checks](contributing.md#run-the-checks)
 exercise these boundaries.
@@ -117,7 +123,9 @@ future partial-chart entry points must state their own success contract.
 celestial-calendar provides a strict fourteen-object snapshot with rates and houses.
 The adapter uses it within its joint domain. Selecting seven output
 objects does not widen that domain. Independent position and house queries are
-also available upstream; this adapter continues to use the joint snapshot.
+also available upstream; natal calculation continues to use the joint snapshot.
+Transit searches instead use each selected moving target's event domain and
+either complete every selected query or fail without a partial result.
 
 If requested Placidus geometry is unavailable, the adapter reports that result
 explicitly and never falls back. Any future fallback requires an explicit policy
@@ -135,7 +143,9 @@ Results remain in memory. Constructors validate types, ranges and derived-value
 consistency; they do not authenticate supplied astronomical values, timezone choices
 or software-version labels, or establish that the values came from the stated
 instant and location. Cross-chart constructors check all derived hits or placements
-against their retained sources, under the same limitation.
+against their retained sources, under the same limitation. Transit constructors
+check supplied hit metadata and order without re-running native searches or
+establishing that a supplied list is complete.
 
 A new natal calculation uses resolved UTC
 and the requested configuration without re-resolving timezones. Structured results,

@@ -122,6 +122,7 @@ def test_query_contracts(catalog: Catalog) -> None:
     "entry.lunation_types",
     "entry.essential_dignities",
     "entry.dispositor_chains",
+    "entry.transit_hits",
   }
   assert all(
     entry.prerequisite_status is PrerequisiteStatus.UNRESOLVED
@@ -643,6 +644,7 @@ def test_retained_rule_ids_and_order(catalog: Catalog) -> None:
     "rule.project.cross_aspect_evaluation",
     "rule.project.cross_house_overlays",
     "rule.project.dispositor_chains",
+    "rule.project.exact_transit_hits",
   ]
   for identifier, configuration in expected:
     variant = catalog.variant(identifier)

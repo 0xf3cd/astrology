@@ -1,4 +1,4 @@
-"""Shared admission checks for supplied-chart comparisons. 给定命盘比较的共用准入检查。"""
+"""Source compatibility and stored-chart selection checks. 来源兼容性与已存命盘的对象选择检查。"""
 
 from collections.abc import Sequence
 
@@ -24,9 +24,9 @@ def _require_comparable_sources(chart_left: NatalChart, chart_right: NatalChart)
 def _selection_for_chart(
   chart: NatalChart, objects: Sequence[ChartObject], name: str
 ) -> tuple[ChartObject, ...]:
-  """Validate a comparison selection and order it by stored positions, then axes.
+  """Validate a chart selection and order it by stored positions, then axes.
 
-  校验比较所用的对象选择，按已存位置及四轴的顺序排列。
+  校验命盘中的对象选择，按已存位置及四轴的顺序排列。
   """
   if not isinstance(objects, Sequence) or isinstance(objects, (str, bytes)):
     raise TypeError(f"{name} must be a sequence of Body, LunarNode or Axis values")

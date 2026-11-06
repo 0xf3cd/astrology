@@ -11,6 +11,7 @@ task you need:
 | Select bodies, aspect participants or orbs | [Configuration](configuration.md) and [aspects](aspects.md) |
 | Calculate and read a chart | [Natal charts](chart.md) and [results/text](records.md) |
 | Compare two charts | [Cross-chart aspects and house overlays](cross_aspects.md) |
+| Find exact transits in a UTC interval | [Exact transit hits](transits.md) |
 | Count elements/modalities or classify lunar phase | [Sign distributions and natal lunar phase](summaries.md) |
 | Query traditional rulers, dignity statuses and dispositor chains | [Rulership and dignities](dignities.md) |
 | Look up names, rules and sources without a chart | [Knowledge queries](knowledge.md) and [catalog](catalog.md) |
@@ -28,6 +29,7 @@ configuration
 chart
 aspects
 cross_aspects
+transits
 summaries
 dignities
 records

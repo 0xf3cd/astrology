@@ -31,7 +31,7 @@ True
 >>> catalog.filter_entries(concept_id="body.sun")[0].identifier
 'entry.body_requests'
 >>> len(catalog.filter_sources(verification=SourceVerification.VERIFIED))
-13
+14
 >>> print(catalog.entry("entry.cross_aspect_evaluation").statement.text("zh-CN"))
 静态主要交叉相位比较两张给定本命盘结果，区分左右端点并保留双侧完整来源，不设运动字段。
 >>> print(catalog.variant("rule.project.cusp_ownership").definition.text("zh-CN"))

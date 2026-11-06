@@ -8,7 +8,7 @@ from typing import TypeAlias, TypeGuard
 
 
 class Body(StrEnum):
-  """Physical natal bodies, distinct from mathematical nodes. 本命盘物理天体，与数学交点区分。"""
+  """Physical celestial bodies, distinct from mathematical nodes. 物理天体，与数学交点区分。"""
 
   SUN = "sun"
   MOON = "moon"
