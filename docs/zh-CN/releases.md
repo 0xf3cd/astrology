@@ -2,7 +2,10 @@
 
 [English](../en/releases.md) · [文档](index.md) · [发行流程](releasing.md)
 
-## 0.3.0 之后的源码变化
+## 0.4.0
+
+本版增加定位星链和移动对本命的精确行运命中，将 celestial-calendar 升至 1.1.1，并删除独立目录版本。
+包索引：[PyPI](https://pypi.org/project/celestial-astrology/0.4.0/)。
 
 ### 精确行运命中与 UTC 输入
 
@@ -10,7 +13,8 @@
 `TransitHits` 保留源盘、选择、TT 区间、实际模型及每次原生命中的速率和方向，
 包括逆行重复命中与相切。不要求移动侧出生记录或地点；固定时刻行运盘、容许度窗口及返照另议。
 
-源码钉住 celestial-calendar 1.1.1，使用其已发行 UTC 转换接口。
+运行依赖精确钉住 `celestial-calendar==1.1.1` 和 `tzdata==2026.5`。
+天文依赖提供行运搜索使用的 UTC 转换接口。
 macOS arm64 下限从 14 升至 **15**；其他平台下限及 Python 3.11–3.14 支持不变。
 已有本命计算和文本格式不变；排盘指南的当前计算报告上游 1.1.1。
 

@@ -2,7 +2,11 @@
 
 [简体中文](../zh-CN/releases.md) · [Documentation](index.md) · [Release procedure](releasing.md)
 
-## Source changes since 0.3.0
+## 0.4.0
+
+This version adds dispositor chains and exact transit-to-natal hits, upgrades
+celestial-calendar to 1.1.1 and removes the independent catalog version.
+Package index: [PyPI](https://pypi.org/project/celestial-astrology/0.4.0/).
 
 ### Exact transit hits and UTC input
 
@@ -13,7 +17,8 @@ including retrograde repetitions and tangent contacts. No moving-side birth
 record or place is required. Fixed-instant transit charts, orb windows and
 returns remain outside this operation.
 
-The source pins celestial-calendar 1.1.1 for its released UTC conversion API.
+Runtime dependencies are exactly `celestial-calendar==1.1.1` and `tzdata==2026.5`.
+The astronomy dependency provides the UTC conversion API used by transit searches.
 The macOS arm64 minimum rises from 14 to **15**; other platform minimums and
 Python 3.11–3.14 support are unchanged. Existing natal calculations and text
 formats are unchanged. The chart guide's current calculation now reports upstream 1.1.1.
