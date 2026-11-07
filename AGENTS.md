@@ -72,6 +72,16 @@ equivalence; original quotations are not rewritten to match prose style.
 This file is the single agent-instruction source; reader documentation follows the
 bilingual paths above. Create source modules only when they contain functionality.
 
+## Milestone delivery
+
+Create `milestone/<version>` from current `main`. Stage branches start from that
+branch and stage PRs target it, with `Part of #N` in their bodies. Squash stage PRs
+into the integration branch. The final PR goes from the integration branch to
+`main` and also squashes, leaving one complete commit per milestone on `main`.
+Its body uses `Closes #N` for each completed child issue, excluding the release
+tracker. Keep the release tracker and milestone open until publication and live
+acceptance are complete.
+
 ## Verification and delivery
 
 Feature PRs keep domain assertions in tests, not the installed-package check;
