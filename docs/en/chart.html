@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Natal charts &#8212; celestial-astrology 0.3.0 documentation / 文档</title>
+    <title>Natal charts &#8212; celestial-astrology 0.4.0 documentation / 文档</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
-    <script src="../../_static/documentation_options.js?v=e259d695"></script>
+    <script src="../../_static/documentation_options.js?v=6c02275b"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/en/chart.html" />
@@ -95,7 +95,7 @@ for structured results and bilingual text output.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">chart</span><span class="o">.</span><span class="n">effective</span><span class="o">.</span><span class="n">evaluation</span>
 <span class="go">'fixed_fourteen_object_joint_snapshot'</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">chart</span><span class="o">.</span><span class="n">provenance</span><span class="o">.</span><span class="n">celestial_version</span>
-<span class="go">'0.8.0'</span>
+<span class="go">'1.1.1'</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">chart</span><span class="o">.</span><span class="n">provenance</span><span class="o">.</span><span class="n">position_frame</span>
 <span class="go">'apparent_geocentric_true_ecliptic_of_date'</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">chart</span><span class="o">.</span><span class="n">provenance</span><span class="o">.</span><span class="n">ut1_derivation</span>
@@ -181,7 +181,7 @@ truncation, so a displayed value never shows the next sign.</p>
 <section id="fail-explicitly">
 <h2>Fail explicitly<a class="headerlink" href="#fail-explicitly" title="Link to this heading">¶</a></h2>
 <p>When input falls outside the calculation’s requirements, <code class="docutils literal notranslate"><span class="pre">natal_chart</span></code> raises an
-error without returning a partial chart or switching house systems. The adapter
+error; see the <a class="reference internal" href="architecture.html#composition-and-failures"><span class="std std-ref">failure policy</span></a>. The adapter
 checks known restrictions before calling the astronomy library; the library
 reports any remaining calculation failures.</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">astrology</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChartDomainError</span><span class="p">,</span> <span class="n">MissingBirthDataError</span>
@@ -227,17 +227,19 @@ as such.</p>
 <td><p><code class="docutils literal notranslate"><span class="pre">ChartDomainError</span></code>, no upstream detail</p></td>
 </tr>
 <tr class="row-odd"><td><p>Instant outside the supported ephemeris range</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">ChartDomainError</span></code> with the upstream operation</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ChartDomainError</span></code> with the upstream message</p></td>
 </tr>
 <tr class="row-even"><td><p>Requested geometry undefined at this latitude</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">ChartDomainError</span></code> with the requested house system</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ChartDomainError</span></code> with the upstream message</p></td>
 </tr>
 </tbody>
 </table>
-<p>The error type is not determined by parsing the astronomy library’s message text.
-Errors detected before calling that library carry no upstream details. Failures
-reported by it record the operation name (<code class="docutils literal notranslate"><span class="pre">operation</span></code>) and recording status
-(<code class="docutils literal notranslate"><span class="pre">recorded</span></code>), as below:</p>
+<p><code class="docutils literal notranslate"><span class="pre">house_system</span></code> identifies the requested geometry. <code class="docutils literal notranslate"><span class="pre">upstream_message</span></code> is None for
+pre-call rejections and contains the upstream exception text for failures reported
+by the astronomy library, even if that text is empty. When supplied by the upstream
+exception, <code class="docutils literal notranslate"><span class="pre">operation</span></code> names the upstream operation and <code class="docutils literal notranslate"><span class="pre">recorded</span></code> indicates whether
+native code reported a recognized error kind. Domain rejections leave both as None.
+The error type is not determined by parsing the message text.</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">high</span> <span class="o">=</span> <span class="n">prepare_natal_input</span><span class="p">(</span><span class="n">BirthRecord</span><span class="p">(</span>
 <span class="gp">... </span>  <span class="n">date</span><span class="p">(</span><span class="mi">1990</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">21</span><span class="p">),</span> <span class="n">time</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">FixedOffset</span><span class="p">(</span><span class="n">timedelta</span><span class="p">(</span><span class="mi">0</span><span class="p">)),</span>
 <span class="gp">... </span>  <span class="n">Location</span><span class="p">(</span><span class="mf">69.65</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span> <span class="n">TimePrecision</span><span class="o">.</span><span class="n">SECOND</span><span class="p">,</span> <span class="p">{</span><span class="s2">"record"</span><span class="p">:</span> <span class="s2">"synthetic"</span><span class="p">},</span>
@@ -245,8 +247,8 @@ reported by it record the operation name (<code class="docutils literal notransl
 <span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
 <span class="gp">... </span>  <span class="n">natal_chart</span><span class="p">(</span><span class="n">high</span><span class="p">,</span> <span class="n">ChartConfig</span><span class="p">(</span><span class="n">HouseSystem</span><span class="o">.</span><span class="n">PLACIDUS</span><span class="p">,</span> <span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">SUN</span><span class="p">,),</span> <span class="p">()))</span>
 <span class="gp">... </span><span class="k">except</span> <span class="n">ChartDomainError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
-<span class="gp">... </span>  <span class="p">(</span><span class="n">error</span><span class="o">.</span><span class="n">house_system</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">error</span><span class="o">.</span><span class="n">operation</span><span class="p">,</span> <span class="n">error</span><span class="o">.</span><span class="n">recorded</span><span class="p">)</span>
-<span class="go">('placidus', 'chart_snapshot', True)</span>
+<span class="gp">... </span>  <span class="p">(</span><span class="n">error</span><span class="o">.</span><span class="n">house_system</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">error</span><span class="o">.</span><span class="n">operation</span><span class="p">,</span> <span class="n">error</span><span class="o">.</span><span class="n">recorded</span><span class="p">,</span> <span class="n">error</span><span class="o">.</span><span class="n">upstream_message</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
+<span class="go">('placidus', None, None, True)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">natal_chart</span><span class="p">(</span><span class="n">high</span><span class="p">,</span> <span class="n">ChartConfig</span><span class="p">(</span><span class="n">HouseSystem</span><span class="o">.</span><span class="n">EQUAL</span><span class="p">,</span> <span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">SUN</span><span class="p">,),</span> <span class="p">()))</span><span class="o">.</span><span class="n">houses</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">value</span>
 <span class="go">'equal'</span>
 </pre></div>
@@ -322,8 +324,9 @@ range, and an instant outside it fails explicitly.</p></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Natal charts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="aspects.html">Aspects</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cross_aspects.html">Cross-chart aspects and house overlays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="transits.html">Exact transit hits</a></li>
 <li class="toctree-l2"><a class="reference internal" href="summaries.html">Sign distributions and natal lunar phase</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dignities.html">Traditional sign rulers and four statuses</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dignities.html">Traditional rulership, dignities and dispositor chains</a></li>
 <li class="toctree-l2"><a class="reference internal" href="records.html">Chart results and text</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference.html">Public API reference</a></li>
 <li class="toctree-l2"><a class="reference internal" href="architecture.html">Repository structure and calculation boundaries</a></li>

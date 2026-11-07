@@ -15,7 +15,7 @@ That API keeps left/right ownership and has no motion field.
 
 <!-- usage: aspects.longitudes -->
 
-`find_aspects` needs no chart and does not call the astronomy library. Give it objects with a longitude in
+Give `find_aspects` objects with a longitude in
 degrees and a rate in degrees per day, and the rules to apply.
 Use one instant and coordinate convention for all objects, and the same day unit
 for their rates (for example, the TT day). Bare numbers cannot verify those prerequisites.
@@ -117,6 +117,9 @@ An aspect rule gives one orb for every object. To give an object its own orb, ad
 | `EITHER_WITHIN_OWN_ORB` | at least one object's own orb, the larger orb |
 | `BOTH_WITHIN_OWN_ORB` | both objects' own orbs, the smaller orb |
 | `MEAN_OF_ORBS` | the mean of the two orbs |
+
+Choose the combination used by the tradition or software you want to follow;
+the library does not recommend one over the others.
 
 When a rule has per-object orbs, you must choose a combination rule. Without
 per-object orbs, a chart request rejects a combination rule, while `find_aspects`

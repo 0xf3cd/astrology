@@ -150,8 +150,7 @@ to the chart adapter, not this record type.
 | `NonexistentBirthTimeError` | The recorded local clock falls in a gap |
 | `HistoricalTimeError` | The instant is before the modern UTC contract |
 
-All four named errors subclass `ValueError`. Validation remains active under
-`python -O`. Input source metadata is a copied read-only mapping of plain strings;
+All four named errors subclass `ValueError`. Input source metadata is a copied read-only mapping of plain strings;
 mutable string subclasses are rejected. Result and input values are frozen.
 
 Environment failures remain separate: a missing `tzdata` package raises an import

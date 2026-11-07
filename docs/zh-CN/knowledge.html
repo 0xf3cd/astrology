@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>知识组织与双语文档 &#8212; celestial-astrology 0.3.0 documentation / 文档</title>
+    <title>知识组织与双语文档 &#8212; celestial-astrology 0.4.0 documentation / 文档</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
-    <script src="../../_static/documentation_options.js?v=e259d695"></script>
+    <script src="../../_static/documentation_options.js?v=6c02275b"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/zh-CN/knowledge.html" />
@@ -56,13 +56,13 @@
 <span class="gp">&gt;&gt;&gt; </span><span class="n">catalog</span><span class="o">.</span><span class="n">concept</span><span class="p">(</span><span class="s2">"body.sun"</span><span class="p">)</span><span class="o">.</span><span class="n">configuration</span><span class="o">.</span><span class="n">name</span>
 <span class="go">'SUN'</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">rule</span><span class="o">.</span><span class="n">identifier</span> <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="n">catalog</span><span class="o">.</span><span class="n">list_variants</span><span class="p">(</span><span class="n">concept_id</span><span class="o">=</span><span class="s2">"body.sun"</span><span class="p">)]</span>
-<span class="go">['rule.lilly1647.essential_dignities']</span>
+<span class="go">['rule.lilly1647.essential_dignities', 'rule.project.dispositor_chains']</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">rule</span><span class="o">.</span><span class="n">identifier</span> <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="n">catalog</span><span class="o">.</span><span class="n">list_variants</span><span class="p">(</span><span class="n">concept_id</span><span class="o">=</span><span class="s2">"body.uranus"</span><span class="p">)]</span>
+<span class="go">['rule.project.dispositor_chains']</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">catalog</span><span class="o">.</span><span class="n">filter_entries</span><span class="p">(</span><span class="n">concept_id</span><span class="o">=</span><span class="s2">"body.sun"</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">identifier</span>
 <span class="go">'entry.body_requests'</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">catalog</span><span class="o">.</span><span class="n">filter_sources</span><span class="p">(</span><span class="n">verification</span><span class="o">=</span><span class="n">SourceVerification</span><span class="o">.</span><span class="n">VERIFIED</span><span class="p">))</span>
-<span class="go">10</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">bool</span><span class="p">(</span><span class="n">catalog</span><span class="o">.</span><span class="n">version</span><span class="p">)</span>
-<span class="go">True</span>
+<span class="go">14</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">catalog</span><span class="o">.</span><span class="n">entry</span><span class="p">(</span><span class="s2">"entry.cross_aspect_evaluation"</span><span class="p">)</span><span class="o">.</span><span class="n">statement</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">"zh-CN"</span><span class="p">))</span>
 <span class="go">静态主要交叉相位比较两张给定本命盘结果，区分左右端点并保留双侧完整来源，不设运动字段。</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">catalog</span><span class="o">.</span><span class="n">variant</span><span class="p">(</span><span class="s2">"rule.project.cusp_ownership"</span><span class="p">)</span><span class="o">.</span><span class="n">definition</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">"zh-CN"</span><span class="p">))</span>
@@ -73,10 +73,11 @@
 读取规则定义。上面最后两次调用输出中文正文；传 <code class="docutils literal notranslate"><span class="pre">&quot;en&quot;</span></code> 可读取英文。</p>
 <p>同一个概念可以有多个名称，但只有一个标识。例如，<code class="docutils literal notranslate"><span class="pre">Sun</span></code>、<code class="docutils literal notranslate"><span class="pre">Sol</span></code> 和“日轮”都指向 <code class="docutils literal notranslate"><span class="pre">body.sun</span></code>。
 规则变体记录某套具体定义，例如采用哪种宫制或月交点算法；仅记录天体名称或交点方向时，不另建规则。
-上例用 <code class="docutils literal notranslate"><span class="pre">list_variants(concept_id=&quot;body.sun&quot;)</span></code> 查到 <code class="docutils literal notranslate"><span class="pre">rule.lilly1647.essential_dignities</span></code> 这条规则，
-这条规则说明太阳等星体在哪些星座入庙、擢升、失势或落陷，出处是 Lilly 的著作。
-例如，<code class="docutils literal notranslate"><span class="pre">list_variants(concept_id=&quot;body.uranus&quot;)</span></code> 返回空元组，表示目录中没有与天王星关联的规则。
-但用 <code class="docutils literal notranslate"><span class="pre">concept(&quot;body.uranus&quot;)</span></code> 或 <code class="docutils literal notranslate"><span class="pre">lookup(&quot;Uranus&quot;)</span></code> 仍能查到天王星的名称记录。</p>
+上例查询太阳时得到两条规则。<code class="docutils literal notranslate"><span class="pre">rule.lilly1647.essential_dignities</span></code> 说明太阳等传统星体
+在哪些星座入庙、擢升、失势或落陷，出处是 Lilly 的著作。
+<code class="docutils literal notranslate"><span class="pre">rule.project.dispositor_chains</span></code> 定义沿传统星座守护关系遍历的路径，见<a class="reference internal" href="dignities.html#id6"><span class="std std-ref">定位星示例</span></a>。
+天王星只关联定位星链规则，因为它可以作为路径起点，但不作四种状态判断。
+用 <code class="docutils literal notranslate"><span class="pre">concept(&quot;body.uranus&quot;)</span></code> 或 <code class="docutils literal notranslate"><span class="pre">lookup(&quot;Uranus&quot;)</span></code> 可读取其名称记录。</p>
 <!-- /usage: knowledge.lookup -->
 <!-- usage: knowledge.editorial_states -->
 <p>也可以查询<a class="reference internal" href="cross_aspects.html"><span class="std std-doc">双盘相位比较</span></a>采用的规则。
@@ -105,14 +106,14 @@
 <p>这里有两条规则：<code class="docutils literal notranslate"><span class="pre">rule.project.cross_house_overlays</span></code> 说明怎样分别选择两张盘的对象、
 区分对象所属盘与宫位所属盘，并保留各自的宫制；<code class="docutils literal notranslate"><span class="pre">rule.project.cusp_ownership</span></code> 定义宫头之间的区间，
 决定黄经落在哪一宫。双盘落宫沿用这套区间规则。</p>
-<p>来源记录指向一个固定提交中的实现代码，可以据此核对算法，但不能据此确认输入天文值的来源，
-也不能推出关系解读。上面的查询只读取说明和出处，不计算落宫，也不判断某张命盘。
+<p>来源记录指向一个固定提交中的实现代码，可以据此核对算法及其支持范围。
+上面的查询只读取说明和出处，不计算落宫，也不判断某张命盘。
 要对两张盘计算落宫，见<a class="reference internal" href="cross_aspects.html#id3"><span class="std std-ref">双盘落宫示例</span></a>。</p>
 <section id="id3">
 <h3>返回值与错误<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">load_catalog()</span></code> 每次都从包内 JSON 文件读取目录，不访问网络，也不使用缓存。
 构造记录时会把传入的序列复制为不可变元组。记录类型错误、标识重复、链接指向不存在的记录或别名冲突时，
-会抛出 <code class="docutils literal notranslate"><span class="pre">TypeError</span></code> 或 <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>；这些检查在 <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-O</span></code> 下仍然执行。</p>
+会抛出 <code class="docutils literal notranslate"><span class="pre">TypeError</span></code> 或 <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>。</p>
 <p><code class="docutils literal notranslate"><span class="pre">lookup()</span></code> 先做 NFC 规范化、去首尾空白及大小写折叠，再精确匹配名称与别名。
 结果为不可变元组：无匹配时返回 <code class="docutils literal notranslate"><span class="pre">()</span></code>，名称有歧义时返回多个不同的概念。
 可用 <code class="docutils literal notranslate"><span class="pre">language=&quot;en&quot;</span></code> 或 <code class="docutils literal notranslate"><span class="pre">language=&quot;zh-CN&quot;</span></code> 限定语言，不选则查两种语言。
@@ -157,12 +158,18 @@
 来源已经核实（<code class="docutils literal notranslate"><span class="pre">verified</span></code>），但条目用于命盘解读时需要哪些条件仍未明确（<code class="docutils literal notranslate"><span class="pre">unresolved</span></code>）。
 该条目标为 <code class="docutils literal notranslate"><span class="pre">reference_only</span></code>，供查阅，不作为命盘结论。
 条目的陈述、定义和限制是项目撰写的说明，与引文分开。</p>
+<p>反过来，将来源标识传给 <code class="docutils literal notranslate"><span class="pre">filter_entries</span></code>，即可查找引用它的条目：</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">source</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">source</span><span class="p">(</span><span class="s2">"source.ptolemy.ashmand1822"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">item</span><span class="o">.</span><span class="n">identifier</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">catalog</span><span class="o">.</span><span class="n">filter_entries</span><span class="p">(</span><span class="n">source_id</span><span class="o">=</span><span class="n">source</span><span class="o">.</span><span class="n">identifier</span><span class="p">)]</span>
+<span class="go">['entry.sign_vocabulary', 'entry.equinoctial_example', 'entry.ashmand_sign_groups']</span>
+</pre></div>
+</div>
 <p>来源记录给出版本、扫描文件哈希、转录时的文字处理和转载条件。包内只收录有限的定义摘录，
 不附扫描图、水印或现代网站说明。同一本书的镜像和书目可以帮助确认版本，但不能当作多份独立依据。
 代码引用给出包版本及固定提交中的符号；程序中的定义用了某位作者的名字，不表示已经核对过其原书公式。</p>
-<p>项目实现来源记录保留已查核的提交，不跟随包版本改写。排盘来源记录还定位到同一提交中
-<code class="docutils literal notranslate"><span class="pre">tests/test_reference.py</span></code> 的交点对拍测试。测试按其中记录的公式计算交点参考黄经，再与上游
-结果比较。这不等于核验 Meeus 印刷原文、确立误差界或证明与密切轨道交点等价。</p>
+<p>项目实现来源记录保留已查核的提交，不跟随包版本改写。
+<a class="reference internal" href="catalog.html#catalog-zh-cn-source-astrology-chart-fc845fa"><span class="std std-ref">排盘来源记录</span></a>定位其交点对拍测试，
+<a class="reference internal" href="catalog.html#catalog-zh-cn-rule-node-definition-meeus-five-term-true"><span class="std std-ref">交点规则</span></a>记录对拍范围及待核的来源问题。</p>
 <p>下面用手工构造的数据表示“只知道部分条件”的情况：第一个条件为真，第二个仍未知。
 目录不会读取这个字典，也不会因此改变条目的命盘适用状态：</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">partial_evidence</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"condition_a"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">"condition_b"</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
@@ -187,13 +194,13 @@
 <span class="go">('complete', 'reference_only', 'not_assessed')</span>
 </pre></div>
 </div>
-<p>这些查询不需要命盘或原生天文库。计算几何时，见<a class="reference internal" href="aspects.html#axis-aspects-zh-cn"><span class="std std-ref">本命显式选择</span></a>及
+<p>计算几何时，见<a class="reference internal" href="aspects.html#axis-aspects-zh-cn"><span class="std std-ref">本命显式选择</span></a>及
 <a class="reference internal" href="cross_aspects.html#cross-axis-aspects-zh-cn"><span class="std std-ref">双盘各侧独立选择</span></a>。</p>
 </section>
 <section id="ashmand-1822">
 <span id="ashmand-sign-groups-zh-cn"></span><h2>Ashmand 1822 年版星座分组<a class="headerlink" href="#ashmand-1822" title="Link to this heading">¶</a></h2>
 <p>这四组出自 Ashmand 的 1822 年英译本 <em>Ptolemy’s Tetrabiblos, or Quadripartite</em>。
-0.2.0 新增 <code class="docutils literal notranslate"><span class="pre">ashmand_sign_group</span></code>，输入一个 <code class="docutils literal notranslate"><span class="pre">Sign</span></code>，即可查到它所属的组别：</p>
+向 <code class="docutils literal notranslate"><span class="pre">ashmand_sign_group</span></code> 输入一个 <code class="docutils literal notranslate"><span class="pre">Sign</span></code>，即可查到它所属的组别：</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">astrology</span><span class="w"> </span><span class="kn">import</span> <span class="n">AshmandSignGroup</span><span class="p">,</span> <span class="n">Sign</span><span class="p">,</span> <span class="n">ashmand_sign_group</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">astrology.knowledge</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_catalog</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">catalog</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">()</span>
@@ -213,12 +220,10 @@
 这里的 <code class="docutils literal notranslate"><span class="pre">complete</span></code> 只表示成员查询所需的条件已齐备：提供一个 <code class="docutils literal notranslate"><span class="pre">Sign</span></code> 即可。
 前面分点星座条目的 <code class="docutils literal notranslate"><span class="pre">unresolved</span></code> 仍然保留，因为那是关于命盘解读条件的另一个问题。</p>
 <p>四组中文名为<strong>至点星座、分点星座、固定星座、双体星座</strong>，对应 tropical、equinoctial、fixed、bicorporeal。
-这里的 tropical 只指两个至点星座，不是热带黄道的全部十二星座。原文直接点名至点与分点两对星座。
-在黄道次序中，固定星座分别紧接这些星座，双体星座分别紧接固定星座。因此
-<a class="reference internal" href="catalog.html#catalog-zh-cn-rule-ptolemy-ashmand-sign-groups"><span class="std std-ref">十二星座表</span></a>是项目推导，不是原文逐项列举。</p>
-<p>原文见第一卷第 XIV 章、印刷页 34–35（PDF 第 72–73 页），记录在 <code class="docutils literal notranslate"><span class="pre">source.ptolemy.ashmand1822</span></code> 中。
-目录中的英文摘录、署名中文译文和项目说明分别标明，引用也注明了摘录范围。
-这里依据的是 Ashmand 的这一版本，不能据此认为各流派都采用相同分类，也不能用组名预测实际天气或日照。</p>
+这里的 tropical 只指两个至点星座，不是热带黄道的全部十二星座。
+<a class="reference internal" href="catalog.html#catalog-zh-cn-rule-ptolemy-ashmand-sign-groups"><span class="std std-ref">规则记录与十二星座表</span></a>说明如何按原文次序推导成员归属。</p>
+<p>原文见第一卷第 XIV 章、印刷页 34–35（PDF 第 72–73 页），定位见<a class="reference internal" href="catalog.html#catalog-zh-cn-source-ptolemy-ashmand1822"><span class="std std-ref">来源记录</span></a>。
+目录中的英文摘录、署名中文译文和项目说明分别标明，引用也注明了摘录范围。</p>
 </section>
 <section id="id6">
 <h2>元素、模式与月相类型<a class="headerlink" href="#id6" title="Link to this heading">¶</a></h2>
@@ -226,17 +231,17 @@
 用法见<a class="reference internal" href="summaries.html"><span class="std std-doc">查询、统计及月相指南</span></a>。
 它们用来描述结果，不是排盘配置项。分类不作性格解读，参考表直接读取计算代码中的定义。</p>
 <p><a class="reference internal" href="catalog.html#catalog-zh-cn-rule-zodiac-elements"><span class="std std-ref">元素</span></a>及
-<a class="reference internal" href="catalog.html#catalog-zh-cn-rule-zodiac-modalities"><span class="std std-ref">模式</span></a>表依据 Astrodienst 无日期的编辑页面，
-按记录中的 2025-12-28 快照核验。来源中的 <code class="docutils literal notranslate"><span class="pre">Sagitarius</span></code> 拼写单独注明，程序中仍使用
-<code class="docutils literal notranslate"><span class="pre">Sign.SAGITTARIUS</span></code>。现代模式分类 <code class="docutils literal notranslate"><span class="pre">Modality</span></code> 与历史分组 <code class="docutils literal notranslate"><span class="pre">AshmandSignGroup</span></code> 是两套不同的分类，
+<a class="reference internal" href="catalog.html#catalog-zh-cn-rule-zodiac-modalities"><span class="std std-ref">模式</span></a>表依据 Astrodienst 的编辑页面；
+快照及转录说明见<a class="reference internal" href="catalog.html#catalog-zh-cn-source-astrodienst-elements-signs"><span class="std std-ref">来源记录</span></a>。
+现代模式分类 <code class="docutils literal notranslate"><span class="pre">Modality</span></code> 与历史分组 <code class="docutils literal notranslate"><span class="pre">AshmandSignGroup</span></code> 是两套不同的分类，
 虽然其中一些组包含相同的星座：两者的固定组相同，现代变动组与 Ashmand 双体组相同，
 Ashmand 的至点、分点两组合起来则对应现代基本模式。成员相同不表示名称和历史定义也相同。</p>
 <p>两个 <code class="docutils literal notranslate"><span class="pre">FIXED</span></code> 成员的字符串值都是 <code class="docutils literal notranslate"><span class="pre">&quot;fixed&quot;</span></code>；按 <code class="docutils literal notranslate"><span class="pre">StrEnum</span></code> 的字符串语义，它们比较相等，
 hash 也相同。要在同一映射中保留二者，请用 <code class="docutils literal notranslate"><span class="pre">(type(member),</span> <span class="pre">member.value)</span></code> 作键，
 或使用各自带类别前缀的目录 ID。</p>
-<p>月相分类采用 Rudhyar 的八种类型，依据 <em>Your Lunation Birthday</em> 第四部分在线转录。
-页面称原文初刊于 <em>Horoscope Magazine</em> 1950 年 1 月；本项目未核对杂志原件。
-参见<a class="reference internal" href="catalog.html#catalog-zh-cn-rule-lunation-rudhyar1950"><span class="std std-ref">区间及来源</span></a>；区间端点如何归类、盈亏方向如何判断，见
+<p>月相分类采用 Rudhyar 的 <em>Your Lunation Birthday</em> 第四部分中的八种类型。
+版本和研究状态见<a class="reference internal" href="catalog.html#catalog-zh-cn-source-rudhyar-lunation-birthday"><span class="std std-ref">来源记录</span></a>，
+区间见<a class="reference internal" href="catalog.html#catalog-zh-cn-rule-lunation-rudhyar1950"><span class="std std-ref">规则表</span></a>；区间端点如何归类、盈亏方向如何判断，见
 <a class="reference internal" href="summaries.html#id3"><span class="std std-ref">用法指南</span></a>。</p>
 </section>
 <section id="id7">
@@ -349,7 +354,7 @@ hash 也相同。要在同一映射中保留二者，请用 <code class="docutil
 <li><p>每个概念／条目只有一个语义身份，附带各语言文本。记录译文对应的语义修订；
 缺译或过期须可见，不能静默换成另一语言并当作翻译完成。</p></li>
 <li><p>原文保留原语言，读者选择译文后仍能找到原文。</p></li>
-<li><p>生成的<a class="reference internal" href="catalog.html"><span class="std std-doc">目录</span></a>标明代码与语料版本。
+<li><p>生成的<a class="reference internal" href="catalog.html"><span class="std std-doc">目录</span></a>标明分发包版本。
 检查及语义审阅见<a class="reference internal" href="contributing.html"><span class="std std-doc">参与开发</span></a>。</p></li>
 </ul>
 <p>显示语言不能改变计算。不同定义不能因为中文译名相同就合成一个对象。
@@ -392,8 +397,9 @@ hash 也相同。要在同一映射中保留二者，请用 <code class="docutil
 <li class="toctree-l2"><a class="reference internal" href="chart.html">本命盘</a></li>
 <li class="toctree-l2"><a class="reference internal" href="aspects.html">相位</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cross_aspects.html">双盘相位与落宫</a></li>
+<li class="toctree-l2"><a class="reference internal" href="transits.html">精确行运命中</a></li>
 <li class="toctree-l2"><a class="reference internal" href="summaries.html">星座分布与出生月相</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dignities.html">传统星座守护与四种状态</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dignities.html">传统守护、尊贵状态与定位星链</a></li>
 <li class="toctree-l2"><a class="reference internal" href="records.html">命盘结果与文本显示</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference.html">公开 API 参考</a></li>
 <li class="toctree-l2"><a class="reference internal" href="architecture.html">仓库结构与计算边界</a></li>

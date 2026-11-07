@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Contributing &#8212; celestial-astrology 0.3.0 documentation / 文档</title>
+    <title>Contributing &#8212; celestial-astrology 0.4.0 documentation / 文档</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
-    <script src="../../_static/documentation_options.js?v=e259d695"></script>
+    <script src="../../_static/documentation_options.js?v=6c02275b"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/en/contributing.html" />
@@ -50,8 +50,7 @@ the repository root:</p>
 uv<span class="w"> </span>run<span class="w"> </span>--locked<span class="w"> </span>python<span class="w"> </span>tools/check.py
 </pre></div>
 </div>
-<p>Python 3.11–3.14 is supported. The lower bound matches celestial-calendar 0.8.0,
-which is a hard dependency of the package. CI runs the
+<p>Python 3.11–3.14 is supported. CI runs the
 same command on Linux 3.11/3.14 and macOS/Windows 3.14. Use
 <code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">sync</span> <span class="pre">--locked</span> <span class="pre">--python</span> <span class="pre">3.11</span></code> to check the lower endpoint locally.
 Use a current patch release for development checks. Safe sdist extraction in these checks
@@ -66,15 +65,17 @@ and an isolated wheel install with its declared runtime dependencies.</p>
 runs <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">build</span> <span class="pre">--wheel</span></code> inside the extracted tree. Strict HTML/doctest builds
 also run there and import the extracted package sources. The check then validates
 the API/catalog pages, generated search index and query code, and doctest results.</p>
-<p>The installed-package test program checks birth inputs,
-timezone-data provenance and configuration outside the checkout. It compares the
-complete numeric chart, resolved input, requested/effective configuration,
-provenance and comparison text with source results from the same revision.
-It also tests a failed Placidus request and checks where modules were imported
-from, including the explicitly loaded native adapter. A separate knowledge-only
-program lists, looks up, filters and resolves citations without time/native
-initialization. Both use isolated imports in normal and optimized modes; wheel
-and sdist checks require the actual corpus resources.</p>
+<p>The installed-package check verifies distribution identity, module origins and
+<code class="docutils literal notranslate"><span class="pre">py.typed</span></code> outside the checkout, including the adapter’s origin after calculation.
+Imports must not initialize native astronomy. Knowledge queries and supplied-chart
+comparisons must not initialize astronomy or time data; the knowledge-only mode
+also rejects <code class="docutils literal notranslate"><span class="pre">ctypes</span></code> modules.
+It compares complete natal, transit and cross-chart observations, including input,
+configuration, provenance and bilingual comparison text, with same-revision source
+results saved in JSON observation files. Chart provenance versions must match installed metadata.
+Knowledge resource location, loading, name lookup and citation access are exercised
+without a chart. Normal and optimized modes both run with isolated imports, and
+the <code class="docutils literal notranslate"><span class="pre">--missing-metadata</span></code> mode checks the calculation failure described below.</p>
 <p>Temporary HTML, doctest reports,
 distributions, and consumer environments use <code class="docutils literal notranslate"><span class="pre">SCRATCH</span></code> when set, otherwise the
 system temporary directory, and are removed on exit. Build metadata and tool
@@ -120,24 +121,27 @@ compare each document’s source example count with its executed Sphinx count.
 Passing these structural checks does not establish that an explanation is clear
 or its translation accurate; both still need to be read and checked.</p>
 <p><code class="docutils literal notranslate"><span class="pre">PACKAGE_FILES</span></code> in <code class="docutils literal notranslate"><span class="pre">tools/check.py</span></code> lists the source files expected in distributions.
-The checks independently scan the source tree for unlisted files and inspect the
-wheel and sdist for missing files. The installed-package test discovers actual Python modules and imports
-them explicitly, deferring the astronomy adapter until calculation. It does not
-import development check modules. Domain edge cases stay in domain tests;
-installed checks retain packaging, resources, metadata, initialization boundaries
-and representative complete use.</p>
+The checks independently scan the source tree for unlisted files, require every
+listed path in the wheel/sdist and compare wheel package bytes with the original
+checkout, including <code class="docutils literal notranslate"><span class="pre">catalog.json</span></code> and <code class="docutils literal notranslate"><span class="pre">py.typed</span></code>. The installed-package check discovers
+and imports each actual Python module, deferring the astronomy adapter until
+calculation; it does not import development checks. Feature PRs keep domain
+assertions in tests, not the installed-package check; packaging agreement uses
+source-to-wheel bytes and observation files.</p>
+<p>Fixed fresh-process inputs live in <code class="docutils literal notranslate"><span class="pre">tests/consumer_cases/</span></code>. Tests pass their text
+to <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">[-O]</span> <span class="pre">-c</span></code> so the repository root stays on <code class="docutils literal notranslate"><span class="pre">sys.path</span></code> for imports from <code class="docutils literal notranslate"><span class="pre">tools</span></code>.</p>
 <p>Sphinx discovers only the two root READMEs and sources under <code class="docutils literal notranslate"><span class="pre">docs/</span></code>. Keep virtual
 environments outside <code class="docutils literal notranslate"><span class="pre">docs/</span></code>: sources anywhere under that directory are documentation
 inputs, while sibling directories are not. Warnings in these document sources still
 fail the strict build.</p>
 <!-- usage: contributing.checks -->
 <p>Install this development package from the checkout using <code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">sync</span></code> above. Its
-distribution name/version is <code class="docutils literal notranslate"><span class="pre">celestial-astrology</span></code> / <code class="docutils literal notranslate"><span class="pre">0.3.0</span></code>; the Python import
+distribution name/version is <code class="docutils literal notranslate"><span class="pre">celestial-astrology</span></code> / <code class="docutils literal notranslate"><span class="pre">0.4.0</span></code>; the Python import
 remains <code class="docutils literal notranslate"><span class="pre">astrology</span></code>. The unrelated
 PyPI project <code class="docutils literal notranslate"><span class="pre">astrology</span></code> is not this library. Confirm the installed package and version:</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">importlib.metadata</span><span class="w"> </span><span class="kn">import</span> <span class="n">version</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">version</span><span class="p">(</span><span class="s2">"celestial-astrology"</span><span class="p">)</span>
-<span class="go">'0.3.0'</span>
+<span class="go">'0.4.0'</span>
 </pre></div>
 </div>
 <!-- /usage: contributing.checks -->
@@ -177,6 +181,17 @@ silent substitutions, and factories whose return type depends on hidden state.</
 </section>
 <section id="correctness">
 <h2>Correctness<a class="headerlink" href="#correctness" title="Link to this heading">¶</a></h2>
+<p>Transit fixtures in <code class="docutils literal notranslate"><span class="pre">tests/reference/transit_reference.json</span></code> use explicitly selected
+Moshier ephemeris calculations through <code class="docutils literal notranslate"><span class="pre">pyswisseph==2.10.3.2</span></code>, not Swiss/JPL data
+files. The optional generator <code class="docutils literal notranslate"><span class="pre">tools/fetch_transit_reference.py</span> <span class="pre">--output</span> <span class="pre">&lt;path&gt;</span></code>
+runs in a separate reference environment with that package, the project’s locked
+dependencies, and the repository root and <code class="docutils literal notranslate"><span class="pre">src/</span></code> on <code class="docutils literal notranslate"><span class="pre">PYTHONPATH</span></code>. It requires
+celestial-calendar 1.1.1 for calibration, but its crossing expectations come from
+Moshier or the existing independent Meeus node formulas. This adds no runtime
+dependency. The fixture records 1,830 calibration samples over 2021–2022, per-body
+angular bounds, a rate-scaled time bound and later held-out cases. Compare counts,
+directions and angular residuals as well as event times; exact native tangencies
+and endpoint ownership have separate controlled/native tests.</p>
 <p>Test the domain boundary as well as representative values: non-finite numbers,
 time ambiguity, coordinate wrap, exact endpoints, missing information, and
 unsupported combinations. Public validation must still run under <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-O</span></code>.</p>
@@ -402,8 +417,9 @@ incomplete evidence; verification of this repository’s merge policy is tracked
 <li class="toctree-l2"><a class="reference internal" href="chart.html">Natal charts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="aspects.html">Aspects</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cross_aspects.html">Cross-chart aspects and house overlays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="transits.html">Exact transit hits</a></li>
 <li class="toctree-l2"><a class="reference internal" href="summaries.html">Sign distributions and natal lunar phase</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dignities.html">Traditional sign rulers and four statuses</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dignities.html">Traditional rulership, dignities and dispositor chains</a></li>
 <li class="toctree-l2"><a class="reference internal" href="records.html">Chart results and text</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference.html">Public API reference</a></li>
 <li class="toctree-l2"><a class="reference internal" href="architecture.html">Repository structure and calculation boundaries</a></li>

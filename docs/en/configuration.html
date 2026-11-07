@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Requested chart configuration &#8212; celestial-astrology 0.3.0 documentation / 文档</title>
+    <title>Requested chart configuration &#8212; celestial-astrology 0.4.0 documentation / 文档</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
-    <script src="../../_static/documentation_options.js?v=e259d695"></script>
+    <script src="../../_static/documentation_options.js?v=6c02275b"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/en/configuration.html" />
@@ -67,9 +67,9 @@ Sun, Moon and mean ascending node. <code class="docutils literal notranslate"><s
 <span class="go">'meeus_five_term_true'</span>
 </pre></div>
 </div>
-<p><code class="docutils literal notranslate"><span class="pre">HouseSystem</span></code> supports Whole Sign, Equal and Placidus. If the selected system cannot
-be calculated at the given time or location, calculation fails without switching
-systems; see the <a class="reference internal" href="chart.html"><span class="std std-doc">chart guide</span></a> for the supported range.
+<p><code class="docutils literal notranslate"><span class="pre">HouseSystem</span></code> supports Whole Sign, Equal and Placidus. See the
+<a class="reference internal" href="chart.html"><span class="std std-doc">chart guide</span></a> for the supported range and the
+<a class="reference internal" href="architecture.html#composition-and-failures"><span class="std std-ref">failure policy</span></a> for unavailable geometry.
 <code class="docutils literal notranslate"><span class="pre">Body</span></code> includes ten physical bodies: the Sun, Moon, and Mercury through Pluto.
 Lunar nodes are mathematical points, selected with <code class="docutils literal notranslate"><span class="pre">LunarNode</span></code>. It offers mean and
 Meeus five-term true definitions, each with ascending and descending nodes.
@@ -155,7 +155,7 @@ You can set a separate orb only for a body, node or axis selected to participate
 </pre></div>
 </div>
 <p>NaN, infinity, negative orbs, booleans, unsupported modes, and inconsistent
-selections fail under normal Python and <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-O</span></code>.</p>
+selections fail validation.</p>
 <!-- /usage: configuration.orbs -->
 <p>See the <a class="reference internal" href="reference.html"><span class="std std-doc">API reference</span></a> for enum members, parameters and return values.
 For calculated models, versions, time scales and effective settings, read the
@@ -197,8 +197,9 @@ For calculated models, versions, time scales and effective settings, read the
 <li class="toctree-l2"><a class="reference internal" href="chart.html">Natal charts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="aspects.html">Aspects</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cross_aspects.html">Cross-chart aspects and house overlays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="transits.html">Exact transit hits</a></li>
 <li class="toctree-l2"><a class="reference internal" href="summaries.html">Sign distributions and natal lunar phase</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dignities.html">Traditional sign rulers and four statuses</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dignities.html">Traditional rulership, dignities and dispositor chains</a></li>
 <li class="toctree-l2"><a class="reference internal" href="records.html">Chart results and text</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference.html">Public API reference</a></li>
 <li class="toctree-l2"><a class="reference internal" href="architecture.html">Repository structure and calculation boundaries</a></li>

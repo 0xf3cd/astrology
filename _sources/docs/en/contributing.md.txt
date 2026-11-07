@@ -19,8 +19,7 @@ uv sync --locked --python 3.14
 uv run --locked python tools/check.py
 ```
 
-Python 3.11–3.14 is supported. The lower bound matches celestial-calendar 0.8.0,
-which is a hard dependency of the package. CI runs the
+Python 3.11–3.14 is supported. CI runs the
 same command on Linux 3.11/3.14 and macOS/Windows 3.14. Use
 `uv sync --locked --python 3.11` to check the lower endpoint locally.
 Use a current patch release for development checks. Safe sdist extraction in these checks
@@ -39,15 +38,17 @@ runs `python -m build --wheel` inside the extracted tree. Strict HTML/doctest bu
 also run there and import the extracted package sources. The check then validates
 the API/catalog pages, generated search index and query code, and doctest results.
 
-The installed-package test program checks birth inputs,
-timezone-data provenance and configuration outside the checkout. It compares the
-complete numeric chart, resolved input, requested/effective configuration,
-provenance and comparison text with source results from the same revision.
-It also tests a failed Placidus request and checks where modules were imported
-from, including the explicitly loaded native adapter. A separate knowledge-only
-program lists, looks up, filters and resolves citations without time/native
-initialization. Both use isolated imports in normal and optimized modes; wheel
-and sdist checks require the actual corpus resources.
+The installed-package check verifies distribution identity, module origins and
+`py.typed` outside the checkout, including the adapter's origin after calculation.
+Imports must not initialize native astronomy. Knowledge queries and supplied-chart
+comparisons must not initialize astronomy or time data; the knowledge-only mode
+also rejects `ctypes` modules.
+It compares complete natal, transit and cross-chart observations, including input,
+configuration, provenance and bilingual comparison text, with same-revision source
+results saved in JSON observation files. Chart provenance versions must match installed metadata.
+Knowledge resource location, loading, name lookup and citation access are exercised
+without a chart. Normal and optimized modes both run with isolated imports, and
+the `--missing-metadata` mode checks the calculation failure described below.
 
 Temporary HTML, doctest reports,
 distributions, and consumer environments use `SCRATCH` when set, otherwise the
@@ -103,12 +104,16 @@ Passing these structural checks does not establish that an explanation is clear
 or its translation accurate; both still need to be read and checked.
 
 `PACKAGE_FILES` in `tools/check.py` lists the source files expected in distributions.
-The checks independently scan the source tree for unlisted files and inspect the
-wheel and sdist for missing files. The installed-package test discovers actual Python modules and imports
-them explicitly, deferring the astronomy adapter until calculation. It does not
-import development check modules. Domain edge cases stay in domain tests;
-installed checks retain packaging, resources, metadata, initialization boundaries
-and representative complete use.
+The checks independently scan the source tree for unlisted files, require every
+listed path in the wheel/sdist and compare wheel package bytes with the original
+checkout, including `catalog.json` and `py.typed`. The installed-package check discovers
+and imports each actual Python module, deferring the astronomy adapter until
+calculation; it does not import development checks. Feature PRs keep domain
+assertions in tests, not the installed-package check; packaging agreement uses
+source-to-wheel bytes and observation files.
+
+Fixed fresh-process inputs live in `tests/consumer_cases/`. Tests pass their text
+to `python [-O] -c` so the repository root stays on `sys.path` for imports from `tools`.
 
 Sphinx discovers only the two root READMEs and sources under `docs/`. Keep virtual
 environments outside `docs/`: sources anywhere under that directory are documentation
@@ -118,14 +123,14 @@ fail the strict build.
 <!-- usage: contributing.checks -->
 
 Install this development package from the checkout using `uv sync` above. Its
-distribution name/version is `celestial-astrology` / `0.3.0`; the Python import
+distribution name/version is `celestial-astrology` / `0.4.0`; the Python import
 remains `astrology`. The unrelated
 PyPI project `astrology` is not this library. Confirm the installed package and version:
 
 ```{doctest}
 >>> from importlib.metadata import version
 >>> version("celestial-astrology")
-'0.3.0'
+'0.4.0'
 ```
 
 <!-- /usage: contributing.checks -->
@@ -169,6 +174,18 @@ choices and retain requested/effective settings. Avoid implicit global settings,
 silent substitutions, and factories whose return type depends on hidden state.
 
 ## Correctness
+
+Transit fixtures in `tests/reference/transit_reference.json` use explicitly selected
+Moshier ephemeris calculations through `pyswisseph==2.10.3.2`, not Swiss/JPL data
+files. The optional generator `tools/fetch_transit_reference.py --output <path>`
+runs in a separate reference environment with that package, the project's locked
+dependencies, and the repository root and `src/` on `PYTHONPATH`. It requires
+celestial-calendar 1.1.1 for calibration, but its crossing expectations come from
+Moshier or the existing independent Meeus node formulas. This adds no runtime
+dependency. The fixture records 1,830 calibration samples over 2021–2022, per-body
+angular bounds, a rate-scaled time bound and later held-out cases. Compare counts,
+directions and angular residuals as well as event times; exact native tangencies
+and endpoint ownership have separate controlled/native tests.
 
 Test the domain boundary as well as representative values: non-finite numbers,
 time ambiguity, coordinate wrap, exact endpoints, missing information, and

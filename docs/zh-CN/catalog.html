@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>知识目录参考 &#8212; celestial-astrology 0.3.0 documentation / 文档</title>
+    <title>知识目录参考 &#8212; celestial-astrology 0.4.0 documentation / 文档</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
-    <script src="../../_static/documentation_options.js?v=e259d695"></script>
+    <script src="../../_static/documentation_options.js?v=6c02275b"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/zh-CN/catalog.html" />
@@ -44,7 +44,7 @@
 原文引述、项目译文和原作陈述分别标明；检索从不确立命盘适用性。
 下方来源、前提、输出及命盘状态见指南的<a class="reference internal" href="knowledge.html#id10"><span class="std std-ref">状态说明</span></a>，
 译文状态见<a class="reference internal" href="knowledge.html#id7"><span class="std std-ref">翻译修订</span></a>。书目及版本内定位保留来源语言。</p>
-<p><code class="docutils literal notranslate"><span class="pre">code=0.3.0</span></code> · <code class="docutils literal notranslate"><span class="pre">corpus=2026.10.30.1</span></code></p>
+<p>分发包版本：<code class="docutils literal notranslate"><span class="pre">0.4.0</span></code></p>
 <section id="axis-ascendant">
 <span id="catalog-zh-cn-axis-ascendant"></span><h2>axis.ascendant · 上升点<a class="headerlink" href="#axis-ascendant" title="Link to this heading">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">kind=axis</span></code></p>
@@ -403,7 +403,7 @@
 <section id="node-definition-mean">
 <span id="catalog-zh-cn-node-definition-mean"></span><h2>node_definition.mean · 平均月交点<a class="headerlink" href="#node-definition-mean" title="Link to this heading">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">kind=node_definition</span></code></p>
-<p>项目的平均交点定义标识。排盘适配层将其对应到天文库的平交点；Meeus 印刷公式本身尚未对原文核验。</p>
+<p>项目的平均交点定义标识，由排盘适配层对应到天文库的平交点。公式对照记录见 entry.node_definitions。</p>
 <p>English names / 英文名称：Mean lunar node, mean node</p>
 <p>Chinese names / 中文名称：平均月交点、平均交点</p>
 <p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.objects.NodeDefinition.MEAN</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">mean</span></code></p>
@@ -411,7 +411,7 @@
 <section id="node-definition-meeus-five-term-true-meeus">
 <span id="catalog-zh-cn-node-definition-meeus-five-term-true"></span><h2>node_definition.meeus_five_term_true · Meeus 五项真月交点<a class="headerlink" href="#node-definition-meeus-five-term-true-meeus" title="Link to this heading">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">kind=node_definition</span></code></p>
-<p>项目定义标识 MEEUS_FIVE_TERM_TRUE。排盘适配层将其对应到天文库的真交点。该交点即五项级数是本项目的认定，已用同一组 Meeus 公式对拍，天文库本身并未指明级数。此处未确立误差界或与密切轨道交点的等价关系。</p>
+<p>平月交点加 Meeus 五项主要周期修正的项目标识。适配层将其对应到上游真交点目标；来源对照及限度见 entry.node_definitions。</p>
 <p>English names / 英文名称：Meeus five-term true lunar node, meeus five-term node</p>
 <p>Chinese names / 中文名称：Meeus 五项真月交点、五项真交点</p>
 <p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.objects.NodeDefinition.MEEUS_FIVE_TERM_TRUE</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">meeus_five_term_true</span></code></p>
@@ -528,7 +528,7 @@
 <section id="rule-lilly1647-essential-dignities-lilly-1647">
 <span id="catalog-zh-cn-rule-lilly1647-essential-dignities"></span><h2>rule.lilly1647.essential_dignities · Lilly 1647 年版七颗传统星体的守护及四种状态<a class="headerlink" href="#rule-lilly1647-essential-dignities-lilly-1647" title="Link to this heading">¶</a></h2>
 <p>astrology.dignities 定义太阳、月亮、水星、金星、火星、木星和土星的入庙及覆盖整个星座的擢升归属。失势与入庙星座相对，落陷与擢升星座相对。essential_dignities 按入庙、擢升、失势、落陷顺序返回全部命中；空元组表示这四项均未命中。HouseRulers 对给定的每个宫头星座调用 sign_ruler，并保留已有的宫主星落点，不重新计算；这一组合政策由项目定义。</p>
-<p>William Lilly（威廉·利利）的《Christian Astrology》（伦敦，1647），第一卷第 VIII–XIV 章及第 XVIII 章。Lilly 称其表依据 Ptolomy；此处未核 Ptolemy 原文。</p>
+<p>William Lilly（威廉·利利）的《Christian Astrology》（伦敦，1647），第一卷第 VIII–XIV 章及第 XVIII 章。第 104 页表题将名字拼作 Ptolomy；指认 Lilly 此表时保留该拼写。此处未核 Ptolemy 原文。</p>
 <p>仅判断太阳、月亮及水星至土星的这四种状态。不判断精确度数、昼夜条件、交点尊贵、外行星守护、三分性、界、面、互容或总分。四项均未命中不等于游离。命盘组合读取实际宫头，不以轴代替，保留所选宫制，并将未计算的宫主星落点保留为缺失。</p>
 <p>Concepts / 概念：<a class="reference internal" href="#catalog-zh-cn-body-sun"><span class="std std-ref">body.sun</span></a>, <a class="reference internal" href="#catalog-zh-cn-body-moon"><span class="std std-ref">body.moon</span></a>, <a class="reference internal" href="#catalog-zh-cn-body-mercury"><span class="std std-ref">body.mercury</span></a>, <a class="reference internal" href="#catalog-zh-cn-body-venus"><span class="std std-ref">body.venus</span></a>, <a class="reference internal" href="#catalog-zh-cn-body-mars"><span class="std std-ref">body.mars</span></a>, <a class="reference internal" href="#catalog-zh-cn-body-jupiter"><span class="std std-ref">body.jupiter</span></a>, <a class="reference internal" href="#catalog-zh-cn-body-saturn"><span class="std std-ref">body.saturn</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-aries"><span class="std std-ref">sign.aries</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-taurus"><span class="std std-ref">sign.taurus</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-gemini"><span class="std std-ref">sign.gemini</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-cancer"><span class="std std-ref">sign.cancer</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-leo"><span class="std std-ref">sign.leo</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-virgo"><span class="std std-ref">sign.virgo</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-libra"><span class="std std-ref">sign.libra</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-scorpio"><span class="std std-ref">sign.scorpio</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-sagittarius"><span class="std std-ref">sign.sagittarius</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-capricorn"><span class="std std-ref">sign.capricorn</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-aquarius"><span class="std std-ref">sign.aquarius</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-pisces"><span class="std std-ref">sign.pisces</span></a>, <a class="reference internal" href="#catalog-zh-cn-dignity-status-domicile"><span class="std std-ref">dignity_status.domicile</span></a>, <a class="reference internal" href="#catalog-zh-cn-dignity-status-exaltation"><span class="std std-ref">dignity_status.exaltation</span></a>, <a class="reference internal" href="#catalog-zh-cn-dignity-status-detriment"><span class="std std-ref">dignity_status.detriment</span></a>, <a class="reference internal" href="#catalog-zh-cn-dignity-status-fall"><span class="std std-ref">dignity_status.fall</span></a></p>
 <table class="docutils align-default">
@@ -788,15 +788,15 @@
 <span id="catalog-zh-cn-rule-node-definition-mean"></span><h2>rule.node_definition.mean · 平均月交点<a class="headerlink" href="#rule-node-definition-mean" title="Link to this heading">¶</a></h2>
 <p>适配层将 MEAN 交点定义对应到上游的平升交点和平降交点。方向由各 LunarNode 身份保留；此定义不选用五项修正。</p>
 <p>项目定义绑定，不是精度档位。</p>
-<p>项目测试按参考公式计算平交点，加上章动项，再与上游结果比较。这不表示已核验 Meeus 印刷原文或确立误差界，也不表示它可与真交点或密切轨道交点互换。</p>
+<p>平交点系数与 Meeus 1998 式 (47.7) 一致，核查见 source.meeus.astronomical-algorithms-1998。原生黄经加入 IAU 1980 章动，以当日真春分点为基准；测试的低精度坐标修正与之区分。这不确立误差界，也不表示可与真交点或密切轨道交点互换。</p>
 <p>Concepts / 概念：<a class="reference internal" href="#catalog-zh-cn-node-definition-mean"><span class="std std-ref">node_definition.mean</span></a></p>
 <p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.objects.NodeDefinition.MEAN</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">mean</span></code></p>
 </section>
 <section id="rule-node-definition-meeus-five-term-true-meeus">
 <span id="catalog-zh-cn-rule-node-definition-meeus-five-term-true"></span><h2>rule.node_definition.meeus_five_term_true · Meeus 五项真月交点<a class="headerlink" href="#rule-node-definition-meeus-five-term-true-meeus" title="Link to this heading">¶</a></h2>
-<p>适配层将 MEEUS_FIVE_TERM_TRUE 对应到上游的真升交点和真降交点。项目以平交点加五项正弦修正及章动项对照结果，据此认定级数；上游目标名称本身未指明该级数。</p>
+<p>适配层将 MEEUS_FIVE_TERM_TRUE 对应到上游的真升交点和真降交点。其平交点及五项正弦修正与 Meeus 1998 第 47 章一致；仅凭上游目标名不能指明级数。</p>
 <p>项目定义绑定，不是精度档位。</p>
-<p>这是实现对拍，不是独立天文互证。Meeus 印刷原文、误差界及与密切轨道交点的等价性仍未核验。</p>
+<p>只用书中印出的五项主要修正，不是瞬时轨道交点的完整周期级数。来源对照确认系数及自变量一致，不确立误差界或完整密切轨道交点等价性。原生 IAU 1980 章动与测试的低精度坐标修正仍须区分，详见 source.meeus.astronomical-algorithms-1998。</p>
 <p>Concepts / 概念：<a class="reference internal" href="#catalog-zh-cn-node-definition-meeus-five-term-true"><span class="std std-ref">node_definition.meeus_five_term_true</span></a></p>
 <p>Configuration request / 配置请求：<a class="reference internal" href="reference.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">astrology.objects.NodeDefinition.MEEUS_FIVE_TERM_TRUE</span></code></span></a> = <code class="docutils literal notranslate"><span class="pre">meeus_five_term_true</span></code></p>
 </section>
@@ -868,9 +868,9 @@
 </section>
 <section id="rule-ptolemy-ashmand-sign-groups-ashmand-1822">
 <span id="catalog-zh-cn-rule-ptolemy-ashmand-sign-groups"></span><h2>rule.ptolemy_ashmand.sign_groups · Ashmand 1822 年版星座分组<a class="headerlink" href="#rule-ptolemy-ashmand-sign-groups-ashmand-1822" title="Link to this heading">¶</a></h2>
-<p>astrology.zodiac.ashmand_sign_group 将每个 Sign 归入一个 AshmandSignGroup。原文直接点名至点与分点两对星座；固定星座在黄道次序中分别紧接这些星座，双体星座分别紧接固定星座。参考表读取这一可执行定义。</p>
+<p>astrology.zodiac.ashmand_sign_group 将每个 Sign 归入一个 AshmandSignGroup。原文直接点名至点与分点两对星座；固定星座在黄道次序中分别紧接这些星座，双体星座分别紧接固定星座。项目按这些先后关系展开十二星座表，不是原文逐项列举；参考表读取这一可执行定义。</p>
 <p>托勒密经被归于 Proclus 的转述本，由 Ashmand 于 1822 年译为英文；这是一个历史来源，不是跨流派共识。</p>
-<p>展开后的十二星座表由项目推导，不是原文逐项列举。此处 tropical 只指至点分组。不提供实际季节保证、命盘匹配、评分或解读。</p>
+<p>此处 tropical 只指至点分组。不提供实际季节保证、命盘匹配、评分或解读。</p>
 <p>Concepts / 概念：<a class="reference internal" href="#catalog-zh-cn-sign-aries"><span class="std std-ref">sign.aries</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-taurus"><span class="std std-ref">sign.taurus</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-gemini"><span class="std std-ref">sign.gemini</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-cancer"><span class="std std-ref">sign.cancer</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-leo"><span class="std std-ref">sign.leo</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-virgo"><span class="std std-ref">sign.virgo</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-libra"><span class="std std-ref">sign.libra</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-scorpio"><span class="std std-ref">sign.scorpio</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-sagittarius"><span class="std std-ref">sign.sagittarius</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-capricorn"><span class="std std-ref">sign.capricorn</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-aquarius"><span class="std std-ref">sign.aquarius</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-pisces"><span class="std std-ref">sign.pisces</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-group-ashmand1822-tropical"><span class="std std-ref">sign_group.ashmand1822.tropical</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-group-ashmand1822-equinoctial"><span class="std std-ref">sign_group.ashmand1822.equinoctial</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-group-ashmand1822-fixed"><span class="std std-ref">sign_group.ashmand1822.fixed</span></a>, <a class="reference internal" href="#catalog-zh-cn-sign-group-ashmand1822-bicorporeal"><span class="std std-ref">sign_group.ashmand1822.bicorporeal</span></a></p>
 <table class="docutils align-default">
 <thead>
@@ -974,6 +974,56 @@
 <p>源盘的黄道、中心和位置坐标约定须一致；当前构造器只接纳热带地心各自日期的位置。直接比较已存黄经与接收盘宫头，不转换共同历元，也不计算三维落宫。拒绝重复或不可用对象；输出为空时仍校验双侧源盘和选择。不执行天文计算、时刻解析、资源加载、组合盘构造或关系解读。</p>
 <p>Concepts / 概念：<a class="reference internal" href="#catalog-zh-cn-house-whole-sign"><span class="std std-ref">house.whole_sign</span></a>, <a class="reference internal" href="#catalog-zh-cn-house-equal"><span class="std std-ref">house.equal</span></a>, <a class="reference internal" href="#catalog-zh-cn-house-placidus"><span class="std std-ref">house.placidus</span></a>, <a class="reference internal" href="#catalog-zh-cn-axis-ascendant"><span class="std std-ref">axis.ascendant</span></a>, <a class="reference internal" href="#catalog-zh-cn-axis-midheaven"><span class="std std-ref">axis.midheaven</span></a>, <a class="reference internal" href="#catalog-zh-cn-axis-descendant"><span class="std std-ref">axis.descendant</span></a>, <a class="reference internal" href="#catalog-zh-cn-axis-imum-coeli"><span class="std std-ref">axis.imum_coeli</span></a></p>
 </section>
+<section id="rule-project-dispositor-chains">
+<span id="catalog-zh-cn-rule-project-dispositor-chains"></span><h2>rule.project.dispositor_chains · 定位星链<a class="headerlink" href="#rule-project-dispositor-chains" title="Link to this heading">¶</a></h2>
+<p>从显式选定的天体／交点落点出发，按 rule.lilly1647.essential_dignities 遍历其星座守护星。经过所有已有的守护星落点，包括未选作根的中间对象。自环表示最终定位星；两星循环表示基于入庙守护的互容；较长循环另列。下一颗守护星缺失时，为该根报告其身份。边包含闭环连线及缺失目标，各根路径则只含不重复的已有对象。循环以源盘顺序最早的成员起头并跨根去重，最终定位星按源盘顺序列出已到达的自环。</p>
+<p>项目基于 Lilly 星座守护表定义的遍历及结果约定；不将图算法归于 Lilly。</p>
+<p>天体及具名月交点可作根，后继均为七颗传统守护星之一。四轴及宫头不作根。不可用的根直接拒绝，不当作缺失的后继报告。不补算缺失位置，只报告已到达的连通部分。此处基于入庙守护的互容不判断相位、擢升互容或其他传统的条件。多个终点不确立唯一的全盘主星。不提供评分、解读或现代共同守护星。</p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-zh-cn-body-sun"><span class="std std-ref">body.sun</span></a>, <a class="reference internal" href="#catalog-zh-cn-body-moon"><span class="std std-ref">body.moon</span></a>, <a class="reference internal" href="#catalog-zh-cn-body-mercury"><span class="std std-ref">body.mercury</span></a>, <a class="reference internal" href="#catalog-zh-cn-body-venus"><span class="std std-ref">body.venus</span></a>, <a class="reference internal" href="#catalog-zh-cn-body-mars"><span class="std std-ref">body.mars</span></a>, <a class="reference internal" href="#catalog-zh-cn-body-jupiter"><span class="std std-ref">body.jupiter</span></a>, <a class="reference internal" href="#catalog-zh-cn-body-saturn"><span class="std std-ref">body.saturn</span></a>, <a class="reference internal" href="#catalog-zh-cn-body-uranus"><span class="std std-ref">body.uranus</span></a>, <a class="reference internal" href="#catalog-zh-cn-body-neptune"><span class="std std-ref">body.neptune</span></a>, <a class="reference internal" href="#catalog-zh-cn-body-pluto"><span class="std std-ref">body.pluto</span></a>, <a class="reference internal" href="#catalog-zh-cn-node-mean-ascending"><span class="std std-ref">node.mean_ascending</span></a>, <a class="reference internal" href="#catalog-zh-cn-node-mean-descending"><span class="std std-ref">node.mean_descending</span></a>, <a class="reference internal" href="#catalog-zh-cn-node-meeus-five-term-true-ascending"><span class="std std-ref">node.meeus_five_term_true_ascending</span></a>, <a class="reference internal" href="#catalog-zh-cn-node-meeus-five-term-true-descending"><span class="std std-ref">node.meeus_five_term_true_descending</span></a></p>
+</section>
+<section id="rule-project-exact-transit-hits">
+<span id="catalog-zh-cn-rule-project-exact-transit-hits"></span><h2>rule.project.exact_transit_hits · 精确行运与本命相位命中<a class="headerlink" href="#rule-project-exact-transit-hits" title="Link to this heading">¶</a></h2>
+<p>将所选本命黄经固定，导数为零。对 astrology.aspects.aspect_angle 定义的主要相位角，将本命度数加各有向分支角并归入一周，搜索移动视黄经达到该度数的时刻。合相与对分相的重合分支各只搜索一次。astrology.transits.transit_hits 组合原生事件，保留其移动速率及接触方向。</p>
+<p>项目对精确黄经相位的组合定义，不选择解读传统。</p>
+<p>本命与移动热带度数保留各自日期，不转换共同历元，也不声称是同时刻的空间角。本命轴是已存宫位几何点，不是地心视天体位置。具名平交点及 Meeus 五项交点保留其定义，不替换为密切轨道交点。精确指原生数值求根或接触合同，不是天文精度保证，也不要求相切速率的位模式为零。精确命中本身不推出容许度窗口、入相出相标签或解读。</p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-zh-cn-aspect-conjunction"><span class="std std-ref">aspect.conjunction</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-sextile"><span class="std std-ref">aspect.sextile</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-square"><span class="std std-ref">aspect.square</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-trine"><span class="std std-ref">aspect.trine</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-opposition"><span class="std std-ref">aspect.opposition</span></a></p>
+</section>
+<section id="source-celestial-calendar-events-1-1-1-celestial-calendar-longitude-events-and-utc-conversion">
+<span id="catalog-zh-cn-source-celestial-calendar-events-1-1-1"></span><h2>source.celestial-calendar.events.1.1.1 · celestial-calendar longitude events and UTC conversion<a class="headerlink" href="#source-celestial-calendar-events-1-1-1-celestial-calendar-longitude-events-and-utc-conversion" title="Link to this heading">¶</a></h2>
+<p>celestial-calendar contributors. Released Python package 1.1.1: events.py, utc_to_jde, longitude_events and model/capability interfaces. <code class="docutils literal notranslate"><span class="pre">language=en</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">source_verification=verified</span></code></p>
+<p><a class="reference external" href="https://github.com/0xf3cd/celestial-calendar/tree/v1.1.1"><code class="docutils literal notranslate"><span class="pre">https://github.com/0xf3cd/celestial-calendar/tree/v1.1.1</span></code></a></p>
+<p>已核公开发行的 1.1.1 Python 绑定定义及原生模型、能力说明。事件搜索及 UTC 转换是上游操作；与固定本命目标组合是本项目规则。</p>
+<p>上游代码采用 MIT 许可证。此记录为项目自写摘要，不再分发上游实现。</p>
+<p>记录地心视黄经穿越或接触、2^-30 日报告网格上的 JDE(TT) 事件时刻、已公布的七点速率算子、increasing／decreasing／tangent 方向码、半开区间、3660 TT 日长度上限及目标各自的速率求值域。UTC 转换使用固定闰秒表，在表尾之后保留最后偏移，不预测未来闰秒。本项目的现代行运输入不开放其历史 UT1 替代。此来源确立接口及模型合同，不是独立数值真值或占星解读。</p>
+</section>
+<section id="source-meeus-astronomical-algorithms-1998-astronomical-algorithms">
+<span id="catalog-zh-cn-source-meeus-astronomical-algorithms-1998"></span><h2>source.meeus.astronomical-algorithms-1998 · Astronomical Algorithms<a class="headerlink" href="#source-meeus-astronomical-algorithms-1998-astronomical-algorithms" title="Link to this heading">¶</a></h2>
+<p>Jean Meeus. Second English edition, Willmann-Bell, 1998; ISBN 0-943396-61-1. <code class="docutils literal notranslate"><span class="pre">language=en</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">source_verification=verified</span></code></p>
+<p><a class="reference external" href="https://search.worldcat.org/isbn/0943396611"><code class="docutils literal notranslate"><span class="pre">https://search.worldcat.org/isbn/0943396611</span></code></a></p>
+<p>已私有保留既有 PDF；SHA-256 为 eca5506c1384dbcee5409dfe04a33cecc6df55f688af41862baf51b9305bd436。原取得 URL 及时间未知。版权页（PDF 第 4 页）列出两组数字：98 99 00 01 02 03 04 05 06 及 9 8 7 6 5 4 3 2 1；不据此推断印次或印刷日期。2026-11-04 按渲染图像核查书名及版权页、印刷第 143–144、337–338、343–344 页（PDF 页码为印刷页码加 8）。式 (47.7)、自变量式 (47.2)–(47.5) 及全部五项主要交点修正，与 tests/test_reference.py::_meeus_nodes 和 celestial-calendar v1.0.0 的 src/astro/lunar_node.hpp、elp2000_82b.hpp::create_context 一致。已保留上游 lunar_node.hpp，SHA-256 为 36f475b8e071ead00761fd6cd0a67fdfcc358d789cb4e89515c2c1ca42bc5c3e。对照结论为各项一致；未改天文算法。</p>
+<p>版权书籍，仅作私有研究收藏。不再分发页图或书中散文；仅记录公式身份及项目自写说明。</p>
+<p>以当日平春分点为基准的平升交点黄经，以及印出的五项主要正弦修正；时间为距 J2000 的力学时世纪数。第 47 章将瞬时月球轨道真交点的更多项指向 Chapront 表，五项截断不是完整密切轨道交点。第 22 章将黄经章动作为坐标修正另行处理。原生输出加入 IAU 1980 章动；测试使用低精度近似，并以第 47 章的平交点作为 Omega，不是逐项照用第 22 章的简化 Omega。本次对照不确立误差界、完整周期级数或独立星历真值。</p>
+</section>
+<section id="source-astrodienst-swisseph-house-definitions-swiss-ephemeris-computer-ephemeris-for-developers-of-astrological-software">
+<span id="catalog-zh-cn-source-astrodienst-swisseph-house-definitions"></span><h2>source.astrodienst.swisseph-house-definitions · Swiss Ephemeris: computer ephemeris for developers of astrological software<a class="headerlink" href="#source-astrodienst-swisseph-house-definitions-swiss-ephemeris-computer-ephemeris-for-developers-of-astrological-software" title="Link to this heading">¶</a></h2>
+<p>Dieter Koch and Alois Treindl, Astrodienst AG. General documentation, copyright 1997–2022; HTML retrieved 2026-11-04. <code class="docutils literal notranslate"><span class="pre">language=en</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">source_verification=verified</span></code></p>
+<p><a class="reference external" href="https://www.astro.com/swisseph/swisseph.htm"><code class="docutils literal notranslate"><span class="pre">https://www.astro.com/swisseph/swisseph.htm</span></code></a></p>
+<p>已私有保留 swisseph.htm HTML，SHA-256 为 7ca3f8863d31001f3a1411139d4759813cc8c3d3c51312fbc45aa84382f05aa2。核查第 6.2.1 节（Placidus）及第 6.2.5 节第 1、4 项（从上升点起算的等宫制及整宫制）。另保留程序手册，SHA-256 为 8fe1629b648eb86420f1ee80b1061c03c99e2d68c5b03c22fedc16819bdebff3，核查宫制列表及极区替代说明。未收外链图片或资源。这是软件文档，不是历史一手见证，也不是对 Swiss Ephemeris 实现的审计。</p>
+<p>版权归 Astrodienst，作私有收藏。公开记录仅用项目释义说明定义，不再分发手册或图片。</p>
+<p>整宫制第一宫从上升点所在星座的起点开始；等宫制从上升点起将黄道分成十二个 30° 宫，与文中另列的 MC／Vehlow 变体区分。Placidus 将各宫头点自己的昼半弧／夜半弧三等分：第 11、12 宫头分别已走完昼半弧的 2/3、1/3，第 2、3 宫头对夜半弧亦然。这些几何定义不选择项目的宫头归属、边界容差或计算有效域。不采纳手册所述极圈外改用 Porphyry 的替代策略；请求的排盘失败时仍报失败。</p>
+</section>
+<section id="source-astrodienst-hellenistic-style-faq-overview-chart-drawing-styles-hellenistic">
+<span id="catalog-zh-cn-source-astrodienst-hellenistic-style-faq"></span><h2>source.astrodienst.hellenistic-style-faq · Overview chart drawing styles: Hellenistic<a class="headerlink" href="#source-astrodienst-hellenistic-style-faq-overview-chart-drawing-styles-hellenistic" title="Link to this heading">¶</a></h2>
+<p>Astrodienst AG. Undated FAQ; Wayback snapshot 2026-01-05 02:51:55 UTC. <code class="docutils literal notranslate"><span class="pre">language=en</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">source_verification=verified</span></code></p>
+<p><a class="reference external" href="https://web.archive.org/web/20260105025155/https://www.astro.com/faq/fq_fh_owstyle_e.htm"><code class="docutils literal notranslate"><span class="pre">https://web.archive.org/web/20260105025155/https://www.astro.com/faq/fq_fh_owstyle_e.htm</span></code></a></p>
+<p>直接请求 FAQ 得到浏览器检查页，并非正文。已私有保留 Wayback HTML，并于 2026-11-04 核查 Chart drawing style: Hellenistic 一节；SHA-256 为 5ca92e5569c8d8cd95dadc54c7fe562090de769be7bbfa20acbcdd2009266e09。未收外链资源。另请求 Astrowiki 的 Aspect URL 也只得到浏览器检查页，不作为已核定义。</p>
+<p>版权归 Astrodienst，作私有收藏；仅收项目对其设置的自写说明。</p>
+<p>记录一种绘图风格：五种具名相位，月亮容许度 13°、太阳及行星 3°，只满足月亮一侧容许度时半实半虚的例子，不设交点容许度或交点相位，以及另用点线显示的整星座相位。FAQ 将容许度及排除交点的设置归于 Chris Brennan 的建议；该署名不延伸到随后点线整星座相位的段落。此为参考夹具的背景，不是通用容许度标准，也不是项目三种合成政策各自的独立出处。不将这些数值或整星座相位采为 API 默认值。</p>
+</section>
 <section id="source-astrology-house-overlays-f269d14-astrology-house-overlay-and-comparison-text-implementation">
 <span id="catalog-zh-cn-source-astrology-house-overlays-f269d14"></span><h2>source.astrology.house_overlays.f269d14 · astrology house-overlay and comparison-text implementation<a class="headerlink" href="#source-astrology-house-overlays-f269d14-astrology-house-overlay-and-comparison-text-implementation" title="Link to this heading">¶</a></h2>
 <p>astrology contributors. src/astrology/house_overlays.py, chart.py, text.py and comparison tests at f269d148b8a3e58bc559e7d89be77a03aae6b289. <code class="docutils literal notranslate"><span class="pre">language=en</span></code></p>
@@ -988,16 +1038,16 @@
 <p>William Lilly. London: printed by Tho. Brudenell for John Partridge and Humph. Blunden, 1647. <code class="docutils literal notranslate"><span class="pre">language=en</span></code></p>
 <p><code class="docutils literal notranslate"><span class="pre">source_verification=verified</span></code></p>
 <p><a class="reference external" href="https://archive.org/details/b30338724"><code class="docutils literal notranslate"><span class="pre">https://archive.org/details/b30338724</span></code></a></p>
-<p>Internet Archive 托管的 Wellcome Library 扫描本 b30338724，2026-10-27 已按页面图像核查，包括 archive n12 的书名及出版页。第 VIII–XIV 章给出七颗传统星体的归属，第 XVIII 章及印刷页 104–105 说明用法。图像 SHA-256：n12 592cee40372d7c6fa60b7c877c327897f8522adfa081062ae6093815d0707818；n137（印刷页 104）3e8e1453ccff006e3229ba8473cb47966baf70fd0bca9c03c317a13fc6a953c8；n138（印刷页 105）e3d63ab52bf2a7be48b1fbdf4a8e53eb319224111094b7a8358806850cb05a72。另一份 1647 年微缩胶片扫描可旁证字形，但仍是同一历史文本，不是另一规则来源。引文合并换行，将长 s 字形规范为 s，以 Unicode 表示原占星符号，其余拼写保留。未查阅印刷原件。</p>
+<p>Internet Archive 托管的 Wellcome Library 扫描本 b30338724。2026-11-04 已私有保留整本 PDF 及 OCR；PDF SHA-256 为 2cb53e20e122ffc6e47917ba10241f6c49687cd7a4696f3b5db655a2a1aab28b。此次按图像核查书名及出版页、第 26、103–105、112 页。scandata 从零起算的 leafNum 为：书名页 13，第 26 页 60，第 103–105 页 137–139，第 112 页 146；此前图像定位少算一叶。leaf138 的 104 为手写，未见印刷页码；相邻 103／105 页序及 scandata 支持沿用第 104 页的常规定位。PDF 第 146 页可见印刷页码 112 及 Reception 段落。未找回旧页图摘要对应的文件，不声称新 IIIF 渲染与其相同。2026-10-27 的核查覆盖第 VIII–XIV 章及第 XVIII 章。引文合并换行，将长 s 规范为 s，以 Unicode 表示占星符号，其余拼写保留。本批未核印刷原件或第二份 1647 年扫描。</p>
 <p>已保留的 Wellcome 条目元数据将此作品标为 Public Domain Mark 1.0（https://creativecommons.org/publicdomain/mark/1.0/）。这里只记录该条目的声明，不作全球权限保证，也不据此断言另一扫描本的权限。仅收录简短的定义转录片段，不收扫描图、批注或现代网站说明。项目自写解释及署名中文译文采用 MIT 许可证。</p>
-<p>太阳、月亮及水星至土星的星座级入庙与擢升，并按原文的相对星座关系展开失势与落陷。行星章节也直接列出其中六颗星体的失势；土星失势为推导所得。不转录精确擢升度数或整张印刷表格的每个单元。不采纳相邻的计分、三分性、界、面或交点尊贵。来源核查仅确认此版本说了什么，不确立实证真值或命盘解读。</p>
+<p>七颗传统星体的星座级入庙及擢升，并按相对星座关系展开失势及落陷；行星章节直接列出六颗星体的失势，土星失势为推导所得。第 104 页表格拼作 Ptolomy。第一章第 26 页以相同黄道度分定义合相，以黄经相差 60°、90°、120°、180° 定义六分相、四分相、三分相及对分相。这些精确定义不规定项目的容许度、运动标签或参与对象政策；第 XIX 章第 105 页对将合相称为相位有所保留。第 112 页太阳在白羊座、火星在狮子座的例子支持基于入庙守护的互容标签（Lilly 所称 reception by Houses）；不采纳该段的征象星条件、强弱判断或其他尊贵关系。不采纳精确擢升度数、计分、三分性、界、面、交点尊贵或解读。定位星链的遍历由项目定义，不归于 Lilly。</p>
 </section>
 <section id="source-astrodienst-elements-signs-the-four-elements-and-the-signs-a-brief-introduction-to-astrology">
 <span id="catalog-zh-cn-source-astrodienst-elements-signs"></span><h2>source.astrodienst.elements-signs · The four Elements and the Signs (A Brief Introduction to Astrology)<a class="headerlink" href="#source-astrodienst-elements-signs-the-four-elements-and-the-signs-a-brief-introduction-to-astrology" title="Link to this heading">¶</a></h2>
 <p>Astrodienst AG (editorial page; no byline). Undated page; Internet Archive snapshot 2025-12-28 09:46:29 UTC. <code class="docutils literal notranslate"><span class="pre">language=en</span></code></p>
 <p><code class="docutils literal notranslate"><span class="pre">source_verification=verified</span></code></p>
 <p><a class="reference external" href="http://web.archive.org/web/20251228094629/https://www.astro.com/astrology/in_elements_e.htm"><code class="docutils literal notranslate"><span class="pre">http://web.archive.org/web/20251228094629/https://www.astro.com/astrology/in_elements_e.htm</span></code></a></p>
-<p>https://www.astro.com/astrology/in_elements_e.htm 的快照。已核快照是一个出版方的编辑文本，不是独立多源互证。Mutable signs 行把 Sagittarius 拼成 Sagitarius；项目规范拼写不变。</p>
+<p>https://www.astro.com/astrology/in_elements_e.htm 的快照，2026-11-04 已私有保留并复核；HTML SHA-256 为 6263ed7ef02f156c4842442d26fa1c845b00b336b67fdae6020019c5f5fba1e5。未收外链资源，不称完整离线网页。此为一个出版方的编辑文本，不是独立多源互证。Mutable signs 行把 Sagittarius 拼成 Sagitarius；项目规范拼写不变。</p>
 <p>页脚声明 Astrodienst AG 版权；页脚以外条款未核。仅收分类事实及项目释义，不转载网页摘文或性格描述。</p>
 <p>十二星座的四元素及三种性质归属，包括 mutable／common 命名。不采纳气质断言。</p>
 </section>
@@ -1006,7 +1056,7 @@
 <p>Dane Rudhyar. khaldea.com archival transcription; page reports Horoscope Magazine, January 1950. <code class="docutils literal notranslate"><span class="pre">language=en</span></code></p>
 <p><code class="docutils literal notranslate"><span class="pre">source_verification=verified</span></code></p>
 <p><a class="reference external" href="https://www.khaldea.com/rudhyar/astroarticles/lunationbirthday_4.php"><code class="docutils literal notranslate"><span class="pre">https://www.khaldea.com/rudhyar/astroarticles/lunationbirthday_4.php</span></code></a></p>
-<p>已核在线档案转录，未核页面所称的 1950 年 1 月杂志原件。类型名称采用标题形式；正文另有 Crescent Type 及 Disseminating Type 短称。</p>
+<p>在线档案转录已于 2026-11-04 私有保留并复核；HTML SHA-256 为 fe62cf7e5456202195372784b48257d066b9fbec9db755cc2a5627443281045c。未收外链资源；此非页面所称的 1950 年 1 月杂志原件。类型名称采用标题形式；正文另有 Crescent Type 及 Disseminating Type 短称。</p>
 <p>站点声明版权并禁止再分发文章。仅收类型名称、角度区间及项目释义，不收文章摘文或整段译文。</p>
 <p>八种月相类型的标题及其 Soli-Lunar Arc 区间。不采纳性格、生理或测光断言。</p>
 </section>
@@ -1060,9 +1110,24 @@
 <p>Ptolemy; paraphrase attributed to Proclus; English translator J. M. Ashmand. Davis and Dickson, London, 1822. <code class="docutils literal notranslate"><span class="pre">language=en</span></code></p>
 <p><code class="docutils literal notranslate"><span class="pre">source_verification=verified</span></code></p>
 <p><a class="reference external" href="https://commons.wikimedia.org/w/index.php?title=File:Ptolemy%27s_Tetrabiblos_or_Quadripartite_(1822).pdf&amp;oldid=1078168290"><code class="docutils literal notranslate"><span class="pre">https://commons.wikimedia.org/w/index.php?title=File:Ptolemy%27s_Tetrabiblos_or_Quadripartite_(1822).pdf&amp;oldid=1078168290</span></code></a></p>
-<p>直接转录 Wikimedia Commons 托管的 Google Books 扫描本印刷页 34–35（PDF 第 72–73 页）。下载文件 SHA-256：8ab3073b2200ba85b3dd812acc0b2edd2d2757f196cc641de42e9a46293189cb。合并换行、断词连字符及规范标点空格，保留措辞。纯文本转录不编码排版强调。不是 1900 年重印本或现代网页转录。版本旁证：https://wdl.warburg.sas.ac.uk/object-wdl-awa-aaan 。镜像及目录不算独立规则作者。</p>
+<p>此前转录 Wikimedia Commons 上 Google Books 扫描本的印刷第 34–35 页（PDF 第 72–73 页），记录 SHA-256 为 8ab3073b2200ba85b3dd812acc0b2edd2d2757f196cc641de42e9a46293189cb。2026-11-04 两次请求该文件均返回 HTTP429，未能保留这些原 PDF 字节或重核摘要；已保留 Commons 固定修订页及文件元数据。原转录合并换行、断词连字符并规范标点空格，保留措辞；纯文本不编码强调。已保留的 Warburg object-wdl-awa-aaan PDF 虽在目录标为 1822，扉页明确注明 1896 重印；它不是此处引用的 1822 扫描本，不用于验证该扫描的页码或排版。镜像不是独立规则作者。</p>
 <p>1822 年文本：Commons 文件修订 1078168290 标为原出版国、作者终身加 70 年或更短保护期地区及美国的公版（模板 PD-old-70-1923，并显示 Public Domain Mark 1.0 声明）；不作全球权限保证。仅收录范围有限的人工转录短文，不再分发扫描图、水印或网站说明。项目中文翻译及原作说明采用 MIT 许可证。</p>
 <p>《第一卷》第 XIV 章的四种星座分组：直接点名的至点／分点两对星座，以及定义固定／双体成员的先后关系。收录完整的分点星座句及范围有限的定义摘录；各定位说明标明片段边界。展开后的十二星座表由项目推导。这不是实证主张、多源共识或适用于命盘的结论。</p>
+</section>
+<section id="entry-transit-hits-statement">
+<span id="catalog-zh-cn-entry-transit-hits"></span><h2>entry.transit_hits · Statement / 陈述<a class="headerlink" href="#entry-transit-hits-statement" title="Link to this heading">¶</a></h2>
+<p>精确行运命中将移动视黄经与所选固定本命度数比较，保留每次原生穿越或接触及其速率、方向。</p>
+<p><code class="docutils literal notranslate"><span class="pre">prerequisites=complete</span></code> · <code class="docutils literal notranslate"><span class="pre">output=reference_only</span></code> · <code class="docutils literal notranslate"><span class="pre">chart=not_assessed</span></code></p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-zh-cn-aspect-conjunction"><span class="std std-ref">aspect.conjunction</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-sextile"><span class="std std-ref">aspect.sextile</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-square"><span class="std std-ref">aspect.square</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-trine"><span class="std std-ref">aspect.trine</span></a>, <a class="reference internal" href="#catalog-zh-cn-aspect-opposition"><span class="std std-ref">aspect.opposition</span></a></p>
+<p>Variants / 变体：<a class="reference internal" href="#catalog-zh-cn-rule-project-exact-transit-hits"><span class="std std-ref">rule.project.exact_transit_hits</span></a>, <a class="reference internal" href="#catalog-zh-cn-rule-project-aspect-deviation"><span class="std std-ref">rule.project.aspect_deviation</span></a></p>
+<p>Prerequisites / 前提：</p>
+<ul class="simple">
+<li><p>给定 NatalChart、显式且可用的本命目标、移动天体或交点身份、主要相位身份，以及每个所选事件来源均接纳的现代 UTC 区间。</p></li>
+</ul>
+<p>Exceptions / 例外：逆行回环可产生多次命中。tangent 是精确数值接触，不承诺速率为零。同一时刻的不同端点身份仍分别保留。</p>
+<p>Limits / 限度：组合及自身日期固定目标约定由项目定义，不归于 Lilly。上游合同不是独立精度参考。范围及坐标限度见 rule.project.exact_transit_hits；目录检索不搜索事件，也不判断命盘适用性。此为参考信息，不用于默认解读输出。</p>
+<p><a class="reference internal" href="#catalog-zh-cn-source-celestial-calendar-events-1-1-1"><span class="std std-ref">source.celestial-calendar.events.1.1.1</span></a>: longitude_events and LongitudeEvent contracts; EVENTS capabilities and model identity descriptions; utc_to_jde</p>
+<p><a class="reference internal" href="#catalog-zh-cn-source-lilly-christian-astrology-1647"><span class="std std-ref">source.lilly.christian-astrology-1647</span></a>: Book I, chapter I, p.26: exact longitude angles only, not this project’s time search, participant policy or interpretation</p>
 </section>
 <section id="entry-sign-elements-statement">
 <span id="catalog-zh-cn-entry-sign-elements"></span><h2>entry.sign_elements · Statement / 陈述<a class="headerlink" href="#entry-sign-elements-statement" title="Link to this heading">¶</a></h2>
@@ -1130,9 +1195,10 @@
 <li><p>调用方选择一个 HouseSystem 成员。</p></li>
 </ul>
 <p>Exceptions / 例外：请求合同不提供宫位几何；排盘适配层提供。</p>
-<p>Limits / 限度：此条目不确立宫制算法或适用域；排盘适配层及其有效域检查确立这些。不存在默认宫制。</p>
+<p>Limits / 限度：外部来源以升点所在星座定义整宫制、以上升点定义等宫制，以各宫头点自己的时间弧定义 Placidus。算法及计算有效域仍由适配层负责，精确边界落宫归 rule.project.cusp_ownership。不选用来源中的其他等宫变体或 Porphyry 替代策略。不存在默认宫制。</p>
 <p><a class="reference internal" href="#catalog-zh-cn-source-astrology-config-fa2e985"><span class="std std-ref">source.astrology.config.fa2e985</span></a>: astrology 0.0.0 / config.HouseSystem and config.ChartConfig at the recorded commit</p>
 <p><a class="reference internal" href="#catalog-zh-cn-source-astrology-chart-fc845fa"><span class="std std-ref">source.astrology.chart.fc845fa</span></a>: astrology 0.0.0 / src/astrology/houses.py at the recorded commit</p>
+<p><a class="reference internal" href="#catalog-zh-cn-source-astrodienst-swisseph-house-definitions"><span class="std std-ref">source.astrodienst.swisseph-house-definitions</span></a>: General documentation 6.2.1 Placidus; 6.2.5 item 1 Equal houses from Ascendant and item 4 Whole Sign houses; retained 2026-11-04 HTML</p>
 </section>
 <section id="entry-node-definitions-statement">
 <span id="catalog-zh-cn-entry-node-definitions"></span><h2>entry.node_definitions · Statement / 陈述<a class="headerlink" href="#entry-node-definitions-statement" title="Link to this heading">¶</a></h2>
@@ -1145,9 +1211,10 @@
 <li><p>天文计算需要排盘适配层及其具名模型；本目录不提供该模型。</p></li>
 </ul>
 <p>Exceptions / 例外：两种定义不得静默互换。</p>
-<p>Limits / 限度：此处未核验 Meeus 书中方程、误差界或与密切轨道交点的等价关系。</p>
+<p>Limits / 限度：印刷的平交点及五项修正系数、自变量与实现一致。五项截断不含完整瞬时交点级数；未核验误差界或完整密切轨道交点等价性。原生输出使用 IAU 1980 章动，测试参考则使用低精度坐标修正。来源核验不补齐此条目的计算前提，也不判断命盘。</p>
 <p><a class="reference internal" href="#catalog-zh-cn-source-astrology-config-fa2e985"><span class="std std-ref">source.astrology.config.fa2e985</span></a>: astrology 0.0.0 / config.NodeDefinition at the recorded commit</p>
 <p><a class="reference internal" href="#catalog-zh-cn-source-astrology-chart-fc845fa"><span class="std std-ref">source.astrology.chart.fc845fa</span></a>: astrology 0.0.0 / src/astrology/celestial.py (_NODE_TARGETS); tests/test_reference.py (_meeus_nodes, _nodes_agree, test_the_lunar_nodes_agree_with_the_meeus_definition) at fc845fa1aa786f7e1eda7b4d901e70e9a505add5</p>
+<p><a class="reference internal" href="#catalog-zh-cn-source-meeus-astronomical-algorithms-1998"><span class="std std-ref">source.meeus.astronomical-algorithms-1998</span></a>: Second English edition (1998), chapter 47 printed pp.337–338, 343–344 / PDF pp.345–346, 351–352: (47.2)–(47.5), (47.7), five principal corrections; chapter 22 pp.143–144 / PDF pp.151–152 for time and nutation context</p>
 </section>
 <section id="entry-node-directions-statement">
 <span id="catalog-zh-cn-entry-node-directions"></span><h2>entry.node_directions · Statement / 陈述<a class="headerlink" href="#entry-node-directions-statement" title="Link to this heading">¶</a></h2>
@@ -1172,8 +1239,10 @@
 <li><p>请求相位须显式给出容许度。</p></li>
 </ul>
 <p>Exceptions / 例外：ChartConfig 允许空的相位请求序列。</p>
-<p>Limits / 限度：此条目只列出请求标识；判断见 entry.aspect_evaluation。不提供默认容许度或解释。</p>
+<p>Limits / 限度：Lilly 提供精确黄经定义，不规定项目的容许度或运动政策，其用语对将合相称为相位有所保留。FAQ 只描述一种软件风格，其中整星座相位与本 API 的黄经判断区分。两份来源都不为此处选定默认容许度、交点／四轴参与、强度或解读。判断仍见 entry.aspect_evaluation。</p>
 <p><a class="reference internal" href="#catalog-zh-cn-source-astrology-config-fa2e985"><span class="std std-ref">source.astrology.config.fa2e985</span></a>: astrology 0.0.0 / config.MajorAspect and config.AspectRule at the recorded commit</p>
+<p><a class="reference internal" href="#catalog-zh-cn-source-lilly-christian-astrology-1647"><span class="std std-ref">source.lilly.christian-astrology-1647</span></a>: Book I, chapter I, printed p.26 / zero-based Wellcome leaf60: exact conjunction, sextile, quartile (square), trine and opposition; chapter XIX p.105 / leaf139 qualifies conjunction terminology</p>
+<p><a class="reference internal" href="#catalog-zh-cn-source-astrodienst-hellenistic-style-faq"><span class="std std-ref">source.astrodienst.hellenistic-style-faq</span></a>: Chart drawing style: Hellenistic, five aspects and Moon/planet orb display; Wayback 2026-01-05 02:51:55 UTC</p>
 </section>
 <section id="entry-aspect-evaluation-statement">
 <span id="catalog-zh-cn-entry-aspect-evaluation"></span><h2>entry.aspect_evaluation · Statement / 陈述<a class="headerlink" href="#entry-aspect-evaluation-statement" title="Link to this heading">¶</a></h2>
@@ -1295,8 +1364,8 @@
 </ul>
 <p>Exceptions / 例外：错误类型及未支持的外行星明确报错；支持对象无命中时返回空元组。宫主星落点未计算时为 None，不表示无命中。四项为空不构成游离判断。</p>
 <p>Limits / 限度：仅限一个具名历史规则集。不提供互容、综合强度、现代守护或解读。原文的昼夜庙标签及其他尊贵不是这四项查询的附加条件。目录检索从不判断命盘适用性。</p>
-<p><a class="reference internal" href="#catalog-zh-cn-source-lilly-christian-astrology-1647"><span class="std std-ref">source.lilly.christian-astrology-1647</span></a>: Book I, chaps. VIII–XIV: Saturn p.57/n90; Jupiter pp.61–62/n94–95; Mars p.65/n98; Sun p.69/n102; Venus p.73/n106; Mercury p.76/n109; Moon p.80/n113. Printed pages / Wellcome archive image indices.</p>
-<p><a class="reference internal" href="#catalog-zh-cn-source-lilly-christian-astrology-1647"><span class="std std-ref">source.lilly.christian-astrology-1647</span></a>: Book I, chap. XVIII, printed p.102 / Wellcome n135; fragment of the exaltation paragraph, following ‘four dignities essentiall’; the line-end split de-/gree is joined</p>
+<p><a class="reference internal" href="#catalog-zh-cn-source-lilly-christian-astrology-1647"><span class="std std-ref">source.lilly.christian-astrology-1647</span></a>: Book I, chaps. VIII–XIV: Saturn p.57/leaf91; Jupiter pp.61–62/leaf95–96; Mars p.65/leaf99; Sun p.69/leaf103; Venus p.73/leaf107; Mercury p.76/leaf110; Moon p.80/leaf114. Printed pages / zero-based Wellcome scandata leafNum.</p>
+<p><a class="reference internal" href="#catalog-zh-cn-source-lilly-christian-astrology-1647"><span class="std std-ref">source.lilly.christian-astrology-1647</span></a>: Book I, chap. XVIII, printed p.102 / Wellcome leaf136; fragment of the exaltation paragraph, following ‘four dignities essentiall’; the line-end split de-/gree is joined</p>
 <p>Original excerpt (English) / 原文引述（英文）：</p>
 <blockquote>
 <div><p>whether he be neer the very degree of his exaltation, yea or not</p>
@@ -1305,7 +1374,7 @@
 <blockquote>
 <div><p>无论它是否接近其擢升的确切度数</p>
 </div></blockquote>
-<p><a class="reference internal" href="#catalog-zh-cn-source-lilly-christian-astrology-1647"><span class="std std-ref">source.lilly.christian-astrology-1647</span></a>: Book I, printed p.105 / Wellcome n138, The Use of the Table, 13th-column detriment example for Venus; sentence fragment retaining the printed oneof spacing</p>
+<p><a class="reference internal" href="#catalog-zh-cn-source-lilly-christian-astrology-1647"><span class="std std-ref">source.lilly.christian-astrology-1647</span></a>: Book I, printed p.105 / Wellcome leaf139, The Use of the Table, 13th-column detriment example for Venus; sentence fragment retaining the printed oneof spacing</p>
 <p>Original excerpt (English) / 原文引述（英文）：</p>
 <blockquote>
 <div><p>a Signe opposite to oneof her owne Houses</p>
@@ -1314,7 +1383,7 @@
 <blockquote>
 <div><p>与她自己的某一入庙星座相对的星座</p>
 </div></blockquote>
-<p><a class="reference internal" href="#catalog-zh-cn-source-lilly-christian-astrology-1647"><span class="std std-ref">source.lilly.christian-astrology-1647</span></a>: Book I, printed p.105 / Wellcome n138, The Use of the Table, 14th-column fall example for Saturn; clause before ‘and so is Infortunate’</p>
+<p><a class="reference internal" href="#catalog-zh-cn-source-lilly-christian-astrology-1647"><span class="std std-ref">source.lilly.christian-astrology-1647</span></a>: Book I, printed p.105 / Wellcome leaf139, The Use of the Table, 14th-column fall example for Saturn; clause before ‘and so is Infortunate’</p>
 <p>Original excerpt (English) / 原文引述（英文）：</p>
 <blockquote>
 <div><p>♄ when he is in ♈ is opposite to ♎ his Exaltation</p>
@@ -1323,7 +1392,7 @@
 <blockquote>
 <div><p>土星位于白羊座时，与其擢升所在的天秤座相对</p>
 </div></blockquote>
-<p><a class="reference internal" href="#catalog-zh-cn-source-lilly-christian-astrology-1647"><span class="std std-ref">source.lilly.christian-astrology-1647</span></a>: Book I, printed p.103 / Wellcome n136, table according to Ptolomy and acknowledgment of differing traditions; p.104 / n137, table and zodiacal-house summary, not a cell-by-cell transcription</p>
+<p><a class="reference internal" href="#catalog-zh-cn-source-lilly-christian-astrology-1647"><span class="std std-ref">source.lilly.christian-astrology-1647</span></a>: Book I, printed p.103 / Wellcome leaf137, acknowledgment of differing traditions; p.104 / leaf138, table heading according to Ptolomy and zodiacal-house summary, not a cell-by-cell transcription</p>
 </section>
 <section id="entry-cross-house-overlays-statement">
 <span id="catalog-zh-cn-entry-cross-house-overlays"></span><h2>entry.cross_house_overlays · Statement / 陈述<a class="headerlink" href="#entry-cross-house-overlays-statement" title="Link to this heading">¶</a></h2>
@@ -1352,6 +1421,21 @@
 <p>Exceptions / 例外：允许轴间及对轴配对，不折叠身份。本命交点互配排除仍只针对月交点；静态双盘配对不设运动字段。</p>
 <p>Limits / 限度：这是项目政策，不是跨传统通用规则，也不认证天文来源。命盘组合不提供轴速率，因此非精确轴命中为不确定；偏差恰为零时仍为精确。标量调用方可给出有意义的有限速率。四轴没有天文输出目标、物理距离、原始位置或统计落点。目录检索从不判断命盘适用性。</p>
 <p><a class="reference internal" href="#catalog-zh-cn-source-astrology-axis-aspects-4cb15cc"><span class="std std-ref">source.astrology.axis_aspects.4cb15cc</span></a>: objects.Axis; config.ChartConfig.aspect_participants; chart._AXIS_FIELDS and _aspect_positions; cross_aspects._selection and _hits; tests/test_axis_aspects.py at the recorded commit</p>
+</section>
+<section id="entry-dispositor-chains-statement">
+<span id="catalog-zh-cn-entry-dispositor-chains"></span><h2>entry.dispositor_chains · Statement / 陈述<a class="headerlink" href="#entry-dispositor-chains-statement" title="Link to this heading">¶</a></h2>
+<p>Dispositors 保留给定命盘及显式根对象，提供不可变的守护边、根路径、已到达循环、最终定位星及各根缺失的守护星。chart_dispositors 从已有落点构造此结果。</p>
+<p><code class="docutils literal notranslate"><span class="pre">prerequisites=complete</span></code> · <code class="docutils literal notranslate"><span class="pre">output=reference_only</span></code> · <code class="docutils literal notranslate"><span class="pre">chart=not_assessed</span></code></p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-zh-cn-body-sun"><span class="std std-ref">body.sun</span></a>, <a class="reference internal" href="#catalog-zh-cn-body-moon"><span class="std std-ref">body.moon</span></a>, <a class="reference internal" href="#catalog-zh-cn-body-mercury"><span class="std std-ref">body.mercury</span></a>, <a class="reference internal" href="#catalog-zh-cn-body-venus"><span class="std std-ref">body.venus</span></a>, <a class="reference internal" href="#catalog-zh-cn-body-mars"><span class="std std-ref">body.mars</span></a>, <a class="reference internal" href="#catalog-zh-cn-body-jupiter"><span class="std std-ref">body.jupiter</span></a>, <a class="reference internal" href="#catalog-zh-cn-body-saturn"><span class="std std-ref">body.saturn</span></a>, <a class="reference internal" href="#catalog-zh-cn-body-uranus"><span class="std std-ref">body.uranus</span></a>, <a class="reference internal" href="#catalog-zh-cn-body-neptune"><span class="std std-ref">body.neptune</span></a>, <a class="reference internal" href="#catalog-zh-cn-body-pluto"><span class="std std-ref">body.pluto</span></a>, <a class="reference internal" href="#catalog-zh-cn-node-mean-ascending"><span class="std std-ref">node.mean_ascending</span></a>, <a class="reference internal" href="#catalog-zh-cn-node-mean-descending"><span class="std std-ref">node.mean_descending</span></a>, <a class="reference internal" href="#catalog-zh-cn-node-meeus-five-term-true-ascending"><span class="std std-ref">node.meeus_five_term_true_ascending</span></a>, <a class="reference internal" href="#catalog-zh-cn-node-meeus-five-term-true-descending"><span class="std std-ref">node.meeus_five_term_true_descending</span></a></p>
+<p>Variants / 变体：<a class="reference internal" href="#catalog-zh-cn-rule-project-dispositor-chains"><span class="std std-ref">rule.project.dispositor_chains</span></a></p>
+<p>Prerequisites / 前提：</p>
+<ul class="simple">
+<li><p>提供 NatalChart 及非空、无重复且已有落点的 Body／LunarNode 身份序列。选择复制为源盘顺序，只选择根对象，不限制已有的中间守护星。</p></li>
+</ul>
+<p>Exceptions / 例外：缺失后继仅保留显式身份，不伪造落点。根已在循环中时没有循环前缀；多个根可共用终点，也可到达不同部分。</p>
+<p>Limits / 限度：来源支持不变的星座守护表；遍历、顺序及输出约定由项目定义，限度见 rule.project.dispositor_chains。此条目不提供评分、解读或命盘适用性判断。</p>
+<p><a class="reference internal" href="#catalog-zh-cn-source-lilly-christian-astrology-1647"><span class="std std-ref">source.lilly.christian-astrology-1647</span></a>: Book I, p.104 / zero-based Wellcome leaf138, Houses of the Planets column and The Use of the Table: sign-ruler assignments only, not the project’s traversal algorithm</p>
+<p><a class="reference internal" href="#catalog-zh-cn-source-lilly-christian-astrology-1647"><span class="std std-ref">source.lilly.christian-astrology-1647</span></a>: Printed p.112 / zero-based Wellcome leaf146 (retained PDF page146), Reception paragraph, Sun in Aries and Mars in Leo: domicile-based mutual reception (Lilly’s reception by Houses) label only, not traversal, significator judgments or other dignities</p>
 </section>
 </section>
 
@@ -1390,8 +1474,9 @@
 <li class="toctree-l2"><a class="reference internal" href="chart.html">本命盘</a></li>
 <li class="toctree-l2"><a class="reference internal" href="aspects.html">相位</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cross_aspects.html">双盘相位与落宫</a></li>
+<li class="toctree-l2"><a class="reference internal" href="transits.html">精确行运命中</a></li>
 <li class="toctree-l2"><a class="reference internal" href="summaries.html">星座分布与出生月相</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dignities.html">传统星座守护与四种状态</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dignities.html">传统守护、尊贵状态与定位星链</a></li>
 <li class="toctree-l2"><a class="reference internal" href="records.html">命盘结果与文本显示</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference.html">公开 API 参考</a></li>
 <li class="toctree-l2"><a class="reference internal" href="architecture.html">仓库结构与计算边界</a></li>

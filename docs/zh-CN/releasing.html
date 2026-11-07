@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>发行流程 &#8212; celestial-astrology 0.3.0 documentation / 文档</title>
+    <title>发行流程 &#8212; celestial-astrology 0.4.0 documentation / 文档</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
-    <script src="../../_static/documentation_options.js?v=e259d695"></script>
+    <script src="../../_static/documentation_options.js?v=6c02275b"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/zh-CN/releasing.html" />
@@ -59,8 +59,8 @@ environment <code class="docutils literal notranslate"><span class="pre">pypi</s
 </section>
 <section id="id3">
 <h2>准备并检查候选<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
-<p>发布新版本前，另行准备并审阅版本升级及配套文档。README 按包名安装最新发行版；
-具体版本的发布情况放在发行说明中。</p>
+<p>发布新版本前，另行准备并审阅版本升级及配套文档。发行说明写明交付了什么；
+包索引的实际可用性记在发行记录中。</p>
 <ol class="arabic simple">
 <li><p>审阅源码、配套双语说明，以及发行追踪单的验收条件。明确依赖政策、计算约定及不兼容的 API 变化。</p></li>
 <li><p>本地运行锁定依赖的完整检查，并运行 PR 质量／安装工作流。
@@ -73,7 +73,7 @@ UTF-8 Markdown 描述。两者都包含英文 <code class="docutils literal notr
 不能留下会随发布过期的候选说法。核对 README 的包名和安装命令，并用接受的包执行示例。
 检查源码及解包 sdist 生成的中英文页面：快照标签始终检查，固定 SHA 的源码／归档链接则在
 <code class="docutils literal notranslate"><span class="pre">ASTROLOGY_DOCS_SOURCE_SHA</span></code> 指定构建源码修订号时检查。
-清单记录源码提交、语料版本、Python／依赖要求、
+清单记录源码提交、Python／依赖要求、
 两份制品的摘要，以及每个归档文件的路径、大小和摘要。额外成员、与源码不同的字节或运行依赖变化都会被拒绝。</p></li>
 <li><p>验证新发行检查的代表性反例。每个新 uv 步骤固定 uv 0.12.5、对应归档的 SHA-256 及新的工具缓存目录。
 在不合并的探针分支上，错误摘要必须使步骤在 uv 运行前失败，包括 ARM 消费者。
@@ -122,21 +122,12 @@ Pages 即使展示已发布版本，也仍是源码文档快照。</p>
 </section>
 <section id="id5">
 <h3>无上传演练<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h3>
-<p>使用通过检查的分发文件和一次性本地目录。在该目录保存一份演练记录，写明版本、源码 SHA、
-索引可用性，以及上传／GitHub Release／Pages 的状态。这些是模拟状态，不是实际发行记录。
-演练不触发发布工作流，不访问上传端点。</p>
-<ol class="arabic simple">
-<li><p>只准备一次清单，保存两份文件的摘要；用这些摘要及接受的源码核验保留制品。</p></li>
-<li><p>在演练记录中将索引可用性设为未收录，按 README 选择源码安装入口。
-确认包描述和生成页面没有声称该版本已经可以从索引安装。</p></li>
-<li><p>只把该记录中的索引可用性改成已收录；同样的描述和页面仍须通过，不能修改包字节。</p></li>
-<li><p>在同一份本地记录中，将上传标为模拟完成，GitHub Release 和 Pages 标为待办，
-重新核验原清单及文件，只补模拟的缺失步骤；不覆盖已有清单重跑准备，也不换成重建的包。</p></li>
-<li><p>对比最初与最终文件摘要，记录命令、实际退出状态和未完成的操作。
-内容修正须另审新版本，不能替换模拟的已有版本。</p></li>
-</ol>
-<p>这检查验收步骤和恢复选择，不证明 OIDC 凭据、PyPI 上传或线上部署可用；
-后者仍须在另获授权的发布及发布后验收中检查。</p>
+<p>发行流程或工作流变化后，若常规发布前检查仍有未覆盖的失败路径，再安排无上传演练。
+核对流程步骤时，使用保留的 wheel 和 sdist 在本地执行相关步骤；核对修改后的构建／消费步骤时，
+使用 PR 触发的工作流。记录缺口、wheel 和 sdist 的精确文件名及摘要、执行命令和结果。
+常规发行可使用正式工作流在人工批准前完成的构建及
+同一 wheel 消费检查，无须另跑演练。无上传运行不能核验 OIDC 凭据、PyPI 上传或线上部署；
+这些仍须在获授权的发布及发布后验收中检查。</p>
 </section>
 </section>
 <section id="id6">
@@ -208,8 +199,9 @@ GitHub 自动生成的源码 ZIP／tar 是 git 快照，不是已发布的 sdist
 <li class="toctree-l2"><a class="reference internal" href="chart.html">本命盘</a></li>
 <li class="toctree-l2"><a class="reference internal" href="aspects.html">相位</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cross_aspects.html">双盘相位与落宫</a></li>
+<li class="toctree-l2"><a class="reference internal" href="transits.html">精确行运命中</a></li>
 <li class="toctree-l2"><a class="reference internal" href="summaries.html">星座分布与出生月相</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dignities.html">传统星座守护与四种状态</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dignities.html">传统守护、尊贵状态与定位星链</a></li>
 <li class="toctree-l2"><a class="reference internal" href="records.html">命盘结果与文本显示</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference.html">公开 API 参考</a></li>
 <li class="toctree-l2"><a class="reference internal" href="architecture.html">仓库结构与计算边界</a></li>

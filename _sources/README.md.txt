@@ -14,7 +14,7 @@ the [guides](https://0xf3cd.github.io/astrology/docs/en/index.html) and
 Further features include
 [element/modality distributions and natal lunar
 phase](https://0xf3cd.github.io/astrology/docs/en/summaries.html),
-[traditional sign rulers and four statuses](https://0xf3cd.github.io/astrology/docs/en/dignities.html),
+[traditional sign rulers, four statuses and dispositor chains](https://0xf3cd.github.io/astrology/docs/en/dignities.html),
 [explicit axis aspects for natal and static cross-chart queries](https://0xf3cd.github.io/astrology/docs/en/aspects.html#select-axes-explicitly),
 and [cross-chart house overlays and bilingual comparison text](https://0xf3cd.github.io/astrology/docs/en/cross_aspects.html).
 Axes (Ascendant, Midheaven, Descendant and
@@ -25,15 +25,19 @@ The library also provides:
 - [Static cross-chart aspects](https://0xf3cd.github.io/astrology/docs/en/cross_aspects.html)
   between two natal charts, retaining both source charts and distinct left/right
   objects, without applying/separating labels.
+- [Exact transit hits](https://0xf3cd.github.io/astrology/docs/en/transits.html)
+  over a UTC interval, retaining repeated retrograde hits, native rates and directions.
 - `ashmand_sign_group(Sign.ARIES)` queries the twelve signs' four groups in
   Ashmand's 1822 edition. See [the source and lookup example](https://0xf3cd.github.io/astrology/docs/en/knowledge.html#ashmand-1822-sign-groups).
 
 ## Install a release
 
-This library depends on celestial-calendar 0.8.0, which publishes
-wheels for Linux x86_64 and aarch64, macOS 14+ arm64 and Windows amd64, and no source
+The celestial-calendar dependency publishes wheels for Linux x86_64 and aarch64,
+macOS arm64 and Windows amd64, and no source
 distribution. On any other platform this package cannot be installed, and
 knowledge browsing is not available either.
+Release-specific minimum operating-system versions are recorded in the
+[release notes](https://0xf3cd.github.io/astrology/docs/en/releases.html).
 
 `celestial-astrology` is the distribution name; the Python import is `astrology`.
 Do not install the unrelated PyPI project named `astrology`.
@@ -57,11 +61,14 @@ py -3.14 -m venv .venv
 .venv\Scripts\python.exe -m pip install celestial-astrology
 ```
 
-Runtime dependencies remain exactly pinned to `celestial-calendar==0.8.0` and
-`tzdata==2026.5`. This can conflict with applications requiring another version.
+Runtime dependencies are exactly pinned. This can conflict with applications
+requiring another version.
 See the [release notes](https://0xf3cd.github.io/astrology/docs/en/releases.html).
 
 ## Install from source
+
+This source checkout requires macOS **15+** on arm64; the other platforms listed
+above are unchanged.
 
 For the exact source
 revision used by the documentation, use the snapshot command on the
@@ -147,6 +154,7 @@ To calculate aspects, supply orb rules in `aspects` and select participants with
 | Resolve a local clock or select a repeated time | [Birth inputs](https://0xf3cd.github.io/astrology/docs/en/birth.html) |
 | Select objects, participants and orbs | [Configuration](https://0xf3cd.github.io/astrology/docs/en/configuration.html) |
 | Compare two charts | [Cross-chart aspects and house overlays](https://0xf3cd.github.io/astrology/docs/en/cross_aspects.html) |
+| Search an interval for exact transits | [Exact transit hits](https://0xf3cd.github.io/astrology/docs/en/transits.html) |
 
 ## First knowledge lookup
 
@@ -180,9 +188,7 @@ longitude only, without object latitude. The five major aspects use caller-suppl
 orbs; applying/separating describes local motion, not a future-event prediction.
 Results keep the four axes separately from the twelve house cusps.
 Immutable results retain the original input, resolved time scales, configuration,
-unrounded astronomy and named models. Chart persistence is removed in the current source; see the
-[release notes](https://0xf3cd.github.io/astrology/docs/en/releases.html) for the
-difference from the published v0.1.0 API.
+unrounded astronomy and named models.
 
 ## Design boundaries
 
@@ -193,7 +199,7 @@ difference from the published v0.1.0 API.
 ## Later work
 
 - [Techniques and presentation](https://github.com/0xf3cd/astrology/milestone/2):
-  transits and returns, relationship charts, tradition-specific rules, additional
+  fixed-instant transits, orb windows and returns, relationship charts, tradition-specific rules, additional
   objects, and chart views.
 - [Advanced and historical research](https://github.com/0xf3cd/astrology/milestone/3):
   directions, progressions, uncertain birth times, historical inputs, spatial

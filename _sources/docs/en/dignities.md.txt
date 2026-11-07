@@ -1,11 +1,10 @@
-# Traditional sign rulers and four statuses
+# Traditional rulership, dignities and dispositor chains
 
 [简体中文](../zh-CN/dignities.md) · [API](reference.md) · [Knowledge](knowledge.md)
 
-These APIs are introduced in 0.3.0; see the [installation instructions](../../README.md#install-a-release)
-for package-index availability and source installation. They use the rules recorded in William Lilly's *Christian
-Astrology* (London, 1647), for Sun, Moon, Mercury, Venus, Mars, Jupiter and Saturn,
-the seven classical planets in traditional astrology.
+`sign_ruler` and `essential_dignities` use the rules recorded in William Lilly's
+*Christian Astrology* (London, 1647), for Sun, Moon, Mercury, Venus, Mars, Jupiter
+and Saturn, the seven classical planets in traditional astrology.
 
 The assessments belong to traditional essential dignities and debilities. This
 API assesses only four sign-level statuses: domicile, exaltation, detriment and
@@ -78,8 +77,8 @@ House system: Whole Sign
 Rule: rule.lilly1647.essential_dignities
 House | Cusp sign | Ruler | Ruler placement | Statuses
 1 | Aries | Mars | Not calculated | Not calculated
->>> text.splitlines()[6].endswith("None of these four")
-True
+>>> print(text.splitlines()[6])  # doctest: +ELLIPSIS
+3 | Gemini | Mercury | Capricorn 1.889...° / House 10 | None of these four
 ```
 
 `HouseRulers` retains only the supplied `NatalChart`. Each `houses` access builds
@@ -108,41 +107,115 @@ True
 ```
 
 `HouseRuler` is immutable. Its `ruler` and `statuses` derive from its fields and
-cannot be supplied separately. A wrong field type raises `TypeError`, including
-a boolean house number. A house outside 1–12 or a placement identifying a different
-ruler raises `ValueError`. A low-level record does not authenticate chart origin
-or bind a cusp sign to a house number; `HouseRulers(chart)` performs that composition.
-It rejects a non-`NatalChart` with `TypeError` and accepts no separate tuple of house records.
-Runtime checks also run under `python -O`.
+cannot be supplied separately. The individual record takes a cusp sign;
+use `HouseRulers(chart)` to derive that sign from a chart's numbered cusp.
+See the [rulership API reference](reference.md#traditional-rulership-and-dignities) for field validation.
+
+### Formatting and errors
 
 `format_house_rulers` requires a supplied `Catalog` and current names in `en` or
-`zh-CN`. Invalid result/catalog types raise `TypeError`, invalid languages and
-missing/stale names `ValueError`. Missing sign/status IDs raise `KeyError`.
-If the catalog has no unique concept for a ruler or house system, formatting raises
-`ValueError`. Table delimiters and nonprinting characters in names are escaped.
-Formatting performs no resource I/O;
-pure queries and chart composition do not initialize native astronomy.
+`zh-CN`. Table delimiters and nonprinting characters in names are escaped.
+Unlike the [chart and comparison tables](records.md#display-does-not-change-classification),
+which truncate angles to whole arcseconds, the ruler's degree within its sign is
+shown as the stored decimal float; the example above abbreviates its digits with `...`.
+Status assessment still uses the sign alone.
+See the [text API reference](reference.md#chart-text) for formatter errors.
+
+## Follow dispositor chains
+
+<!-- usage: dignities.dispositors -->
+
+A placement's dispositor is the traditional ruler of its sign. Use
+`chart_dispositors` to follow that ruler's placement and continue until the path
+reaches a self-loop, a cycle or a ruler absent from the chart.
+
+This complete synthetic example calculates all ten bodies but selects only the
+Sun and Moon as starting objects:
+
+```{doctest}
+>>> from datetime import date, time, timedelta
+>>> from astrology import (BirthRecord, Body, ChartConfig, FixedOffset, HouseSystem,
+...     Location, natal_chart, prepare_natal_input, chart_dispositors)
+>>> birth = prepare_natal_input(BirthRecord(date(2000, 1, 1), time(12),
+...     FixedOffset(timedelta(0)), Location(0, 0)))
+>>> chart = natal_chart(birth, ChartConfig(HouseSystem.WHOLE_SIGN, tuple(Body), ()))
+>>> paths = chart_dispositors(chart, objects=(Body.MOON, Body.SUN))
+>>> paths.chart is chart, tuple(body.value for body in paths.objects)
+(True, ('sun', 'moon'))
+>>> tuple(body.value for body in paths.chains[Body.SUN])
+('sun', 'saturn', 'venus', 'jupiter', 'mars')
+>>> paths.edges[Body.MARS] is Body.SATURN
+True
+>>> tuple(tuple(body.value for body in cycle) for cycle in paths.cycles)
+(('venus', 'jupiter', 'mars', 'saturn'),)
+>>> paths.final_dispositors, dict(paths.missing_rulers)
+((), {})
+```
+
+The Sun in Capricorn leads to Saturn, then Venus, Jupiter and Mars. Mars leads
+back to Saturn: `edges` includes that closing link, while `chains[Body.SUN]`
+stops before repeating Saturn. The Sun is a tail into the four-planet cycle,
+not a member of it. The Moon reaches the same cycle, so `cycles` lists it once.
+Saturn, Venus, Jupiter and Mars were not selected as roots, but their placements
+remain available for traversal.
+
+<!-- /usage: dignities.dispositors -->
+
+Read the other endings as follows:
+
+- `final_dispositors` lists reached planets that rule their own signs. Their
+  self-loop edges remain in `edges`. For a root that reaches such a planet,
+  `chains[root]` lists that planet once.
+- A two-planet item in `cycles` is domicile-based mutual reception under this
+  rule. Longer cycles, such as the example, are not labeled mutual reception.
+- `missing_rulers[root]` gives the absent next ruler for that root. The path
+  ends at the last available object, and the edge to the absent ruler remains.
+
+For example, a chart containing only this Sun cannot continue to Saturn:
+
+```{doctest}
+>>> sparse = natal_chart(birth, ChartConfig(HouseSystem.WHOLE_SIGN, (Body.SUN,), ()))
+>>> incomplete = chart_dispositors(sparse, objects=(Body.SUN,))
+>>> incomplete.chains[Body.SUN], incomplete.missing_rulers[Body.SUN]
+((<Body.SUN: 'sun'>,), <Body.SATURN: 'saturn'>)
+```
+
+No missing position is calculated. Only components reached from the selected
+roots appear; several roots may have different final dispositors or cycles.
+The plural `final_dispositors` does not assert a unique ruler of the whole chart.
+
+`Dispositors(chart, objects)` constructs the same immutable result directly.
+Selections are copied and ordered by the chart's placements, not argument order.
+`edges` keys, roots and final dispositors follow source-chart order. Each cycle
+preserves edge direction and starts with its earliest member in source order.
+The cycles are ordered by those first members in source order. All mappings are read-only;
+paths, cycles and endpoint lists are tuples.
+
+Pass an explicit, nonempty sequence of available `Body` or `LunarNode` members.
+Outer bodies and named nodes can start a chain; their successors still use the
+seven classical sign rulers. Axes and cusps are not admitted as roots. Wrong
+chart types, non-sequences, strings and wrong identity types raise `TypeError`;
+empty, duplicate or unavailable roots raise `ValueError`. An unavailable root
+is an input error, distinct from a missing successor in a valid chain.
+
+`paths.rule_id` is `rule.project.dispositor_chains`. The
+{ref}`project rule <catalog-en-rule-project-dispositor-chains>` defines traversal
+and result ordering over Lilly's unchanged sign-ruler table. Its
+{ref}`knowledge entry <catalog-en-entry-dispositor-chains>` records the source
+boundary and the limits of domicile-based reception. It provides no scoring,
+interpretation or modern co-rulers, and has no dedicated formatter.
 
 ## Source and limits
 
-The {ref}`source record <catalog-en-source-lilly-christian-astrology-1647>` locates
-the inspected Wellcome scan, its 1647 imprint, image hashes and Public Domain Mark
-statement. Book I, chapters VIII–XIV provide the planet assignments; chapter XVIII,
-printed pp.102 and 104–105 explain sign-wide exaltation and the opposite-sign
-relations. Six detriments are explicit in the planet chapters; Saturn's is derived
-from its domiciles and the stated relation. The generated table is a project
-expansion of those assignments, not a transcription of every printed table cell.
+See the {ref}`rule and generated table <catalog-en-rule-lilly1647-essential-dignities>`
+for the assignments and their derivation, and the
+{ref}`source record <catalog-en-source-lilly-christian-astrology-1647>` for the
+edition, scan, transcription conventions and research limits. The catalog keeps
+source excerpts, credited Chinese translations and project explanations distinct.
 
-Three short English excerpts are distinguished from credited Chinese translations
-and project explanations. Their locators state the fragment boundaries; long-s,
-line breaks and astrological glyphs have the recorded normalization. A second
-scan corroborates readings of the same historical witness, not an independent
-tradition. Lilly calls his table Ptolemaic; Ptolemy's original was not inspected.
-
-This API does not assess exact exaltation degrees, sect, node dignities, triplicity,
+The four-status query does not assess exact exaltation degrees, sect, node dignities, triplicity,
 bounds/terms, faces, reception, aggregate scores or interpretation. Day/night
-domicile labels are not extra conditions on the four sign queries. Source
-verification records what the edition states, not empirical validity.
+domicile labels are not extra conditions on the four sign queries.
 
 Catalog status concepts have IDs `dignity_status.<value>` and no request-configuration
 link. `entry.essential_dignities` has complete query prerequisites but remains

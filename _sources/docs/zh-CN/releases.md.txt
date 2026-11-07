@@ -2,11 +2,50 @@
 
 [English](../en/releases.md) · [文档](index.md) · [发行流程](releasing.md)
 
+## 0.4.0
+
+本版增加定位星链和移动对本命的精确行运命中，将 celestial-calendar 升至 1.1.1，并删除独立目录版本。
+包索引：[PyPI](https://pypi.org/project/celestial-astrology/0.4.0/)。
+
+### 精确行运命中与 UTC 输入
+
+[`transit_hits`](transits.md)在显式现代 UTC 区间内搜索移动对固定本命的精确主要相位。
+`TransitHits` 保留源盘、选择、TT 区间、实际模型及每次原生命中的速率和方向，
+包括逆行重复命中与相切。不要求移动侧出生记录或地点；固定时刻行运盘、容许度窗口及返照不在本操作范围内。
+
+### 依赖与平台
+
+运行依赖精确钉住 `celestial-calendar==1.1.1` 和 `tzdata==2026.5`。
+天文依赖提供行运搜索使用的 UTC 转换接口。
+macOS arm64 下限从 14 升至 **15**；其他平台下限及 Python 3.11–3.14 支持不变。
+已有本命计算和文本格式不变。
+
+### 定位星链与守护关系归属
+
+[`chart_dispositors(chart, objects=...)`](dignities.md#跟随定位星链)
+返回不可变的 `Dispositors`，包含守护边、各选定根的路径、已到达的循环及最终定位星，
+以及缺失的后继守护星。使用不变的 Lilly 传统星座守护表；遍历由项目定义，不提供评分或解读。
+
+`HouseRuler` 和 `HouseRulers` 从 `astrology.summaries` 移至 `astrology.dignities`。
+直接从模块导入的代码须更新路径，旧模块不留别名。
+包根导入（`from astrology import HouseRulers`）仍有效。
+这是一次 0.x 源码路径兼容性变化；命盘计算、尊贵归属及已有文本输出不变。
+
+知识目录记录已核的 Meeus 交点项、相位及宫制的外部定义、修正后的 Lilly 扫描定位，
+以及原件保留或访问限度。来源核查不改变命盘适用性或默认输出资格；模型选择、容许度及数值算法不变。
+
+### 不兼容变化：删除目录版本
+
+源码 API 删除 `Catalog.version` 及其构造参数。自定义目录改用
+`Catalog(concepts, variants, sources, entries)`，省去原来的首个版本参数。
+目录 JSON 的 `version` 键和发行清单的 `corpus_version` 键也已删除，不提供替代的独立目录版本。
+若需查询已安装包的版本，使用 `importlib.metadata` 的 `version("celestial-astrology")`。
+这是一次 0.x 兼容性变化；源码修订、文献版次及命盘来源信息仍保留。
+
 ## 0.3.0
 
 此版本增加本命分析、四轴相位选择和双盘落宫功能。
-已发布文件见 [PyPI](https://pypi.org/project/celestial-astrology/0.3.0/)；
-若尚未列出此版本，请[从源码安装](../../README.zh-CN.md#从源码安装)。
+包索引：[PyPI](https://pypi.org/project/celestial-astrology/0.3.0/)。
 
 - [元素／模式分布](summaries.md)：等权统计明确选择的对象，保留零计数类别、计数及比例。
 - [出生月相](summaries.md)：按具名的 Rudhyar 规则及本项目说明的区间边界，对日月黄经角度分类。

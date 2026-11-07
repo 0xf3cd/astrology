@@ -6,6 +6,9 @@
 已执行的例子、校验行为和支持范围见[出生输入](birth.md)、[请求配置](configuration.md)、
 [排盘指南](chart.md)、[相位指南](aspects.md)及[命盘结果](records.md)。独立查询见[知识指南](knowledge.md)。
 
+计算边界：[初始化与 I/O](architecture.md#副作用边界)、[构造校验](architecture.md#可复现性)及
+[宫制失败](architecture.md#组合与失败)。
+
 ## 出生记录与时刻解析
 
 ```{eval-rst}
@@ -99,6 +102,18 @@
    :no-index:
 ```
 
+## 精确行运命中
+
+UTC 区间搜索及结果字段见[精确行运命中](transits.md)。
+
+```{eval-rst}
+.. automodule:: astrology.transits
+   :members: TransitDirection, TransitDomainError, TransitSource, TransitHit, TransitHits, transit_hits
+   :undoc-members:
+   :member-order: bysource
+   :no-index:
+```
+
 ## 双盘落宫
 
 计算方法见[双盘落宫示例](cross_aspects.md#查询对象落入另一张盘的哪一宫)，文本输出见[比较文本示例](cross_aspects.md#输出比较文本)。
@@ -126,7 +141,7 @@
 
 ```{eval-rst}
 .. automodule:: astrology.summaries
-   :members: SignDistribution, sign_distribution, chart_sign_distribution, natal_lunar_phase, HouseRuler, HouseRulers
+   :members: SignDistribution, sign_distribution, chart_sign_distribution, natal_lunar_phase
    :undoc-members:
    :member-order: bysource
    :no-index:
@@ -134,11 +149,11 @@
 
 ## 传统守护与本质尊贵
 
-具名来源、同时命中和缺失落点见[尊贵指南](dignities.md)。
+星座查询、宫主星及定位星链见[尊贵指南](dignities.md)。
 
 ```{eval-rst}
 .. automodule:: astrology.dignities
-   :members: DignityStatus, sign_ruler, essential_dignities
+   :members: DignityStatus, sign_ruler, essential_dignities, HouseRuler, HouseRulers, Dispositors, chart_dispositors
    :undoc-members:
    :member-order: bysource
    :no-index:

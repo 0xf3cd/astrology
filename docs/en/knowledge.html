@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Knowledge organization and bilingual documentation &#8212; celestial-astrology 0.3.0 documentation / 文档</title>
+    <title>Knowledge organization and bilingual documentation &#8212; celestial-astrology 0.4.0 documentation / 文档</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
-    <script src="../../_static/documentation_options.js?v=e259d695"></script>
+    <script src="../../_static/documentation_options.js?v=6c02275b"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/en/knowledge.html" />
@@ -58,13 +58,13 @@ for calculation.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">catalog</span><span class="o">.</span><span class="n">concept</span><span class="p">(</span><span class="s2">"body.sun"</span><span class="p">)</span><span class="o">.</span><span class="n">configuration</span><span class="o">.</span><span class="n">name</span>
 <span class="go">'SUN'</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">rule</span><span class="o">.</span><span class="n">identifier</span> <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="n">catalog</span><span class="o">.</span><span class="n">list_variants</span><span class="p">(</span><span class="n">concept_id</span><span class="o">=</span><span class="s2">"body.sun"</span><span class="p">)]</span>
-<span class="go">['rule.lilly1647.essential_dignities']</span>
+<span class="go">['rule.lilly1647.essential_dignities', 'rule.project.dispositor_chains']</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">rule</span><span class="o">.</span><span class="n">identifier</span> <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="n">catalog</span><span class="o">.</span><span class="n">list_variants</span><span class="p">(</span><span class="n">concept_id</span><span class="o">=</span><span class="s2">"body.uranus"</span><span class="p">)]</span>
+<span class="go">['rule.project.dispositor_chains']</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">catalog</span><span class="o">.</span><span class="n">filter_entries</span><span class="p">(</span><span class="n">concept_id</span><span class="o">=</span><span class="s2">"body.sun"</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">identifier</span>
 <span class="go">'entry.body_requests'</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">catalog</span><span class="o">.</span><span class="n">filter_sources</span><span class="p">(</span><span class="n">verification</span><span class="o">=</span><span class="n">SourceVerification</span><span class="o">.</span><span class="n">VERIFIED</span><span class="p">))</span>
-<span class="go">10</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">bool</span><span class="p">(</span><span class="n">catalog</span><span class="o">.</span><span class="n">version</span><span class="p">)</span>
-<span class="go">True</span>
+<span class="go">14</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">catalog</span><span class="o">.</span><span class="n">entry</span><span class="p">(</span><span class="s2">"entry.cross_aspect_evaluation"</span><span class="p">)</span><span class="o">.</span><span class="n">statement</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">"en"</span><span class="p">))</span>
 <span class="go">Static major cross aspects compare two supplied natal results with distinct left/right endpoints and preserve both complete sources, without a motion field.</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">catalog</span><span class="o">.</span><span class="n">variant</span><span class="p">(</span><span class="s2">"rule.project.cusp_ownership"</span><span class="p">)</span><span class="o">.</span><span class="n">definition</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">"en"</span><span class="p">))</span>
@@ -77,12 +77,13 @@ print those texts in English; use <code class="docutils literal notranslate"><sp
 <p>Several names can identify one concept: <code class="docutils literal notranslate"><span class="pre">Sun</span></code>, <code class="docutils literal notranslate"><span class="pre">Sol</span></code> and <code class="docutils literal notranslate"><span class="pre">日轮</span></code> all refer to
 <code class="docutils literal notranslate"><span class="pre">body.sun</span></code>. A rule variant records a particular definition, such as a house
 system or lunar-node algorithm. A record that only names a body or a node direction
-does not need a separate rule. Above, <code class="docutils literal notranslate"><span class="pre">list_variants(concept_id=&quot;body.sun&quot;)</span></code> finds
-the rule <code class="docutils literal notranslate"><span class="pre">rule.lilly1647.essential_dignities</span></code>. This rule records the signs of domicile,
-exaltation, detriment and fall for the Sun and other classical planets, citing Lilly’s work.
-For example, <code class="docutils literal notranslate"><span class="pre">list_variants(concept_id=&quot;body.uranus&quot;)</span></code> returns an empty tuple:
-the catalog has no rule linked to Uranus. You can still retrieve its name record
-with <code class="docutils literal notranslate"><span class="pre">concept(&quot;body.uranus&quot;)</span></code> or <code class="docutils literal notranslate"><span class="pre">lookup(&quot;Uranus&quot;)</span></code>.</p>
+does not need a separate rule. Above, the Sun lookup finds two rules.
+<code class="docutils literal notranslate"><span class="pre">rule.lilly1647.essential_dignities</span></code> records the signs of domicile, exaltation,
+detriment and fall for the Sun and other classical planets, citing Lilly’s work.
+<code class="docutils literal notranslate"><span class="pre">rule.project.dispositor_chains</span></code> defines paths following traditional sign rulers;
+see the <a class="reference internal" href="dignities.html#follow-dispositor-chains"><span class="std std-ref">dispositor example</span></a>.
+Uranus links only the chain rule, since it can start a path but has no four-status
+assessment. Retrieve its name record with <code class="docutils literal notranslate"><span class="pre">concept(&quot;body.uranus&quot;)</span></code> or <code class="docutils literal notranslate"><span class="pre">lookup(&quot;Uranus&quot;)</span></code>.</p>
 <!-- /usage: knowledge.lookup -->
 <!-- usage: knowledge.editorial_states -->
 <p>You can also look up the rules for <a class="reference internal" href="cross_aspects.html"><span class="std std-doc">cross-chart aspect comparison</span></a>.
@@ -117,8 +118,7 @@ owners, and retain each chart’s house system. <code class="docutils literal no
 the intervals between cusps that determine a longitude’s house. House overlays use
 that same interval rule.</p>
 <p>The source record links to implementation code at a fixed commit, so you can
-check the algorithm. It does not verify where the input astronomical values came
-from or support relationship interpretation. The query above only reads explanations
+check the algorithm and its stated scope. The query above only reads explanations
 and citations; it does not calculate placements or assess a chart. To calculate
 placements between two charts, see the <a class="reference internal" href="cross_aspects.html#find-houses-in-the-other-chart"><span class="std std-ref">house-overlay example</span></a>.</p>
 <section id="return-values-and-errors">
@@ -126,7 +126,7 @@ placements between two charts, see the <a class="reference internal" href="cross
 <p>Each <code class="docutils literal notranslate"><span class="pre">load_catalog()</span></code> reads the packaged JSON file without network access or a
 cache. Record constructors copy input sequences into immutable tuples. Invalid
 record types, duplicate IDs, links to missing records and conflicting aliases
-raise <code class="docutils literal notranslate"><span class="pre">TypeError</span></code> or <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>; these checks also run under <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-O</span></code>.</p>
+raise <code class="docutils literal notranslate"><span class="pre">TypeError</span></code> or <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>.</p>
 <p><code class="docutils literal notranslate"><span class="pre">lookup()</span></code> normalizes NFC, trims and case-folds, then matches exact names/aliases.
 It returns an immutable tuple: <code class="docutils literal notranslate"><span class="pre">()</span></code> for no match, several distinct concepts for
 ambiguous names. Select <code class="docutils literal notranslate"><span class="pre">language=&quot;en&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">language=&quot;zh-CN&quot;</span></code> to restrict
@@ -183,6 +183,12 @@ checked (<code class="docutils literal notranslate"><span class="pre">verified</
 unclear (<code class="docutils literal notranslate"><span class="pre">unresolved</span></code>). The entry is marked <code class="docutils literal notranslate"><span class="pre">reference_only</span></code>, for consultation
 rather than chart conclusions. The entry’s statements,
 definitions and limits are project explanations, separate from the quotation.</p>
+<p>To go the other way, pass a source ID to <code class="docutils literal notranslate"><span class="pre">filter_entries</span></code> to find entries citing it:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">source</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">source</span><span class="p">(</span><span class="s2">"source.ptolemy.ashmand1822"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">item</span><span class="o">.</span><span class="n">identifier</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">catalog</span><span class="o">.</span><span class="n">filter_entries</span><span class="p">(</span><span class="n">source_id</span><span class="o">=</span><span class="n">source</span><span class="o">.</span><span class="n">identifier</span><span class="p">)]</span>
+<span class="go">['entry.sign_vocabulary', 'entry.equinoctial_example', 'entry.ashmand_sign_groups']</span>
+</pre></div>
+</div>
 <p>Source records give the edition, scan hash, transcription changes and reproduction
 terms. The package includes limited definition excerpts, not scan images,
 watermarks or modern website prose. Mirrors and bibliographic records can help
@@ -191,11 +197,10 @@ citations identify the package version and symbols at a fixed commit. A definiti
 bearing an author’s name does not mean the formulas in that author’s book have
 been checked.</p>
 <p>Implementation source records stay pinned to the inspected commits instead of
-following the package version. The chart source record locates the node-comparison
-test in <code class="docutils literal notranslate"><span class="pre">tests/test_reference.py</span></code> at that same commit. The test calculates reference
-node longitudes from the formulas recorded there and compares them with upstream
-results. This does not verify Meeus’s printed text, establish an error bound or show
-equivalence to an osculating node.</p>
+following the package version. The
+<a class="reference internal" href="catalog.html#catalog-en-source-astrology-chart-fc845fa"><span class="std std-ref">chart source record</span></a> locates its
+node-comparison test; the <a class="reference internal" href="catalog.html#catalog-en-rule-node-definition-meeus-five-term-true"><span class="std std-ref">node rule</span></a>
+records the comparison’s scope and unresolved source questions.</p>
 <p>The hand-written data below illustrates knowing only some of the conditions:
 the first is true, while the second remains unknown. The catalog does not read
 this dictionary or change the entry’s chart-applicability status:</p>
@@ -225,14 +230,14 @@ retroactively evidence for the axis extension.</p>
 <span class="go">('complete', 'reference_only', 'not_assessed')</span>
 </pre></div>
 </div>
-<p>These queries need no chart or native astronomy. To calculate the geometry, see
+<p>To calculate the geometry, see
 <a class="reference internal" href="aspects.html#select-axes-explicitly"><span class="std std-ref">explicit natal selection</span></a> and
 <a class="reference internal" href="cross_aspects.html#select-axes-on-each-side"><span class="std std-ref">independent cross-side selection</span></a>.</p>
 </section>
 <section id="ashmand-1822-sign-groups">
 <h2>Ashmand 1822 sign groups<a class="headerlink" href="#ashmand-1822-sign-groups" title="Link to this heading">¶</a></h2>
 <p>These groups come from Ashmand’s 1822 <em>Ptolemy’s Tetrabiblos, or Quadripartite</em>.
-New in 0.2.0, <code class="docutils literal notranslate"><span class="pre">ashmand_sign_group</span></code> takes a <code class="docutils literal notranslate"><span class="pre">Sign</span></code> and returns its group:</p>
+<code class="docutils literal notranslate"><span class="pre">ashmand_sign_group</span></code> takes a <code class="docutils literal notranslate"><span class="pre">Sign</span></code> and returns its group:</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">astrology</span><span class="w"> </span><span class="kn">import</span> <span class="n">AshmandSignGroup</span><span class="p">,</span> <span class="n">Sign</span><span class="p">,</span> <span class="n">ashmand_sign_group</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">astrology.knowledge</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_catalog</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">catalog</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">()</span>
@@ -255,17 +260,12 @@ The earlier equinoctial entry remains <code class="docutils literal notranslate"
 chart interpretation are a separate question.</p>
 <p>The four labels are <strong>tropical</strong>, <strong>equinoctial</strong>, <strong>fixed</strong> and <strong>bicorporeal</strong>.
 Tropical here means the two solstitial signs, not all twelve signs of the tropical
-zodiac. The source directly names the tropical and equinoctial pairs. In zodiac
-order, fixed signs immediately follow those signs, and bicorporeal signs
-immediately follow fixed signs. The
-<a class="reference internal" href="catalog.html#catalog-en-rule-ptolemy-ashmand-sign-groups"><span class="std std-ref">twelve-sign table</span></a> is
-project-derived, not a verbatim source list.</p>
+zodiac. The <a class="reference internal" href="catalog.html#catalog-en-rule-ptolemy-ashmand-sign-groups"><span class="std std-ref">rule record and twelve-sign table</span></a>
+explain how the membership is derived from the source’s ordering.</p>
 <p>The definitions appear in Book I, chapter XIV, printed pp. 34–35 (PDF pp. 72–73),
-recorded as <code class="docutils literal notranslate"><span class="pre">source.ptolemy.ashmand1822</span></code>. The catalog labels English excerpts,
+recorded in the <a class="reference internal" href="catalog.html#catalog-en-source-ptolemy-ashmand1822"><span class="std std-ref">source record</span></a>. The catalog labels English excerpts,
 credited Chinese translations and project explanations separately, with the
-extent of each excerpt recorded in its citation. This classification follows
-Ashmand’s edition; it does not establish agreement across traditions or predict
-actual weather or daylight.</p>
+extent of each excerpt recorded in its citation.</p>
 </section>
 <section id="elements-modalities-and-lunation-types">
 <h2>Elements, modalities and lunation types<a class="headerlink" href="#elements-modalities-and-lunation-types" title="Link to this heading">¶</a></h2>
@@ -276,8 +276,8 @@ results, not chart configuration options. The classifications carry no personali
 interpretation, and reference tables read their definitions directly from calculation code.</p>
 <p>The <a class="reference internal" href="catalog.html#catalog-en-rule-zodiac-elements"><span class="std std-ref">element</span></a> and
 <a class="reference internal" href="catalog.html#catalog-en-rule-zodiac-modalities"><span class="std std-ref">modality</span></a> tables follow Astrodienst’s
-undated editorial page, inspected through the recorded 2025-12-28 snapshot.
-Its <code class="docutils literal notranslate"><span class="pre">Sagitarius</span></code> spelling is recorded without changing <code class="docutils literal notranslate"><span class="pre">Sign.SAGITTARIUS</span></code>.
+editorial page; its snapshot and transcription notes are in the
+<a class="reference internal" href="catalog.html#catalog-en-source-astrodienst-elements-signs"><span class="std std-ref">source record</span></a>.
 The modern modalities (<code class="docutils literal notranslate"><span class="pre">Modality</span></code>) and historical groups (<code class="docutils literal notranslate"><span class="pre">AshmandSignGroup</span></code>) are
 different classifications, although some groups contain the same signs. Their fixed
 groups agree; the modern mutable group matches Ashmand’s bicorporeal group, and
@@ -286,10 +286,9 @@ Having the same members does not make their names or historical definitions equi
 <p>Both <code class="docutils literal notranslate"><span class="pre">FIXED</span></code> members have the string value <code class="docutils literal notranslate"><span class="pre">&quot;fixed&quot;</span></code> and compare and hash equal
 as <code class="docutils literal notranslate"><span class="pre">StrEnum</span></code> members. To keep both in one mapping, use <code class="docutils literal notranslate"><span class="pre">(type(member),</span> <span class="pre">member.value)</span></code>
 keys or their distinct qualified catalog IDs.</p>
-<p>The lunation convention is Rudhyar’s eight types in the inspected online
-transcription of <em>Your Lunation Birthday</em>, Part Four. The page reports first
-publication in <em>Horoscope Magazine</em>, January 1950; the original was not inspected.
-See the <a class="reference internal" href="catalog.html#catalog-en-rule-lunation-rudhyar1950"><span class="std std-ref">intervals and source</span></a> and
+<p>The lunation convention uses Rudhyar’s eight types in <em>Your Lunation Birthday</em>,
+Part Four. See the <a class="reference internal" href="catalog.html#catalog-en-source-rudhyar-lunation-birthday"><span class="std std-ref">source record</span></a>
+for the edition and research status, the <a class="reference internal" href="catalog.html#catalog-en-rule-lunation-rudhyar1950"><span class="std std-ref">intervals</span></a> and
 the <a class="reference internal" href="summaries.html#classify-a-supplied-sun-moon-pair"><span class="std std-ref">usage guide</span></a> for how boundary
 angles are classified and waxing or waning is determined.</p>
 </section>
@@ -429,7 +428,7 @@ semantic revision a translation covers; absence or staleness is visible rather
 than silently replaced with text in another language.</p></li>
 <li><p>Original excerpts remain in their source language. A reader may choose a
 translation without losing access to that original.</p></li>
-<li><p>The generated <a class="reference internal" href="catalog.html"><span class="std std-doc">catalog</span></a> identifies its code and corpus versions.
+<li><p>The generated <a class="reference internal" href="catalog.html"><span class="std std-doc">catalog</span></a> identifies its package version.
 Checks and semantic review are described in <a class="reference internal" href="contributing.html"><span class="std std-doc">contributing</span></a>.</p></li>
 </ul>
 <p>Language labels must not change calculation. Distinct definitions must not be
@@ -472,8 +471,9 @@ should support both languages and aliases while returning stable identities.</p>
 <li class="toctree-l2"><a class="reference internal" href="chart.html">Natal charts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="aspects.html">Aspects</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cross_aspects.html">Cross-chart aspects and house overlays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="transits.html">Exact transit hits</a></li>
 <li class="toctree-l2"><a class="reference internal" href="summaries.html">Sign distributions and natal lunar phase</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dignities.html">Traditional sign rulers and four statuses</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dignities.html">Traditional rulership, dignities and dispositor chains</a></li>
 <li class="toctree-l2"><a class="reference internal" href="records.html">Chart results and text</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference.html">Public API reference</a></li>
 <li class="toctree-l2"><a class="reference internal" href="architecture.html">Repository structure and calculation boundaries</a></li>

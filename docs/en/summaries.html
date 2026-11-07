@@ -5,18 +5,18 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Sign distributions and natal lunar phase &#8212; celestial-astrology 0.3.0 documentation / 文档</title>
+    <title>Sign distributions and natal lunar phase &#8212; celestial-astrology 0.4.0 documentation / 文档</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
-    <script src="../../_static/documentation_options.js?v=e259d695"></script>
+    <script src="../../_static/documentation_options.js?v=6c02275b"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/en/summaries.html" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Traditional sign rulers and four statuses" href="dignities.html" />
-    <link rel="prev" title="Cross-chart aspects and house overlays" href="cross_aspects.html" />
+    <link rel="next" title="Traditional rulership, dignities and dispositor chains" href="dignities.html" />
+    <link rel="prev" title="Exact transit hits" href="transits.html" />
    
   <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
   
@@ -37,9 +37,8 @@
   <section id="sign-distributions-and-natal-lunar-phase">
 <h1>Sign distributions and natal lunar phase<a class="headerlink" href="#sign-distributions-and-natal-lunar-phase" title="Link to this heading">¶</a></h1>
 <p><a class="reference internal" href="../zh-CN/summaries.html"><span class="std std-doc">简体中文</span></a> · <a class="reference internal" href="reference.html"><span class="std std-doc">API</span></a> · <a class="reference internal" href="knowledge.html"><span class="std std-doc">Knowledge</span></a></p>
-<p>These APIs are introduced in 0.3.0; see the <a class="reference internal" href="../../README.html#install-a-release"><span class="std std-ref">installation instructions</span></a>
-for package-index availability and source installation. They classify supplied values without astronomy or source-chart
-changes. Formatters take a loaded catalog and do no resource I/O.</p>
+<p>Use these APIs to count selected placements by sign element or modality, or to
+classify a supplied Sun/Moon pair by lunar phase.</p>
 <section id="query-signs-and-count-an-explicit-population">
 <h2>Query signs and count an explicit population<a class="headerlink" href="#query-signs-and-count-an-explicit-population" title="Link to this heading">¶</a></h2>
 <!-- usage: summaries.population -->
@@ -83,13 +82,13 @@ and the Moon in a water sign, so each element has 50%. Both signs are cardinal,
 giving that modality 100%. Every category is shown, including zero counts.
 Percentages use two decimal places alongside the counts and total. No planet
 weights or dominant scores are assigned.</p>
-<p><code class="docutils literal notranslate"><span class="pre">sign_distribution</span></code> and <code class="docutils literal notranslate"><span class="pre">SignDistribution</span></code> copy sequences to immutable placement
-tuples, preserving input order. Empty or duplicate populations raise <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>;
-<code class="docutils literal notranslate"><span class="pre">None</span></code>, iterators and non-<code class="docutils literal notranslate"><span class="pre">Placement</span></code> members raise <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>. The caller must
-ensure that directly supplied placements share a common source; the function
-cannot verify their origin. Counts, proportions and total derive from the stored
-placements, so a different total cannot be supplied separately. <code class="docutils literal notranslate"><span class="pre">element_of</span></code> and <code class="docutils literal notranslate"><span class="pre">modality_of</span></code> accept only <code class="docutils literal notranslate"><span class="pre">Sign</span></code>,
-not strings or unrelated enums.</p>
+<p>Supply a nonempty sequence of <code class="docutils literal notranslate"><span class="pre">Placement</span></code> records with distinct identities from a
+common source, such as one chart. Choosing a consistent source is your responsibility;
+see the <a class="reference internal" href="architecture.html#reproducibility"><span class="std std-ref">validation boundary</span></a>.
+<code class="docutils literal notranslate"><span class="pre">SignDistribution</span></code> copies them into an immutable tuple in input
+order; counts, proportions and total derive from that snapshot. <code class="docutils literal notranslate"><span class="pre">element_of</span></code> and
+<code class="docutils literal notranslate"><span class="pre">modality_of</span></code> take <code class="docutils literal notranslate"><span class="pre">Sign</span></code> members. See the
+<a class="reference internal" href="reference.html#chart-summaries-and-lunar-phase"><span class="std std-ref">summary API reference</span></a> for validation errors.</p>
 <!-- /usage: summaries.population -->
 <p>Classification sources and the distinction from historical sign groups are
 described in <a class="reference internal" href="knowledge.html#elements-modalities-and-lunation-types"><span class="std std-ref">knowledge</span></a>.</p>
@@ -116,8 +115,7 @@ direction of increasing longitude, returning that angle and its lunar phase type
 </div>
 <p>The oriented difference is <code class="docutils literal notranslate"><span class="pre">(Moon</span> <span class="pre">-</span> <span class="pre">Sun)</span> <span class="pre">mod</span> <span class="pre">360</span></code>, in degrees. Finite longitudes may
 exceed one turn; the calculation removes whole turns.
-Booleans, strings and unrelated types raise <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>; nonfinite values raise
-<code class="docutils literal notranslate"><span class="pre">ValueError</span></code>. Bare numbers carry no instant or coordinate convention, so the
+Bare numbers carry no instant or coordinate convention, so the
 scalar function cannot detect a frame mismatch.</p>
 <p>See the <a class="reference internal" href="catalog.html#catalog-en-rule-lunation-rudhyar1950"><span class="std std-ref">generated intervals</span></a> and
 <a class="reference internal" href="knowledge.html#elements-modalities-and-lunation-types"><span class="std std-ref">source discussion</span></a>.
@@ -137,8 +135,7 @@ rate-based forecast.</p>
 <h2>Compose from an existing natal chart<a class="headerlink" href="#compose-from-an-existing-natal-chart" title="Link to this heading">¶</a></h2>
 <p>First calculate a chart from synthetic data, then count selected objects with
 <code class="docutils literal notranslate"><span class="pre">chart_sign_distribution</span></code> and read its lunar phase with <code class="docutils literal notranslate"><span class="pre">natal_lunar_phase</span></code>. Those
-two functions only read the chart’s existing positions and placements, without
-repeating astronomical calculations:</p>
+two functions read the chart’s existing positions and placements:</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">date</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">timedelta</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">astrology</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">BirthRecord</span><span class="p">,</span> <span class="n">FixedOffset</span><span class="p">,</span> <span class="n">Location</span><span class="p">,</span> <span class="n">ChartConfig</span><span class="p">,</span> <span class="n">HouseSystem</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">natal_chart</span><span class="p">,</span> <span class="n">prepare_natal_input</span><span class="p">,</span> <span class="n">chart_sign_distribution</span><span class="p">,</span> <span class="n">natal_lunar_phase</span><span class="p">)</span>
@@ -155,14 +152,13 @@ repeating astronomical calculations:</p>
 <span class="go">True</span>
 </pre></div>
 </div>
-<p><code class="docutils literal notranslate"><span class="pre">objects</span></code> is required and nonempty. <code class="docutils literal notranslate"><span class="pre">None</span></code>, strings and wrong identity types raise
-<code class="docutils literal notranslate"><span class="pre">TypeError</span></code>; duplicates or unavailable identities raise <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>. Results
-follow source-chart order, not selection order. To count all requested objects,
+<p><code class="docutils literal notranslate"><span class="pre">objects</span></code> must be a nonempty selection of distinct bodies/nodes already in the chart.
+Results follow source-chart order, not selection order. To count all requested objects,
 explicitly pass <code class="docutils literal notranslate"><span class="pre">objects=chart.requested.objects</span></code>. No unselected body, node or axis
 is added. Axes are not placements and are rejected even when explicitly selected
-for these statistics. <code class="docutils literal notranslate"><span class="pre">natal_lunar_phase</span></code> requires Sun and Moon; missing positions raise
-<code class="docutils literal notranslate"><span class="pre">ValueError</span></code> naming absent identities, never a request to calculate them. Both
-wrappers reject non-<code class="docutils literal notranslate"><span class="pre">NatalChart</span></code> inputs with <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>. Checks work under <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-O</span></code>.</p>
+for these statistics. <code class="docutils literal notranslate"><span class="pre">natal_lunar_phase</span></code> requires Sun and Moon; missing positions
+raise an error naming the absent identities rather than calculating them. Full
+error contracts are in the <a class="reference internal" href="reference.html#chart-summaries-and-lunar-phase"><span class="std std-ref">summary API reference</span></a>.</p>
 <p>Catalog entries remain <code class="docutils literal notranslate"><span class="pre">reference_only</span></code>, with stated prerequisites <code class="docutils literal notranslate"><span class="pre">complete</span></code> and
 chart applicability <code class="docutils literal notranslate"><span class="pre">not_assessed</span></code>. Verified source inspection does not make
 catalog lookup a chart evaluation.</p>
@@ -181,9 +177,9 @@ not promised.</p>
 <p>The phase formatter prints the stored float without arcsecond truncation. Labels
 never come from rounded text. <code class="docutils literal notranslate"><span class="pre">format_sign_distribution</span></code> and <code class="docutils literal notranslate"><span class="pre">format_lunar_phase</span></code>
 require current catalog names in
-<code class="docutils literal notranslate"><span class="pre">en</span></code> or <code class="docutils literal notranslate"><span class="pre">zh-CN</span></code>; missing/stale names raise <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>, missing IDs <code class="docutils literal notranslate"><span class="pre">KeyError</span></code>, and
-invalid result/catalog types <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>. Names’ table delimiters and nonprinting
-characters are escaped.</p>
+<code class="docutils literal notranslate"><span class="pre">en</span></code> or <code class="docutils literal notranslate"><span class="pre">zh-CN</span></code>; missing or stale names cause an error instead of a language fallback.
+Names’ table delimiters and nonprinting characters are escaped. See the
+<a class="reference internal" href="reference.html#chart-text"><span class="std std-ref">text API reference</span></a> for formatter errors.</p>
 </section>
 </section>
 
@@ -221,8 +217,9 @@ characters are escaped.</p>
 <li class="toctree-l2"><a class="reference internal" href="chart.html">Natal charts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="aspects.html">Aspects</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cross_aspects.html">Cross-chart aspects and house overlays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="transits.html">Exact transit hits</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Sign distributions and natal lunar phase</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dignities.html">Traditional sign rulers and four statuses</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dignities.html">Traditional rulership, dignities and dispositor chains</a></li>
 <li class="toctree-l2"><a class="reference internal" href="records.html">Chart results and text</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference.html">Public API reference</a></li>
 <li class="toctree-l2"><a class="reference internal" href="architecture.html">Repository structure and calculation boundaries</a></li>
@@ -241,8 +238,8 @@ characters are escaped.</p>
 <ul>
   <li><a href="../index.html">Documentation overview</a><ul>
   <li><a href="index.html">Documentation</a><ul>
-      <li>Previous: <a href="cross_aspects.html" title="previous chapter">Cross-chart aspects and house overlays</a></li>
-      <li>Next: <a href="dignities.html" title="next chapter">Traditional sign rulers and four statuses</a></li>
+      <li>Previous: <a href="transits.html" title="previous chapter">Exact transit hits</a></li>
+      <li>Next: <a href="dignities.html" title="next chapter">Traditional rulership, dignities and dispositor chains</a></li>
   </ul></li>
   </ul></li>
 </ul>

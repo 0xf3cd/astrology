@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Release procedure &#8212; celestial-astrology 0.3.0 documentation / 文档</title>
+    <title>Release procedure &#8212; celestial-astrology 0.4.0 documentation / 文档</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
-    <script src="../../_static/documentation_options.js?v=e259d695"></script>
+    <script src="../../_static/documentation_options.js?v=6c02275b"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/en/releasing.html" />
@@ -66,8 +66,8 @@ is a blocker; do not switch to a token or weaken protection to continue.</p>
 <section id="prepare-and-inspect-the-candidate">
 <h2>Prepare and inspect the candidate<a class="headerlink" href="#prepare-and-inspect-the-candidate" title="Link to this heading">¶</a></h2>
 <p>Before publishing a new version, prepare its version bump and matching
-documentation in a separate reviewed change. README commands install the latest
-release by package name; version-specific availability belongs in the release notes.</p>
+documentation in a separate reviewed change. Release notes describe what shipped;
+actual package-index availability belongs in the release record.</p>
 <ol class="arabic simple">
 <li><p>Review the source, matching bilingual notes and the acceptance criteria in
 the release tracker. Keep dependency policy, calculation conventions and
@@ -87,7 +87,7 @@ Chinese pages from both the checkout and the extracted sdist. Snapshot labels
 are always checked; fixed-SHA source/archive links are checked when
 <code class="docutils literal notranslate"><span class="pre">ASTROLOGY_DOCS_SOURCE_SHA</span></code> identifies the build’s source revision.
 The manifest records source
-commit, corpus version, Python/dependency requirements, the two artifact digests
+commit, Python/dependency requirements, the two artifact digests
 and every archived file’s path/size/digest. Unexpected members, changed source bytes or
 changed runtime requirements fail inspection.</p></li>
 <li><p>Verify representative rejection cases for the new release checks. Every new
@@ -144,29 +144,14 @@ manual requirement into a claim of automatic enforcement.</p>
 </section>
 <section id="rehearse-without-uploading">
 <h3>Rehearse without uploading<a class="headerlink" href="#rehearse-without-uploading" title="Link to this heading">¶</a></h3>
-<p>Use the checked distributions and a disposable local directory. In that directory,
-keep a rehearsal record with the version, source SHA, index availability and
-upload/GitHub Release/Pages states. These are simulated states, not the actual
-release record. Do not dispatch the publishing workflow or contact an upload endpoint.</p>
-<ol class="arabic simple">
-<li><p>Prepare the manifest once and save both file digests. Verify the retained
-distributions using those digests and the accepted source.</p></li>
-<li><p>Set index availability to absent in the rehearsal record, then follow the
-README’s source-install instructions. Verify that its package descriptions and
-rendered pages make no claim of index availability.</p></li>
-<li><p>Change only index availability in that record to listed.
-The same descriptions and pages must still pass, without editing package bytes.</p></li>
-<li><p>In the same local record, mark the upload as simulated complete and GitHub
-Release and Pages as pending. Reverify the
-original manifest/files and finish only the simulated missing steps. Do not
-rerun preparation over its existing manifest or substitute rebuilt packages.</p></li>
-<li><p>Compare the original and final file digests. Record commands, actual exit
-statuses and incomplete operations. A content correction requires a new
-reviewed version, not a replacement under the simulated existing version.</p></li>
-</ol>
-<p>This exercises the acceptance instructions and recovery choices. It does not
-prove OIDC credentials, PyPI upload or live deployment; those need separately
-authorized publication and post-publication checks.</p>
+<p>Use a no-upload rehearsal when changes to the release procedure or workflows leave
+a failure path untested by the normal pre-publication checks. To check instructions,
+run the affected steps locally with the retained wheel and sdist; to check changed
+build/consumer steps, use a pull-request workflow run. Record the gap, exact wheel
+and sdist filenames/digests, commands and results. A routine release can use the
+formal workflow’s build and same-wheel consumers before manual approval without
+a separate rehearsal. A no-upload run does not verify OIDC credentials, PyPI upload
+or live deployment; those require authorized publication and post-publication checks.</p>
 </section>
 </section>
 <section id="authorize-and-run-publication">
@@ -250,8 +235,9 @@ new reviewed release version.</p>
 <li class="toctree-l2"><a class="reference internal" href="chart.html">Natal charts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="aspects.html">Aspects</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cross_aspects.html">Cross-chart aspects and house overlays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="transits.html">Exact transit hits</a></li>
 <li class="toctree-l2"><a class="reference internal" href="summaries.html">Sign distributions and natal lunar phase</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dignities.html">Traditional sign rulers and four statuses</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dignities.html">Traditional rulership, dignities and dispositor chains</a></li>
 <li class="toctree-l2"><a class="reference internal" href="records.html">Chart results and text</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference.html">Public API reference</a></li>
 <li class="toctree-l2"><a class="reference internal" href="architecture.html">Repository structure and calculation boundaries</a></li>

@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Release notes &#8212; celestial-astrology 0.3.0 documentation / 文档</title>
+    <title>Release notes &#8212; celestial-astrology 0.4.0 documentation / 文档</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
-    <script src="../../_static/documentation_options.js?v=e259d695"></script>
+    <script src="../../_static/documentation_options.js?v=6c02275b"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/en/releases.html" />
@@ -38,10 +38,60 @@
 <h1>Release notes<a class="headerlink" href="#release-notes" title="Link to this heading">¶</a></h1>
 <p><a class="reference internal" href="../zh-CN/releases.html"><span class="std std-doc">简体中文</span></a> · <a class="reference internal" href="index.html"><span class="std std-doc">Documentation</span></a> · <a class="reference internal" href="releasing.html"><span class="std std-doc">Release procedure</span></a></p>
 <section id="id1">
-<h2>0.3.0<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
+<h2>0.4.0<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
+<p>This version adds dispositor chains and exact transit-to-natal hits, upgrades
+celestial-calendar to 1.1.1 and removes the independent catalog version.
+Package index: <a class="reference external" href="https://pypi.org/project/celestial-astrology/0.4.0/">PyPI</a>.</p>
+<section id="exact-transit-hits-and-utc-input">
+<h3>Exact transit hits and UTC input<a class="headerlink" href="#exact-transit-hits-and-utc-input" title="Link to this heading">¶</a></h3>
+<p><a class="reference internal" href="transits.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">transit_hits</span></code></span></a> searches an explicit modern UTC interval for exact
+moving-to-fixed-natal major aspects. <code class="docutils literal notranslate"><span class="pre">TransitHits</span></code> retains the source chart,
+selections, TT interval, effective models and every native hit’s rate/direction,
+including retrograde repetitions and tangent contacts. No moving-side birth
+record or place is required. Fixed-instant transit charts, orb windows and
+returns remain outside this operation.</p>
+</section>
+<section id="dependencies-and-platforms">
+<h3>Dependencies and platforms<a class="headerlink" href="#dependencies-and-platforms" title="Link to this heading">¶</a></h3>
+<p>Runtime dependencies are exactly <code class="docutils literal notranslate"><span class="pre">celestial-calendar==1.1.1</span></code> and <code class="docutils literal notranslate"><span class="pre">tzdata==2026.5</span></code>.
+The astronomy dependency provides the UTC conversion API used by transit searches.
+The macOS arm64 minimum rises from 14 to <strong>15</strong>; other platform minimums and
+Python 3.11–3.14 support are unchanged. Existing natal calculations and text
+formats are unchanged.</p>
+</section>
+<section id="dispositor-chains-and-rulership-ownership">
+<h3>Dispositor chains and rulership ownership<a class="headerlink" href="#dispositor-chains-and-rulership-ownership" title="Link to this heading">¶</a></h3>
+<p><a class="reference internal" href="dignities.html#follow-dispositor-chains"><span class="std std-ref"><code class="docutils literal notranslate"><span class="pre">chart_dispositors(chart,</span> <span class="pre">objects=...)</span></code></span></a>
+returns immutable <code class="docutils literal notranslate"><span class="pre">Dispositors</span></code>: ruler edges, paths from selected roots, reached
+cycles and final dispositors, and missing successor rulers. It uses Lilly’s
+unchanged traditional sign rulers. The traversal is a project rule, with no
+scoring or interpretation.</p>
+<p><code class="docutils literal notranslate"><span class="pre">HouseRuler</span></code> and <code class="docutils literal notranslate"><span class="pre">HouseRulers</span></code> move from <code class="docutils literal notranslate"><span class="pre">astrology.summaries</span></code> to
+<code class="docutils literal notranslate"><span class="pre">astrology.dignities</span></code>. Update direct module imports; the old module has no aliases.
+Imports from the package root (<code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">astrology</span> <span class="pre">import</span> <span class="pre">HouseRulers</span></code>) remain valid.
+This is a 0.x source-path compatibility change. Chart calculations, dignity
+assignments and existing text output are unchanged.</p>
+<p>The knowledge catalog records inspected Meeus node terms, external definitions
+of aspects and house systems, corrected Lilly scan locators, and retention or
+access limits. Source inspection does not change chart applicability or default
+output eligibility; model choices, orbs and numerical algorithms are unchanged.</p>
+</section>
+<section id="breaking-change-catalog-version-removed">
+<h3>Breaking change: catalog version removed<a class="headerlink" href="#breaking-change-catalog-version-removed" title="Link to this heading">¶</a></h3>
+<p>The source API removes <code class="docutils literal notranslate"><span class="pre">Catalog.version</span></code> and its constructor argument. Custom
+catalogs now use <code class="docutils literal notranslate"><span class="pre">Catalog(concepts,</span> <span class="pre">variants,</span> <span class="pre">sources,</span> <span class="pre">entries)</span></code>, omitting the
+former first version argument. The catalog JSON’s <code class="docutils literal notranslate"><span class="pre">version</span></code> key and release
+manifest’s <code class="docutils literal notranslate"><span class="pre">corpus_version</span></code> key are also removed, with no separate catalog version
+to replace them. For the installed package version, use
+<code class="docutils literal notranslate"><span class="pre">version(&quot;celestial-astrology&quot;)</span></code> from <code class="docutils literal notranslate"><span class="pre">importlib.metadata</span></code>. This is a 0.x
+compatibility change; source revisions, bibliographic editions and chart
+provenance remain.</p>
+</section>
+</section>
+<section id="id2">
+<h2>0.3.0<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
 <p>This version adds natal analysis, axis aspect selection and cross-chart house overlays.
-Check <a class="reference external" href="https://pypi.org/project/celestial-astrology/0.3.0/">PyPI</a> for this version;
-if it is not listed, <a class="reference internal" href="../../README.html#install-from-source"><span class="std std-ref">install from source</span></a>.</p>
+Package index: <a class="reference external" href="https://pypi.org/project/celestial-astrology/0.3.0/">PyPI</a>.</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="summaries.html"><span class="std std-doc">Element and modality distributions</span></a> count explicitly selected
 objects equally and retain zero-count categories, counts and proportions.</p></li>
@@ -66,8 +116,8 @@ recovery without replacing published files.</p>
 unchanged from 0.2.0. This version does not add transits, returns, constructed
 relationship charts or an interactive chart UI.</p>
 </section>
-<section id="id2">
-<h2>0.2.0<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<section id="id3">
+<h2>0.2.0<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
 <section id="static-cross-chart-aspects">
 <h3>Static cross-chart aspects<a class="headerlink" href="#static-cross-chart-aspects" title="Link to this heading">¶</a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">cross_chart_aspects</span></code> compares two in-memory natal results with explicit rules.
@@ -98,8 +148,8 @@ remain. This removal does not change the astronomy, timezone policy or dependenc
 pins.</p>
 </section>
 </section>
-<section id="id3">
-<h2>0.1.0<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
+<section id="id4">
+<h2>0.1.0<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h2>
 <p>The first release provides modern tropical, geocentric natal charts and an
 independently browsable English/Chinese knowledge catalog. Install the distribution
 <code class="docutils literal notranslate"><span class="pre">celestial-astrology</span></code>; Python imports remain <code class="docutils literal notranslate"><span class="pre">astrology</span></code>.</p>
@@ -202,8 +252,9 @@ additional objects, interpretation and a chart-wheel UI are outside this release
 <li class="toctree-l2"><a class="reference internal" href="chart.html">Natal charts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="aspects.html">Aspects</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cross_aspects.html">Cross-chart aspects and house overlays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="transits.html">Exact transit hits</a></li>
 <li class="toctree-l2"><a class="reference internal" href="summaries.html">Sign distributions and natal lunar phase</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dignities.html">Traditional sign rulers and four statuses</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dignities.html">Traditional rulership, dignities and dispositor chains</a></li>
 <li class="toctree-l2"><a class="reference internal" href="records.html">Chart results and text</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference.html">Public API reference</a></li>
 <li class="toctree-l2"><a class="reference internal" href="architecture.html">Repository structure and calculation boundaries</a></li>

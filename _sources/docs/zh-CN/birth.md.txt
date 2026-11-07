@@ -131,7 +131,7 @@ True
 | `NonexistentBirthTimeError` | 记录的本地钟点处于空缺中 |
 | `HistoricalTimeError` | 时刻早于现代 UTC 合同的下限 |
 
-四种具名错误都是 `ValueError` 的子类。校验在 `python -O` 下仍然有效。
+四种具名错误都是 `ValueError` 的子类。
 输入来源元数据复制为只读的普通字符串映射，带可变属性的字符串子类会被拒绝；输入和结果值均被冻结。
 
 环境故障另行处理：`tzdata` 包缺失时抛出导入错误，版本元数据缺失或无效时抛出 `RuntimeError`，

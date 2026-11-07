@@ -11,7 +11,7 @@
 [API 参考](https://0xf3cd.github.io/astrology/docs/zh-CN/reference.html)。
 
 功能包括[元素／模式分布与出生月相](https://0xf3cd.github.io/astrology/docs/zh-CN/summaries.html)、
-[传统星座守护与四种状态](https://0xf3cd.github.io/astrology/docs/zh-CN/dignities.html)，
+[传统星座守护、四种状态与定位星链](https://0xf3cd.github.io/astrology/docs/zh-CN/dignities.html)，
 本命及静态双盘查询的[显式选四轴参与相位](https://0xf3cd.github.io/astrology/docs/zh-CN/aspects.html#axis-aspects-zh-cn)，
 以及[双盘落宫和双语比较文本](https://0xf3cd.github.io/astrology/docs/zh-CN/cross_aspects.html)。
 四轴（上升点、中天、下降点、天底）只有被显式选择后才参与相位。
@@ -19,15 +19,17 @@
 此外还提供：
 
 - 两张本命盘之间的[静态交叉相位](https://0xf3cd.github.io/astrology/docs/zh-CN/cross_aspects.html)，保留两张源盘并区分左右对象，不标入相／离相。
+- UTC 区间内的[精确行运命中](https://0xf3cd.github.io/astrology/docs/zh-CN/transits.html)，保留逆行造成的多次命中及原生速率、方向。
 - 用 `ashmand_sign_group(Sign.ARIES)` 查询十二星座在 Ashmand 1822 年版中的四组归属。见[来源及查询示例](https://0xf3cd.github.io/astrology/docs/zh-CN/knowledge.html#ashmand-sign-groups-zh-cn)。
 
 <a id="install-a-release-zh-cn"></a>
 
 ## 安装发行版
 
-本库依赖 celestial-calendar 0.8.0。它只发布 Linux x86_64 与 aarch64、
-macOS 14+ arm64、Windows amd64 的轮子，没有源码分发包。其他平台无法安装本包，
+依赖 celestial-calendar 只发布 Linux x86_64 与 aarch64、
+macOS arm64、Windows amd64 的轮子，没有源码分发包。其他平台无法安装本包，
 连知识浏览也不可用。
+各发行版的最低操作系统版本见[发行说明](https://0xf3cd.github.io/astrology/docs/zh-CN/releases.html)。
 
 分发包名是 `celestial-astrology`，Python 导入名仍是 `astrology`。
 请勿安装 PyPI 上另一个无关的 `astrology` 项目。
@@ -51,12 +53,14 @@ py -3.14 -m venv .venv
 .venv\Scripts\python.exe -m pip install celestial-astrology
 ```
 
-运行依赖仍精确固定为 `celestial-calendar==0.8.0` 和 `tzdata==2026.5`，
+运行依赖均精确固定，
 可能与要求其他版本的应用发生依赖冲突。详见[发行说明](https://0xf3cd.github.io/astrology/docs/zh-CN/releases.html)。
 
 <a id="install-from-source-zh-cn"></a>
 
 ## 从源码安装
+
+当前源码在 macOS arm64 上要求 **15+**；上面列出的其他平台不变。
 
 若要安装文档对应的固定源码版本，使用[文档首页](https://0xf3cd.github.io/astrology/)标明提交号的快照安装命令。
 若已下载或克隆所需源码，则在其根目录运行以下命令。安装需要联网下载构建依赖和精确钉版的运行依赖。
@@ -136,6 +140,7 @@ moon: scorpio
 | 解析当地钟点，或选择重复时刻 | [出生输入](https://0xf3cd.github.io/astrology/docs/zh-CN/birth.html) |
 | 选择对象、相位参与者和容许度 | [配置](https://0xf3cd.github.io/astrology/docs/zh-CN/configuration.html) |
 | 比较两张命盘 | [双盘相位与落宫](https://0xf3cd.github.io/astrology/docs/zh-CN/cross_aspects.html) |
+| 搜索区间内的精确行运 | [精确行运命中](https://0xf3cd.github.io/astrology/docs/zh-CN/transits.html) |
 
 ## 第一次查询知识
 
@@ -165,8 +170,7 @@ body.sun
 支持 Whole Sign（整宫制）、Equal（等宫制）和 Placidus，计算太阳、月亮、八颗行星及显式选择的月交点定义。
 落宫只用黄经，不用对象黄纬。五大相位使用调用方提供的容许度；入相／离相描述局部运动，不预测未来事件。
 结果把四轴与十二宫头分别保存。
-不可变结果保留原始输入、解析后的时标、配置、未舍入天文值和具名模型。当前源码已撤回命盘持久化；
-与已发布 v0.1.0 API 的差异见[发行说明](https://0xf3cd.github.io/astrology/docs/zh-CN/releases.html)。
+不可变结果保留原始输入、解析后的时标、配置、未舍入天文值和具名模型。
 
 ## 设计边界
 
@@ -176,7 +180,7 @@ body.sun
 
 ## 后续方向
 
-- [技术与展示](https://github.com/0xf3cd/astrology/milestone/2)：行运与返照、关系盘、
+- [技术与展示](https://github.com/0xf3cd/astrology/milestone/2)：固定时刻行运、容许度窗口与返照、关系盘、
   流派规则、更多对象，以及星盘视图。
 - [进阶技术与历史研究](https://github.com/0xf3cd/astrology/milestone/3)：主限、推运、
   不确定出生时间、历史输入、空间落宫与有来源的解释知识。

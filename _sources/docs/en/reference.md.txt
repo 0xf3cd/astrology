@@ -8,6 +8,10 @@ See [birth inputs](birth.md), [requested configuration](configuration.md),
 [charts](chart.md), [aspects](aspects.md) and [chart results](records.md) for executed examples. The
 [knowledge guide](knowledge.md) covers chart-independent queries.
 
+Calculation boundaries: [initialization and I/O](architecture.md#effects-boundary),
+[constructor checks](architecture.md#reproducibility), and
+[house-system failures](architecture.md#composition-and-failures).
+
 ## Birth records and resolution
 
 ```{eval-rst}
@@ -94,6 +98,17 @@ See [cross-chart aspects and house overlays](cross_aspects.md) for usage and the
    :member-order: bysource
 ```
 
+## Exact transit hits
+
+See [exact transit hits](transits.md) for a UTC-interval search and result fields.
+
+```{eval-rst}
+.. automodule:: astrology.transits
+   :members: TransitDirection, TransitDomainError, TransitSource, TransitHit, TransitHits, transit_hits
+   :undoc-members:
+   :member-order: bysource
+```
+
 ## Cross-chart house overlays
 
 See the [house-overlay example](cross_aspects.md#find-houses-in-the-other-chart)
@@ -120,18 +135,18 @@ The [dignity guide](dignities.md) covers the house-ruler records.
 
 ```{eval-rst}
 .. automodule:: astrology.summaries
-   :members: SignDistribution, sign_distribution, chart_sign_distribution, natal_lunar_phase, HouseRuler, HouseRulers
+   :members: SignDistribution, sign_distribution, chart_sign_distribution, natal_lunar_phase
    :undoc-members:
    :member-order: bysource
 ```
 
 ## Traditional rulership and dignities
 
-See [the dignity guide](dignities.md) for the named source, simultaneous statuses and missing placements.
+See [the dignity guide](dignities.md) for sign queries, house rulers and dispositor chains.
 
 ```{eval-rst}
 .. automodule:: astrology.dignities
-   :members: DignityStatus, sign_ruler, essential_dignities
+   :members: DignityStatus, sign_ruler, essential_dignities, HouseRuler, HouseRulers, Dispositors, chart_dispositors
    :undoc-members:
    :member-order: bysource
 ```

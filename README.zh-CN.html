@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>celestial-astrology &#8212; celestial-astrology 0.3.0 documentation / 文档</title>
+    <title>celestial-astrology &#8212; celestial-astrology 0.4.0 documentation / 文档</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
-    <script src="_static/documentation_options.js?v=e259d695"></script>
+    <script src="_static/documentation_options.js?v=6c02275b"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="canonical" href="https://0xf3cd.github.io/astrology/README.zh-CN.html" />
@@ -44,21 +44,23 @@
 先运行下面的示例；更多用法和参数说明见<a class="reference external" href="https://0xf3cd.github.io/astrology/docs/zh-CN/index.html">使用指南</a>和
 <a class="reference external" href="https://0xf3cd.github.io/astrology/docs/zh-CN/reference.html">API 参考</a>。</p>
 <p>功能包括<a class="reference external" href="https://0xf3cd.github.io/astrology/docs/zh-CN/summaries.html">元素／模式分布与出生月相</a>、
-<a class="reference external" href="https://0xf3cd.github.io/astrology/docs/zh-CN/dignities.html">传统星座守护与四种状态</a>，
+<a class="reference external" href="https://0xf3cd.github.io/astrology/docs/zh-CN/dignities.html">传统星座守护、四种状态与定位星链</a>，
 本命及静态双盘查询的<a class="reference external" href="https://0xf3cd.github.io/astrology/docs/zh-CN/aspects.html#axis-aspects-zh-cn">显式选四轴参与相位</a>，
 以及<a class="reference external" href="https://0xf3cd.github.io/astrology/docs/zh-CN/cross_aspects.html">双盘落宫和双语比较文本</a>。
 四轴（上升点、中天、下降点、天底）只有被显式选择后才参与相位。</p>
 <p>此外还提供：</p>
 <ul class="simple">
 <li><p>两张本命盘之间的<a class="reference external" href="https://0xf3cd.github.io/astrology/docs/zh-CN/cross_aspects.html">静态交叉相位</a>，保留两张源盘并区分左右对象，不标入相／离相。</p></li>
+<li><p>UTC 区间内的<a class="reference external" href="https://0xf3cd.github.io/astrology/docs/zh-CN/transits.html">精确行运命中</a>，保留逆行造成的多次命中及原生速率、方向。</p></li>
 <li><p>用 <code class="docutils literal notranslate"><span class="pre">ashmand_sign_group(Sign.ARIES)</span></code> 查询十二星座在 Ashmand 1822 年版中的四组归属。见<a class="reference external" href="https://0xf3cd.github.io/astrology/docs/zh-CN/knowledge.html#ashmand-sign-groups-zh-cn">来源及查询示例</a>。</p></li>
 </ul>
 <p><a id="install-a-release-zh-cn"></a></p>
 <section id="id1">
 <h2>安装发行版<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
-<p>本库依赖 celestial-calendar 0.8.0。它只发布 Linux x86_64 与 aarch64、
-macOS 14+ arm64、Windows amd64 的轮子，没有源码分发包。其他平台无法安装本包，
-连知识浏览也不可用。</p>
+<p>依赖 celestial-calendar 只发布 Linux x86_64 与 aarch64、
+macOS arm64、Windows amd64 的轮子，没有源码分发包。其他平台无法安装本包，
+连知识浏览也不可用。
+各发行版的最低操作系统版本见<a class="reference external" href="https://0xf3cd.github.io/astrology/docs/zh-CN/releases.html">发行说明</a>。</p>
 <p>分发包名是 <code class="docutils literal notranslate"><span class="pre">celestial-astrology</span></code>，Python 导入名仍是 <code class="docutils literal notranslate"><span class="pre">astrology</span></code>。
 请勿安装 PyPI 上另一个无关的 <code class="docutils literal notranslate"><span class="pre">astrology</span></code> 项目。</p>
 <p>请在上述支持的平台使用 <strong>Python 3.11–3.14</strong>。</p>
@@ -74,12 +76,13 @@ macOS 14+ arm64、Windows amd64 的轮子，没有源码分发包。其他平台
 <span class="p">.</span><span class="n">venv</span><span class="p">\</span><span class="n">Scripts</span><span class="p">\</span><span class="n">python</span><span class="p">.</span><span class="n">exe</span> <span class="n">-m</span> <span class="n">pip</span> <span class="n">install</span> <span class="n">celestial-astrology</span>
 </pre></div>
 </div>
-<p>运行依赖仍精确固定为 <code class="docutils literal notranslate"><span class="pre">celestial-calendar==0.8.0</span></code> 和 <code class="docutils literal notranslate"><span class="pre">tzdata==2026.5</span></code>，
+<p>运行依赖均精确固定，
 可能与要求其他版本的应用发生依赖冲突。详见<a class="reference external" href="https://0xf3cd.github.io/astrology/docs/zh-CN/releases.html">发行说明</a>。</p>
 <p><a id="install-from-source-zh-cn"></a></p>
 </section>
 <section id="id2">
 <h2>从源码安装<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<p>当前源码在 macOS arm64 上要求 <strong>15+</strong>；上面列出的其他平台不变。</p>
 <p>若要安装文档对应的固定源码版本，使用<a class="reference external" href="https://0xf3cd.github.io/astrology/">文档首页</a>标明提交号的快照安装命令。
 若已下载或克隆所需源码，则在其根目录运行以下命令。安装需要联网下载构建依赖和精确钉版的运行依赖。
 切换源码修订时请重新下载或克隆一份源码，避免旧 <code class="docutils literal notranslate"><span class="pre">build/</span></code> 目录中的文件被带入新的安装包。</p>
@@ -158,6 +161,9 @@ moon: scorpio
 <tr class="row-even"><td><p>比较两张命盘</p></td>
 <td><p><a class="reference external" href="https://0xf3cd.github.io/astrology/docs/zh-CN/cross_aspects.html">双盘相位与落宫</a></p></td>
 </tr>
+<tr class="row-odd"><td><p>搜索区间内的精确行运</p></td>
+<td><p><a class="reference external" href="https://0xf3cd.github.io/astrology/docs/zh-CN/transits.html">精确行运命中</a></p></td>
+</tr>
 </tbody>
 </table>
 </section>
@@ -185,8 +191,7 @@ body.sun
 <p>支持 Whole Sign（整宫制）、Equal（等宫制）和 Placidus，计算太阳、月亮、八颗行星及显式选择的月交点定义。
 落宫只用黄经，不用对象黄纬。五大相位使用调用方提供的容许度；入相／离相描述局部运动，不预测未来事件。
 结果把四轴与十二宫头分别保存。
-不可变结果保留原始输入、解析后的时标、配置、未舍入天文值和具名模型。当前源码已撤回命盘持久化；
-与已发布 v0.1.0 API 的差异见<a class="reference external" href="https://0xf3cd.github.io/astrology/docs/zh-CN/releases.html">发行说明</a>。</p>
+不可变结果保留原始输入、解析后的时标、配置、未舍入天文值和具名模型。</p>
 </section>
 <section id="id6">
 <h2>设计边界<a class="headerlink" href="#id6" title="Link to this heading">¶</a></h2>
@@ -199,7 +204,7 @@ body.sun
 <section id="id7">
 <h2>后续方向<a class="headerlink" href="#id7" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p><a class="reference external" href="https://github.com/0xf3cd/astrology/milestone/2">技术与展示</a>：行运与返照、关系盘、
+<li><p><a class="reference external" href="https://github.com/0xf3cd/astrology/milestone/2">技术与展示</a>：固定时刻行运、容许度窗口与返照、关系盘、
 流派规则、更多对象，以及星盘视图。</p></li>
 <li><p><a class="reference external" href="https://github.com/0xf3cd/astrology/milestone/3">进阶技术与历史研究</a>：主限、推运、
 不确定出生时间、历史输入、空间落宫与有来源的解释知识。</p></li>
@@ -248,8 +253,9 @@ body.sun
 <li class="toctree-l2"><a class="reference internal" href="docs/zh-CN/chart.html">本命盘</a></li>
 <li class="toctree-l2"><a class="reference internal" href="docs/zh-CN/aspects.html">相位</a></li>
 <li class="toctree-l2"><a class="reference internal" href="docs/zh-CN/cross_aspects.html">双盘相位与落宫</a></li>
+<li class="toctree-l2"><a class="reference internal" href="docs/zh-CN/transits.html">精确行运命中</a></li>
 <li class="toctree-l2"><a class="reference internal" href="docs/zh-CN/summaries.html">星座分布与出生月相</a></li>
-<li class="toctree-l2"><a class="reference internal" href="docs/zh-CN/dignities.html">传统星座守护与四种状态</a></li>
+<li class="toctree-l2"><a class="reference internal" href="docs/zh-CN/dignities.html">传统守护、尊贵状态与定位星链</a></li>
 <li class="toctree-l2"><a class="reference internal" href="docs/zh-CN/records.html">命盘结果与文本显示</a></li>
 <li class="toctree-l2"><a class="reference internal" href="docs/zh-CN/reference.html">公开 API 参考</a></li>
 <li class="toctree-l2"><a class="reference internal" href="docs/zh-CN/architecture.html">仓库结构与计算边界</a></li>

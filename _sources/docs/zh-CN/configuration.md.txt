@@ -34,8 +34,8 @@
 'meeus_five_term_true'
 ```
 
-`HouseSystem` 可选 Whole Sign（整宫制）、Equal（等宫制）和 Placidus。所选宫制在给定时刻或地点
-无法计算时，排盘会报错，不会换成另一种宫制；支持范围见[排盘指南](chart.md)。
+`HouseSystem` 可选 Whole Sign（整宫制）、Equal（等宫制）和 Placidus。
+支持范围见[排盘指南](chart.md)，几何不可用时的处理见[失败政策](architecture.md#组合与失败)。
 `Body` 包括太阳、月亮及水星至冥王星，共十个物理天体。月交点不是物理天体，用 `LunarNode` 选择。
 它提供平均交点和 Meeus 五项真交点两种定义，每种都区分升交点和降交点。
 选择哪种定义决定了计算哪个交点，不是切换精度；两种定义不能互相替代，也可以在同一请求中同时选择。
@@ -122,7 +122,7 @@ Traceback (most recent call last):
 ValueError: orb_combination is required when aspect rules have object orbs
 ```
 
-NaN、无穷、负容许度、布尔值、不支持的模式及不一致的选择，在普通 Python 和 `python -O` 下都会报错。
+NaN、无穷、负容许度、布尔值、不支持的模式及不一致的选择都会在校验时报错。
 
 <!-- /usage: configuration.orbs -->
 
