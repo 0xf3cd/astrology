@@ -13,7 +13,7 @@ JDE(TT): Julian Dates on the TT time scale, not UTC clock readings.
 
 This synthetic birth example calculates one stored natal Sun. The moving side
 needs only an object selection and an interval, with no birthplace or houses.
-Both endpoints must be aware built-in `datetime` values at or after
+Both endpoints must be timezone-aware built-in `datetime` values at or after
 1972-01-01 UTC. Local offsets are normalized to UTC; naive values are rejected.
 
 ```{doctest}
@@ -32,10 +32,11 @@ Both endpoints must be aware built-in `datetime` values at or after
 ...   moving_objects=(Body.MERCURY,), natal_objects=(Body.SUN,),
 ...   aspects=(MajorAspect.CONJUNCTION,))
 >>> for hit in result.hits:
-...   print(f"{hit.jde_tt:.5f} {hit.direction.value} {hit.longitude_rate_deg_per_tt_day:+.3f}")
-2460392.23731 increasing +1.208
-2460414.61236 decreasing -0.744
-2460437.45999 increasing +0.812
+...   print(f"{hit.moving_object.value} {hit.aspect.value} {hit.natal_object.value} "
+...         f"{hit.jde_tt:.5f} {hit.direction.value} {hit.longitude_rate_deg_per_tt_day:+.3f}")
+mercury conjunction sun 2460392.23731 increasing +1.208
+mercury conjunction sun 2460414.61236 decreasing -0.744
+mercury conjunction sun 2460437.45999 increasing +0.812
 ```
 
 Mercury reaches the fixed natal Sun degree three times: once while its longitude
@@ -44,14 +45,22 @@ Rates are degrees per TT day, copied from the upstream event. A `tangent` event
 touches the requested longitude without crossing it; its reported rate need not
 be exactly zero.
 
-To display a UTC date, import `jde_to_utc` from `celestial_calendar` and call
-`jde_to_utc(hit.jde_tt)`. It returns UTC civil fields (`year`, `month`, `day`,
-`fraction`), where `fraction` is the elapsed fraction of that UTC day. Retain `jde_tt` as the event
-time: a UTC-to-TT-to-UTC round trip need not recover the original civil fields at
-leap seconds or the 1972 model boundary. After the last leap-second entry, the
-converter retains the last known offset.
-
 <!-- /usage: transits.hits -->
+
+For ordinary UTC clock display, convert the civil fields returned by `jde_to_utc`
+to a timezone-aware `datetime`. `fraction` is the elapsed fraction of that UTC day:
+
+```{doctest}
+>>> from celestial_calendar import jde_to_utc
+>>> civil = jde_to_utc(result.hits[0].jde_tt)
+>>> displayed = datetime(civil.year, civil.month, civil.day, tzinfo=UTC) + timedelta(days=civil.fraction)
+>>> displayed.isoformat(timespec="seconds")
+'2024-03-22T17:40:34+00:00'
+```
+
+Retain `jde_tt` as the event time; this seconds-only display loses precision.
+A UTC-to-TT-to-UTC round trip need not recover the original civil fields at leap
+seconds or the 1972 model boundary, and Python `datetime` cannot represent a leap second.
 
 ## Select targets and aspects
 
@@ -81,9 +90,31 @@ longitude, which can differ by a small numerical residual or lie on the other
 side of 0°/360°. See the {ref}`rule and coordinate limits
 <catalog-en-rule-project-exact-transit-hits>` for the own-date longitude convention.
 
-Each moving object, natal target and oriented aspect branch requires a separate
-upstream interval scan. Start with the selections you need; expanding all three
-selections multiplies the work.
+## Search cost
+
+The number of upstream interval scans is:
+
+`moving objects × natal targets × total oriented aspect branches`
+
+All five major aspects have eight branches in total, not five. Narrow each
+selection to the question you need, and start with a short interval. The call
+provides no progress callback and returns only after every selected scan succeeds;
+it does not return partial results.
+
+Measurements on 2026-11-07 with celestial-calendar 1.1.1 and Python 3.14.9 on a
+16-core Linux machine give approximate costs, not timing guarantees. One longitude
+scan over 365 TT days took about 2–11 seconds for Jupiter, Uranus, Venus, Saturn,
+Mars and Mercury; Mercury was slowest. Sun and Moon each took less than 0.1 second.
+A separate one-year search of Saturn and Jupiter against natal Sun, Moon and
+Ascendant, selecting conjunction, square and opposition, took about 74 seconds:
+`2 × 3 × (1 + 2 + 1) = 24` scans.
+
+Ten moving bodies against ten natal bodies plus four axes, with all five aspects,
+require `10 × 14 × 8 = 1120` scans. Extrapolating each moving body's measured scan
+time equally across all natal targets and branches gives roughly an hour for that
+one-year request; the complete request was not timed. Costs depend on the target,
+interval, machine and load; do not assume that they scale linearly with interval
+length from these samples.
 
 ## Read and retain the result
 
@@ -152,3 +183,7 @@ an endpoint; see the [birth-time explanation](birth.md).
 This operation finds
 exact moving-to-fixed hits. It does not calculate a fixed-instant transit chart,
 orb-entry windows, returns, moving-to-moving events or interpretation.
+For aspects at one chosen instant, compare an already calculated chart at that
+instant with the natal chart using [static cross-chart aspects](cross_aspects.md#compare-two-example-charts),
+selecting objects separately on each side. This compares stored own-date longitudes
+under the [source-compatibility convention](cross_aspects.md#source-compatibility-and-calculation-boundaries).

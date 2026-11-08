@@ -24,6 +24,7 @@ def _workflow() -> dict[str, Any]:
 
 def _contract(workflow: dict[str, Any]) -> None:
   assert set(workflow["on"]) == {"pull_request", "workflow_dispatch"}
+  assert workflow["on"]["pull_request"] == {"branches": ["main", "milestone/**"]}
   assert workflow["permissions"] == {}
   assert workflow["env"]["RELEASE_SHA"] == "${{ inputs.sha || github.sha }}"
   jobs = workflow["jobs"]
@@ -114,6 +115,12 @@ def test_checkout_policy_preserves_linux_archive_text_bytes() -> None:
   "defect",
   [
     "event",
+    "main-only",
+    "milestone-only",
+    "no-branch-filter",
+    "empty-branches",
+    "all-branches",
+    "wrong-branch",
     "needs",
     "build-token",
     "if",
@@ -142,6 +149,18 @@ def test_workflow_contract_rejects_representative_defects(defect: str) -> None:
   )
   if defect == "event":
     workflow["on"]["pull_request_target"] = workflow["on"].pop("pull_request")
+  elif defect == "main-only":
+    workflow["on"]["pull_request"]["branches"] = ["main"]
+  elif defect == "milestone-only":
+    workflow["on"]["pull_request"]["branches"] = ["milestone/**"]
+  elif defect == "no-branch-filter":
+    workflow["on"]["pull_request"] = {}
+  elif defect == "empty-branches":
+    workflow["on"]["pull_request"]["branches"] = []
+  elif defect == "all-branches":
+    workflow["on"]["pull_request"]["branches"] = ["**"]
+  elif defect == "wrong-branch":
+    workflow["on"]["pull_request"]["branches"] = ["main", "feature/**"]
   elif defect == "needs":
     publish["needs"] = ["build"]
   elif defect == "build-token":

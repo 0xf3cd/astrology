@@ -2,6 +2,24 @@
 
 [简体中文](../zh-CN/releases.md) · [Documentation](index.md) · [Release procedure](releasing.md)
 
+## Source changes since 0.4.0
+
+The source checkout consolidates project implementation citations under
+`source.astrology`, with module and symbol locators. The following catalog source
+IDs are removed; use `source.astrology` for all six:
+
+- `source.astrology.house_overlays.f269d14`
+- `source.astrology.axis_aspects.4cb15cc`
+- `source.astrology.sign_groups.c92ac82`
+- `source.astrology.cross_aspects.0d7122a`
+- `source.astrology.chart.fc845fa`
+- `source.astrology.config.fa2e985`
+
+Their full historical revisions remain in the new source's lineage. This is a
+catalog data change in the source checkout; the published 0.4.0 package retains
+its original catalog. The [project source record](knowledge.md#follow-a-source-to-a-definition)
+identifies the release tree used for implementation references.
+
 ## 0.4.0
 
 This version adds dispositor chains and exact transit-to-natal hits, upgrades

@@ -10,17 +10,17 @@
 先运行下面的示例；更多用法和参数说明见[使用指南](https://0xf3cd.github.io/astrology/docs/zh-CN/index.html)和
 [API 参考](https://0xf3cd.github.io/astrology/docs/zh-CN/reference.html)。
 
-功能包括[元素／模式分布与出生月相](https://0xf3cd.github.io/astrology/docs/zh-CN/summaries.html)、
-[传统星座守护、四种状态与定位星链](https://0xf3cd.github.io/astrology/docs/zh-CN/dignities.html)，
-本命及静态双盘查询的[显式选四轴参与相位](https://0xf3cd.github.io/astrology/docs/zh-CN/aspects.html#axis-aspects-zh-cn)，
-以及[双盘落宫和双语比较文本](https://0xf3cd.github.io/astrology/docs/zh-CN/cross_aspects.html)。
-四轴（上升点、中天、下降点、天底）只有被显式选择后才参与相位。
+功能包括：
 
-此外还提供：
-
+- [元素／模式分布与出生月相](https://0xf3cd.github.io/astrology/docs/zh-CN/summaries.html)。
+- [传统星座守护、四种状态与定位星链](https://0xf3cd.github.io/astrology/docs/zh-CN/dignities.html)。
+- 本命及静态双盘查询的[显式选四轴参与相位](https://0xf3cd.github.io/astrology/docs/zh-CN/aspects.html#axis-aspects-zh-cn)。
+- [双盘落宫和双语比较文本](https://0xf3cd.github.io/astrology/docs/zh-CN/cross_aspects.html)。
 - 两张本命盘之间的[静态交叉相位](https://0xf3cd.github.io/astrology/docs/zh-CN/cross_aspects.html)，保留两张源盘并区分左右对象，不标入相／离相。
 - UTC 区间内的[精确行运命中](https://0xf3cd.github.io/astrology/docs/zh-CN/transits.html)，保留逆行造成的多次命中及原生速率、方向。
 - 用 `ashmand_sign_group(Sign.ARIES)` 查询十二星座在 Ashmand 1822 年版中的四组归属。见[来源及查询示例](https://0xf3cd.github.io/astrology/docs/zh-CN/knowledge.html#ashmand-sign-groups-zh-cn)。
+
+四轴（上升点、中天、下降点、天底）只有被显式选择后才参与相位。
 
 <a id="install-a-release-zh-cn"></a>
 
@@ -145,7 +145,7 @@ moon: scorpio
 ## 第一次查询知识
 
 把这份独立脚本保存为 `first_knowledge.py`，用同一个虚拟环境的 Python 运行。
-下面按名称和别名查找太阳：
+下面先按稳定 ID 读取太阳，再按别名“日轮”查找同一概念：
 
 ```python
 from astrology import load_catalog
@@ -185,7 +185,7 @@ body.sun
 - [进阶技术与历史研究](https://github.com/0xf3cd/astrology/milestone/3)：主限、推运、
   不确定出生时间、历史输入、空间落宫与有来源的解释知识。
 
-这些 milestone 记录方向，不设发布日期。每种技术在实现前须明确其定义、出处与参考案例。
+这些 milestone 记录方向，不设发布日期。
 
 ## 许可证
 

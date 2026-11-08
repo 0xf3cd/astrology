@@ -33,7 +33,7 @@ True
 >>> catalog.filter_entries(concept_id="body.sun")[0].identifier
 'entry.body_requests'
 >>> len(catalog.filter_sources(verification=SourceVerification.VERIFIED))
-14
+9
 >>> print(catalog.entry("entry.cross_aspect_evaluation").statement.text("en"))
 Static major cross aspects compare two supplied natal results with distinct left/right endpoints and preserve both complete sources, without a motion field.
 >>> print(catalog.variant("rule.project.cusp_ownership").definition.text("en"))
@@ -86,7 +86,7 @@ source records:
 ('rule.project.cross_house_overlays', 'rule.project.cusp_ownership')
 >>> citation, source = catalog.citations(overlay.identifier)[0]
 >>> source.identifier
-'source.astrology.house_overlays.f269d14'
+'source.astrology'
 >>> overlay.prerequisite_status.value, overlay.output_eligibility.value, overlay.chart_applicability
 ('complete', 'reference_only', 'not_assessed')
 ```
@@ -97,7 +97,7 @@ owners, and retain each chart's house system. `rule.project.cusp_ownership` defi
 the intervals between cusps that determine a longitude's house. House overlays use
 that same interval rule.
 
-The source record links to implementation code at a fixed commit, so you can
+The source record links to implementation code at a named release tag, so you can
 check the algorithm and its stated scope. The query above only reads explanations
 and citations; it does not calculate placements or assess a chart. To calculate
 placements between two charts, see the [house-overlay example](cross_aspects.md#find-houses-in-the-other-chart).
@@ -181,14 +181,16 @@ Source records give the edition, scan hash, transcription changes and reproducti
 terms. The package includes limited definition excerpts, not scan images,
 watermarks or modern website prose. Mirrors and bibliographic records can help
 confirm an edition; they are not independent evidence for its rules. Code
-citations identify the package version and symbols at a fixed commit. A definition
+citations identify the release tag, modules and symbols. A definition
 bearing an author's name does not mean the formulas in that author's book have
 been checked.
 
-Implementation source records stay pinned to the inspected commits instead of
-following the package version. The
-{ref}`chart source record <catalog-en-source-astrology-chart-fc845fa>` locates its
-node-comparison test; the {ref}`node rule <catalog-en-rule-node-definition-meeus-five-term-true>`
+The {ref}`project source record <catalog-en-source-astrology>` names the release
+tree used for implementation references. Its edition can differ from a source
+checkout, whose changes are listed in the [source-change notes](releases.md).
+Historical source IDs and full revisions remain in its lineage; those inspections
+do not cover later extensions. The node-test citation names its module and symbols,
+while the {ref}`node rule <catalog-en-rule-node-definition-meeus-five-term-true>`
 records the comparison's scope and unresolved source questions.
 
 The hand-written data below illustrates knowing only some of the conditions:
@@ -211,9 +213,8 @@ satisfies an entry or store chart evidence for that judgment.
 `axis.ascendant`, `axis.midheaven`, `axis.descendant` and `axis.imum_coeli` are
 separate concepts bound to `Axis`, not bodies, nodes or cusp aliases. The
 reference-only `entry.axis_aspects` states the project's explicit-selection,
-pairing and missing-rate policies and cites their fixed implementation revision.
-The earlier body/node sources keep their original revisions; they are not
-retroactively evidence for the axis extension.
+pairing and missing-rate policies. Its project-source citation names the axis
+implementation units at the release tag.
 
 ```{doctest}
 >>> from astrology import Axis
@@ -283,9 +284,8 @@ groups agree; the modern mutable group matches Ashmand's bicorporeal group, and
 Ashmand's tropical and equinoctial groups together match the modern cardinal group.
 Having the same members does not make their names or historical definitions equivalent.
 
-Both `FIXED` members have the string value `"fixed"` and compare and hash equal
-as `StrEnum` members. To keep both in one mapping, use `(type(member), member.value)`
-keys or their distinct qualified catalog IDs.
+For Python mappings that combine these enum types, see the
+[API note on enum keys](reference.md#zodiac-classification).
 
 The lunation convention uses Rudhyar's eight types in *Your Lunation Birthday*,
 Part Four. See the {ref}`source record <catalog-en-source-rudhyar-lunation-birthday>`
@@ -319,28 +319,8 @@ substring matching is not supported. Use `Catalog.lookup()` for exact identity l
 
 ## Add a sourced variant
 
-1. Inspect a retrievable edition and reproduction terms. Record work, author or
-   translator, edition, language, locator, lineage, supported claim and limits.
-   Mark unverified material honestly; two mirrors are not two sources.
-2. Add stable records to `src/astrology/knowledge/catalog.json`. Reference an
-   owning enum class/member instead of copying its value or inventing an algorithm.
-   Add a separate explicit variant only when it carries a rule, with its own
-   definition and limits; configuration links alone do not generate variants.
-   Lunar-node definition links are derived from `LunarNode.definition`, and the
-   loader checks all twelve Sign-to-concept identities in the built-in corpus.
-   Source-only variants have no config reference; entries link variant IDs and citations.
-3. Keep excerpts, translations and authored statements distinct. `text_defaults`
-   supplies initial revision 1 and project translation credit; each text can
-   override them. Increment a changed text's `revision`; retain its old `zh_revision`
-   until translation review, then update revision and credit together.
-4. State prerequisites, exceptions and limits. Select source verification,
-   prerequisite completeness and output eligibility independently. Retrieval must
-   leave chart applicability `not_assessed` even when one condition is computable.
-   Leave unsupported interpretations out of the default corpus.
-5. Add boundary/source tests, run the [complete checks](contributing.md) and inspect
-   both generated language pages. Checks cover current translations, complete
-   config/catalog/API references and installed resources. Semantic review still
-   verifies translation meaning and source fidelity.
+To contribute a definition or variant, follow the
+[source and translation procedure](contributing.md#add-a-sourced-variant).
 
 ## Records and ownership
 

@@ -55,7 +55,7 @@ Calculate this synthetic example once, then read its existing cusps and placemen
 
 ```{doctest}
 >>> from datetime import date, time, timedelta
->>> from astrology import (BirthRecord, FixedOffset, Location, ChartConfig, HouseSystem,
+>>> from astrology import (BirthRecord, Body, FixedOffset, Location, ChartConfig, HouseSystem,
 ...     natal_chart, prepare_natal_input, HouseRulers, format_house_rulers, load_catalog)
 >>> chart = natal_chart(prepare_natal_input(BirthRecord(date(2000, 1, 1), time(12),
 ...     FixedOffset(timedelta(0)), Location(0, 0))),
@@ -97,7 +97,7 @@ house. Status assessment uses the sign alone, not the displayed degree.
 ### Construct an individual record
 
 ```{doctest}
->>> from astrology import HouseRuler, Placement
+>>> from astrology import Body, Sign, HouseRuler, Placement, essential_dignities
 >>> placement = Placement(Body.MERCURY, Sign.VIRGO, 0, 6)
 >>> record = HouseRuler(house=3, cusp_sign=Sign.GEMINI, placement=placement)
 >>> record.ruler is Body.MERCURY, record.statuses == essential_dignities(Body.MERCURY, Sign.VIRGO)
@@ -166,12 +166,14 @@ Read the other endings as follows:
 - `final_dispositors` lists reached planets that rule their own signs. Their
   self-loop edges remain in `edges`. For a root that reaches such a planet,
   `chains[root]` lists that planet once.
-- A two-planet item in `cycles` is domicile-based mutual reception under this
-  rule. Longer cycles, such as the example, are not labeled mutual reception.
+- A two-planet item in `cycles` is domicile-based mutual reception: each planet
+  occupies a sign ruled by the other. Longer cycles, such as the example, are not
+  labeled mutual reception.
 - `missing_rulers[root]` gives the absent next ruler for that root. The path
   ends at the last available object, and the edge to the absent ruler remains.
 
-For example, a chart containing only this Sun cannot continue to Saturn:
+Continuing the preceding example with the same `birth`, a chart containing only
+this Sun cannot continue to Saturn:
 
 ```{doctest}
 >>> sparse = natal_chart(birth, ChartConfig(HouseSystem.WHOLE_SIGN, (Body.SUN,), ()))
@@ -200,9 +202,10 @@ is an input error, distinct from a missing successor in a valid chain.
 
 `paths.rule_id` is `rule.project.dispositor_chains`. The
 {ref}`project rule <catalog-en-rule-project-dispositor-chains>` defines traversal
-and result ordering over Lilly's unchanged sign-ruler table. Its
-{ref}`knowledge entry <catalog-en-entry-dispositor-chains>` records the source
-boundary and the limits of domicile-based reception. It provides no scoring,
+and result ordering over Lilly's unchanged sign-ruler table, including the narrow
+domicile-based mutual-reception label. Its
+{ref}`knowledge entry <catalog-en-entry-dispositor-chains>` cites the sources and
+links to that rule's limits. The operation provides no scoring,
 interpretation or modern co-rulers, and has no dedicated formatter.
 
 ## Source and limits
@@ -219,4 +222,5 @@ domicile labels are not extra conditions on the four sign queries.
 
 Catalog status concepts have IDs `dignity_status.<value>` and no request-configuration
 link. `entry.essential_dignities` has complete query prerequisites but remains
-`reference_only` and `not_assessed`. Catalog retrieval does not evaluate a chart.
+`reference_only` and `not_assessed`. Catalog retrieval does not evaluate a chart;
+see [the separate status meanings](knowledge.md#status-has-several-dimensions).

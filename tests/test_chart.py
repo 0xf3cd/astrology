@@ -23,6 +23,7 @@ from astrology import (
   ChartConfig,
   ChartDomainError,
   FixedOffset,
+  HistoricalTimeError,
   HouseSystem,
   Location,
   LunarNode,
@@ -139,6 +140,89 @@ def test_a_civil_year_beyond_the_supported_range_is_rejected() -> None:
   assert caught.value.house_system is HouseSystem.WHOLE_SIGN
   assert caught.value.operation is None
   assert caught.value.upstream_message is None
+
+
+@pytest.mark.parametrize("end_year", [2003, 2200])
+def test_the_civil_year_ceiling_comes_from_the_selected_model(
+  end_year: int, monkeypatch: pytest.MonkeyPatch
+) -> None:
+  import celestial_calendar as celestial
+
+  import astrology.celestial as adapter
+
+  capability = replace(celestial.house_capability(), civil_end_year_exclusive=end_year)
+  calls: list[celestial.DeltaTModel] = []
+
+  def selected_capability(
+    *, delta_t_model: celestial.DeltaTModel
+  ) -> celestial.CivilHouseCapability:
+    calls.append(delta_t_model)
+    return capability
+
+  monkeypatch.setattr(celestial, "house_capability", selected_capability)
+  resolved = resolved_at(date(2100, 1, 1), time(12), 0.0)
+  if end_year <= resolved.utc.year:
+    with pytest.raises(ChartDomainError, match=f"end year {end_year} ") as caught:
+      adapter._precheck(resolved, config_for())
+    assert caught.value.upstream_message is None
+    assert caught.value.operation is None
+    assert caught.value.recorded is None
+  else:
+    assert adapter._precheck(resolved, config_for()) is resolved.record.location
+  assert calls == [celestial.DeltaTModel.ALGO5]
+
+
+@pytest.mark.parametrize("latitude", [None, -90.0, 90.0])
+def test_location_rejections_precede_native_capability_queries(
+  latitude: float | None, monkeypatch: pytest.MonkeyPatch
+) -> None:
+  import celestial_calendar as celestial
+
+  import astrology.celestial as adapter
+
+  def unexpected(*arguments: object, **keywords: object) -> NoReturn:
+    pytest.fail("Location rejection must precede every native query")
+
+  monkeypatch.setattr(celestial, "house_capability", unexpected)
+  monkeypatch.setattr(celestial, "chart_snapshot", unexpected)
+  resolved = resolve_birth_time(record_at(*_NORTH[:2], latitude))
+  expected = MissingBirthDataError if latitude is None else ChartDomainError
+  with pytest.raises(expected):
+    adapter._precheck(resolved, config_for())
+  with pytest.raises(expected):
+    natal_chart(resolved, config_for())
+
+
+@pytest.mark.parametrize("year", [1884, 1900, 1971])
+def test_historical_utc_is_rejected_during_public_birth_preparation(year: int) -> None:
+  with pytest.raises(HistoricalTimeError):
+    prepare_natal_input(record_at(date(year, 1, 1), time(12), 0.0))
+
+
+@pytest.mark.parametrize("recorded", [True, False])
+@pytest.mark.parametrize("message", ["", "capability unavailable"])
+def test_house_capability_failures_keep_native_diagnostics(
+  recorded: bool, message: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+  import celestial_calendar as celestial
+
+  failure = celestial.CelestialError("house_capability", message, recorded=recorded)
+
+  def reject(**keywords: object) -> NoReturn:
+    raise failure
+
+  def unexpected(*arguments: object) -> NoReturn:
+    pytest.fail("Chart calculation must not follow a failed capability query")
+
+  monkeypatch.setattr(celestial, "house_capability", reject)
+  monkeypatch.setattr(celestial, "chart_snapshot", unexpected)
+  with pytest.raises(ChartDomainError) as caught:
+    natal_chart(resolved_at(*_NORTH[:2], *_NORTH[2:]), config_for(HouseSystem.EQUAL))
+  assert caught.value.house_system is HouseSystem.EQUAL
+  assert caught.value.operation == failure.operation
+  assert caught.value.recorded is recorded
+  assert caught.value.upstream_message == str(failure)
+  assert caught.value.__cause__ is failure
 
 
 def test_the_upper_jde_bound_is_reported_as_a_domain_error() -> None:

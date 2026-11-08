@@ -48,6 +48,9 @@ The development package provides a tropical natal chart API and
 chart-independent knowledge queries. Importing it initializes no native
 astronomy.
 
+New result types do not add policy fields with only one legal value. Document
+those conventions in the guides; retain the existing fields.
+
 ## Knowledge and documentation
 
 Use English for PR and issue titles/bodies, comments, and review replies. English
@@ -71,6 +74,17 @@ equivalence; original quotations are not rewritten to match prose style.
 
 This file is the single agent-instruction source; reader documentation follows the
 bilingual paths above. Create source modules only when they contain functionality.
+
+## Milestone delivery
+
+Create `milestone/<version>` from current `main`. Stage branches start from that
+branch and stage PRs target it, with `Part of #N` in their bodies. Squash stage PRs
+into the integration branch. The final PR goes from the integration branch to
+`main` and also squashes, leaving one complete commit per milestone on `main`.
+Its body uses plain-text closing references such as `Closes #N` for each completed
+child issue, excluding the release tracker. Keep the release tracker and milestone
+open until [publication acceptance](docs/en/releasing.md#verify-and-record-the-published-result)
+is complete.
 
 ## Verification and delivery
 

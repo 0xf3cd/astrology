@@ -30,22 +30,32 @@
 ...   moving_objects=(Body.MERCURY,), natal_objects=(Body.SUN,),
 ...   aspects=(MajorAspect.CONJUNCTION,))
 >>> for hit in result.hits:
-...   print(f"{hit.jde_tt:.5f} {hit.direction.value} {hit.longitude_rate_deg_per_tt_day:+.3f}")
-2460392.23731 increasing +1.208
-2460414.61236 decreasing -0.744
-2460437.45999 increasing +0.812
+...   print(f"{hit.moving_object.value} {hit.aspect.value} {hit.natal_object.value} "
+...         f"{hit.jde_tt:.5f} {hit.direction.value} {hit.longitude_rate_deg_per_tt_day:+.3f}")
+mercury conjunction sun 2460392.23731 increasing +1.208
+mercury conjunction sun 2460414.61236 decreasing -0.744
+mercury conjunction sun 2460437.45999 increasing +0.812
 ```
 
 水星三次到达固定的本命太阳度数：黄经递增时一次，逆行时一次，恢复递增后又一次。
 速率单位为度/TT 日，直接保留上游事件值。`tangent` 表示到达查询黄经后相切而未穿越，
 报告的速率不必恰为零。
 
-如需显示 UTC 日期，从 `celestial_calendar` 导入 `jde_to_utc`，调用 `jde_to_utc(hit.jde_tt)`，
-取得 UTC 民用字段 `year`、`month`、`day`、`fraction`；`fraction` 是当天已过时间占 UTC 日的比例。
-仍应保留原始 `jde_tt` 作为事件时刻：从 UTC 转为 TT 再转回时，上游不保证在闰秒及
-1972 年模型交界处还原原始民用字段。最后一条闰秒记录之后，转换仍只保留最后已知偏移。
-
 <!-- /usage: transits.hits -->
+
+显示普通 UTC 钟点时，可将 `jde_to_utc` 返回的民用字段转为有时区的 `datetime`。
+`fraction` 是当天已过时间占 UTC 日的比例：
+
+```{doctest}
+>>> from celestial_calendar import jde_to_utc
+>>> civil = jde_to_utc(result.hits[0].jde_tt)
+>>> displayed = datetime(civil.year, civil.month, civil.day, tzinfo=UTC) + timedelta(days=civil.fraction)
+>>> displayed.isoformat(timespec="seconds")
+'2024-03-22T17:40:34+00:00'
+```
+
+仍应保留原始 `jde_tt` 作为事件时刻；这里只显示到秒，会损失精度。从 UTC 转为 TT 再转回时，
+上游不保证在闰秒及 1972 年模型交界处还原原始民用字段，Python `datetime` 也不能表示闰秒。
 
 ## 选择目标与相位
 
@@ -66,8 +76,24 @@
 或位于 0°/360° 的另一侧。
 自身日期黄经约定见{ref}`规则及坐标限度 <catalog-zh-cn-rule-project-exact-transit-hits>`。
 
-每组移动对象、本命目标和有向相位分支都要单独调用上游扫描区间。
-先选择实际需要的对象和相位；同时扩大三项选择会使工作量相乘。
+## 搜索耗时
+
+上游区间扫描次数为：
+
+`移动对象数 × 本命目标数 × 所选相位的有向分支总数`
+
+五种主要相位合计八个分支，不是五个。各项只选实际需要的对象和相位，先从短区间开始。
+调用没有进度回调，所有所选扫描成功后才返回，不返回部分结果。
+
+2026-11-07 在一台 16 核 Linux 机器上，以 celestial-calendar 1.1.1、Python 3.14.9
+实测得到以下近似耗时，不作为保证。对木星、天王星、金星、土星、火星、水星，单条黄经扫描
+365 TT 日约需 2–11 秒，水星最慢；太阳和月亮各不到 0.1 秒。另一次一年区间搜索，
+移动侧选土星和木星，本命侧选太阳、月亮、上升点，相位选合相、四分相、对分相，约需 74 秒，
+共 `2 × 3 × (1 + 2 + 1) = 24` 次扫描。
+
+十颗移动天体对十颗本命天体及四轴，选五种主要相位，共需 `10 × 14 × 8 = 1120` 次扫描。
+将每颗移动天体的单次实测耗时等量外推到所有本命目标和分支，这样的一年请求约需一小时；
+没有对完整请求计时。耗时取决于目标、区间、机器和负载，不应由这些样本假定耗时随区间长度线性增长。
 
 ## 读取和保留结果
 
@@ -86,7 +112,7 @@ True
 `result.sources[0].model_description` 提供其名称及说明。
 
 `start_jde_tt` 与 `end_jde_tt` 保留转换后的搜索区间。每个 `TransitSource` 保存实际移动模型、
-事件域端点、最长区间及上游说明。结果还保留 astrology 版本及明确的时间、位置坐标和历元政策。
+事件域端点、最长区间及上游说明。结果还保留 astrology 版本及明确的时间、位置参考系和历元政策。
 这里的版本描述本次行运计算；`result.chart.provenance` 描述原本命计算，两处版本可以不同。
 
 命中按 TT 时刻、移动对象选择顺序、本命源盘顺序、相位角升序及负分支在前排序。
@@ -122,3 +148,6 @@ True
 
 本操作搜索精确的移动对固定命中，不计算固定时刻行运盘、容许度进出窗口、返照、
 两颗移动对象间的事件或解读。
+若要查一个指定时刻的相位，用[静态双盘相位](cross_aspects.md#比较两张示例盘)比较该时刻已算好的盘
+与本命盘，并分别选择两侧对象。这按[源盘兼容约定](cross_aspects.md#源盘兼容与计算边界)
+比较各自日期的已存黄经。

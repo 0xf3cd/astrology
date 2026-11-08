@@ -316,6 +316,9 @@ This does not change the project's MIT license or constitute a general license a
 
 ## Knowledge and documentation
 
+Each technique needs a named definition, sources and reference cases before
+implementation.
+
 Follow the [knowledge design](knowledge.md). Link explanations to stable concepts,
 rules and sources. Preserve original quotations and label translations; a checked
 source is not evidence that a particular chart meets its prerequisites.
@@ -327,6 +330,31 @@ detect a missing translation file, but cannot establish semantic equivalence.
 The catalog checks also reject stale text revisions, missing record descriptions,
 unknown references and duplicate IDs. Both language views have executable examples;
 source and translation review checks that conditions and limits retain their meaning.
+
+### Add a sourced variant
+
+1. Inspect a retrievable edition and reproduction terms. Record work, author or
+   translator, edition, language, locator, lineage, supported claim and limits.
+   Mark unverified material honestly; two mirrors are not two sources.
+2. Add stable records to `src/astrology/knowledge/catalog.json`. Reference an
+   owning enum class/member instead of copying its value or inventing an algorithm.
+   Add a separate explicit variant only when it carries a rule, with its own
+   definition and limits; configuration links alone do not generate variants.
+   Lunar-node definition links are derived from `LunarNode.definition`, and the
+   loader checks all twelve Sign-to-concept identities in the built-in corpus.
+   Source-only variants have no config reference; entries link variant IDs and citations.
+3. Keep excerpts, translations and authored statements distinct. `text_defaults`
+   supplies initial revision 1 and project translation credit; each text can
+   override them. Increment a changed text's `revision`; retain its old `zh_revision`
+   until translation review, then update revision and credit together.
+4. State prerequisites, exceptions and limits. Select source verification,
+   prerequisite completeness and output eligibility independently. Retrieval must
+   leave chart applicability `not_assessed` even when one condition is computable.
+   Leave unsupported interpretations out of the default corpus.
+5. Add boundary/source tests, run the [complete checks](#run-the-checks) and inspect
+   both generated language pages. Checks cover current translations, complete
+   config/catalog/API references and installed resources. Semantic review still
+   verifies translation meaning and source fidelity.
 
 ## Review evidence
 
