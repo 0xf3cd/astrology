@@ -78,9 +78,10 @@ Create `milestone/<version>` from current `main`. Stage branches start from that
 branch and stage PRs target it, with `Part of #N` in their bodies. Squash stage PRs
 into the integration branch. The final PR goes from the integration branch to
 `main` and also squashes, leaving one complete commit per milestone on `main`.
-Its body uses `Closes #N` for each completed child issue, excluding the release
-tracker. Keep the release tracker and milestone open until publication and live
-acceptance are complete.
+Its body uses plain-text closing references such as `Closes #N` for each completed
+child issue, excluding the release tracker. Keep the release tracker and milestone
+open until [publication acceptance](docs/en/releasing.md#verify-and-record-the-published-result)
+is complete.
 
 ## Verification and delivery
 
