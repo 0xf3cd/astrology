@@ -3,6 +3,7 @@
 import doctest
 import html
 import json
+import re
 from dataclasses import fields, is_dataclass, replace
 from importlib.metadata import version
 from pathlib import Path
@@ -132,6 +133,17 @@ def test_ashmand_guide_example_runs_without_earlier_sections(language: Language)
   runner = doctest.DocTestRunner()
   result = runner.run(case)
   assert result.attempted > 0 and result.failed == 0
+
+
+@pytest.mark.parametrize("language", ["en", "zh-CN"])
+def test_dignities_import_bearing_examples_run_independently(language: Language) -> None:
+  path = Path(__file__).resolve().parents[1] / "docs" / language / "dignities.md"
+  blocks = re.findall(r"```\{doctest\}\n(.*?)```", path.read_text(encoding="utf-8"), re.S)
+  assert len(blocks) == 5
+  for index, example in enumerate(blocks[:4]):
+    case = doctest.DocTestParser().get_doctest(example, {}, f"{path}:{index + 1}", str(path), 0)
+    result = doctest.DocTestRunner().run(case)
+    assert result.attempted > 0 and result.failed == 0
 
 
 def _strings(value: object, language: Language) -> list[str]:

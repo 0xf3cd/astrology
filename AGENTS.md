@@ -48,6 +48,9 @@ The development package provides a tropical natal chart API and
 chart-independent knowledge queries. Importing it initializes no native
 astronomy.
 
+New result types do not add policy fields with only one legal value. Document
+those conventions in the guides; retain the existing fields.
+
 ## Knowledge and documentation
 
 Use English for PR and issue titles/bodies, comments, and review replies. English

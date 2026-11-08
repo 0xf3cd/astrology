@@ -2,6 +2,21 @@
 
 [English](../en/releases.md) · [文档](index.md) · [发行流程](releasing.md)
 
+## 0.4.0 之后的源码变更
+
+源码中的项目实现引用合并到 `source.astrology`，各引用用模块与符号定位。
+以下六个目录来源 ID 已移除，均改用 `source.astrology`：
+
+- `source.astrology.house_overlays.f269d14`
+- `source.astrology.axis_aspects.4cb15cc`
+- `source.astrology.sign_groups.c92ac82`
+- `source.astrology.cross_aspects.0d7122a`
+- `source.astrology.chart.fc845fa`
+- `source.astrology.config.fa2e985`
+
+原完整历史修订保留在新来源的 lineage 中。这是源码中的目录数据变更，已发布的 0.4.0 包仍保留
+原目录。[项目来源说明](knowledge.md#从来源查到定义)标明实现引用所用的发行树。
+
 ## 0.4.0
 
 本版增加定位星链和移动对本命的精确行运命中，将 celestial-calendar 升至 1.1.1，并删除独立目录版本。

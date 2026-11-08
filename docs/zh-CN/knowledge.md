@@ -31,7 +31,7 @@ True
 >>> catalog.filter_entries(concept_id="body.sun")[0].identifier
 'entry.body_requests'
 >>> len(catalog.filter_sources(verification=SourceVerification.VERIFIED))
-14
+9
 >>> print(catalog.entry("entry.cross_aspect_evaluation").statement.text("zh-CN"))
 静态主要交叉相位比较两张给定本命盘结果，区分左右端点并保留双侧完整来源，不设运动字段。
 >>> print(catalog.variant("rule.project.cusp_ownership").definition.text("zh-CN"))
@@ -77,7 +77,7 @@ True
 ('rule.project.cross_house_overlays', 'rule.project.cusp_ownership')
 >>> citation, source = catalog.citations(overlay.identifier)[0]
 >>> source.identifier
-'source.astrology.house_overlays.f269d14'
+'source.astrology'
 >>> overlay.prerequisite_status.value, overlay.output_eligibility.value, overlay.chart_applicability
 ('complete', 'reference_only', 'not_assessed')
 ```
@@ -86,7 +86,7 @@ True
 区分对象所属盘与宫位所属盘，并保留各自的宫制；`rule.project.cusp_ownership` 定义宫头之间的区间，
 决定黄经落在哪一宫。双盘落宫沿用这套区间规则。
 
-来源记录指向一个固定提交中的实现代码，可以据此核对算法及其支持范围。
+来源记录指向具名发行 tag 中的实现代码，可以据此核对算法及其支持范围。
 上面的查询只读取说明和出处，不计算落宫，也不判断某张命盘。
 要对两张盘计算落宫，见[双盘落宫示例](cross_aspects.md#查询对象落入另一张盘的哪一宫)。
 
@@ -154,10 +154,11 @@ True
 
 来源记录给出版本、扫描文件哈希、转录时的文字处理和转载条件。包内只收录有限的定义摘录，
 不附扫描图、水印或现代网站说明。同一本书的镜像和书目可以帮助确认版本，但不能当作多份独立依据。
-代码引用给出包版本及固定提交中的符号；程序中的定义用了某位作者的名字，不表示已经核对过其原书公式。
+代码引用给出发行 tag、模块与符号；程序中的定义用了某位作者的名字，不表示已经核对过其原书公式。
 
-项目实现来源记录保留已查核的提交，不跟随包版本改写。
-{ref}`排盘来源记录 <catalog-zh-cn-source-astrology-chart-fc845fa>`定位其交点对拍测试，
+{ref}`项目来源记录 <catalog-zh-cn-source-astrology>`标明实现引用所用的发行树，其版本可能与源码工作树不同；
+源码变更另见[变更说明](releases.md)。历史来源 ID 与完整修订保留在 lineage 中，这些历史核查不覆盖后续扩展。
+交点测试引用给出模块与符号，
 {ref}`交点规则 <catalog-zh-cn-rule-node-definition-meeus-five-term-true>`记录对拍范围及待核的来源问题。
 
 下面用手工构造的数据表示“只知道部分条件”的情况：第一个条件为真，第二个仍未知。
@@ -177,7 +178,7 @@ True
 
 `axis.ascendant`、`axis.midheaven`、`axis.descendant` 和 `axis.imum_coeli` 是绑定到 `Axis`
 的不同概念，不是天体、交点或宫头的别名。仅供参考的 `entry.axis_aspects` 说明项目的显式选择、
-配对及缺速率政策，并引用固定修订的实现。原天体和交点来源仍保留原修订，不倒记为四轴扩展的证据。
+配对及缺速率政策，其项目来源引用给出发行 tag 中对应的四轴实现单元。
 
 ```{doctest}
 >>> from astrology import Axis
@@ -237,9 +238,7 @@ True
 虽然其中一些组包含相同的星座：两者的固定组相同，现代变动组与 Ashmand 双体组相同，
 Ashmand 的至点、分点两组合起来则对应现代基本模式。成员相同不表示名称和历史定义也相同。
 
-两个 `FIXED` 成员的字符串值都是 `"fixed"`；按 `StrEnum` 的字符串语义，它们比较相等，
-hash 也相同。要在同一映射中保留二者，请用 `(type(member), member.value)` 作键，
-或使用各自带类别前缀的目录 ID。
+若在 Python 映射中混用这两种枚举，见 [API 的枚举键说明](reference.md#星座归属)。
 
 月相分类采用 Rudhyar 的 *Your Lunation Birthday* 第四部分中的八种类型。
 版本和研究状态见{ref}`来源记录 <catalog-zh-cn-source-rudhyar-lunation-birthday>`，
@@ -268,20 +267,7 @@ hash 也相同。要在同一映射中保留二者，请用 `(type(member), memb
 
 ## 增加有来源的变体
 
-1. 查可取得的版本及转载条件，记录作品、作者或译者、版本、语言、定位、谱系、所支持的陈述及限度。
-   未核材料如实标注，两个镜像不算两份来源。
-2. 在 `src/astrology/knowledge/catalog.json` 添加稳定记录。引用所属枚举类与成员，
-   不抄其值，也不虚构算法。只有承载规则时才另加显式变体，写明其定义与限制；配置链接本身
-   不会生成变体。月交点的定义关联从 `LunarNode.definition` 派生，加载器还检查内置语料中
-   十二个 Sign 与概念的身份对应。
-   纯来源变体没有配置引用；条目关联变体标识及引用。
-3. 区分引文、译文及原作陈述。`text_defaults` 提供初始修订 1 及项目译者署名，各文本可覆盖它们。
-   文本改动时递增 `revision`；译文未经复核前保留原 `zh_revision`，复核后再更新修订及署名。
-4. 写清前提、例外及限度；独立选择来源查核、前提完整性与输出资格。
-   即使一个条件可算，检索仍须将命盘适用性留为 `not_assessed`。
-   缺乏依据的解释不进入默认语料。
-5. 补充边界与来源测试，运行[完整检查](contributing.md)，核双语生成页。
-   检查覆盖当前译文、完整配置／目录／API 及安装资源；语义审阅仍须核译意与来源保真。
+贡献定义或变体时，请按[来源与译文维护步骤](contributing.md#增加有来源的变体)操作。
 
 ## 记录与归属
 

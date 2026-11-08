@@ -534,14 +534,14 @@ def test_whole_sign_axes_are_not_cusps_and_nonzero_roundoff_is_not_exact() -> No
   assert opposite.motion is AspectMotion.INDETERMINATE
 
 
-def test_axis_entry_has_a_fixed_implementation_source_and_no_chart_assessment() -> None:
+def test_axis_entry_has_a_release_implementation_source_and_no_chart_assessment() -> None:
   catalog = load_catalog()
   entry = catalog.entry("entry.axis_aspects")
   assert set(entry.concept_ids) == {f"axis.{axis.value}" for axis in Axis}
   assert entry.chart_applicability == "not_assessed"
   assert entry.output_eligibility.value == "reference_only"
   citation, source = catalog.citations(entry.identifier)[0]
-  assert citation.source_id == "source.astrology.axis_aspects.4cb15cc"
+  assert citation.source_id == "source.astrology"
   assert source.url is not None
-  assert source.url.endswith("4cb15cc2f63a67ba804c04840f255ffff1209382")
-  assert "objects.Axis" in citation.locator
+  assert source.url.endswith("v0.4.0")
+  assert "objects.py: Axis" in citation.locator

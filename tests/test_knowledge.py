@@ -82,7 +82,7 @@ def test_query_contracts(catalog: Catalog) -> None:
   ]
   vocabulary = catalog.entry("entry.sign_vocabulary")
   assert "rule.ptolemy_ashmand.sign_groups" in vocabulary.rule_ids
-  assert "source.astrology.sign_groups.c92ac82" in {c.source_id for c in vocabulary.citations}
+  assert "source.astrology" in {c.source_id for c in vocabulary.citations}
   assert catalog.concept("body.sun").configuration is Body.SUN
   assert len(catalog.list_variants()) == len(catalog.variants)
   assert catalog.filter_entries() == tuple(catalog.entries)
@@ -192,10 +192,13 @@ def test_ashmand_groups_have_names_sources_and_separate_states(catalog: Catalog)
   citations = catalog.citations(entry.identifier)
   assert sum(source.identifier == "source.ptolemy.ashmand1822" for _, source in citations) == 4
   citation, implementation = citations[-1]
-  assert implementation.identifier == "source.astrology.sign_groups.c92ac82"
-  assert implementation.url.endswith("/c92ac826c3065fc9e4a2cc949cf87c64c79c0c63")
+  assert implementation.identifier == "source.astrology"
+  assert implementation.url.endswith("/v0.4.0")
   assert "ashmand_sign_group" in citation.locator
-  assert "not independent historical" in implementation.scope.en
+  assert (
+    "not independent astronomical corroboration, historical corroboration"
+    in implementation.scope.en
+  )
   excerpts = [c for c, _ in citations if c.excerpt is not None]
   assert len(excerpts) == 3
   assert all(c.excerpt is not None and c.excerpt.zh for c in excerpts)
@@ -668,8 +671,8 @@ def test_cross_policy_is_independently_retrievable_without_chart_applicability(
   assert entry.output_eligibility is OutputEligibility.REFERENCE_ONLY
   assert entry.chart_applicability == "not_assessed"
   citation, source = catalog.citations(entry.identifier)[0]
-  assert source.identifier == "source.astrology.cross_aspects.0d7122a"
-  assert source.url.endswith("/0d7122a7f7ef86ecc5798c9ea12668c68bb4a516")
+  assert source.identifier == "source.astrology"
+  assert source.url.endswith("/v0.4.0")
   assert "src/astrology/cross_aspects.py" in citation.locator
   assert source.verification is SourceVerification.VERIFIED
   assert citation.excerpt is None
@@ -678,7 +681,7 @@ def test_cross_policy_is_independently_retrievable_without_chart_applicability(
   assert "one shared instant" in catalog.variant("rule.project.aspect_motion").definition.en
 
 
-def test_overlay_policy_has_fixed_source_and_separate_editorial_states(catalog: Catalog) -> None:
+def test_overlay_policy_has_release_source_and_separate_editorial_states(catalog: Catalog) -> None:
   entry = catalog.entry("entry.cross_house_overlays")
   rule = catalog.variant("rule.project.cross_house_overlays")
   expected_ids = {f"house.{system.value}" for system in HouseSystem} | {
@@ -693,14 +696,13 @@ def test_overlay_policy_has_fixed_source_and_separate_editorial_states(catalog: 
   assert entry.output_eligibility is OutputEligibility.REFERENCE_ONLY
   assert entry.chart_applicability == "not_assessed"
   citation, source = catalog.citations(entry.identifier)[0]
-  commit = "f269d148b8a3e58bc559e7d89be77a03aae6b289"
-  assert source.identifier == "source.astrology.house_overlays.f269d14"
-  assert source.url == f"https://github.com/0xf3cd/astrology/tree/{commit}"
-  assert commit in source.edition
+  assert source.identifier == "source.astrology"
+  assert source.url == "https://github.com/0xf3cd/astrology/tree/v0.4.0"
+  assert "v0.4.0" in source.edition
   assert entry in catalog.filter_entries(source_id=source.identifier)
   assert source.verification is SourceVerification.VERIFIED
   assert citation.excerpt is None
-  for name in ("house_overlays.py", "houses.house_of", "tests/test_house_overlays.py"):
+  for name in ("house_overlays.py", "houses.py: house_of", "tests/test_house_overlays.py"):
     assert name in citation.locator
   assert "not independent astronomical corroboration" in source.scope.en
   assert "without common-epoch conversion or three-dimensional placement" in rule.limits.en
@@ -714,11 +716,10 @@ def test_overlay_policy_has_fixed_source_and_separate_editorial_states(catalog: 
   assert rule.definition.status("zh-CN") is TranslationStatus.CURRENT
 
 
-def test_fixed_implementation_source_and_node_test_locator(catalog: Catalog) -> None:
-  source = catalog.source("source.astrology.chart.fc845fa")
-  commit = "fc845fa1aa786f7e1eda7b4d901e70e9a505add5"
-  assert source.url == f"https://github.com/0xf3cd/astrology/tree/{commit}"
-  assert commit in source.edition
+def test_release_implementation_source_and_node_test_locator(catalog: Catalog) -> None:
+  source = catalog.source("source.astrology")
+  assert source.url == "https://github.com/0xf3cd/astrology/tree/v0.4.0"
+  assert "v0.4.0" in source.edition
   citation = catalog.entry("entry.node_definitions").citations[1]
   assert citation.source_id == source.identifier
   assert "tests/test_reference.py" in citation.locator
@@ -732,6 +733,51 @@ def test_fixed_implementation_source_and_node_test_locator(catalog: Catalog) -> 
   assert (
     catalog.entry("entry.node_definitions").prerequisite_status is PrerequisiteStatus.UNRESOLVED
   )
+
+
+def test_project_source_consolidation_preserves_lineage_and_citation_coverage(
+  catalog: Catalog,
+) -> None:
+  source = catalog.source("source.astrology")
+  assert [
+    item.identifier for item in catalog.sources if item.identifier.startswith("source.astrology")
+  ] == [source.identifier]
+  former = {
+    "house_overlays.f269d14": "f269d148b8a3e58bc559e7d89be77a03aae6b289",
+    "axis_aspects.4cb15cc": "4cb15cc2f63a67ba804c04840f255ffff1209382",
+    "sign_groups.c92ac82": "c92ac826c3065fc9e4a2cc949cf87c64c79c0c63",
+    "cross_aspects.0d7122a": "0d7122a7f7ef86ecc5798c9ea12668c68bb4a516",
+    "chart.fc845fa": "fc845fa1aa786f7e1eda7b4d901e70e9a505add5",
+    "config.fa2e985": "fa2e985c964dab653a6aa0f5771062ad9fd956dc",
+  }
+  for suffix, revision in former.items():
+    identifier = f"source.astrology.{suffix}"
+    for text in (source.lineage.en, source.lineage.zh or ""):
+      assert identifier in text and revision in text
+    with pytest.raises(KeyError):
+      catalog.source(identifier)
+  expected = {
+    "body_requests": 2,
+    "house_requests": 2,
+    "node_definitions": 2,
+    "node_directions": 1,
+    "aspect_requests": 1,
+    "aspect_evaluation": 1,
+    "cross_aspect_evaluation": 1,
+    "sign_vocabulary": 2,
+    "ashmand_sign_groups": 1,
+    "cross_house_overlays": 1,
+    "axis_aspects": 1,
+    "transit_hits": 1,
+    "dispositor_chains": 1,
+  }
+  actual = {
+    entry.identifier.removeprefix("entry."): sum(
+      citation.source_id == source.identifier for citation in entry.citations
+    )
+    for entry in catalog.filter_entries(source_id=source.identifier)
+  }
+  assert actual == expected
 
 
 @pytest.mark.parametrize(

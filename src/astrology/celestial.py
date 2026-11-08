@@ -62,8 +62,6 @@ _EVENT_DIRECTIONS: dict[celestial.EventDirection, TransitDirection] = {
 # 记录下来的模型标识仍然是真的。
 _DELTA_T_MODEL = celestial.DeltaTModel.ALGO5
 
-_MAX_CIVIL_YEAR = 2099
-
 
 def celestial_version() -> str:
   """Return the installed celestial-calendar version. 返回已安装的 celestial-calendar 版本。"""
@@ -88,17 +86,16 @@ def _target(identity: AstronomicalObject) -> Target:
 
 
 def _precheck(resolved: ResolvedBirth, config: ChartConfig) -> Location:
-  """Validate location and civil limits before evaluating the chart.
+  """Validate location and the upstream civil-year ceiling before chart calculation.
 
-  Requires a location, a latitude strictly inside ±90 (records admit the endpoints,
-  geometry requires the open interval) and a civil year through 2099, all before any
-  native call; returns the validated location. The JDE(TT) upper bound inside 2099 is
-  left to the native domain check; both surfaces raise ChartDomainError.
+  Reject missing locations and latitudes outside the open interval ±90 before any
+  native call. Then query house_capability for the selected ΔT model and enforce its
+  exclusive upper year. Native TT and geometry checks still apply. Capability failures
+  retain their diagnostics in ChartDomainError; return the validated location.
 
-  在调用原生库之前校验地点与民用时间限制：缺少地点；纬度不在
-  ±90 的开区间内（出生记录允许取到端点，宫位几何不允许）；民用年超过 2099。通过时返回
-  校验过的地点。2099 年内 JDE(TT) 的上界留给原生库自己的域检查；两处拒绝抛出的都是
-  ChartDomainError。
+  排盘前校验地点与上游民用年上界。缺少地点或纬度不在 ±90 开区间内时，不调用原生库。
+  随后用所选 ΔT 模型查询 house_capability，按其不包含的结束年校验；原生 TT 与几何检查仍适用。
+  能力查询失败时，ChartDomainError 保留上游诊断。通过时返回已校验的地点。
   """
   location = resolved.record.location
   if location is None:
@@ -108,9 +105,20 @@ def _precheck(resolved: ResolvedBirth, config: ChartConfig) -> Location:
       "Birth latitude must be strictly inside ±90 degrees for house geometry",
       house_system=config.house_system,
     )
-  if resolved.utc.year >= _MAX_CIVIL_YEAR + 1:
+  try:
+    capability = celestial.house_capability(delta_t_model=_DELTA_T_MODEL)
+  except celestial.CelestialError as exc:
     raise ChartDomainError(
-      f"Civil year {resolved.utc.year} is outside the supported range through {_MAX_CIVIL_YEAR}",
+      f"Requested {config.house_system.value} house capability query failed: {exc}",
+      house_system=config.house_system,
+      operation=exc.operation,
+      recorded=exc.recorded,
+      upstream_message=str(exc),
+    ) from exc
+  if resolved.utc.year >= capability.civil_end_year_exclusive:
+    raise ChartDomainError(
+      f"Civil year {resolved.utc.year} reaches or exceeds the upstream house capability "
+      f"end year {capability.civil_end_year_exclusive} (exclusive)",
       house_system=config.house_system,
     )
   return location

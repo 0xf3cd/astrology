@@ -62,6 +62,10 @@
 
 ## 星座归属
 
+`Modality.FIXED` 与 `AshmandSignGroup.FIXED` 的字符串值都是 `"fixed"`，按 `StrEnum`
+语义比较相等，hash 也相同。要在同一 Python 映射中保留二者，请用 `(type(member), member.value)`
+作键，或使用各自带类别前缀的目录 ID。两套分类及其历史含义仍有区别。
+
 ```{eval-rst}
 .. automodule:: astrology.zodiac
    :members: Sign, AshmandSignGroup, Element, Modality, ashmand_sign_group, element_of, modality_of, sign_of, sign_degree, truncate_display

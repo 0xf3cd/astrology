@@ -15,6 +15,13 @@ This example calculates charts from two synthetic birth records, then checks
 whether their Suns form a conjunction within a 3-degree orb. The comparison takes
 its own aspect rules, so the natal charts do not need to include aspects.
 
+For a fixed-instant transit comparison, use the chart calculated at that instant
+as `chart_left` and the natal chart as `chart_right`. Select `Body.SUN` on each
+side to compare only the transiting and natal Suns. `find_aspects` is a single-chart
+operation: it requires distinct identities and also forms pairs within its input,
+so it cannot represent these two Suns. This static comparison does not search for
+exact hit times; use [transit hits](transits.md) for an interval search.
+
 ```{doctest}
 >>> from datetime import date, time, timedelta
 >>> from astrology import (AspectRule, BirthRecord, Body, ChartConfig, FixedOffset,
@@ -85,12 +92,9 @@ A longitude exactly on a cusp belongs to the house starting there. Each chart
 keeps its own house system and remains unchanged. Swapping the chart arguments
 swaps the owners in the result; you can also pass the same chart on both sides.
 
-Selecting an object twice on one side, or selecting an object absent from that
-chart, raises `ValueError`. Non-object values or non-sequence selections raise
+Both comparisons raise `ValueError` if you select an object twice on one side or
+select an object absent from that chart. Non-object values or non-sequence selections raise
 `TypeError`. These checks still run when the other selection is empty.
-Constructing `CrossChartHouseOverlays` directly recomputes the complete placement
-sequence from the charts and selections. Missing records, different house numbers
-or a different order are rejected.
 
 ## Choose pairs and orbs
 
@@ -139,7 +143,6 @@ orb limit also counts as a hit.
 
 The following requests raise `ValueError`, even when there are no pairs to compare:
 
-- Selecting an object twice on one side, or selecting an object absent from that chart.
 - Repeating an aspect in the rules, or overriding an object selected on neither side.
 - Omitting the combination when there are overrides, or supplying one without overrides.
 
@@ -203,8 +206,8 @@ values, model and version labels, and selected objects. The overlay table then l
 the owners and house number for each placement. The aspect table lists every
 matching branch, including multiple hits for one pair, without motion labels such
 as applying or separating. It also shows base orbs, object overrides, the combination
-rule and each hit's effective orb limit. A deviation whose absolute value equals
-the limit counts as a hit. Empty results still show the selections and aspect rules.
+rule and each hit's effective orb limit. Empty results still show the selections
+and aspect rules.
 
 Branches, deviations and orbs are displayed in degrees, minutes and seconds using
 the [whole-arcsecond truncation rule](records.md#display-does-not-change-classification).
@@ -245,7 +248,7 @@ The charts may have different dates, locations, house systems, models and softwa
 labels. These are retained and do not by themselves cause rejection. Constructing
 a cross-aspect result recomputes all hits from the charts, selections and rules;
 constructing an overlay result recomputes all placements from the charts and
-selections. Any difference from the supplied records is rejected. See the
+selections. Missing records, different values or a different order are rejected. See the
 [validation boundary](architecture.md#reproducibility) for what these checks establish.
 
 House overlays likewise compare each object's stored longitude at its own date

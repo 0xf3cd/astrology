@@ -162,6 +162,6 @@ Birth/configuration values, the independent knowledge catalog, the tropical
 natal chart, major aspects and text output are implemented,
 with bilingual documentation and installed-package verification.
 
-The [v0.1.0 milestone](https://github.com/0xf3cd/astrology/milestone/1) owns task
+The [project milestones](https://github.com/0xf3cd/astrology/milestones) track task
 status. The source layout can evolve as these concrete implementations reveal
 shared needs; a general backend/plugin framework is not a prerequisite.

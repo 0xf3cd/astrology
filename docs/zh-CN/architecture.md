@@ -126,5 +126,5 @@ Equal 和 Whole Sign 同样保留上游对四轴无定义情形的限制，不�
 出生／配置值、独立知识目录、热带本命盘、主要相位及文本输出已实现，
 并配有双语文档与安装包验收。
 
-任务状态归 [v0.1.0 milestone](https://github.com/0xf3cd/astrology/milestone/1)。
+任务状态见[项目 milestones](https://github.com/0xf3cd/astrology/milestones)。
 包结构随实际实现中出现的共用关系调整，不以通用后端／插件框架为前置。

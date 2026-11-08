@@ -62,6 +62,11 @@ See the [complete natal result and text example](records.md) for natal output, o
 
 ## Zodiac classification
 
+`Modality.FIXED` and `AshmandSignGroup.FIXED` both have the string value `"fixed"`
+and compare and hash equal as `StrEnum` members. To keep both in one Python
+mapping, use `(type(member), member.value)` keys or their distinct qualified
+catalog IDs. The classifications and their historical meanings remain distinct.
+
 ```{eval-rst}
 .. automodule:: astrology.zodiac
    :members: Sign, AshmandSignGroup, Element, Modality, ashmand_sign_group, element_of, modality_of, sign_of, sign_degree, truncate_display
