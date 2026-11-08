@@ -2,17 +2,17 @@
 
 from collections.abc import Sequence
 
-from astrology.chart import NatalChart
+from astrology.chart import Chart, _require_chart
 from astrology.objects import Axis, ChartObject, _is_chart_object
 
 
-def _require_comparable_sources(chart_left: NatalChart, chart_right: NatalChart) -> None:
+def _require_comparable_sources(chart_left: Chart, chart_right: Chart) -> None:
   """Keep this boundary check even while public constructors admit one convention.
 
   即使公开构造器目前只接纳一种坐标约定，也保留比较入口处的校验。
   """
-  if type(chart_left) is not NatalChart or type(chart_right) is not NatalChart:
-    raise TypeError("chart_left and chart_right must be NatalChart values")
+  _require_chart(chart_left)
+  _require_chart(chart_right)
   if (
     chart_left.requested.zodiac != chart_right.requested.zodiac
     or chart_left.requested.center != chart_right.requested.center
@@ -22,7 +22,7 @@ def _require_comparable_sources(chart_left: NatalChart, chart_right: NatalChart)
 
 
 def _selection_for_chart(
-  chart: NatalChart, objects: Sequence[ChartObject], name: str
+  chart: Chart, objects: Sequence[ChartObject], name: str
 ) -> tuple[ChartObject, ...]:
   """Validate a chart selection and order it by stored positions, then axes.
 

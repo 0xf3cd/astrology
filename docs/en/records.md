@@ -7,6 +7,13 @@ values or pass it to `format_chart` with an explicit knowledge catalog. The
 package provides no chart save/restore API or storage schema; see the
 [release notes](releases.md) for the API removal.
 
+`moment_chart` returns an immutable `MomentChart` with `moment` instead of a
+resolved birth input. `moment.utc` and `moment.location` identify the supplied
+instant/site; optional `moment.source_jde_tt` retains a source event's original TT,
+separately from `times.jde_tt`. Its other result fields share the chart contracts
+below. `format_chart` labels it as a moment chart and omits birth/timezone
+provenance. See the [moment examples](moments.md).
+
 ## A complete example
 
 <!-- usage: records.output -->

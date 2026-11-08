@@ -64,13 +64,15 @@ def acceptance_chart() -> astrology.NatalChart:
   return astrology.natal_chart(astrology.prepare_natal_input(record, fold=0), config)
 
 
-def chart_observations(chart: astrology.NatalChart) -> str:
+def chart_observations(chart: astrology.Chart) -> str:
   """Capture exact same-revision check values.
 
   取得同一源码修订的精确检查值。
   """
   values = {
-    "resolved": repr(chart.resolved),
+    ("resolved" if isinstance(chart, astrology.NatalChart) else "moment"): repr(
+      chart.resolved if isinstance(chart, astrology.NatalChart) else chart.moment
+    ),
     "requested": repr(chart.requested),
     "effective": repr(chart.effective),
     "provenance": repr(chart.provenance),
@@ -127,16 +129,49 @@ def acceptance_transits(chart: astrology.NatalChart) -> astrology.TransitHits:
   )
 
 
+def acceptance_moments(
+  chart: astrology.NatalChart, transits: astrology.TransitHits
+) -> tuple[astrology.MomentChart, astrology.MomentChart]:
+  """Exercise datetime and retained-hit calculation paths at an explicit synthetic site.
+
+  在显式的合成地点分别执行 datetime 与保留命中的排盘路径。
+  """
+  site = astrology.Location(0, 0)
+  return (
+    astrology.moment_chart(datetime(2024, 1, 1, tzinfo=UTC), site, chart.requested),
+    astrology.moment_chart(transits.hits[0], site, chart.requested),
+  )
+
+
 def calculation_observations(
   chart: astrology.NatalChart,
   transits: astrology.TransitHits,
+  moments: tuple[astrology.MomentChart, astrology.MomentChart],
+  catalog: Catalog,
 ) -> str:
-  """Capture supplied natal and transit values without recalculating them.
+  """Capture supplied astronomy values and their pure comparison/text outputs.
 
-  记录给定的本命及行运值，不重新计算。
+  记录给定天文值及其纯规则比较与文本输出。
   """
+  fixed = astrology.transit_aspects(
+    moments[0], chart, (astrology.AspectRule(astrology.MajorAspect.CONJUNCTION, 3),)
+  )
+  languages: tuple[Literal["en", "zh-CN"], ...] = ("en", "zh-CN")
   return json.dumps(
-    {"chart": json.loads(chart_observations(chart)), "transits": repr(transits)},
+    {
+      "chart": json.loads(chart_observations(chart)),
+      "transits": repr(transits),
+      "moments": [json.loads(chart_observations(moment)) for moment in moments],
+      "fixed_aspects": repr(fixed),
+      "moment_text": {
+        language: [astrology.format_chart(moment, catalog, language=language) for moment in moments]
+        for language in languages
+      },
+      "fixed_text": {
+        language: astrology.format_transit_aspects(fixed, catalog, language=language)
+        for language in languages
+      },
+    },
     sort_keys=True,
     allow_nan=False,
   )
@@ -386,9 +421,12 @@ def _check_natal_chart(expected_observations: Path | None = None) -> None:
   if not adapter.is_relative_to(Path(sys.prefix).resolve()):
     raise ValueError("Imported astrology.celestial from outside the consumer environment")
   transits = acceptance_transits(chart)
-  if expected_observations is not None and calculation_observations(
-    chart, transits
-  ) != expected_observations.read_text(encoding="utf-8"):
+  observed = calculation_observations(
+    chart, transits, acceptance_moments(chart, transits), astrology.load_catalog()
+  )
+  if expected_observations is not None and observed != expected_observations.read_text(
+    encoding="utf-8"
+  ):
     raise ValueError("Installed calculation differs from the development entry point")
 
 

@@ -12,11 +12,12 @@
 
 功能包括：
 
+- [时刻盘与固定时刻行运对本命相位](https://0xf3cd.github.io/astrology/docs/zh-CN/moments.html)，支持从保留的精确命中直接建盘及双语文本。
 - [元素／模式分布与出生月相](https://0xf3cd.github.io/astrology/docs/zh-CN/summaries.html)。
 - [传统星座守护、四种状态与定位星链](https://0xf3cd.github.io/astrology/docs/zh-CN/dignities.html)。
 - 本命及静态双盘查询的[显式选四轴参与相位](https://0xf3cd.github.io/astrology/docs/zh-CN/aspects.html#axis-aspects-zh-cn)。
 - [双盘落宫和双语比较文本](https://0xf3cd.github.io/astrology/docs/zh-CN/cross_aspects.html)。
-- 两张本命盘之间的[静态交叉相位](https://0xf3cd.github.io/astrology/docs/zh-CN/cross_aspects.html)，保留两张源盘并区分左右对象，不标入相／离相。
+- 两张本命盘或时刻盘之间的[静态交叉相位](https://0xf3cd.github.io/astrology/docs/zh-CN/cross_aspects.html)，保留两张源盘并区分左右对象，不标入相／离相。
 - UTC 区间内的[精确行运命中](https://0xf3cd.github.io/astrology/docs/zh-CN/transits.html)，保留逆行造成的多次命中及原生速率、方向。
 - 用 `ashmand_sign_group(Sign.ARIES)` 查询十二星座在 Ashmand 1822 年版中的四组归属。见[来源及查询示例](https://0xf3cd.github.io/astrology/docs/zh-CN/knowledge.html#ashmand-sign-groups-zh-cn)。
 

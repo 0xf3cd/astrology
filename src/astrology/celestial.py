@@ -1,20 +1,20 @@
-"""Concrete celestial-calendar calls for natal snapshots and transit event searches.
+"""Concrete celestial-calendar calls for chart snapshots and transit event searches.
 
 Copy native records into chart/transit domain values. Calculation entries import
 this adapter lazily; importing the public value types does not load it.
 
-为本命快照与行运事件搜索提供 celestial-calendar 的具体调用。
+为命盘快照与行运事件搜索提供 celestial-calendar 的具体调用。
 将原生记录复制为命盘或行运领域值；计算入口延迟导入本层，导入公开值类型不会加载它。
 """
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import UTC, datetime, timedelta
 
 import celestial_calendar as celestial
 from celestial_calendar import BodyState, Target
 
-from astrology.birth import Location, MissingBirthDataError, ResolvedBirth
+from astrology.birth import Location, MissingBirthDataError
 from astrology.chart import ChartDomainError, ChartHouses, ChartTimes, EclipticPosition
 from astrology.config import ChartConfig, HouseSystem
 from astrology.objects import AstronomicalObject, Body, LunarNode, _is_astronomical_object
@@ -85,7 +85,7 @@ def _target(identity: AstronomicalObject) -> Target:
   return _NODE_TARGETS[identity]
 
 
-def _precheck(resolved: ResolvedBirth, config: ChartConfig) -> Location:
+def _precheck(utc: datetime, location: Location | None, config: ChartConfig) -> Location:
   """Validate location and the upstream civil-year ceiling before chart calculation.
 
   Reject missing locations and latitudes outside the open interval ±90 before any
@@ -97,7 +97,6 @@ def _precheck(resolved: ResolvedBirth, config: ChartConfig) -> Location:
   随后用所选 ΔT 模型查询 house_capability，按其不包含的结束年校验；原生 TT 与几何检查仍适用。
   能力查询失败时，ChartDomainError 保留上游诊断。通过时返回已校验的地点。
   """
-  location = resolved.record.location
   if location is None:
     raise MissingBirthDataError("Chart calculation requires a birth location")
   if not -90.0 < location.latitude < 90.0:
@@ -115,9 +114,9 @@ def _precheck(resolved: ResolvedBirth, config: ChartConfig) -> Location:
       recorded=exc.recorded,
       upstream_message=str(exc),
     ) from exc
-  if resolved.utc.year >= capability.civil_end_year_exclusive:
+  if utc.year >= capability.civil_end_year_exclusive:
     raise ChartDomainError(
-      f"Civil year {resolved.utc.year} reaches or exceeds the upstream house capability "
+      f"Civil year {utc.year} reaches or exceeds the upstream house capability "
       f"end year {capability.civil_end_year_exclusive} (exclusive)",
       house_system=config.house_system,
     )
@@ -146,7 +145,7 @@ def _civil(instant: datetime) -> celestial.CivilDateTime:
 
 
 def snapshot(
-  resolved: ResolvedBirth, config: ChartConfig
+  utc: datetime, location: Location, config: ChartConfig
 ) -> tuple[ChartTimes, tuple[EclipticPosition, ...], ChartHouses]:
   """Calculate the upstream joint snapshot for a resolved instant and requested configuration.
 
@@ -159,8 +158,8 @@ def snapshot(
   一起求值；`config.objects` 只选一部分时，只是从结果里筛出这些，求值域不会缩小。ΔT 模型
   固定为 Algo5 并显式传入，由调用方记录。失败时抛出带有请求宫制的 ChartDomainError。
   """
-  location = _precheck(resolved, config)
-  civil = _civil(resolved.utc)
+  location = _precheck(utc, location, config)
+  civil = _civil(utc)
   native_location = celestial.GeoLocation(location.latitude, location.longitude)
   native_system = _HOUSE_SYSTEMS[config.house_system]
   try:
@@ -200,6 +199,31 @@ def snapshot(
   )
   times = ChartTimes(native.times.jd_ut1, native.times.jde_tt)
   return times, positions, houses
+
+
+def moment_utc(jde_tt: float, house_system: HouseSystem) -> datetime:
+  """Convert a source event's TT to a Python UTC instant for snapshot calculation.
+
+  把来源事件的 TT 转为 Python UTC 时刻，供快照计算使用。
+  """
+  try:
+    civil = celestial.jde_to_utc(jde_tt)
+    return datetime(civil.year, civil.month, civil.day, tzinfo=UTC) + timedelta(days=civil.fraction)
+  except (ValueError, OverflowError) as exc:
+    raise ChartDomainError(
+      f"Source event cannot be converted to a chart UTC instant: {exc}",
+      house_system=house_system,
+      operation="jde_to_utc",
+      upstream_message=str(exc),
+    ) from exc
+  except celestial.CelestialError as exc:
+    raise ChartDomainError(
+      f"Source event UTC conversion failed: {exc}",
+      house_system=house_system,
+      operation=exc.operation,
+      recorded=exc.recorded,
+      upstream_message=str(exc),
+    ) from exc
 
 
 def transit_interval(start: datetime, end: datetime) -> tuple[float, float]:

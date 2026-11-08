@@ -41,11 +41,11 @@ same enum classes. `Axis` is also available from `astrology`.
    :member-order: bysource
 ```
 
-## Natal chart composition
+## Natal and moment chart composition
 
 ```{eval-rst}
 .. automodule:: astrology.chart
-   :members: ChartDomainError, ChartTimes, EclipticPosition, ChartHouses, Placement, EffectiveConfiguration, ChartProvenance, NatalChart, natal_chart
+   :members: ChartDomainError, ChartTimes, EclipticPosition, ChartHouses, Placement, EffectiveConfiguration, ChartProvenance, NatalChart, MomentInput, MomentChart, Chart, natal_chart, moment_chart
    :undoc-members:
    :member-order: bysource
 ```
@@ -57,7 +57,7 @@ See the [complete natal result and text example](records.md) for natal output, o
 
 ```{eval-rst}
 .. automodule:: astrology.text
-   :members: format_chart, format_sign_distribution, format_lunar_phase, format_house_rulers, format_house_overlays, format_cross_aspects
+   :members: format_chart, format_sign_distribution, format_lunar_phase, format_house_rulers, format_house_overlays, format_cross_aspects, format_transit_aspects
 ```
 
 ## Zodiac classification
@@ -99,6 +99,17 @@ See [cross-chart aspects and house overlays](cross_aspects.md) for usage and the
 ```{eval-rst}
 .. automodule:: astrology.cross_aspects
    :members: CrossAspectHit, CrossChartAspects, cross_chart_aspects
+   :undoc-members:
+   :member-order: bysource
+```
+
+## Fixed-instant transit aspects
+
+See [moment charts](moments.md) for fixed-instant comparisons and bilingual output.
+
+```{eval-rst}
+.. automodule:: astrology.transit_aspects
+   :members: TransitAspectHit, TransitAspects, transit_aspects
    :undoc-members:
    :member-order: bysource
 ```

@@ -308,6 +308,7 @@ def test_identical_geometry_keeps_distinct_source_ownership() -> None:
 
 def test_sources_and_geometrically_irrelevant_differences_are_retained() -> None:
   result = acceptance_cross_aspects()
+  assert isinstance(result.chart_right, NatalChart)
   source = {"record": "another synthetic source"}
   right = replace(
     result.chart_right,
@@ -331,6 +332,7 @@ def test_sources_and_geometrically_irrelevant_differences_are_retained() -> None
   source.clear()
   assert changed.hits == result.hits
   assert changed.chart_left is result.chart_left and changed.chart_right is right
+  assert isinstance(changed.chart_right, NatalChart)
   assert changed.chart_right.resolved.record.source["record"] == "another synthetic source"
   assert changed.chart_right.requested.house_system is HouseSystem.EQUAL
   assert changed.chart_right.provenance.astrology_version == "other"

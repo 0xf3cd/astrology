@@ -488,9 +488,10 @@ def test_consumer_installs_only_retained_wheel_and_keeps_all_acceptance_modes(
   monkeypatch.setattr(checker, "run", capture)
   monkeypatch.setattr("tools.installed_check.acceptance_chart", lambda: None)
   monkeypatch.setattr("tools.installed_check.acceptance_transits", lambda _chart: None)
+  monkeypatch.setattr("tools.installed_check.acceptance_moments", lambda _chart, _transits: None)
   monkeypatch.setattr(
     "tools.installed_check.calculation_observations",
-    lambda _chart, _transits: "runner-local-source-result",
+    lambda _chart, _transits, _moments, _catalog: "runner-local-source-result",
   )
   monkeypatch.setattr("tools.installed_check.acceptance_cross_aspects", lambda: None)
   monkeypatch.setattr("tools.installed_check.acceptance_house_overlays", lambda: None)

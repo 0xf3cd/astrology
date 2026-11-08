@@ -35,7 +35,7 @@ True
 >>> len(catalog.filter_sources(verification=SourceVerification.VERIFIED))
 9
 >>> print(catalog.entry("entry.cross_aspect_evaluation").statement.text("en"))
-Static major cross aspects compare two supplied natal results with distinct left/right endpoints and preserve both complete sources, without a motion field.
+Static major cross aspects compare two supplied natal or moment results with distinct left/right endpoints and preserve both complete sources, without a motion field.
 >>> print(catalog.variant("rule.project.cusp_ownership").definition.text("en"))
 House membership uses half-open intervals [cusp, next cusp): a longitude exactly on a cusp belongs to the house that starts there, and membership wraps across 0/360 degrees.
 ```

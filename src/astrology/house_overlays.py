@@ -10,7 +10,7 @@ from dataclasses import dataclass
 from typing import Literal
 
 from astrology._comparison import _require_comparable_sources, _selection_for_chart
-from astrology.chart import NatalChart, _selected_longitudes
+from astrology.chart import Chart, _selected_longitudes
 from astrology.houses import _require_house_number, house_of
 from astrology.objects import ChartObject, _is_chart_object
 
@@ -66,8 +66,8 @@ class CrossChartHouseOverlays:
   构造时会重新计算完整落宫序列，拒绝与它不同的记录。
   """
 
-  chart_left: NatalChart
-  chart_right: NatalChart
+  chart_left: Chart
+  chart_right: Chart
   left_objects: tuple[ChartObject, ...]
   right_objects: tuple[ChartObject, ...]
   placements: tuple[HouseOverlay, ...]
@@ -89,8 +89,8 @@ class CrossChartHouseOverlays:
 
 
 def _placements(
-  chart_left: NatalChart,
-  chart_right: NatalChart,
+  chart_left: Chart,
+  chart_right: Chart,
   left_objects: tuple[ChartObject, ...],
   right_objects: tuple[ChartObject, ...],
 ) -> tuple[HouseOverlay, ...]:
@@ -110,8 +110,8 @@ def _placements(
 
 
 def cross_chart_house_overlays(
-  chart_left: NatalChart,
-  chart_right: NatalChart,
+  chart_left: Chart,
+  chart_right: Chart,
   *,
   left_objects: Sequence[ChartObject] | None = None,
   right_objects: Sequence[ChartObject] | None = None,

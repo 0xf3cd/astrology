@@ -1,6 +1,6 @@
-"""Static major aspects between two supplied natal results.
+"""Static major aspects between two supplied charts.
 
-对两张给定本命盘结果判断静态主要相位。
+对两张给定命盘判断静态主要相位。
 """
 
 from __future__ import annotations
@@ -10,7 +10,7 @@ from dataclasses import dataclass
 
 from astrology._comparison import _require_comparable_sources, _selection_for_chart
 from astrology.aspects import _geometry_values, _pair_geometry, aspect_angle
-from astrology.chart import NatalChart, _aspect_positions
+from astrology.chart import Chart, _aspect_positions
 from astrology.config import AspectRule, MajorAspect, OrbCombination
 from astrology.objects import ChartObject, _is_chart_object
 
@@ -60,8 +60,8 @@ class CrossChartAspects:
   构造时按两侧来源、选择和规则重算全部命中，拒绝任何差异。
   """
 
-  chart_left: NatalChart
-  chart_right: NatalChart
+  chart_left: Chart
+  chart_right: Chart
   left_objects: tuple[ChartObject, ...]
   right_objects: tuple[ChartObject, ...]
   rules: tuple[AspectRule, ...]
@@ -116,8 +116,8 @@ def _rules(
 
 
 def _hits(
-  chart_left: NatalChart,
-  chart_right: NatalChart,
+  chart_left: Chart,
+  chart_right: Chart,
   left_objects: tuple[ChartObject, ...],
   right_objects: tuple[ChartObject, ...],
   rules: tuple[AspectRule, ...],
@@ -142,8 +142,8 @@ def _hits(
 
 
 def cross_chart_aspects(
-  chart_left: NatalChart,
-  chart_right: NatalChart,
+  chart_left: Chart,
+  chart_right: Chart,
   rules: Sequence[AspectRule],
   *,
   left_objects: Sequence[ChartObject] | None = None,

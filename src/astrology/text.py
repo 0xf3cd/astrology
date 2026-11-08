@@ -10,7 +10,7 @@ from typing import cast
 
 from astrology.aspects import AspectMotion
 from astrology.birth import Location
-from astrology.chart import NatalChart
+from astrology.chart import Chart, NatalChart, _require_chart
 from astrology.config import AspectRule, HouseSystem, MajorAspect
 from astrology.cross_aspects import CrossChartAspects
 from astrology.dignities import HouseRulers
@@ -22,6 +22,7 @@ from astrology.knowledge.records import _LANGUAGES, Language
 from astrology.lunar_phase import LunarPhaseResult
 from astrology.objects import Axis, ChartObject
 from astrology.summaries import SignDistribution
+from astrology.transit_aspects import TransitAspects
 from astrology.zodiac import (
   _ELEMENT_RULE_ID,
   _MODALITY_RULE_ID,
@@ -33,6 +34,9 @@ from astrology.zodiac import (
 _HEADINGS = {
   "en": {
     "title": "Tropical geocentric natal chart",
+    "moment_title": "Tropical geocentric moment chart",
+    "moment_utc": "Supplied UTC",
+    "source_tt": "Source event JDE(TT)",
     "input": "Recorded clock / timezone",
     "utc": "Resolved UTC",
     "location": "Latitude / longitude (degrees, north/east positive)",
@@ -62,6 +66,9 @@ _HEADINGS = {
   },
   "zh-CN": {
     "title": "热带地心本命盘",
+    "moment_title": "热带地心时刻盘",
+    "moment_utc": "给定的 UTC",
+    "source_tt": "来源事件 JDE(TT)",
     "input": "原始钟点 / 时区",
     "utc": "已解析的 UTC",
     "location": "纬度 / 经度（度，北纬、东经为正）",
@@ -158,6 +165,13 @@ _COMPARISON_LABELS = {
   "en": {
     "overlays": "Cross-chart house overlays",
     "aspects": "Static cross-chart aspects",
+    "transit_aspects": "Fixed-instant transit-to-natal aspects",
+    "moving": "Moving",
+    "natal": "Natal (fixed)",
+    "moving_objects": "Moving selected objects",
+    "natal_objects": "Natal selected objects",
+    "transit_columns": "Moving object | Natal object | Aspect | Branch | Deviation | Orb limit | Motion",
+    "local": "Local motion uses moving rates against zero natal motion; applying does not predict an exact hit.",
     "left": "Left",
     "right": "Right",
     "left_objects": "Left selected objects",
@@ -172,6 +186,13 @@ _COMPARISON_LABELS = {
   "zh-CN": {
     "overlays": "双盘落宫",
     "aspects": "静态双盘相位",
+    "transit_aspects": "固定时刻的行运对本命相位",
+    "moving": "移动盘",
+    "natal": "本命盘（固定）",
+    "moving_objects": "移动盘所选对象",
+    "natal_objects": "本命盘所选对象",
+    "transit_columns": "移动对象 | 本命对象 | 相位 | 分支 | 偏差 | 容许度上限 | 运动",
+    "local": "局部运动按移动速率对零本命速率判断；入相不预言之后会有精确命中。",
     "left": "左盘",
     "right": "右盘",
     "left_objects": "左盘所选对象",
@@ -247,7 +268,7 @@ def _aspect_rule_lines(
   return lines
 
 
-def format_chart(chart: NatalChart, catalog: Catalog, *, language: Language = "en") -> str:
+def format_chart(chart: Chart, catalog: Catalog, *, language: Language = "en") -> str:
   """Return a text table of chart positions, houses, aspects, configuration and provenance.
 
   The caller supplies the loaded Catalog. Names must exist with current translations
@@ -259,29 +280,43 @@ def format_chart(chart: NatalChart, catalog: Catalog, *, language: Language = "e
   Nonprinting characters, backslashes and table delimiters in supplied names and
   provenance are escaped for display; the chart values are unchanged.
 
+  Natal output retains recorded birth/timezone provenance. A moment chart shows
+  supplied UTC/location and optional source-event TT without birth/timezone metadata.
+
   返回命盘位置、宫位、相位、配置及来源的文本表格。调用方须提供已加载的 Catalog；
   en 或 zh-CN 的名称及译文必须齐备且为当前版本，
   否则抛出 ValueError（缺少星座标识时为 KeyError）。角度沿用 truncate_display 的整角秒截断规则，
   不改分类、宫位或运动状态；偏差显示为零时也保留原运动标签。
   chart/catalog 类型错误时抛出 TypeError。
   传入名称及来源中的非打印字符、反斜线和表格分隔符会转义显示，不改命盘中的值。
+  本命盘保留出生钟点及时区来源；时刻盘显示给定 UTC、地点及可选的来源事件 TT，
+  不显示出生或时区资料。
   """
-  if type(chart) is not NatalChart or type(catalog) is not Catalog:
-    raise TypeError("chart and catalog must be NatalChart and Catalog values")
+  _require_chart(chart)
+  if type(catalog) is not Catalog:
+    raise TypeError("catalog must be a Catalog")
   if type(language) is not str or language not in _LANGUAGES:
     raise ValueError("language must be en or zh-CN")
   labels = _HEADINGS[language]
-  record = chart.resolved.record
-  location = cast("Location", record.location)
-  lines = [
-    labels["title"],
-    f"{labels['input']}: {record.birth_date} {record.birth_time} / {chart.resolved.timezone_identity}",
-    f"{labels['utc']}: {chart.resolved.utc.isoformat()}",
-    f"{labels['location']}: {location.latitude} / {location.longitude}",
-    "",
-    labels["positions"],
-    labels["position_columns"],
-  ]
+  if isinstance(chart, NatalChart):
+    record = chart.resolved.record
+    location = cast("Location", record.location)
+    lines = [
+      labels["title"],
+      f"{labels['input']}: {record.birth_date} {record.birth_time} / {chart.resolved.timezone_identity}",
+      f"{labels['utc']}: {chart.resolved.utc.isoformat()}",
+      f"{labels['location']}: {location.latitude} / {location.longitude}",
+    ]
+  else:
+    location = chart.moment.location
+    lines = [
+      labels["moment_title"],
+      f"{labels['moment_utc']}: {chart.moment.utc.isoformat()}",
+      f"{labels['location']}: {location.latitude} / {location.longitude}",
+    ]
+    if chart.moment.source_jde_tt is not None:
+      lines.append(f"{labels['source_tt']}: {chart.moment.source_jde_tt}")
+  lines.extend(("", labels["positions"], labels["position_columns"]))
   for position, placement in zip(chart.positions, chart.placements, strict=True):
     rate = position.longitude_rate_deg_per_tt_day
     motion = "R" if rate < 0.0 else "D" if rate > 0.0 else "S"
@@ -347,13 +382,15 @@ def format_chart(chart: NatalChart, catalog: Catalog, *, language: Language = "e
     ]
   )
   lines.extend(_aspect_rule_lines(requested.aspects, catalog, language))
-  lines.extend(
-    [
-      "",
-      labels["provenance"],
+  lines.extend(("", labels["provenance"]))
+  if isinstance(chart, NatalChart):
+    lines.append(
       f"{labels['time_source']}: {_cell(chart.resolved.tzdata_version or labels['none'])} / "
       f"{_cell(chart.resolved.iana_version or labels['none'])} / "
-      f"{labels['none'] if chart.resolved.fold is None else chart.resolved.fold}",
+      f"{labels['none'] if chart.resolved.fold is None else chart.resolved.fold}"
+    )
+  lines.extend(
+    [
       f"{labels['times']}: {chart.times.jd_ut1} / {chart.times.jde_tt}",
       f"{labels['model']}: {_cell(chart.effective.delta_t_model)} / {chart.effective.evaluation}",
       f"{labels['versions']}: {_cell(chart.provenance.astrology_version)} / "
@@ -481,19 +518,23 @@ def _comparison_sources(
   labels = _COMPARISON_LABELS[language]
   lines = [labels["sources"]]
   for side, chart in (("left", result.chart_left), ("right", result.chart_right)):
-    lines.append(
-      f"{labels[side]} | {_name(chart.houses.system, catalog, language)} | "
-      f"{chart.requested.zodiac} / {chart.requested.center} | "
-      f"{chart.provenance.position_frame} | {chart.times.jd_ut1} / {chart.times.jde_tt} | "
-      f"{_cell(chart.effective.delta_t_model)} | "
-      f"{_cell(chart.provenance.astrology_version)} / {_cell(chart.provenance.celestial_version)}"
-    )
+    lines.append(_source_line(labels[side], chart, catalog, language))
   for side, objects in (("left", result.left_objects), ("right", result.right_objects)):
     names = ", ".join(
       f"{_name(identity, catalog, language)} [{identity.value}]" for identity in objects
     )
     lines.append(f"{labels[f'{side}_objects']}: {names or labels['empty_objects']}")
   return lines
+
+
+def _source_line(label: str, chart: Chart, catalog: Catalog, language: Language) -> str:
+  return (
+    f"{label} | {_name(chart.houses.system, catalog, language)} | "
+    f"{chart.requested.zodiac} / {chart.requested.center} | "
+    f"{chart.provenance.position_frame} | {chart.times.jd_ut1} / {chart.times.jde_tt} | "
+    f"{_cell(chart.effective.delta_t_model)} | "
+    f"{_cell(chart.provenance.astrology_version)} / {_cell(chart.provenance.celestial_version)}"
+  )
 
 
 def format_house_overlays(
@@ -570,6 +611,63 @@ def format_cross_aspects(
           _angle(hit.branch_deg, signed=True),
           _angle(hit.deviation_deg, signed=True),
           _angle(hit.orb_limit_deg),
+        )
+      )
+    )
+  if not result.hits:
+    lines.append(headings["none"])
+  lines.append(f"{headings['combination']}: {result.combination or headings['none']}")
+  lines.extend(
+    _aspect_rule_lines(result.rules, catalog, language)
+    or [f"{headings['rule']}: {headings['none']}"]
+  )
+  lines.append(headings["display"])
+  return "\n".join(lines)
+
+
+def format_transit_aspects(
+  result: TransitAspects, catalog: Catalog, *, language: Language = "en"
+) -> str:
+  """Format fixed-instant aspects with moving/natal roles, rules and local motion.
+
+  Both source charts and selections are identified. Branch, deviation and orb limit
+  use the same whole-arcsecond truncation as format_chart; even displayed-zero
+  deviations retain their original motion. Names/escaping and type/language errors
+  follow format_cross_aspects. No chart calculation or catalog loading is performed.
+
+  显示固定时刻相位，区分移动与本命角色，并列出规则及局部运动。表明双侧源盘及选择；
+  分支、偏差和容许度上限按 format_chart 的整角秒规则截断，即使偏差显示为零，仍保留
+  原运动标签。名称、转义及类型和语言错误沿用 format_cross_aspects。
+  不进行排盘或目录加载。
+  """
+  if type(result) is not TransitAspects or type(catalog) is not Catalog:
+    raise TypeError("result and catalog must be TransitAspects and Catalog values")
+  if type(language) is not str or language not in _LANGUAGES:
+    raise ValueError("language must be en or zh-CN")
+  labels, headings = _COMPARISON_LABELS[language], _HEADINGS[language]
+  lines = [
+    labels["transit_aspects"],
+    labels["sources"],
+    _source_line(labels["moving"], result.moving_chart, catalog, language),
+    _source_line(labels["natal"], result.natal_chart, catalog, language),
+  ]
+  for side, objects in (("moving", result.moving_objects), ("natal", result.natal_objects)):
+    names = ", ".join(
+      f"{_name(identity, catalog, language)} [{identity.value}]" for identity in objects
+    )
+    lines.append(f"{labels[f'{side}_objects']}: {names or labels['empty_objects']}")
+  lines.extend(("", labels["local"], labels["transit_columns"]))
+  for hit in result.hits:
+    lines.append(
+      " | ".join(
+        (
+          f"{_name(hit.moving_object, catalog, language)} [{hit.moving_object.value}]",
+          f"{_name(hit.natal_object, catalog, language)} [{hit.natal_object.value}]",
+          _name(hit.aspect, catalog, language),
+          _angle(hit.branch_deg, signed=True),
+          _angle(hit.deviation_deg, signed=True),
+          _angle(hit.orb_limit_deg),
+          _MOTIONS[language][hit.motion],
         )
       )
     )

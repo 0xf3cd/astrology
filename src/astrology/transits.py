@@ -1,13 +1,13 @@
-"""Exact moving-to-fixed-natal aspects over a modern UTC interval.
+"""Exact moving-to-fixed-source aspects over a modern UTC interval.
 
-在现代 UTC 区间内搜索移动对象与固定本命黄经的精确相位。
+在现代 UTC 区间内搜索移动对象与固定源盘黄经的精确相位。
 """
 
 from __future__ import annotations
 
 from collections.abc import Sequence
 from dataclasses import dataclass
-from datetime import UTC, datetime, timezone
+from datetime import datetime
 from enum import StrEnum
 from typing import Final, Literal, get_args
 
@@ -15,8 +15,14 @@ from astrology._comparison import _selection_for_chart
 from astrology._distribution import installed_version
 from astrology._validation import finite_number
 from astrology.aspects import _branches, aspect_angle
-from astrology.birth import _require_modern_utc
-from astrology.chart import _POSITION_FRAME, NatalChart, _PositionFrame, _selected_longitudes
+from astrology.birth import _normalize_utc
+from astrology.chart import (
+  _POSITION_FRAME,
+  Chart,
+  _PositionFrame,
+  _require_chart,
+  _selected_longitudes,
+)
 from astrology.config import MajorAspect
 from astrology.objects import (
   AstronomicalObject,
@@ -80,20 +86,6 @@ class TransitDomainError(ValueError):
     self.start_jde_tt = start_jde_tt
     self.end_jde_tt = end_jde_tt
     self.upstream_message = upstream_message
-
-
-def _utc(value: datetime, name: str) -> datetime:
-  if type(value) is not datetime:
-    raise TypeError(f"{name} must be a built-in datetime")
-  offset = value.utcoffset()
-  if value.tzinfo is None or offset is None:
-    raise ValueError(f"{name} must have a defined UTC offset")
-  try:
-    normalized = value.replace(tzinfo=timezone(offset), fold=0).astimezone(UTC)
-  except OverflowError as exc:
-    raise ValueError(f"{name} is outside the datetime range after UTC normalization") from exc
-  _require_modern_utc(normalized)
-  return normalized
 
 
 def _moving(values: Sequence[AstronomicalObject]) -> tuple[AstronomicalObject, ...]:
@@ -204,19 +196,26 @@ class TransitHit:
 
 @dataclass(frozen=True, slots=True)
 class TransitHits:
-  """Immutable natal source, search configuration, model provenance and ordered hits.
+  """Immutable source chart, search configuration, model provenance and ordered hits.
 
   Sequences are isolated as tuples. Construction checks supplied consistency,
   not the astronomical origin or completeness of a caller-supplied hit list.
   It performs no native calls. Coordinate and source details are in
   rule.project.exact_transit_hits and entry.transit_hits.
 
-  不可变的本命来源、搜索配置、模型溯源及已排序命中。序列复制为元组；构造时检查给定数据的
+  The source may be a NatalChart or MomentChart. The retained epoch_policy value
+  names the fixed-reference (historically natal) role, not the source's input kind:
+  both use its fixed stored own-date degrees against moving-of-date degrees.
+
+  不可变的源盘、搜索配置、模型溯源及已排序命中。序列复制为元组；构造时检查给定数据的
   一致性，不认证天文来源或调用方所给命中列表的完整性，也不调用原生天文库。
   坐标及来源详情分别见 rule.project.exact_transit_hits 和 entry.transit_hits。
+  源盘可以是 NatalChart 或 MomentChart。保留的 epoch_policy 值所指的是固定参考侧
+  （历史上称本命侧）的角色，不是源盘输入类型；两者都把源盘自身日期的已存度数固定，
+  与移动对象自身日期的度数比较。
   """
 
-  chart: NatalChart
+  chart: Chart
   start_utc: datetime
   end_utc: datetime
   start_jde_tt: float
@@ -233,9 +232,9 @@ class TransitHits:
   epoch_policy: _EpochPolicy = _EPOCH_POLICY
 
   def __post_init__(self) -> None:
-    if type(self.chart) is not NatalChart:
-      raise TypeError("chart must be a NatalChart")
-    start, end = _utc(self.start_utc, "start_utc"), _utc(self.end_utc, "end_utc")
+    _require_chart(self.chart)
+    start = _normalize_utc(self.start_utc, "start_utc")
+    end = _normalize_utc(self.end_utc, "end_utc")
     if start >= end:
       raise ValueError("UTC interval must be nonempty and increasing")
     for name, instant in (("start_utc", start), ("end_utc", end)):
@@ -314,7 +313,7 @@ def _ordered(
 
 
 def transit_hits(
-  chart: NatalChart,
+  chart: Chart,
   *,
   start_utc: datetime,
   end_utc: datetime,
@@ -322,7 +321,7 @@ def transit_hits(
   natal_objects: Sequence[ChartObject],
   aspects: Sequence[MajorAspect],
 ) -> TransitHits:
-  """Find every exact selected moving-to-natal branch in [start_utc, end_utc).
+  """Find every exact selected moving-to-fixed-source branch in [start_utc, end_utc).
 
   Endpoints must be aware built-in datetimes at or after 1972-01-01 UTC. Selections
   and aspects are explicit, nonempty and unique; moving bodies/nodes need not be
@@ -337,7 +336,11 @@ def transit_hits(
   details: rule.project.exact_transit_hits and entry.transit_hits. Missing installed
   distribution metadata raises importlib.metadata.PackageNotFoundError.
 
-  搜索 [start_utc, end_utc) 内所选移动对象与本命黄经的全部精确分支。
+  chart may be a NatalChart or MomentChart; natal_objects names its fixed-reference
+  role. Its stored degrees remain fixed regardless of the source input kind.
+  TransitHits.epoch_policy retains its existing value for both source kinds.
+
+  搜索 [start_utc, end_utc) 内所选移动对象与固定源盘黄经的全部精确分支。
   端点须为有时区的内建 datetime，归一为 UTC 后不早于 1972-01-01。对象及相位须显式、非空且
   不重复；移动天体或交点不必出现在本命盘中，本命四轴须显式选择。不使用容许度。
   上游将 UTC 转为 TT；半开搜索区间最长 3660 TT 日，并受每个所选事件来源的域限制。
@@ -346,10 +349,11 @@ def transit_hits(
   负分支在前排序。保留原值，包括相切速率；报告时刻为 2^-30 日的整数倍。
   坐标及来源详情分别见 rule.project.exact_transit_hits 和 entry.transit_hits；
   已安装分发包元数据缺失时抛出 importlib.metadata.PackageNotFoundError。
+  chart 可以是 NatalChart 或 MomentChart；natal_objects 命名其固定参考侧的角色，
+  两种输入都固定源盘的已存度数。TransitHits.epoch_policy 对两种来源保留原值。
   """
-  if type(chart) is not NatalChart:
-    raise TypeError("chart must be a NatalChart")
-  start, end = _utc(start_utc, "start_utc"), _utc(end_utc, "end_utc")
+  _require_chart(chart)
+  start, end = _normalize_utc(start_utc, "start_utc"), _normalize_utc(end_utc, "end_utc")
   if start >= end:
     raise ValueError("UTC interval must be nonempty and increasing")
   moving = _moving(moving_objects)

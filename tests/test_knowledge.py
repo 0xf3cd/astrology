@@ -123,6 +123,8 @@ def test_query_contracts(catalog: Catalog) -> None:
     "entry.essential_dignities",
     "entry.dispositor_chains",
     "entry.transit_hits",
+    "entry.moment_charts",
+    "entry.transit_aspects",
   }
   assert all(
     entry.prerequisite_status is PrerequisiteStatus.UNRESOLVED
@@ -240,6 +242,27 @@ def test_partial_computation_cannot_promote_retrieval(catalog: Catalog) -> None:
     == "not_assessed"
   )
   assert entry in catalog.filter_entries(concept_id="sign.aries")
+
+
+@pytest.mark.parametrize("identifier", ["moment_charts", "transit_aspects"])
+def test_moment_entries_are_reference_rules_not_chart_matches(
+  catalog: Catalog, identifier: str
+) -> None:
+  entry = catalog.entry(f"entry.{identifier}")
+  assert f"rule.project.{identifier}" in entry.rule_ids
+  assert entry.prerequisite_status is PrerequisiteStatus.COMPLETE
+  assert entry.output_eligibility is OutputEligibility.REFERENCE_ONLY
+  assert entry.chart_applicability == "not_assessed"
+  for text in (entry.statement, entry.exceptions, entry.limits, *entry.prerequisites):
+    assert text.text("en") and text.text("zh-CN")
+  assert catalog.citations(entry.identifier)
+  if identifier == "moment_charts":
+    assert {citation.source_id for citation in entry.citations} == {
+      "source.celestial-calendar.events.1.1.1"
+    }
+  else:
+    assert {citation.source_id for citation in entry.citations} == {"source.astrology"}
+    assert all("transit_aspects.py" not in citation.locator for citation in entry.citations)
 
 
 def test_container_ownership(catalog: Catalog) -> None:
@@ -647,6 +670,8 @@ def test_retained_rule_ids_and_order(catalog: Catalog) -> None:
     "rule.project.cross_aspect_evaluation",
     "rule.project.cross_house_overlays",
     "rule.project.dispositor_chains",
+    "rule.project.moment_charts",
+    "rule.project.transit_aspects",
     "rule.project.exact_transit_hits",
   ]
   for identifier, configuration in expected:
@@ -769,6 +794,7 @@ def test_project_source_consolidation_preserves_lineage_and_citation_coverage(
     "cross_house_overlays": 1,
     "axis_aspects": 1,
     "transit_hits": 1,
+    "transit_aspects": 1,
     "dispositor_chains": 1,
   }
   actual = {

@@ -10,6 +10,8 @@ request asks for are in `chart.aspects`; the [aspect guide](aspects.md) explains
 
 ## Calculate one chart
 
+For an explicit instant/location without a birth record, use [moment_chart](moments.md).
+
 <!-- usage: chart.calculation -->
 
 Prepare the input first. A chart needs a known clock, an explicit timezone and

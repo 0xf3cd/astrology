@@ -163,12 +163,15 @@ def test_the_civil_year_ceiling_comes_from_the_selected_model(
   resolved = resolved_at(date(2100, 1, 1), time(12), 0.0)
   if end_year <= resolved.utc.year:
     with pytest.raises(ChartDomainError, match=f"end year {end_year} ") as caught:
-      adapter._precheck(resolved, config_for())
+      adapter._precheck(resolved.utc, resolved.record.location, config_for())
     assert caught.value.upstream_message is None
     assert caught.value.operation is None
     assert caught.value.recorded is None
   else:
-    assert adapter._precheck(resolved, config_for()) is resolved.record.location
+    assert (
+      adapter._precheck(resolved.utc, resolved.record.location, config_for())
+      is resolved.record.location
+    )
   assert calls == [celestial.DeltaTModel.ALGO5]
 
 
@@ -188,7 +191,7 @@ def test_location_rejections_precede_native_capability_queries(
   resolved = resolve_birth_time(record_at(*_NORTH[:2], latitude))
   expected = MissingBirthDataError if latitude is None else ChartDomainError
   with pytest.raises(expected):
-    adapter._precheck(resolved, config_for())
+    adapter._precheck(resolved.utc, resolved.record.location, config_for())
   with pytest.raises(expected):
     natal_chart(resolved, config_for())
 
