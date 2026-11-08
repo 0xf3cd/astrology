@@ -17,7 +17,9 @@ its own aspect rules, so the natal charts do not need to include aspects.
 
 For a fixed-instant transit comparison, use the chart calculated at that instant
 as `chart_left` and the natal chart as `chart_right`. Select `Body.SUN` on each
-side to compare only the transiting and natal Suns. `find_aspects` is a single-chart
+side to compare only the transiting and natal Suns. The comparison uses stored
+own-date longitudes under the [source-compatibility convention](#source-compatibility-and-calculation-boundaries).
+`find_aspects` is a single-chart
 operation: it requires distinct identities and also forms pairs within its input,
 so it cannot represent these two Suns. This static comparison does not search for
 exact hit times; use [transit hits](transits.md) for an interval search.

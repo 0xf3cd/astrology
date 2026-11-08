@@ -145,7 +145,7 @@ moon: scorpio
 ## 第一次查询知识
 
 把这份独立脚本保存为 `first_knowledge.py`，用同一个虚拟环境的 Python 运行。
-下面先按稳定 ID 读取太阳，再按别名 "Sol" 查找同一概念：
+下面先按稳定 ID 读取太阳，再按别名“日轮”查找同一概念：
 
 ```python
 from astrology import load_catalog

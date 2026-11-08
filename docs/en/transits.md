@@ -110,10 +110,11 @@ Ascendant, selecting conjunction, square and opposition, took about 74 seconds:
 `2 × 3 × (1 + 2 + 1) = 24` scans.
 
 Ten moving bodies against ten natal bodies plus four axes, with all five aspects,
-require `10 × 14 × 8 = 1120` scans. The single-scan measurements suggest roughly an
-hour for that one-year request; the complete request was not timed. Costs depend
-on the target, interval, machine and load; do not assume linear scaling from these
-samples.
+require `10 × 14 × 8 = 1120` scans. Extrapolating each moving body's measured scan
+time equally across all natal targets and branches gives roughly an hour for that
+one-year request; the complete request was not timed. Costs depend on the target,
+interval, machine and load; do not assume that they scale linearly with interval
+length from these samples.
 
 ## Read and retain the result
 
@@ -184,4 +185,5 @@ exact moving-to-fixed hits. It does not calculate a fixed-instant transit chart,
 orb-entry windows, returns, moving-to-moving events or interpretation.
 For aspects at one chosen instant, compare an already calculated chart at that
 instant with the natal chart using [static cross-chart aspects](cross_aspects.md#compare-two-example-charts),
-selecting objects separately on each side.
+selecting objects separately on each side. This compares stored own-date longitudes
+under the [source-compatibility convention](cross_aspects.md#source-compatibility-and-calculation-boundaries).

@@ -82,7 +82,7 @@ establish. Use `natal_chart` to calculate values from resolved input.
 Selected axis names in participants, orb overrides and hits come from the supplied
 catalog, just like body names. An old body/node-only request needs no axis concepts:
 the Ascendant, Midheaven, Descendant and Imum Coeli rows in "Axes and house cusps"
-use fixed bilingual labels.
+use fixed labels in the selected language, independent of the supplied catalog.
 
 Calling `natal_chart(chart.resolved, chart.requested)` calculates a fresh result
 with the current implementation and records its provenance. It keeps the resolved
