@@ -77,6 +77,7 @@ def test_query_contracts(catalog: Catalog) -> None:
     "rule.ptolemy_ashmand.sign_groups",
   ]
   assert [v.identifier for v in catalog.list_variants(concept_id="body.sun")] == [
+    "rule.project.solar_lunar_returns",
     "rule.lilly1647.essential_dignities",
     "rule.project.dispositor_chains",
   ]
@@ -125,6 +126,7 @@ def test_query_contracts(catalog: Catalog) -> None:
     "entry.transit_hits",
     "entry.moment_charts",
     "entry.transit_aspects",
+    "entry.solar_lunar_returns",
   }
   assert all(
     entry.prerequisite_status is PrerequisiteStatus.UNRESOLVED
@@ -643,11 +645,18 @@ def test_retired_identity_variants_keep_their_concepts(catalog: Catalog, identif
     else ()
   )
   assert tuple(v.identifier for v in catalog.list_variants(concept_id=concept_id)) == (
+    *(
+      ("rule.project.solar_lunar_returns",)
+      if concept.configuration in (Body.SUN, Body.MOON)
+      else ()
+    ),
     *expected,
     "rule.project.dispositor_chains",
   )
-  assert catalog.filter_entries(concept_id=concept_id)[0].rule_ids == ()
-  entry = catalog.filter_entries(concept_id=concept_id)[0]
+  entry = catalog.entry(
+    "entry.body_requests" if concept_id.startswith("body.") else "entry.node_directions"
+  )
+  assert concept_id in entry.concept_ids and entry.rule_ids == ()
   with pytest.raises(ValueError, match="Dangling"):
     replace(catalog, entries=(replace(entry, rule_ids=(identifier,)),))
 
@@ -670,6 +679,7 @@ def test_retained_rule_ids_and_order(catalog: Catalog) -> None:
     for v in catalog.variants
     if v.identifier
     not in (
+      "rule.project.solar_lunar_returns",
       "rule.zodiac.elements",
       "rule.zodiac.modalities",
       "rule.lunation.rudhyar1950",

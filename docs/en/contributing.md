@@ -175,6 +175,26 @@ silent substitutions, and factories whose return type depends on hidden state.
 
 ## Correctness
 
+Return fixtures in `tests/reference/return_reference.json` use independently
+calculated natal degrees and TT crossings from pyswisseph 2.10.3.2 / Swiss 2.10.03,
+explicit Moshier plus speed flags 260. Regenerate them without project/native
+imports or a dependency change:
+
+```sh
+uv run --no-project --python 3.11 --with pyswisseph==2.10.3.2 python tools/fetch_return_reference.py --output <path>
+```
+
+The recipe pins birth/search TT−UTC offsets to 64.184/69.184 seconds for its 2000
+natal instants and 2023–2024 intervals. The Sun 5-second and Moon 30-second fixture
+tolerances cover measured cross-model differences (maxima 1.344672/11.771331 seconds)
+for these synthetic cases only, not global error bounds. Tests separately recompute
+native wrapped residuals within 1e-6 degree, compare all event counts and exercise
+exact endpoint collisions. Cases include near-zero degrees, leap-day birth and
+two solar returns within calendar 2024. Some overlapping windows repeat events;
+they are not independent observations. The recipe hash binds the fixture to its
+generator. This optional reference environment adds no runtime or locked dependency;
+Swiss code and ephemeris files are not distributed here.
+
 Transit fixtures in `tests/reference/transit_reference.json` use explicitly selected
 Moshier ephemeris calculations through `pyswisseph==2.10.3.2`, not Swiss/JPL data
 files. The optional generator `tools/fetch_transit_reference.py --output <path>`

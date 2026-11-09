@@ -13,6 +13,7 @@ task you need:
 | Build a moment chart or compare fixed-instant transits | [Moment charts](moments.md) |
 | Compare two charts | [Cross-chart aspects and house overlays](cross_aspects.md) |
 | Find exact transits in a UTC interval | [Exact transit hits](transits.md) |
+| Find solar/lunar returns and choose a chart location | [Returns](returns.md) |
 | Count elements/modalities or classify lunar phase | [Sign distributions and natal lunar phase](summaries.md) |
 | Query traditional rulers, dignity statuses and dispositor chains | [Rulership and dignities](dignities.md) |
 | Look up names, rules and sources without a chart | [Knowledge queries](knowledge.md) and [catalog](catalog.md) |
@@ -32,6 +33,7 @@ moments
 aspects
 cross_aspects
 transits
+returns
 summaries
 dignities
 records

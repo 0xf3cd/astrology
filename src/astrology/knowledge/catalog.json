@@ -67,6 +67,14 @@
   ],
   "variants": [
     {
+      "identifier": "rule.project.solar_lunar_returns",
+      "name": {"en": "Solar and lunar returns to natal longitude", "zh": "日月返回本命黄经的返照"},
+      "concept_ids": ["body.sun", "body.moon", "aspect.conjunction"],
+      "definition": {"en": "A solar or lunar return is the moving Sun or Moon reaching the stored natal longitude of that same body. astrology.returns.return_hits selects a same-body conjunction through transit_hits and returns its TransitHits unchanged. The explicit half-open UTC interval selects all occurrences, including an empty result. Each retained hit can be passed to moment_chart with a caller-supplied location and ChartConfig.", "zh": "日返照或月返照指移动太阳或月亮到达同一星体已存本命黄经的时刻。astrology.returns.return_hits 通过 transit_hits 选择同星体合相，原样返回 TransitHits。显式的左闭右开 UTC 区间选择全部发生次数，也可以没有命中。每个保留命中都可连同调用方提供的地点及 ChartConfig 交给 moment_chart。"},
+      "tradition": {"en": "Modern return definitions in Astrowiki, Mary Shea and Isabelle Ghaneh; the own-date apparent geocentric tropical comparison and explicit-location interface are project conventions. Birthplace and residence practices remain distinct choices made by the caller.", "zh": "返照定义据 Astrowiki、Mary Shea 及 Isabelle Ghaneh 的现代说明；各自日期的地心视热带黄经比较及显式地点接口属于项目约定。出生地与居住地做法保持区分，由调用方选择。"},
+      "limits": {"en": "No common-epoch or sidereal transformation, calendar-anniversary shortcut or location inference. A calendar year can contain two solar returns; all events in the interval are retained. Search and chart construction are separate: a valid event need not admit the requested house geometry. Numerical reproducibility does not establish forecasting efficacy.", "zh": "不转换共同历元或恒星黄道，不按日历周年近似，也不推断地点。一个公历年可能有两次日返照；保留区间内全部事件。搜索与建盘分开：事件合法不等于所请求的宫位几何可计算。数值可复现不证明预测有效。"}
+    },
+    {
       "identifier": "rule.lilly1647.essential_dignities",
       "name": {"en": "Lilly 1647 seven-planet rulership and four statuses", "zh": "Lilly 1647 年版七颗传统星体的守护及四种状态", "revision": 2, "zh_revision": 2},
       "concept_ids": ["body.sun", "body.moon", "body.mercury", "body.venus", "body.mars", "body.jupiter", "body.saturn", "sign.aries", "sign.taurus", "sign.gemini", "sign.cancer", "sign.leo", "sign.virgo", "sign.libra", "sign.scorpio", "sign.sagittarius", "sign.capricorn", "sign.aquarius", "sign.pisces", "dignity_status.domicile", "dignity_status.exaltation", "dignity_status.detriment", "dignity_status.fall"],
@@ -168,6 +176,66 @@
     }
   ],
   "sources": [
+    {
+      "identifier": "source.astrowiki.solar_return.10448",
+      "title": "Solar Return Chart",
+      "author": "Astrodienst Astrowiki contributors",
+      "edition": "Revision 10448; Wayback capture 2025-05-24T23:01:38Z",
+      "language": "en",
+      "lineage": {"en": "Inspected retained HTML on 2026-11-09, SHA-256 81284cb34235c36980397ed72a805879b257a3c3d5f60b32dfbba9f14115fa10. Linked assets were not retained. Same editorial publisher as the lunar page and return FAQ; those pages are not additional independent authors for the solar definition.", "zh": "2026-11-09 核查保留的 HTML，SHA-256 为 81284cb34235c36980397ed72a805879b257a3c3d5f60b32dfbba9f14115fa10。未保留外链资源。与月返照页及返照 FAQ 属同一编辑出版方，这些页面不另算太阳定义的独立作者。"},
+      "rights": {"en": "Third-party text; only a short attributed definition and project Chinese translation are included. No HTML or linked assets are redistributed.", "zh": "第三方文本；仅收具名短定义及项目中文翻译，不再分发 HTML 或外链资源。"},
+      "scope": {"en": "Defines the exact solar return to natal position and discusses birthplace versus residence. Does not specify this project's full coordinate, time-scale, interval or error contracts. Interpretive claims are not adopted.", "zh": "定义太阳精确返回本命位置，并讨论出生地与居住地。不定义项目完整的坐标、时标、区间或错误合同，不采纳解读断言。"},
+      "verification": "verified",
+      "url": "https://web.archive.org/web/20250524230138/https://www.astro.com/astrowiki/en/Solar_Return_Chart"
+    },
+    {
+      "identifier": "source.shea.solar_returns",
+      "title": "Introduction to Solar Returns",
+      "author": "Mary Shea",
+      "edition": "Author's webpage inspected 2026-11-09; publication date not stated",
+      "language": "en",
+      "lineage": {"en": "Retained response HTML SHA-256 d194d7f481719eafdceaec3188060fa5729bdb7dc0376c7f85a51dc84233d158. Linked assets were not retained. A separately authored practitioner explanation, not evidence for an independent historical lineage.", "zh": "保留响应 HTML 的 SHA-256 为 d194d7f481719eafdceaec3188060fa5729bdb7dc0376c7f85a51dc84233d158，未保留外链资源。属于另一作者的实践说明，不据此认定历史传承独立。"},
+      "rights": {"en": "Copyrighted author webpage; only a short attributed definition and project Chinese translation are included, not the article or assets.", "zh": "作者网页受版权保护；仅收具名短定义及项目中文翻译，不收文章全文或资源。"},
+      "scope": {"en": "Defines the transiting Sun's return to natal degree, minute and second, and discusses the return location. Does not establish numerical accuracy bounds or the project's API policies; predictions are outside scope.", "zh": "定义移动太阳返回本命度、分、秒，并讨论返照地点。不确立数值精度界或项目 API 政策；预测不在采用范围内。"},
+      "verification": "verified",
+      "url": "https://www.maryshea.com/introduction-to-solar-returns"
+    },
+    {
+      "identifier": "source.astrowiki.lunar_return.12661",
+      "title": "Lunar Return Chart",
+      "author": "Astrodienst Astrowiki contributors",
+      "edition": "Fixed revision 12661, inspected 2026-11-09",
+      "language": "en",
+      "lineage": {"en": "Retained response HTML SHA-256 5e5b76a7f32db8cdfe4e134972d15860e23b5083b42e37e65255a1d6c3e9379e. Linked assets were not retained. Same editorial publisher as the solar page and FAQ.", "zh": "保留响应 HTML 的 SHA-256 为 5e5b76a7f32db8cdfe4e134972d15860e23b5083b42e37e65255a1d6c3e9379e，未保留外链资源。与日返照页及 FAQ 属同一编辑出版方。"},
+      "rights": {"en": "Third-party text; only a short attributed definition and project Chinese translation are included. No HTML or linked assets are redistributed.", "zh": "第三方文本；仅收具名短定义及项目中文翻译，不再分发 HTML 或外链资源。"},
+      "scope": {"en": "Defines the Moon's exact return to its birth position and discusses birthplace/residence. Its approximate 27.3-day recurrence is not a calendar-month selection rule or a specification of this project's complete coordinate conventions. Interpretations are not adopted.", "zh": "定义月亮精确返回出生位置，并讨论出生地／居住地。约 27.3 日的周期说明不是按公历月选事件的规则，也不定义项目完整坐标约定。不采纳解读。"},
+      "verification": "verified",
+      "url": "https://www.astro.com/wiki/astrowiki-en/index.php?title=Lunar_Return_Chart&oldid=12661"
+    },
+    {
+      "identifier": "source.ghaneh.lunar_return.2005",
+      "title": "How to Read a Lunar Return—Yours or Anyone’s",
+      "author": "Isabelle Ghaneh",
+      "edition": "Llewellyn Journal, 2005-02-21",
+      "language": "en",
+      "lineage": {"en": "Author's article inspected 2026-11-09; retained HTML SHA-256 b9adb65e4cf0295ecd784141eb387c6967afc99ae24f5d4fd722c23c077f5a40. Linked assets were not retained. A separately authored modern explanation, not proof of an independent historical tradition.", "zh": "2026-11-09 核查作者文章；保留 HTML 的 SHA-256 为 b9adb65e4cf0295ecd784141eb387c6967afc99ae24f5d4fd722c23c077f5a40，未保留外链资源。属于另一作者的现代说明，不据此证明历史传统独立。"},
+      "rights": {"en": "Copyright Llewellyn Worldwide; only one short attributed definition and project Chinese translation are included. No article, biographical example or linked assets are redistributed.", "zh": "版权归 Llewellyn Worldwide；仅收一句具名短定义及项目中文翻译，不再分发文章、生平实例或外链资源。"},
+      "scope": {"en": "Defines the Moon's return to its natal position; the author uses current residence. Monthly wording is descriptive, not one event per calendar month. Interpretations, personal examples and forecasting claims are not adopted.", "zh": "定义月亮返回本命位置，作者采用当前居住地。“每月”的措辞是周期描述，不表示每个公历月只选一次。不采纳解读、个人实例或预测断言。"},
+      "verification": "verified",
+      "url": "https://www.llewellyn.com/journal/article/780"
+    },
+    {
+      "identifier": "source.astrodienst.return_faq.20260104",
+      "title": "Return charts FAQ",
+      "author": "Astrodienst",
+      "edition": "Wayback capture 2026-01-04T10:38:02Z, inspected 2026-11-09",
+      "language": "en",
+      "lineage": {"en": "Original gzip response SHA-256 bbfcbed43f16ebd2e085be1b7b411f3466045f44468e6be754b046ab757c89ea; decoded HTML SHA-256 1109099624c3a226d3ae5054d7dbba7d0522478028d31b73b4cc8e099e36c6b3. Linked assets were not retained. Same publisher as Astrowiki, not another independent definition source.", "zh": "原 gzip 响应 SHA-256 为 bbfcbed43f16ebd2e085be1b7b411f3466045f44468e6be754b046ab757c89ea；解压 HTML 为 1109099624c3a226d3ae5054d7dbba7d0522478028d31b73b4cc8e099e36c6b3。未保留外链资源。与 Astrowiki 同属一个出版方，不另算独立定义来源。"},
+      "rights": {"en": "Copyrighted service documentation, cited with project paraphrases only; no response HTML or assets are redistributed.", "zh": "受版权保护的服务文档，仅引用并作项目释义，不再分发响应 HTML 或资源。"},
+      "scope": {"en": "Documents exact-transit return timing and birthplace/relocation calculator choices. Supports recording location practice, not a universal preferred location, this project's API or astronomical error bounds.", "zh": "说明精确行运返照时刻及计算器的出生地／重定位选项。支持记录地点实践，不确立普适的首选地点、项目 API 或天文误差界。"},
+      "verification": "verified",
+      "url": "https://web.archive.org/web/20260104103802/https://www.astro.com/faq/fq_fh_return_e.htm"
+    },
     {
       "identifier": "source.celestial-calendar.events.1.1.1",
       "title": "celestial-calendar longitude events and UTC conversion",
@@ -278,6 +346,27 @@
     }
   ],
   "entries": [
+    {
+      "identifier": "entry.solar_lunar_returns",
+      "statement": {"en": "Solar and lunar returns find the Sun or Moon at its stored natal longitude. Search every occurrence in an explicit interval, then construct a moment chart at a chosen event with an explicit location and configuration.", "zh": "日月返照查找太阳或月亮到达其已存本命黄经的时刻。在显式区间内搜索全部发生次数，再选择事件，连同显式地点及配置建立时刻盘。"},
+      "concept_ids": ["body.sun", "body.moon", "aspect.conjunction"],
+      "rule_ids": ["rule.project.solar_lunar_returns", "rule.project.exact_transit_hits", "rule.project.moment_charts"],
+      "citations": [
+        {"source_id": "source.astrowiki.solar_return.10448", "locator": "Opening definition; complete sentence. Later location discussion distinguishes birthplace and residence.", "excerpt": {"en": "A chart erected for the exact moment when the Sun returns to its position in the natal chart.", "zh": "为太阳精确返回本命盘中自身位置的时刻所建立的盘。"}},
+        {"source_id": "source.shea.solar_returns", "locator": "Opening definition under Introduction to Solar Returns; complete sentence.", "excerpt": {"en": "A solar returns chart is a chart erected for the moment the transiting Sun returns to the natal position of the Sun (degree, minute, and second).", "zh": "日返照盘是为移动太阳返回太阳本命位置（度、分、秒）的时刻所建立的盘。"}},
+        {"source_id": "source.astrowiki.lunar_return.12661", "locator": "Opening definition; complete sentence.", "excerpt": {"en": "A horoscope erected for the time the Moon reaches the exact position it had at the time of birth.", "zh": "为月亮到达其出生时精确位置的时刻所建立的命盘。"}},
+        {"source_id": "source.ghaneh.lunar_return.2005", "locator": "First paragraph after the opening question; complete sentence. The next sentence uses current residence.", "excerpt": {"en": "Every month, the moon returns to the exact position it held in your natal chart at your time of birth.", "zh": "每月，月亮都会返回它在你出生时的本命盘中所处的精确位置。"}},
+        {"source_id": "source.astrodienst.return_faq.20260104", "locator": "Return-chart questions about birthplace, relocation and exact transit timing; paraphrase only."}
+      ],
+      "prerequisites": [
+        {"en": "A NatalChart storing the selected Sun or Moon and an explicit nonempty modern UTC search interval admitted by that body's event model.", "zh": "保存所选太阳或月亮的 NatalChart，以及被该星体事件模型接纳的显式非空现代 UTC 搜索区间。"},
+        {"en": "For each chart, an explicit Location and ChartConfig, plus a converted UTC instant admitted by the complete snapshot and requested houses.", "zh": "建立每张盘时，须有显式 Location 及 ChartConfig，且转换后的 UTC 时刻被完整快照及请求宫制接纳。"}
+      ],
+      "exceptions": {"en": "No hit is a valid search result. A found event remains available if chart construction fails; no location, birth record, anniversary time or replacement house system is manufactured.", "zh": "没有命中也是合法搜索结果。建盘失败时，已找到的事件仍可保留；不制造地点、出生记录、周年时刻或替代宫制。"},
+      "limits": {"en": "The cited definitions and location practices do not specify the project's own-date apparent geocentric tropical model, all-occurrence half-open interval or failure policy; these are named project conventions. Keep TransitHits for the natal reference, body, interval, event models and versions, and MomentChart for event source TT, location, requested/effective chart configuration and provenance. Source-event TT and derived calculation TT remain distinct. No return interpretation, precession-corrected or sidereal variant, other planetary return or efficacy claim is supplied. Retrieval does not calculate or assess a chart.", "zh": "所引定义及地点实践不规定项目的各自日期地心视热带模型、左闭右开区间的全部命中或失败政策；这些属于具名项目约定。保留 TransitHits 以保存本命参考、星体、区间、事件模型及版本，保留 MomentChart 以保存事件来源 TT、地点、请求及有效排盘配置与来源记录。来源事件 TT 与导出的计算 TT 保持区分。不提供返照解读、岁差修正或恒星黄道变体、其他行星返照，也不声称预测有效。检索不排盘或评估命盘。"},
+      "prerequisite_status": "complete",
+      "output_eligibility": "reference_only"
+    },
     {
       "identifier": "entry.moment_charts",
       "statement": {"en": "A moment chart retains an explicit instant and location without birth metadata; a retained transit hit can supply its source time through the public chart entry.", "zh": "时刻盘保留显式时刻与地点，不含出生资料；保留的行运命中可通过公开建盘入口提供来源时刻。"},

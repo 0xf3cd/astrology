@@ -132,6 +132,21 @@ doctrees、缓存及其他构建控制文件不进入站点成品。检查所有
 
 ## 正确性
 
+`tests/reference/return_reference.json` 的返照夹具使用 pyswisseph 2.10.3.2 / Swiss 2.10.03
+独立计算的本命黄经及 TT 穿越时刻，显式采用 Moshier 加速率标志 260。重生成时不导入项目或
+其原生天文后端，也不改项目依赖：
+
+```sh
+uv run --no-project --python 3.11 --with pyswisseph==2.10.3.2 python tools/fetch_return_reference.py --output <path>
+```
+
+配方为其 2000 年本命时刻及 2023–2024 年区间钉定出生／搜索 TT−UTC 偏移 64.184／69.184 秒。
+太阳 5 秒、月亮 30 秒容差覆盖本批合成样例测得的跨模型差异（最大值 1.344672／11.771331 秒），
+不是全域误差界。测试另外重算原生回绕残差，要求小于 1e-6 度，并比较全部事件次数、检查
+精确端点重合。样例覆盖近零度、闰日出生及 2024 公历年内两次日返照。部分重叠窗口包含重复
+事件，不算独立观测。配方散列将夹具绑定到生成器。可选参考环境不增加运行时或锁定依赖；
+仓内不分发 Swiss 代码或星历文件。
+
 `tests/reference/transit_reference.json` 的行运夹具通过 `pyswisseph==2.10.3.2` 显式选择
 Moshier 星历，不使用 Swiss/JPL 数据文件。可选生成器
 `tools/fetch_transit_reference.py --output <path>` 在单独参考环境中运行，需安装该包及项目的

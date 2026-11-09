@@ -12,6 +12,7 @@
 
 功能包括：
 
+- [日返照与月返照](https://0xf3cd.github.io/astrology/docs/zh-CN/returns.html)：查找显式区间内全部事件，再按给定地点建盘。
 - [时刻盘与固定时刻行运对本命相位](https://0xf3cd.github.io/astrology/docs/zh-CN/moments.html)，支持从保留的精确命中直接建盘及双语文本。
 - [元素／模式分布与出生月相](https://0xf3cd.github.io/astrology/docs/zh-CN/summaries.html)。
 - [传统星座守护、四种状态与定位星链](https://0xf3cd.github.io/astrology/docs/zh-CN/dignities.html)。
@@ -142,6 +143,7 @@ moon: scorpio
 | 选择对象、相位参与者和容许度 | [配置](https://0xf3cd.github.io/astrology/docs/zh-CN/configuration.html) |
 | 比较两张命盘 | [双盘相位与落宫](https://0xf3cd.github.io/astrology/docs/zh-CN/cross_aspects.html) |
 | 搜索区间内的精确行运 | [精确行运命中](https://0xf3cd.github.io/astrology/docs/zh-CN/transits.html) |
+| 查找日月返照并建盘 | [返照](https://0xf3cd.github.io/astrology/docs/zh-CN/returns.html) |
 
 ## 第一次查询知识
 

@@ -12,6 +12,7 @@
 | 按给定时刻建盘或比较固定时刻行运 | [时刻盘](moments.md) |
 | 比较两张命盘 | [双盘相位与落宫](cross_aspects.md) |
 | 搜索 UTC 区间内的精确行运 | [精确行运命中](transits.md) |
+| 查找日月返照并选择排盘地点 | [返照](returns.md) |
 | 统计元素、模式分布或判断月相类型 | [星座分布与出生月相](summaries.md) |
 | 查传统守护、尊贵状态与定位星链 | [守护与尊贵](dignities.md) |
 | 不排盘，查名称、规则和出处 | [知识查询](knowledge.md)及[目录](catalog.md) |
@@ -30,6 +31,7 @@ moments
 aspects
 cross_aspects
 transits
+returns
 summaries
 dignities
 records

@@ -88,6 +88,7 @@ def test_package_root_surface() -> None:
     "natal_lunar_phase",
     "prepare_natal_input",
     "resolve_birth_time",
+    "return_hits",
     "sign_degree",
     "sign_distribution",
     "sign_of",

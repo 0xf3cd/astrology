@@ -15,6 +15,8 @@ also be queried without a chart.
 records. Natal and moment results share validation and the concrete UTC/location
 snapshot. Fixed-instant transit aspects reuse cross geometry, with local motion
 against zero fixed-side rates; their source/result construction remains native-free.
+[Solar and lunar returns](returns.md) select same-body conjunction events against
+a natal chart, then reuse the moment-chart boundary for an explicit location.
 
 ## Organization
 
@@ -34,6 +36,7 @@ src/astrology/
   _comparison.py    Source compatibility and stored-chart object selection
   cross_aspects.py  Static comparison of supplied charts, retaining both sources
   transits.py       Exact moving-to-fixed-source interval events
+  returns.py        Solar/lunar return selection over exact transit hits
   transit_aspects.py Fixed-instant moving-to-natal geometry and local motion
   house_overlays.py Directional house placement between supplied charts
   lunar_phase.py    Oriented solar/lunar arc and named lunation types
@@ -70,6 +73,11 @@ for both cross-chart consumers and validates natal target selections for transit
 selected natal degrees and the aspect branches in `aspects.py`. It retains the
 source chart without creating a moving-side birth record or house geometry.
 
+`returns.py` owns the natal-only, Sun/Moon-only return selection. It delegates to
+`transit_hits` and returns the same `TransitHits`; chart construction stays with
+`moment_chart`. Retaining both results preserves the reference search and the
+chosen chart's location/configuration without a separate return-result family.
+
 `dignities.py` owns the sign-ruler table and the house-ruler and dispositor results
 derived from it. These supplied-chart operations use existing placements without
 initializing astronomy. `summaries.py` keeps sign distributions and natal lunar phase.
@@ -82,7 +90,8 @@ the result later without moving calculation into a frontend.
 
 Package imports, knowledge queries, classifications, summaries and supplied-chart
 comparisons do not initialize native astronomy. `natal_chart`, `moment_chart` and `transit_hits`
-load the astronomy adapter only when called. `resolve_birth_time` reads timezone data,
+load the astronomy adapter only when called. `return_hits` delegates to `transit_hits`
+after validating its source/body. `resolve_birth_time` reads timezone data,
 and `load_catalog` reads packaged knowledge; formatters use a caller-supplied catalog
 without resource I/O. The [isolation checks](contributing.md#run-the-checks)
 exercise these boundaries.

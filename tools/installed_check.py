@@ -8,7 +8,7 @@ from importlib import import_module
 from importlib.metadata import PackageNotFoundError, distribution, version
 from importlib.resources import files
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 import astrology
 from astrology.knowledge import Catalog
@@ -143,10 +143,31 @@ def acceptance_moments(
   )
 
 
+def acceptance_returns(
+  chart: astrology.NatalChart,
+) -> tuple[tuple[astrology.TransitHits, astrology.MomentChart], ...]:
+  """Calculate each luminary's return search and a chart at its first hit.
+
+  分别搜索日月返照，并为各自的第一次命中建盘。
+  """
+  results = []
+  for body in (astrology.Body.SUN, astrology.Body.MOON):
+    events = astrology.return_hits(
+      chart,
+      body,
+      start_utc=datetime(2024, 1, 1, tzinfo=UTC),
+      end_utc=datetime(2024, 5, 1, tzinfo=UTC),
+    )
+    moving = astrology.moment_chart(events.hits[0], astrology.Location(40, 100), chart.requested)
+    results.append((events, moving))
+  return tuple(results)
+
+
 def calculation_observations(
   chart: astrology.NatalChart,
   transits: astrology.TransitHits,
   moments: tuple[astrology.MomentChart, astrology.MomentChart],
+  returns: tuple[tuple[astrology.TransitHits, astrology.MomentChart], ...],
   catalog: Catalog,
 ) -> str:
   """Capture supplied astronomy values and their pure comparison/text outputs.
@@ -163,6 +184,38 @@ def calculation_observations(
       "transits": repr(transits),
       "moments": [json.loads(chart_observations(moment)) for moment in moments],
       "fixed_aspects": repr(fixed),
+      "returns": [
+        {
+          "search": repr(events),
+          "chart": json.loads(chart_observations(moving)),
+          "comparison": repr(
+            astrology.cross_chart_aspects(
+              moving,
+              events.chart,
+              chart.requested.aspects,
+              combination=chart.requested.orb_combination,
+            )
+          ),
+          "overlays": repr(astrology.cross_chart_house_overlays(moving, events.chart)),
+          "transits": repr(
+            astrology.transit_aspects(
+              moving, chart, chart.requested.aspects, combination=chart.requested.orb_combination
+            )
+          ),
+          "rulers": repr(astrology.HouseRulers(moving)),
+          "dispositors": repr(
+            astrology.chart_dispositors(moving, objects=moving.requested.objects)
+          ),
+          "distribution": repr(
+            astrology.chart_sign_distribution(moving, objects=moving.requested.objects)
+          ),
+          "text": {
+            language: astrology.format_chart(moving, catalog, language=language)
+            for language in languages
+          },
+        }
+        for events, moving in returns
+      ],
       "moment_text": {
         language: [astrology.format_chart(moment, catalog, language=language) for moment in moments]
         for language in languages
@@ -394,12 +447,33 @@ def _check_knowledge() -> None:
   catalog.lookup("Sol")
   catalog.lookup("日轮")
   catalog.citations("entry.equinoctial_example")
+  catalog.citations("entry.solar_lunar_returns")
   if any(
     name.startswith(("tzdata", "zoneinfo", "celestial", "ctypes"))
     for name in set(sys.modules) - before
   ):
     raise ValueError("Knowledge query initialized time or native machinery")
   _check_native_isolation()
+
+
+def _check_return_failures(hit: astrology.TransitHit) -> None:
+  """Require explicit location and preserve unavailable-house failures.
+
+  要求显式地点，并保留宫位不可用的失败。
+  """
+  config = astrology.ChartConfig(astrology.HouseSystem.PLACIDUS, (astrology.Body.SUN,), ())
+  try:
+    astrology.moment_chart(hit, cast(astrology.Location, None), config)
+  except TypeError:
+    pass
+  else:
+    raise ValueError("Installed return chart accepted a missing location")
+  try:
+    astrology.moment_chart(hit, astrology.Location(89.9, 0), config)
+  except astrology.ChartDomainError:
+    pass
+  else:
+    raise ValueError("Installed return chart substituted unavailable house geometry")
 
 
 def _check_natal_chart(expected_observations: Path | None = None) -> None:
@@ -421,8 +495,10 @@ def _check_natal_chart(expected_observations: Path | None = None) -> None:
   if not adapter.is_relative_to(Path(sys.prefix).resolve()):
     raise ValueError("Imported astrology.celestial from outside the consumer environment")
   transits = acceptance_transits(chart)
+  returns = acceptance_returns(chart)
+  _check_return_failures(returns[0][0].hits[0])
   observed = calculation_observations(
-    chart, transits, acceptance_moments(chart, transits), astrology.load_catalog()
+    chart, transits, acceptance_moments(chart, transits), returns, astrology.load_catalog()
   )
   if expected_observations is not None and observed != expected_observations.read_text(
     encoding="utf-8"

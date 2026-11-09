@@ -7,6 +7,9 @@ a UTC interval. It returns a `TransitHits` result with the original chart, the
 search inputs and model provenance, and each crossing or contact. Hit times are
 JDE(TT): Julian Dates on the TT time scale, not UTC clock readings.
 
+For a natal-only Sun/Moon return query and a chart at a chosen hit/location, see
+[solar and lunar returns](returns.md).
+
 ## Search an interval
 
 The fixed source may also be a `MomentChart`; `natal_objects` names its
