@@ -33,7 +33,7 @@ True
 >>> len(catalog.filter_sources(verification=SourceVerification.VERIFIED))
 9
 >>> print(catalog.entry("entry.cross_aspect_evaluation").statement.text("zh-CN"))
-静态主要交叉相位比较两张给定本命盘结果，区分左右端点并保留双侧完整来源，不设运动字段。
+静态主要交叉相位比较两张给定本命盘或时刻盘结果，区分左右端点并保留双侧完整来源，不设运动字段。
 >>> print(catalog.variant("rule.project.cusp_ownership").definition.text("zh-CN"))
 落宫使用半开区间 [宫头, 下一宫头)：恰好落在宫头上的黄经归入从该宫头开始的宫，成员关系跨 0/360 环绕。
 ```

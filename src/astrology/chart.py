@@ -1,18 +1,19 @@
-"""Immutable natal results, shared chart access and modern tropical chart composition.
+"""Immutable natal and moment results and modern tropical chart composition.
 
-不可变本命盘结果、共用命盘访问，以及现代热带本命盘的组合。
+不可变本命盘与时刻盘结果，以及现代热带命盘的组合。
 """
 
 from __future__ import annotations
 
+import datetime
 from collections.abc import Sequence
 from dataclasses import dataclass, field
-from typing import Final, Literal, get_args
+from typing import TYPE_CHECKING, Final, Literal, TypeAlias, get_args
 
 from astrology._distribution import installed_version
 from astrology._validation import finite_number
 from astrology.aspects import AspectHit, AspectObject, find_aspects
-from astrology.birth import MissingBirthDataError, ResolvedBirth
+from astrology.birth import Location, MissingBirthDataError, ResolvedBirth, _normalize_utc
 from astrology.config import ChartConfig, HouseSystem, OrbCombination
 from astrology.houses import _cusps, _require_house_number, house_of
 from astrology.objects import (
@@ -24,6 +25,9 @@ from astrology.objects import (
   _is_chart_object,
 )
 from astrology.zodiac import Sign, _longitude, sign_degree, sign_of
+
+if TYPE_CHECKING:
+  from astrology.transits import TransitHit
 
 _Evaluation = Literal["fixed_fourteen_object_joint_snapshot"]
 _PositionFrame = Literal["apparent_geocentric_true_ecliptic_of_date"]
@@ -277,42 +281,110 @@ class NatalChart:
   aspects: tuple[AspectHit, ...]
 
   def __post_init__(self) -> None:
-    for name, expected in (
-      ("resolved", ResolvedBirth),
-      ("requested", ChartConfig),
-      ("effective", EffectiveConfiguration),
-      ("provenance", ChartProvenance),
-      ("times", ChartTimes),
-      ("houses", ChartHouses),
-    ):
-      if type(getattr(self, name)) is not expected:
-        raise TypeError(f"{name} must be a {expected.__name__}")
+    if type(self.resolved) is not ResolvedBirth:
+      raise TypeError("resolved must be a ResolvedBirth")
+    _validate_chart(self)
     if self.resolved.record.location is None:
       raise MissingBirthDataError("A complete chart requires a birth location")
-    for name, member_type in (
-      ("positions", EclipticPosition),
-      ("placements", Placement),
-      ("aspects", AspectHit),
-    ):
-      members = getattr(self, name)
-      if not isinstance(members, Sequence) or isinstance(members, (str, bytes)):
-        raise TypeError(f"{name} must be a sequence")
-      snapshot = tuple(members)
-      if any(type(member) is not member_type for member in snapshot):
-        raise TypeError(f"{name} must contain only {member_type.__name__} values")
-      object.__setattr__(self, name, snapshot)
-    if not self.requested.house_system is self.effective.house_system is self.houses.system:
-      raise ValueError("Requested, effective and stored house systems must agree")
-    if tuple(position.identity for position in self.positions) != self.requested.objects:
-      raise ValueError("Position identities and order must match requested objects")
-    if self.effective.aspect_objects != self.requested.aspect_participants():
-      raise ValueError("Effective aspect participants differ from the request")
-    if self.effective.orb_combination is not self.requested.orb_combination:
-      raise ValueError("Effective orb combination differs from the request")
-    if self.placements != _placements(self.positions, self.houses):
-      raise ValueError("Stored placements differ from pure derivation")
-    if self.aspects != _aspects(self.positions, self.houses, self.requested):
-      raise ValueError("Stored aspects differ from pure derivation")
+
+
+@dataclass(frozen=True, slots=True)
+class MomentInput:
+  """A modern UTC instant and explicit location, optionally retaining a source event's TT.
+
+  The aware built-in datetime is normalized to UTC and isolated from caller-owned
+  tzinfo. source_jde_tt is the original event time, not a replacement for the
+  calculation times. Construction validates supplied values without astronomy I/O.
+
+  现代 UTC 时刻及显式地点，可另存来源事件的 TT。有时区的内建 datetime 会归一为 UTC，
+  不引用调用方的 tzinfo。source_jde_tt 是原始事件时刻，不替代计算时标。
+  构造时只校验给定值，不调用天文计算。
+  """
+
+  utc: datetime.datetime
+  location: Location
+  source_jde_tt: float | None = None
+
+  def __post_init__(self) -> None:
+    object.__setattr__(self, "utc", _normalize_utc(self.utc, "utc"))
+    if type(self.location) is not Location:
+      raise TypeError("location must be a Location")
+    if self.source_jde_tt is not None:
+      object.__setattr__(self, "source_jde_tt", finite_number(self.source_jde_tt, "source_jde_tt"))
+
+
+@dataclass(frozen=True, slots=True)
+class MomentChart:
+  """An immutable chart at a supplied instant and location, without birth metadata.
+
+  Common result checks and intra-chart aspects follow NatalChart. Sequences are
+  copied into tuples. The moment input participates in equality and hashing;
+  constructors check pure consistency without recalculating astronomical values.
+
+  给定时刻与地点的不可变命盘，不含出生资料。共用结果校验及盘内相位规则与 NatalChart
+  相同，序列会复制为元组。时刻输入参与相等与哈希判断；构造器检查纯规则一致性，
+  不重新计算天文值。
+  """
+
+  moment: MomentInput
+  requested: ChartConfig
+  effective: EffectiveConfiguration
+  provenance: ChartProvenance
+  times: ChartTimes
+  positions: tuple[EclipticPosition, ...]
+  houses: ChartHouses
+  placements: tuple[Placement, ...]
+  aspects: tuple[AspectHit, ...]
+
+  def __post_init__(self) -> None:
+    if type(self.moment) is not MomentInput:
+      raise TypeError("moment must be a MomentInput")
+    _validate_chart(self)
+
+
+Chart: TypeAlias = NatalChart | MomentChart
+"""A natal or supplied-instant chart. 本命盘或给定时刻的命盘。"""
+
+
+def _require_chart(chart: Chart) -> None:
+  if type(chart) not in (NatalChart, MomentChart):
+    raise TypeError("chart must be a NatalChart or MomentChart")
+
+
+def _validate_chart(chart: Chart) -> None:
+  for name, expected in (
+    ("requested", ChartConfig),
+    ("effective", EffectiveConfiguration),
+    ("provenance", ChartProvenance),
+    ("times", ChartTimes),
+    ("houses", ChartHouses),
+  ):
+    if type(getattr(chart, name)) is not expected:
+      raise TypeError(f"{name} must be a {expected.__name__}")
+  for name, member_type in (
+    ("positions", EclipticPosition),
+    ("placements", Placement),
+    ("aspects", AspectHit),
+  ):
+    members = getattr(chart, name)
+    if not isinstance(members, Sequence) or isinstance(members, (str, bytes)):
+      raise TypeError(f"{name} must be a sequence")
+    snapshot = tuple(members)
+    if any(type(member) is not member_type for member in snapshot):
+      raise TypeError(f"{name} must contain only {member_type.__name__} values")
+    object.__setattr__(chart, name, snapshot)
+  if not chart.requested.house_system is chart.effective.house_system is chart.houses.system:
+    raise ValueError("Requested, effective and stored house systems must agree")
+  if tuple(position.identity for position in chart.positions) != chart.requested.objects:
+    raise ValueError("Position identities and order must match requested objects")
+  if chart.effective.aspect_objects != chart.requested.aspect_participants():
+    raise ValueError("Effective aspect participants differ from the request")
+  if chart.effective.orb_combination is not chart.requested.orb_combination:
+    raise ValueError("Effective orb combination differs from the request")
+  if chart.placements != _placements(chart.positions, chart.houses):
+    raise ValueError("Stored placements differ from pure derivation")
+  if chart.aspects != _aspects(chart.positions, chart.houses, chart.requested):
+    raise ValueError("Stored aspects differ from pure derivation")
 
 
 def _placements(
@@ -397,34 +469,99 @@ def natal_chart(resolved: ResolvedBirth, config: ChartConfig) -> NatalChart:
   if resolved.record.location is None:
     raise MissingBirthDataError("Chart calculation requires a birth location")
 
+  effective, provenance, times, positions, houses, placements, aspects = _calculate(
+    resolved.utc, resolved.record.location, config
+  )
+  return NatalChart(
+    resolved, config, effective, provenance, times, positions, houses, placements, aspects
+  )
+
+
+def _calculate(
+  utc: datetime.datetime, location: Location, config: ChartConfig
+) -> tuple[
+  EffectiveConfiguration,
+  ChartProvenance,
+  ChartTimes,
+  tuple[EclipticPosition, ...],
+  ChartHouses,
+  tuple[Placement, ...],
+  tuple[AspectHit, ...],
+]:
   from astrology.celestial import (  # Deferred: native astronomy out of imports.
     celestial_version,
     delta_t_model_id,
     snapshot,
   )
 
-  times, positions, houses = snapshot(resolved, config)
+  times, positions, houses = snapshot(utc, location, config)
   placements = _placements(positions, houses)
   aspects = _aspects(positions, houses, config)
-  return NatalChart(
-    resolved=resolved,
-    requested=config,
-    effective=EffectiveConfiguration(
+  return (
+    EffectiveConfiguration(
       house_system=config.house_system,
       delta_t_model=delta_t_model_id(),
       evaluation=_EVALUATION,
       aspect_objects=config.aspect_participants(),
       orb_combination=config.orb_combination,
     ),
-    provenance=ChartProvenance(
+    ChartProvenance(
       celestial_version=celestial_version(),
       position_frame=_POSITION_FRAME,
       ut1_derivation=_UT1_DERIVATION,
       astrology_version=installed_version(),
     ),
-    times=times,
-    positions=positions,
-    houses=houses,
-    placements=placements,
-    aspects=aspects,
+    times,
+    positions,
+    houses,
+    placements,
+    aspects,
+  )
+
+
+def moment_chart(
+  instant: datetime.datetime | TransitHit, location: Location, config: ChartConfig
+) -> MomentChart:
+  """Calculate a moment chart from an aware instant or a retained TransitHit.
+
+  Location and configuration are explicit. A datetime is normalized to modern UTC;
+  a hit's JDE(TT) is converted upstream at this calculation boundary. Its original
+  time is retained in moment.source_jde_tt, separately from the normalized UTC and
+  derived ChartTimes. Conversion follows the upstream fixed leap table and Python's
+  microsecond datetime representation; it need not round-trip exactly at leap steps
+  or the 1972 boundary. The converted UTC must itself be at or after 1972-01-01.
+  House geometry and the joint snapshot domain follow natal_chart. Conversion/domain
+  failures raise ChartDomainError; pre-1972 UTC raises HistoricalTimeError. See
+  entry.moment_charts and entry.transit_aspects for the project conventions.
+
+  从有时区的时刻或保留的 TransitHit 计算时刻盘。地点与配置须显式给出。datetime 归一为
+  现代 UTC；命中的 JDE(TT) 在此计算入口由上游转换。原事件时刻保存在 moment.source_jde_tt，
+  与归一后的 UTC 及导出的 ChartTimes 分开。转换使用上游固定闰秒表和 Python 微秒级 datetime，
+  在闰秒阶跃或 1972 边界不保证精确往返；转换后的 UTC 本身也须不早于 1972-01-01。
+  宫几何与联合快照有效域沿用 natal_chart。转换或求值域失败抛出 ChartDomainError，
+  早于 1972 的 UTC 抛出 HistoricalTimeError。项目约定见 entry.moment_charts 和
+  entry.transit_aspects。
+  """
+  if type(location) is not Location:
+    raise TypeError("location must be a Location")
+  if type(config) is not ChartConfig:
+    raise TypeError("config must be a ChartConfig")
+  source_jde_tt = None
+  if type(instant) is datetime.datetime:
+    utc = _normalize_utc(instant, "instant")
+  else:
+    from astrology.transits import TransitHit
+
+    if type(instant) is not TransitHit:
+      raise TypeError("instant must be a built-in datetime or TransitHit")
+    from astrology.celestial import moment_utc
+
+    source_jde_tt = instant.jde_tt
+    utc = moment_utc(source_jde_tt, config.house_system)
+  moment = MomentInput(utc, location, source_jde_tt)
+  effective, provenance, times, positions, houses, placements, aspects = _calculate(
+    moment.utc, location, config
+  )
+  return MomentChart(
+    moment, config, effective, provenance, times, positions, houses, placements, aspects
   )

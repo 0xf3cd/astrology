@@ -13,13 +13,14 @@ the [guides](https://0xf3cd.github.io/astrology/docs/en/index.html) and
 
 The library provides:
 
+- [Moment charts and fixed-instant transit-to-natal aspects](https://0xf3cd.github.io/astrology/docs/en/moments.html), including direct construction from a retained exact hit and bilingual text.
 - [Element/modality distributions and natal lunar phase](https://0xf3cd.github.io/astrology/docs/en/summaries.html).
 - [Traditional sign rulers, four statuses and dispositor chains](https://0xf3cd.github.io/astrology/docs/en/dignities.html).
 - [Explicit axis aspects](https://0xf3cd.github.io/astrology/docs/en/aspects.html#select-axes-explicitly)
   for natal and static cross-chart queries.
 - [Cross-chart house overlays and bilingual comparison text](https://0xf3cd.github.io/astrology/docs/en/cross_aspects.html).
 - [Static cross-chart aspects](https://0xf3cd.github.io/astrology/docs/en/cross_aspects.html)
-  between two natal charts, retaining both source charts and distinct left/right
+  between natal or moment charts, retaining both source charts and distinct left/right
   objects, without applying/separating labels.
 - [Exact transit hits](https://0xf3cd.github.io/astrology/docs/en/transits.html)
   over a UTC interval, retaining repeated retrograde hits, native rates and directions.
@@ -199,7 +200,7 @@ unrounded astronomy and named models.
 ## Later work
 
 - [Techniques and presentation](https://github.com/0xf3cd/astrology/milestone/2):
-  fixed-instant transits, orb windows and returns, relationship charts, tradition-specific rules, additional
+  orb windows and returns, relationship charts, tradition-specific rules, additional
   objects, and chart views.
 - [Advanced and historical research](https://github.com/0xf3cd/astrology/milestone/3):
   directions, progressions, uncertain birth times, historical inputs, spatial

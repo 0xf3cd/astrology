@@ -9,6 +9,7 @@
 | 准备出生记录并解析时刻 | [出生输入](birth.md) |
 | 选择天体、相位参与者或容许度 | [配置](configuration.md)及[相位](aspects.md) |
 | 计算并读取命盘 | [本命盘](chart.md)及[结果／文本](records.md) |
+| 按给定时刻建盘或比较固定时刻行运 | [时刻盘](moments.md) |
 | 比较两张命盘 | [双盘相位与落宫](cross_aspects.md) |
 | 搜索 UTC 区间内的精确行运 | [精确行运命中](transits.md) |
 | 统计元素、模式分布或判断月相类型 | [星座分布与出生月相](summaries.md) |
@@ -25,6 +26,7 @@
 birth
 configuration
 chart
+moments
 aspects
 cross_aspects
 transits

@@ -25,14 +25,18 @@ from astrology.birth import (
   resolve_birth_time,
 )
 from astrology.chart import (
+  Chart,
   ChartDomainError,
   ChartHouses,
   ChartProvenance,
   ChartTimes,
   EclipticPosition,
   EffectiveConfiguration,
+  MomentChart,
+  MomentInput,
   NatalChart,
   Placement,
+  moment_chart,
   natal_chart,
 )
 from astrology.config import (
@@ -78,7 +82,9 @@ from astrology.text import (
   format_house_rulers,
   format_lunar_phase,
   format_sign_distribution,
+  format_transit_aspects,
 )
+from astrology.transit_aspects import TransitAspectHit, TransitAspects, transit_aspects
 from astrology.transits import (
   TransitDirection,
   TransitDomainError,
@@ -111,6 +117,7 @@ __all__ = [
   "BirthRecord",
   "Body",
   "Catalog",
+  "Chart",
   "ChartConfig",
   "ChartDomainError",
   "ChartHouses",
@@ -138,6 +145,8 @@ __all__ = [
   "MajorAspect",
   "MissingBirthDataError",
   "Modality",
+  "MomentChart",
+  "MomentInput",
   "NatalChart",
   "NodeDefinition",
   "NonexistentBirthTimeError",
@@ -148,6 +157,8 @@ __all__ = [
   "Sign",
   "SignDistribution",
   "TimePrecision",
+  "TransitAspectHit",
+  "TransitAspects",
   "TransitDirection",
   "TransitDomainError",
   "TransitHit",
@@ -168,10 +179,12 @@ __all__ = [
   "format_house_rulers",
   "format_lunar_phase",
   "format_sign_distribution",
+  "format_transit_aspects",
   "house_of",
   "load_catalog",
   "lunar_phase",
   "modality_of",
+  "moment_chart",
   "natal_chart",
   "natal_lunar_phase",
   "prepare_natal_input",
@@ -180,6 +193,7 @@ __all__ = [
   "sign_distribution",
   "sign_of",
   "sign_ruler",
+  "transit_aspects",
   "transit_hits",
   "truncate_display",
 ]

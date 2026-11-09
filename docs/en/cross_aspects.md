@@ -11,6 +11,10 @@ Both operations use the stored longitudes; check the
 
 ## Compare two example charts
 
+Both comparison functions also accept `MomentChart` sources in either role.
+Their comparisons remain static. For a supplied instant and moving-to-natal
+motion labels, use [moment_chart and transit_aspects](moments.md).
+
 This example calculates charts from two synthetic birth records, then checks
 whether their Suns form a conjunction within a 3-degree orb. The comparison takes
 its own aspect rules, so the natal charts do not need to include aspects.

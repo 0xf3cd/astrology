@@ -9,6 +9,12 @@ JDE(TT): Julian Dates on the TT time scale, not UTC clock readings.
 
 ## Search an interval
 
+The fixed source may also be a `MomentChart`; `natal_objects` names its
+fixed-reference role, not its birth-input kind. `TransitHits.epoch_policy` keeps
+`fixed_natal_degree_against_moving_of_date_longitude` for both source types because
+the longitude convention is unchanged. The genuine source type/input remains in
+`result.chart`. For building and reading a moment chart, see [moment charts](moments.md).
+
 <!-- usage: transits.hits -->
 
 This synthetic birth example calculates one stored natal Sun. The moving side
@@ -183,7 +189,7 @@ an endpoint; see the [birth-time explanation](birth.md).
 This operation finds
 exact moving-to-fixed hits. It does not calculate a fixed-instant transit chart,
 orb-entry windows, returns, moving-to-moving events or interpretation.
-For aspects at one chosen instant, compare an already calculated chart at that
-instant with the natal chart using [static cross-chart aspects](cross_aspects.md#compare-two-example-charts),
-selecting objects separately on each side. This compares stored own-date longitudes
+For aspects at one chosen instant with local motion, use [moment_chart and
+transit_aspects](moments.md). [Static cross-chart aspects](cross_aspects.md#compare-two-example-charts)
+remain available when no motion is wanted; both compare own-date stored longitudes
 under the [source-compatibility convention](cross_aspects.md#source-compatibility-and-calculation-boundaries).

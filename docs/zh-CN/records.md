@@ -5,6 +5,11 @@
 `natal_chart` 返回内存中的不可变 `NatalChart`。可以直接查看结构化结果，或显式提供知识目录，
 交给 `format_chart` 显示。包不提供命盘存取接口或保存格式；接口撤回说明见[发行说明](releases.md)。
 
+`moment_chart` 返回不可变 `MomentChart`，以 `moment` 代替已解析出生输入。
+`moment.utc` 与 `moment.location` 标明给定时刻及地点；可选的 `moment.source_jde_tt`
+保留来源事件的原始 TT，与 `times.jde_tt` 分开。其他结果字段沿用下文的命盘合同。
+`format_chart` 将其标为时刻盘，不显示出生或时区来源资料。见[时刻盘示例](moments.md)。
+
 ## 一个完整例子
 
 <!-- usage: records.output -->

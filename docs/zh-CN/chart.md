@@ -8,6 +8,8 @@
 
 ## 计算一张盘
 
+给定时刻与地点、无需出生记录的排盘，使用 [moment_chart](moments.md)。
+
 <!-- usage: chart.calculation -->
 
 先准备输入。排盘需要已知钟点、显式时区和地点；[出生指南](birth.md)说明这一步。

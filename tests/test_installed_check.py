@@ -244,8 +244,13 @@ def test_installed_comparison_keeps_raw_values_and_metadata(
   expected = consumer.parent / "expected-observations.json"
   original = installed_check.calculation_observations
 
-  def observe(chart: astrology.NatalChart, transits: astrology.TransitHits) -> str:
-    packed = original(chart, transits)
+  def observe(
+    chart: astrology.NatalChart,
+    transits: astrology.TransitHits,
+    moments: tuple[astrology.MomentChart, astrology.MomentChart],
+    catalog: astrology.Catalog,
+  ) -> str:
+    packed = original(chart, transits, moments, catalog)
     envelope = json.loads(packed)
     values = envelope["chart"]
     assert set(values) == {field.name for field in fields(chart)}
@@ -283,6 +288,77 @@ def test_installed_comparison_keeps_raw_values_and_metadata(
     installed_check.main(version("celestial-astrology"), expected_observations=expected)
 
 
+@pytest.mark.parametrize(
+  "field",
+  [
+    "moment",
+    "positions",
+    "times",
+    "houses",
+    "placements",
+    "aspects",
+    "requested",
+    "effective",
+    "provenance",
+  ],
+)
+def test_installed_consumer_compares_each_moment_field(
+  consumer: Path, monkeypatch: pytest.MonkeyPatch, field: str
+) -> None:
+  original = installed_check.calculation_observations
+  expected = consumer.parent / "expected-moment-observations.json"
+
+  def observe(
+    chart: astrology.NatalChart,
+    transits: astrology.TransitHits,
+    moments: tuple[astrology.MomentChart, astrology.MomentChart],
+    catalog: astrology.Catalog,
+  ) -> str:
+    values = json.loads(original(chart, transits, moments, catalog))
+    assert len(values["moments"]) == 2
+    assert moments[0].moment.source_jde_tt is None
+    assert moments[1].moment.source_jde_tt == transits.hits[0].jde_tt
+    assert all(
+      set(packed) == {f.name for f in fields(moment)}
+      for packed, moment in zip(values["moments"], moments, strict=True)
+    )
+    values["moments"][1][field] = "corrupted moment observation"
+    expected.write_text(
+      json.dumps(values, ensure_ascii=False, separators=(",", ":")), encoding="utf-8"
+    )
+    return original(chart, transits, moments, catalog)
+
+  monkeypatch.setattr(installed_check, "calculation_observations", observe)
+  with pytest.raises(ValueError, match="Installed calculation differs"):
+    installed_check.main(version("celestial-astrology"), expected_observations=expected)
+
+
+@pytest.mark.parametrize("field", ["fixed_aspects", "fixed_text", "moment_text"])
+def test_installed_consumer_compares_new_operation_outputs(
+  consumer: Path, monkeypatch: pytest.MonkeyPatch, field: str
+) -> None:
+  original = installed_check.calculation_observations
+  expected = consumer.parent / "expected-operation-observations.json"
+
+  def observe(
+    chart: astrology.NatalChart,
+    transits: astrology.TransitHits,
+    moments: tuple[astrology.MomentChart, astrology.MomentChart],
+    catalog: astrology.Catalog,
+  ) -> str:
+    packed = original(chart, transits, moments, catalog)
+    values = json.loads(packed)
+    values[field] = "corrupted operation output"
+    expected.write_text(
+      json.dumps(values, ensure_ascii=False, separators=(",", ":")), encoding="utf-8"
+    )
+    return packed
+
+  monkeypatch.setattr(installed_check, "calculation_observations", observe)
+  with pytest.raises(ValueError, match="Installed calculation differs"):
+    installed_check.main(version("celestial-astrology"), expected_observations=expected)
+
+
 @pytest.mark.parametrize("changed", [False, True])
 def test_installed_consumer_executes_and_compares_transit_values(
   consumer: Path,
@@ -293,9 +369,14 @@ def test_installed_consumer_executes_and_compares_transit_values(
   original = installed_check.calculation_observations
   calls: list[astrology.TransitHits] = []
 
-  def observe(chart: astrology.NatalChart, transits: astrology.TransitHits) -> str:
+  def observe(
+    chart: astrology.NatalChart,
+    transits: astrology.TransitHits,
+    moments: tuple[astrology.MomentChart, astrology.MomentChart],
+    catalog: astrology.Catalog,
+  ) -> str:
     calls.append(transits)
-    packed = original(chart, transits)
+    packed = original(chart, transits, moments, catalog)
     values = json.loads(packed)
     assert values["transits"] == repr(transits)
     assert transits.chart is chart

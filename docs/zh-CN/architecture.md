@@ -2,12 +2,15 @@
 
 [English](../en/architecture.md) · [项目入口](../../README.zh-CN.md) · [知识组织](knowledge.md)
 
-出生记录、现代时刻解析、请求配置、热带本命盘、主要相位、文本及独立知识已实现，用法和约束见[出生](birth.md)、
+出生记录、现代时刻解析、请求配置、热带本命盘与时刻盘、主要相位、文本及独立知识已实现，用法和约束见[出生](birth.md)、
 [配置](configuration.md)、[排盘](chart.md)、[相位](aspects.md)、
 [结果](records.md)及[知识](knowledge.md)指南；另可[静态比较两张源盘的交叉相位](cross_aspects.md)。
-当前命盘是可复现的现代热带黄道、地心本命盘，
-并能独立查阅排盘所依据的知识。
-[精确行运命中](transits.md)则在 UTC 区间内搜索移动对象与固定本命度数的相位。
+命盘使用现代热带黄道、地心坐标，也可不排盘，独立查阅所依据的知识。
+[精确行运命中](transits.md)则在 UTC 区间内搜索移动对象与固定源盘度数的相位。
+
+[时刻盘](moments.md)使用显式时刻及地点，不使用出生记录。本命盘与时刻盘共用校验及具体的
+UTC/地点快照。固定时刻行运相位复用双盘几何，按移动速率对零固定侧速率判断局部运动；
+其给定来源及结果的构造仍不加载原生天文。
 
 ## 结构组织
 
@@ -25,7 +28,8 @@ src/astrology/
   chart.py          组合与不可变命盘结果
   _comparison.py    来源兼容性与已存命盘对象选择
   cross_aspects.py  静态比较给定命盘，保留双侧来源
-  transits.py       移动对固定本命的精确区间事件
+  transits.py       移动对固定源盘的精确区间事件
+  transit_aspects.py 固定时刻移动对本命的几何与局部运动
   house_overlays.py 给定命盘之间的双向落宫
   lunar_phase.py    有向日月弧及具名月相类型
   dignities.py      传统尊贵、宫主星及定位星链
@@ -64,7 +68,7 @@ docs/zh-CN/         对应的中文指南与说明
 ## 副作用边界
 
 包导入、知识查询、分类、摘要及给定命盘的比较都不初始化原生天文库。
-`natal_chart` 和 `transit_hits` 仅在调用时加载天文适配层。`resolve_birth_time` 读取时区数据，
+`natal_chart`、`moment_chart` 和 `transit_hits` 仅在调用时加载天文适配层。`resolve_birth_time` 读取时区数据，
 `load_catalog` 读取包内知识；格式化函数使用调用方传入的目录，不执行资源 I/O。
 [隔离检查](contributing.md#运行检查)验证这些边界。
 

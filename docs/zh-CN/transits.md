@@ -8,6 +8,11 @@
 
 ## 搜索一个区间
 
+固定源盘也可以是 `MomentChart`；`natal_objects` 命名固定参考侧的角色，不是出生输入类型。
+两种来源的黄经约定相同，因此 `TransitHits.epoch_policy` 均保留
+`fixed_natal_degree_against_moving_of_date_longitude`。真实来源类型及输入仍保存在 `result.chart`。
+时刻盘的构造与读取见[时刻盘](moments.md)。
+
 <!-- usage: transits.hits -->
 
 下面用合成出生资料计算一颗已存本命太阳。移动侧只需对象选择和区间，不需要出生地点或宫位。
@@ -148,6 +153,6 @@ True
 
 本操作搜索精确的移动对固定命中，不计算固定时刻行运盘、容许度进出窗口、返照、
 两颗移动对象间的事件或解读。
-若要查一个指定时刻的相位，用[静态双盘相位](cross_aspects.md#比较两张示例盘)比较该时刻已算好的盘
-与本命盘，并分别选择两侧对象。这按[源盘兼容约定](cross_aspects.md#源盘兼容与计算边界)
-比较各自日期的已存黄经。
+若要查一个指定时刻的相位及局部运动，用 [moment_chart 与 transit_aspects](moments.md)。
+不需要运动标签时，仍可用[静态双盘相位](cross_aspects.md#比较两张示例盘)。两者都按
+[源盘兼容约定](cross_aspects.md#源盘兼容与计算边界)比较各自日期的已存黄经。

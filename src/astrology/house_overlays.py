@@ -10,7 +10,7 @@ from dataclasses import dataclass
 from typing import Literal
 
 from astrology._comparison import _require_comparable_sources, _selection_for_chart
-from astrology.chart import NatalChart, _selected_longitudes
+from astrology.chart import Chart, _selected_longitudes
 from astrology.houses import _require_house_number, house_of
 from astrology.objects import ChartObject, _is_chart_object
 
@@ -66,8 +66,8 @@ class CrossChartHouseOverlays:
   构造时会重新计算完整落宫序列，拒绝与它不同的记录。
   """
 
-  chart_left: NatalChart
-  chart_right: NatalChart
+  chart_left: Chart
+  chart_right: Chart
   left_objects: tuple[ChartObject, ...]
   right_objects: tuple[ChartObject, ...]
   placements: tuple[HouseOverlay, ...]
@@ -89,8 +89,8 @@ class CrossChartHouseOverlays:
 
 
 def _placements(
-  chart_left: NatalChart,
-  chart_right: NatalChart,
+  chart_left: Chart,
+  chart_right: Chart,
   left_objects: tuple[ChartObject, ...],
   right_objects: tuple[ChartObject, ...],
 ) -> tuple[HouseOverlay, ...]:
@@ -110,8 +110,8 @@ def _placements(
 
 
 def cross_chart_house_overlays(
-  chart_left: NatalChart,
-  chart_right: NatalChart,
+  chart_left: Chart,
+  chart_right: Chart,
   *,
   left_objects: Sequence[ChartObject] | None = None,
   right_objects: Sequence[ChartObject] | None = None,
@@ -120,7 +120,7 @@ def cross_chart_house_overlays(
 
   left_objects and right_objects select objects from their respective charts.
   None selects all bodies and nodes in that chart, without axes, independently of
-  its natal aspect selection. Explicit selections may include stored axes. Their
+  its intra-chart aspect selection. Explicit selections may include stored axes. Their
   longitudes come from the actual axis fields, not cusps or calculated opposites.
   Bodies and nodes follow chart order, then selected axes follow in ASC/MC/DSC/IC order.
 
@@ -142,7 +142,7 @@ def cross_chart_house_overlays(
   coordinates raise ValueError.
 
   查询每个所选对象落入另一张盘的哪一宫。left_objects 和 right_objects 分别选择左右盘的对象。
-  None 表示该盘的全部天体和交点，不含四轴，也不沿用本命相位的对象选择。显式选择可以包含已存轴，
+  None 表示该盘的全部天体和交点，不含四轴，也不沿用盘内相位的对象选择。显式选择可以包含已存轴，
   黄经从实际轴字段读取，不用宫头或计算出的对轴代替。天体和交点按盘中顺序排列，
   所选四轴随后按上升、中天、下降、天底排列。
 

@@ -19,6 +19,9 @@ REQUIRED_TOPICS = frozenset(
   {
     "birth.resolution",
     "chart.calculation",
+    "chart.moment",
+    "chart.hit_moment",
+    "transits.fixed",
     "configuration.objects",
     "configuration.participants",
     "configuration.orbs",
