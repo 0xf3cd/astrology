@@ -153,9 +153,9 @@ def cross_chart_aspects(
   """Compare each selected left position with every selected right position, without motion.
 
   None selects all bodies/nodes on that side and no axes, independently of the
-  source chart's aspect selection. Explicit selections may include any stored axis,
-  even if absent from that selection. Read the actual axis fields, never cusps or
-  synthesized opposite axes.
+  source chart's aspect selection. Explicit selections may include any axis stored
+  in that side's chart, even if the axis did not participate in that chart's own
+  aspects. Read the actual axis fields, never cusps or synthesized opposite axes.
   An empty selection or rule sequence is valid. Same identities, node-node pairs
   and the same chart in both roles are allowed. Rules are explicit and never
   inherited. Object-orb overrides apply by identity on either side and may name

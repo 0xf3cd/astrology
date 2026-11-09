@@ -81,8 +81,9 @@ House | Cusp sign | Ruler | Ruler placement | Statuses
 3 | Gemini | Mercury | Capricorn 1.889...° / House 10 | None of these four
 ```
 
-`HouseRulers` retains only the supplied `NatalChart`. Each `houses` access builds
-twelve new records in house order; repeated accesses return equal tuples.
+`HouseRulers` retains only the supplied chart, which may be a `NatalChart` or
+`MomentChart`. Each `houses` access builds twelve new records in house order;
+repeated accesses return equal tuples.
 It uses **actual cusp longitudes**, not ASC or MC as replacements for the first
 or tenth cusp. Repeated cusp signs remain separate
 records. The requested house system and raw astronomy are unchanged. No ruler is
