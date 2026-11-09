@@ -131,7 +131,19 @@ def test_all_four_axes_are_explicit_and_moving_rates_remain_absent(axis: Axis) -
     for h in result.hits
   )
   frozen = transit_aspects(moving, natal, rules, moving_objects=(Body.SUN,), natal_objects=(axis,))
-  assert all(h.motion is not AspectMotion.STATIONARY for h in frozen.hits)
+  assert all(
+    h.motion in (AspectMotion.APPLYING, AspectMotion.SEPARATING)
+    or abs(h.deviation_deg) in (0.0, 180.0)
+    for h in frozen.hits
+  )
+  (conjunction,) = (h for h in frozen.hits if h.aspect is MajorAspect.CONJUNCTION)
+  expected_motion = {
+    Axis.ASCENDANT: AspectMotion.EXACT,
+    Axis.MIDHEAVEN: AspectMotion.SEPARATING,
+    Axis.IMUM_COELI: AspectMotion.APPLYING,
+    Axis.DESCENDANT: AspectMotion.INDETERMINATE,
+  }[axis]
+  assert conjunction.motion is expected_motion
   assert all(
     not isinstance(h.moving_object, Axis) for h in transit_aspects(moving, natal, rules).hits
   )

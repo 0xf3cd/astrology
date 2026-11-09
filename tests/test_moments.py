@@ -304,18 +304,22 @@ def test_existing_consumers_accept_the_genuine_moment_result(recorded_chart: Nat
 
 
 @pytest.mark.parametrize(
-  "language,title,excluded",
+  "language,title,source_label,excluded",
   [
-    ("en", "moment chart", ("Recorded clock", "tzdata package", "fold")),
-    ("zh-CN", "时刻盘", ("原始钟点", "tzdata 包", "fold")),
+    ("en", "moment chart", "Source event JDE(TT)", ("Recorded clock", "tzdata package", "fold")),
+    ("zh-CN", "时刻盘", "来源事件 JDE(TT)", ("原始钟点", "tzdata 包", "fold")),
   ],
 )
 def test_moment_text_does_not_fabricate_birth_or_timezone_provenance(
-  language: Any, title: str, excluded: tuple[str, ...]
+  language: Any, title: str, source_label: str, excluded: tuple[str, ...]
 ) -> None:
   chart = moment_chart(_hit(2460392.2373059206), SITE, CONFIG)
   text = format_chart(chart, load_catalog(), language=language)
   assert title in text
   assert chart.moment.utc.isoformat() in text
   assert str(chart.moment.source_jde_tt) in text
+  assert source_label in text
   assert all(word not in text for word in excluded)
+  direct = moment_chart(NOW, SITE, CONFIG)
+  assert direct.moment.source_jde_tt is None
+  assert source_label not in format_chart(direct, load_catalog(), language=language)
