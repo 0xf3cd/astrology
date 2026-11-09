@@ -43,7 +43,8 @@ True
 The interval is `[start_utc, end_utc)`: a hit at the start is included, one at the
 end is excluded. All hits are returned in time order. An interval with no return
 has `hits == ()`. Choose the interval yourself; no birthday, calendar month or
-nearest-return window is inferred. The leap-day example above has one solar return.
+nearest-return window is inferred. In the interval above, the leap-day example has
+one solar return.
 For a birth near the turn of a year, a calendar-year search can find one solar
 return near each end of the year; both are retained. A leap-day birth needs no
 substitute anniversary date.
@@ -96,8 +97,8 @@ Changing location leaves the geocentric event and positions unchanged but change
 local axes and houses. To use the birthplace, pass it explicitly as above; no
 current location is inferred. Supply the chart configuration too. It may differ
 from the natal configuration and need not contain the returning body; the search
-still retains the selected body and its stored natal longitude. No objects or
-house systems are silently added.
+still retains the selected body and its stored natal longitude. No objects are
+added and the house system is not replaced.
 
 Keep **both `events` and `returned`** for the complete calculation. `events`
 retains the natal chart, selected body, interval, event models, versions and every
@@ -172,5 +173,6 @@ project conventions. It is available without a chart or native astronomy:
 ```
 
 `complete` means the entry states its prerequisites; `reference_only` makes it
-reference material, and `not_assessed` means applicability to a chart has not been
-checked. These are [separate editorial states](knowledge.md#status-has-several-dimensions).
+reference material, and `not_assessed` means retrieving the entry does not assess
+a chart against those prerequisites. These are
+[separate editorial states](knowledge.md#status-has-several-dimensions).
