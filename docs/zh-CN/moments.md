@@ -27,11 +27,15 @@
 True
 >>> len(moving.positions)
 3
+>>> round(moving.positions[0].longitude_deg, 6)
+2.60136
+>>> moving.placements[0].sign.name, moving.placements[0].house
+('ARIES', 7)
 ```
 
 `moving.moment` 保存归一后的 UTC、地点及可选的来源事件 TT；`moving.times` 保存
-计算所得的 JD(UT1) 与 JDE(TT)。位置、宫位、落点、盘内相位、配置及来源的作用与本命盘
-相同。本例没有请求盘内相位。
+计算所得的 JD(UT1) 与 JDE(TT)。位置、宫位、落点、盘内相位、配置及来源的含义见
+[结构化结果指南](records.md#查看结构化结果)。本例没有请求盘内相位。
 
 <!-- /usage: chart.moment -->
 
@@ -64,17 +68,19 @@ True
 水星 [mercury] | 太阳 [sun] | 合相 | 0°00'00" | -0°00'58" | 3°00'00" | 离相
 ```
 
-这一行区分移动与本命对象，保留相位、有向分支、带符号偏差、包含等号的容许度上限及局部运动。
+这一行区分移动与本命对象，保留相位、[有向分支与带符号偏差](aspects.md#分支与偏差)、
+包含等号的容许度上限及[运动状态](aspects.md#入相、离相和其他状态)。
 未经舍入的原值仍在 `fixed.hits` 中；显示到整角秒不改变命中或运动判断，即使非零偏差显示成零。
 
 <!-- /usage: transits.fixed -->
 
 选择为 `None` 时，使用该侧全部已存天体和交点，不加入四轴。显式选择可包含四个 `Axis` 成员。
-空选择或空规则不产生命中，但仍校验非法输入。允许同名对象、具名交点间及轴间配对。
+空选择或空规则不产生命中，但仍校验非法输入。允许同名对象及轴间配对，也允许两侧所选交点的全部组合。
 排序与按对象设置的容许度合成规则沿用[双盘相位](cross_aspects.md)。
 
-移动侧须为 `MomentChart`，固定侧须为 `NatalChart`。对相同有序选择，每对原始分支、偏差和
-容许度上限与 `cross_chart_aspects` 完全相同。运动状态使用移动侧速率对**零本命速率**判断，
+移动侧须为 `MomentChart`，固定侧须为 `NatalChart`。把时刻盘放在左侧、本命盘放在右侧，
+并保持两侧对象选择相同时，每对原始分支、偏差和容许度上限与 `cross_chart_aspects` 完全相同。
+运动状态使用移动侧速率对**零本命速率**判断，
 固定本命四轴也为零，不使用本命位置记录中出生时刻的速率。移动四轴没有提供速率：非精确命中
 为不确定，偏差恰为零时仍为精确。入相表示局部导数，不保证之后会有精确事件。双侧保留各自
 日期的热带黄经，不转换共同历元，也不声称是同时刻的空间角。
@@ -132,6 +138,9 @@ True
 3
 >>> print(format_chart(moving, catalog, language='zh-CN').splitlines()[0])
 热带地心时刻盘
+>>> print(next(line for line in format_chart(moving, catalog, language='zh-CN').splitlines()
+...     if line.startswith('太阳 [sun] |')))
+太阳 [sun] | 白羊座 2°36'04" | 7 | D
 ```
 
 时刻盘文本显示给定 UTC 和地点，有来源事件时另列 TT，不添加出生钟点、时区身份或 tzdata/fold

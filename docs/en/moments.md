@@ -28,12 +28,17 @@ normalized to UTC. The input and calculated times are separate records:
 True
 >>> len(moving.positions)
 3
+>>> round(moving.positions[0].longitude_deg, 6)
+2.60136
+>>> moving.placements[0].sign.name, moving.placements[0].house
+('ARIES', 7)
 ```
 
 `moving.moment` holds the normalized UTC, location and optional source-event TT.
 `moving.times` holds the calculated JD(UT1) and JDE(TT). Positions, houses,
-placements, intra-chart aspects, configuration and provenance have the same roles
-as in a natal result. This example requests no intra-chart aspects.
+placements, intra-chart aspects, configuration and provenance follow the
+[structured result guide](records.md#read-the-structured-result).
+This example requests no intra-chart aspects.
 
 <!-- /usage: chart.moment -->
 
@@ -67,8 +72,9 @@ Fixed-instant transit-to-natal aspects
 Mercury [mercury] | Sun [sun] | Conjunction | 0°00'00" | -0°00'58" | 3°00'00" | separating
 ```
 
-The row retains the moving/natal identities, aspect, oriented branch, signed
-deviation, inclusive orb limit and local motion. The original unrounded values
+The row retains the moving/natal identities, aspect, [oriented branch and signed
+deviation](aspects.md#read-the-branch-and-the-deviation), inclusive orb limit and
+[motion status](aspects.md#applying-separating-and-the-other-statuses). The original unrounded values
 remain in `fixed.hits`; whole-arcsecond display truncation changes neither hit
 membership nor motion, even when a nonzero deviation displays as zero.
 
@@ -76,13 +82,15 @@ membership nor motion, even when a nonzero deviation displays as zero.
 
 `None` selections use each source's stored bodies/nodes without axes. Explicit
 selections may include any of the four `Axis` members. Empty selections or rules
-produce no hits; invalid inputs are still checked. Same-identity pairs, named
-node-node pairs and axis-axis pairs are allowed. Ordering and per-object orb
+produce no hits; invalid inputs are still checked. Same-identity and axis-axis
+pairs are allowed, as is every combination of the nodes selected on each side.
+Ordering and per-object orb
 combinations follow [cross-chart aspects](cross_aspects.md).
 
 The moving side must be a `MomentChart`, the fixed side a `NatalChart`. Each pair's
-raw branch, deviation and orb limit exactly match `cross_chart_aspects` for the
-same ordered selection. Motion uses moving rates against **zero natal motion**,
+raw branch, deviation and orb limit exactly match `cross_chart_aspects` with the
+moment chart on the left, the natal chart on the right and the same object selections.
+Motion uses moving rates against **zero natal motion**,
 including fixed natal axes; it never uses the natal positions' stored birth-time
 rates. Moving axes have no supplied rate: non-exact hits are indeterminate, while
 zero deviation is exact. Applying describes a local derivative, not a promise of
@@ -149,6 +157,9 @@ True
 3
 >>> print(format_chart(moving, catalog).splitlines()[0])
 Tropical geocentric moment chart
+>>> print(next(line for line in format_chart(moving, catalog).splitlines()
+...     if line.startswith('Sun [sun] |')))
+Sun [sun] | Aries 2°36'04" | 7 | D
 ```
 
 Moment text shows supplied UTC/location and, when present, source-event TT; it

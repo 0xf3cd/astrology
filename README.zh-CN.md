@@ -181,7 +181,7 @@ body.sun
 
 ## 后续方向
 
-- [技术与展示](https://github.com/0xf3cd/astrology/milestone/2)：固定时刻行运、容许度窗口与返照、关系盘、
+- [技术与展示](https://github.com/0xf3cd/astrology/milestone/2)：容许度窗口与返照、关系盘、
   流派规则、更多对象，以及星盘视图。
 - [进阶技术与历史研究](https://github.com/0xf3cd/astrology/milestone/3)：主限、推运、
   不确定出生时间、历史输入、空间落宫与有来源的解释知识。

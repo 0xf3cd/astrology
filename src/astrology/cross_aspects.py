@@ -152,9 +152,10 @@ def cross_chart_aspects(
 ) -> CrossChartAspects:
   """Compare each selected left position with every selected right position, without motion.
 
-  None selects all bodies/nodes on that side and no axes, independently of natal participants;
-  explicit selections may include any of its stored axes, even if absent from natal
-  aspects. Read the actual axis fields, never cusps or synthesized opposite axes.
+  None selects all bodies/nodes on that side and no axes, independently of the
+  source chart's aspect selection. Explicit selections may include any stored axis,
+  even if absent from that selection. Read the actual axis fields, never cusps or
+  synthesized opposite axes.
   An empty selection or rule sequence is valid. Same identities, node-node pairs
   and the same chart in both roles are allowed. Rules are explicit and never
   inherited. Object-orb overrides apply by identity on either side and may name
@@ -171,8 +172,8 @@ def cross_chart_aspects(
   not automatically rejected. Source charts are retained unchanged.
 
   将每个所选左盘位置与每个所选右盘位置比较，不判断运动状态。None 选该侧全部天体和交点，不加入四轴；
-  显式选择可含该盘任一已存轴，即使未参与本命相位。直接读取轴字段，不使用宫头或合成对轴。
-  不继承本命相位参与者；空选择和空规则合法。允许同名对象、跨盘交点配对及同一张盘占两个角色。
+  显式选择可含该盘任一已存轴，即使未参与盘内相位。直接读取轴字段，不使用宫头或合成对轴。
+  不继承源盘的相位对象选择；空选择和空规则合法。允许同名对象、跨盘交点配对及同一张盘占两个角色。
   规则须显式给出，不继承源盘规则。对象容许度按标识作用于两侧，只能指向所选对象；有覆盖时
   必须给合成方式，无覆盖时不能给。拒绝重复规则、重复参与对象及源盘没有的对象。
   所选四轴在天体和交点之后按上升、中天、下降、天底顺序排列。保留轴间及对轴配对，不折叠身份。
