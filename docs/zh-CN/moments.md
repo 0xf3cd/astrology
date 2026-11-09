@@ -1,9 +1,10 @@
 # 时刻盘与固定时刻行运相位
 
-[English](../en/moments.md) · [命盘](chart.md) · [精确行运搜索](transits.md) · [日月返照](returns.md)
+[English](../en/moments.md) · [命盘](chart.md) · [精确行运搜索](transits.md)
 
 用 `moment_chart` 为给定时刻与地点建盘，得到不含出生记录、也不推断地点的
 `MomentChart`。用 `transit_aspects` 比较该时刻盘的移动对象与已有本命盘的固定度数。
+搜索日月返照再建盘的用法，见[日月返照](returns.md)。
 本页示例按顺序续接。
 
 ## 按给定时刻建盘

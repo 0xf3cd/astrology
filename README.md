@@ -202,7 +202,7 @@ unrounded astronomy and named models.
 ## Later work
 
 - [Techniques and presentation](https://github.com/0xf3cd/astrology/milestone/2):
-  orb windows and returns, relationship charts, tradition-specific rules, additional
+  orb windows and other planetary returns, relationship charts, tradition-specific rules, additional
   objects, and chart views.
 - [Advanced and historical research](https://github.com/0xf3cd/astrology/milestone/3):
   directions, progressions, uncertain birth times, historical inputs, spatial

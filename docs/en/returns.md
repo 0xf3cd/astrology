@@ -43,12 +43,14 @@ True
 The interval is `[start_utc, end_utc)`: a hit at the start is included, one at the
 end is excluded. All hits are returned in time order. An interval with no return
 has `hits == ()`. Choose the interval yourself; no birthday, calendar month or
-nearest-return window is inferred. A calendar year can contain two solar returns,
-and neither is discarded. A leap-day birth needs no substitute anniversary date.
+nearest-return window is inferred. The leap-day example above has one solar return.
+For a birth near the turn of a year, a calendar-year search can find one solar
+return near each end of the year; both are retained. A leap-day birth needs no
+substitute anniversary date.
 
 The reference is the selected body's **stored natal apparent geocentric tropical
 longitude**. It is compared with the moving longitude at its own date, following
-the [exact-transit convention](transits.md#limits-and-failures). `return_hits` makes
+the [exact-transit convention](transits.md#select-targets-and-aspects). `return_hits` makes
 one same-body conjunction query and returns its complete result unchanged:
 
 ```{doctest}
@@ -94,13 +96,14 @@ Changing location leaves the geocentric event and positions unchanged but change
 local axes and houses. To use the birthplace, pass it explicitly as above; no
 current location is inferred. Supply the chart configuration too. It may differ
 from the natal configuration and need not contain the returning body; the search
-still retains that reference. No objects or house systems are silently added.
+still retains the selected body and its stored natal longitude. No objects or
+house systems are silently added.
 
 Keep **both `events` and `returned`** for the complete calculation. `events`
 retains the natal chart, selected body, interval, event models, versions and every
 hit. `returned` retains its location, requested/effective chart configuration,
 provenance and source event TT separately from normalized UTC and derived
-`ChartTimes`. Source TT need not equal the snapshot's derived TT; see
+`ChartTimes`. Source TT need not equal the chart calculation's derived TT; see
 [time conversion](moments.md#build-from-a-retained-exact-hit).
 
 ## Read or compare the return chart
@@ -153,7 +156,7 @@ These calls describe geometry and text, not a return interpretation.
   `TransitDomainError` retains an upstream rejection; it is not an empty result.
 - Finding an event does not ensure its chart can be calculated. Missing location
   raises `TypeError`; unavailable house geometry raises `ChartDomainError`, without
-  a fallback. Event conversion and snapshot admission follow
+  a fallback. Event conversion and the chart's calculation domain follow
   [moment-chart input contracts](moments.md#calculate-at-an-instant).
 
 `entry.solar_lunar_returns` in the [catalog](catalog.md) records the definitions,
@@ -167,3 +170,7 @@ project conventions. It is available without a chart or native astronomy:
 >>> len(catalog.citations(entry.identifier))
 5
 ```
+
+`complete` means the entry states its prerequisites; `reference_only` makes it
+reference material, and `not_assessed` means applicability to a chart has not been
+checked. These are [separate editorial states](knowledge.md#status-has-several-dimensions).

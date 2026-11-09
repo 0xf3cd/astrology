@@ -194,9 +194,9 @@
       "author": "Mary Shea",
       "edition": "Author's webpage inspected 2026-11-09; publication date not stated",
       "language": "en",
-      "lineage": {"en": "Retained response HTML SHA-256 d194d7f481719eafdceaec3188060fa5729bdb7dc0376c7f85a51dc84233d158. Linked assets were not retained. A separately authored practitioner explanation, not evidence for an independent historical lineage.", "zh": "保留响应 HTML 的 SHA-256 为 d194d7f481719eafdceaec3188060fa5729bdb7dc0376c7f85a51dc84233d158，未保留外链资源。属于另一作者的实践说明，不据此认定历史传承独立。"},
+      "lineage": {"en": "Retained response HTML SHA-256 d194d7f481719eafdceaec3188060fa5729bdb7dc0376c7f85a51dc84233d158. Linked assets were not retained. The footer says © 2020 by Mary Shea; this is a copyright marker, not a stated publication date. A separately authored practitioner explanation, not evidence for an independent historical lineage.", "zh": "保留响应 HTML 的 SHA-256 为 d194d7f481719eafdceaec3188060fa5729bdb7dc0376c7f85a51dc84233d158，未保留外链资源。页脚标 © 2020 by Mary Shea；这是版权标记，不是明示的发布日期。属于另一作者的实践说明，不据此认定历史传承独立。", "revision": 2, "zh_revision": 2},
       "rights": {"en": "Copyrighted author webpage; only a short attributed definition and project Chinese translation are included, not the article or assets.", "zh": "作者网页受版权保护；仅收具名短定义及项目中文翻译，不收文章全文或资源。"},
-      "scope": {"en": "Defines the transiting Sun's return to natal degree, minute and second, and discusses the return location. Does not establish numerical accuracy bounds or the project's API policies; predictions are outside scope.", "zh": "定义移动太阳返回本命度、分、秒，并讨论返照地点。不确立数值精度界或项目 API 政策；预测不在采用范围内。"},
+      "scope": {"en": "Defines the transiting Sun's return to natal degree, minute and second. Does not establish numerical accuracy bounds or the project's API policies; predictions are outside scope.", "zh": "定义移动太阳返回本命度、分、秒。不确立数值精度界或项目 API 政策；预测不在采用范围内。", "revision": 2, "zh_revision": 2},
       "verification": "verified",
       "url": "https://www.maryshea.com/introduction-to-solar-returns"
     },
@@ -352,7 +352,7 @@
       "concept_ids": ["body.sun", "body.moon", "aspect.conjunction"],
       "rule_ids": ["rule.project.solar_lunar_returns", "rule.project.exact_transit_hits", "rule.project.moment_charts"],
       "citations": [
-        {"source_id": "source.astrowiki.solar_return.10448", "locator": "Opening definition; complete sentence. Later location discussion distinguishes birthplace and residence.", "excerpt": {"en": "A chart erected for the exact moment when the Sun returns to its position in the natal chart.", "zh": "为太阳精确返回本命盘中自身位置的时刻所建立的盘。"}},
+        {"source_id": "source.astrowiki.solar_return.10448", "locator": "Opening definition; post-colon span after 'A return chart, or to be more precise:'. Later location discussion distinguishes birthplace and residence.", "excerpt": {"en": "A chart erected for the exact moment when the Sun returns to its position in the natal chart.", "zh": "为太阳精确返回本命盘中自身位置的时刻所建立的盘。"}},
         {"source_id": "source.shea.solar_returns", "locator": "Opening definition under Introduction to Solar Returns; complete sentence.", "excerpt": {"en": "A solar returns chart is a chart erected for the moment the transiting Sun returns to the natal position of the Sun (degree, minute, and second).", "zh": "日返照盘是为移动太阳返回太阳本命位置（度、分、秒）的时刻所建立的盘。"}},
         {"source_id": "source.astrowiki.lunar_return.12661", "locator": "Opening definition; complete sentence.", "excerpt": {"en": "A horoscope erected for the time the Moon reaches the exact position it had at the time of birth.", "zh": "为月亮到达其出生时精确位置的时刻所建立的命盘。"}},
         {"source_id": "source.ghaneh.lunar_return.2005", "locator": "First paragraph after the opening question; complete sentence. The next sentence uses current residence.", "excerpt": {"en": "Every month, the moon returns to the exact position it held in your natal chart at your time of birth.", "zh": "每月，月亮都会返回它在你出生时的本命盘中所处的精确位置。"}},

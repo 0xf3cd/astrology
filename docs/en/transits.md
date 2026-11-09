@@ -7,8 +7,8 @@ a UTC interval. It returns a `TransitHits` result with the original chart, the
 search inputs and model provenance, and each crossing or contact. Hit times are
 JDE(TT): Julian Dates on the TT time scale, not UTC clock readings.
 
-For a natal-only Sun/Moon return query and a chart at a chosen hit/location, see
-[solar and lunar returns](returns.md).
+For the natal-only Sun/Moon convenience `return_hits` and a chart at a chosen
+hit/location, see [solar and lunar returns](returns.md).
 
 ## Search an interval
 
@@ -191,7 +191,7 @@ an endpoint; see the [birth-time explanation](birth.md).
 
 This operation finds
 exact moving-to-fixed hits. It does not calculate a fixed-instant transit chart,
-orb-entry windows, returns, moving-to-moving events or interpretation.
+orb-entry windows, moving-to-moving events or interpretation.
 For aspects at one chosen instant with local motion, use [moment_chart and
 transit_aspects](moments.md). [Static cross-chart aspects](cross_aspects.md#compare-two-example-charts)
 remain available when no motion is wanted; both compare own-date stored longitudes
