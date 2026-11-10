@@ -31,7 +31,7 @@ def test_packaging_and_installed_identity_agree_without_changing_import_name() -
     (Path(__file__).resolve().parents[1] / "pyproject.toml").read_text(encoding="utf-8")
   )["project"]
   assert project["name"] == "celestial-astrology"
-  assert project["version"] == "0.4.0"
+  assert project["version"] == "0.5.0"
   assert project["name"] == _distribution.DISTRIBUTION_NAME
   assert version("celestial-astrology") == project["version"]
   assert project["dependencies"] == ["celestial-calendar==1.1.1", "tzdata==2026.5"]

@@ -197,7 +197,7 @@ def test_ashmand_groups_have_names_sources_and_separate_states(catalog: Catalog)
   assert sum(source.identifier == "source.ptolemy.ashmand1822" for _, source in citations) == 4
   citation, implementation = citations[-1]
   assert implementation.identifier == "source.astrology"
-  assert implementation.url.endswith("/v0.4.0")
+  assert implementation.url.endswith("/v0.5.0")
   assert "ashmand_sign_group" in citation.locator
   assert (
     "not independent astronomical corroboration, historical corroboration"
@@ -728,7 +728,7 @@ def test_cross_policy_is_independently_retrievable_without_chart_applicability(
   assert entry.chart_applicability == "not_assessed"
   citation, source = catalog.citations(entry.identifier)[0]
   assert source.identifier == "source.astrology"
-  assert source.url.endswith("/v0.4.0")
+  assert source.url.endswith("/v0.5.0")
   assert "src/astrology/cross_aspects.py" in citation.locator
   assert source.verification is SourceVerification.VERIFIED
   assert citation.excerpt is None
@@ -753,8 +753,8 @@ def test_overlay_policy_has_release_source_and_separate_editorial_states(catalog
   assert entry.chart_applicability == "not_assessed"
   citation, source = catalog.citations(entry.identifier)[0]
   assert source.identifier == "source.astrology"
-  assert source.url == "https://github.com/0xf3cd/astrology/tree/v0.4.0"
-  assert "v0.4.0" in source.edition
+  assert source.url == "https://github.com/0xf3cd/astrology/tree/v0.5.0"
+  assert "v0.5.0" in source.edition
   assert entry in catalog.filter_entries(source_id=source.identifier)
   assert source.verification is SourceVerification.VERIFIED
   assert citation.excerpt is None
@@ -774,8 +774,8 @@ def test_overlay_policy_has_release_source_and_separate_editorial_states(catalog
 
 def test_release_implementation_source_and_node_test_locator(catalog: Catalog) -> None:
   source = catalog.source("source.astrology")
-  assert source.url == "https://github.com/0xf3cd/astrology/tree/v0.4.0"
-  assert "v0.4.0" in source.edition
+  assert source.url == "https://github.com/0xf3cd/astrology/tree/v0.5.0"
+  assert "v0.5.0" in source.edition
   citation = catalog.entry("entry.node_definitions").citations[1]
   assert citation.source_id == source.identifier
   assert "tests/test_reference.py" in citation.locator

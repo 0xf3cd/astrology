@@ -2,10 +2,39 @@
 
 [English](../en/releases.md) · [文档](index.md) · [发行流程](releasing.md)
 
-## 0.4.0 之后的源码变更
+## 0.5.0
 
-源码中的项目实现引用合并到 `source.astrology`，各引用用模块与符号定位。
-以下六个目录来源 ID 已移除，均改用 `source.astrology`：
+本版增加时刻盘、固定时刻的行运对本命相位及中英文文本，以及日月返照工作流。
+包索引：[PyPI](https://pypi.org/project/celestial-astrology/0.5.0/)。
+
+### 时刻盘与固定时刻相位
+
+[`moment_chart`](moments.md)接收带时区的 `datetime` 或保留的 `TransitHit`，
+连同显式地点与配置生成 `MomentChart`。输入 UTC、原事件 TT 与计算所得的时标分别保留，
+不创建出生记录。双盘相位、落宫、宫主星、定位星、星座分布、区间行运搜索及命盘文本均可使用时刻盘。
+
+`transit_aspects` 用显式容许度规则，将时刻盘的移动对象与本命盘的固定度数比较，
+本命度数视为静止，运动状态使用移动侧的速率判断。`format_transit_aspects` 提供中英文表格。
+已有的静态双盘相位比较仍不设运动标签。
+
+### 日月返照
+
+[`return_hits`](returns.md)在显式 UTC 区间内，查找太阳或月亮返回其已存本命黄经的全部事件。
+它委托已有的同星体合相搜索，返回 `TransitHits`；选定命中后，将其与地点和配置传给 `moment_chart`。
+同时保留搜索结果与盘结果，可保存本命参考、区间、事件模型、原事件 TT 和排盘设置。
+地点不推断；请求的宫位几何不可用时仍报错，不换制兜底。
+返照定义、地点做法及项目约定在知识目录中分别记录。
+
+### 指南与兼容性
+
+[行运指南](transits.md#搜索耗时)说明扫描代价，以及对象和相位选择如何增加查询次数。
+民用年份限度改读上游 `house_capability()` 的结果。
+已有本命计算约定及运行依赖钉版不变：`celestial-calendar==1.1.1` 和 `tzdata==2026.5`。
+Python 3.11–3.14 及 0.4.0 的平台要求不变。
+容许度窗口、其他行星返照及解读不在本版范围内。
+
+项目实现引用使用 `source.astrology`，指向 v0.5.0 发行树，各引用用模块与符号定位。
+以下六个目录来源 ID 已移除，按这些 ID 查询的调用方须改用 `source.astrology`：
 
 - `source.astrology.house_overlays.f269d14`
 - `source.astrology.axis_aspects.4cb15cc`
@@ -14,8 +43,8 @@
 - `source.astrology.chart.fc845fa`
 - `source.astrology.config.fa2e985`
 
-原完整历史修订保留在新来源的 lineage 中。这是源码中的目录数据变更，已发布的 0.4.0 包仍保留
-原目录。[项目来源说明](knowledge.md#从来源查到定义)标明实现引用所用的发行树。
+原完整历史修订保留在来源的 lineage 中，0.4.0 包仍保留原目录。
+见[项目来源说明](knowledge.md#从来源查到定义)。
 
 ## 0.4.0
 
