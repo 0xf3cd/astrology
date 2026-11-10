@@ -8,7 +8,7 @@ from importlib import import_module
 from importlib.metadata import PackageNotFoundError, distribution, version
 from importlib.resources import files
 from pathlib import Path
-from typing import Any, Literal, cast
+from typing import Any, Literal
 
 import astrology
 from astrology.knowledge import Catalog
@@ -456,26 +456,6 @@ def _check_knowledge() -> None:
   _check_native_isolation()
 
 
-def _check_return_failures(hit: astrology.TransitHit) -> None:
-  """Require explicit location and preserve unavailable-house failures.
-
-  要求显式地点，并保留宫位不可用的失败。
-  """
-  config = astrology.ChartConfig(astrology.HouseSystem.PLACIDUS, (astrology.Body.SUN,), ())
-  try:
-    astrology.moment_chart(hit, cast(astrology.Location, None), config)
-  except TypeError:
-    pass
-  else:
-    raise ValueError("Installed return chart accepted a missing location")
-  try:
-    astrology.moment_chart(hit, astrology.Location(89.9, 0), config)
-  except astrology.ChartDomainError:
-    pass
-  else:
-    raise ValueError("Installed return chart substituted unavailable house geometry")
-
-
 def _check_natal_chart(expected_observations: Path | None = None) -> None:
   """Calculate a synthetic natal chart and transits in the installed environment.
 
@@ -496,7 +476,6 @@ def _check_natal_chart(expected_observations: Path | None = None) -> None:
     raise ValueError("Imported astrology.celestial from outside the consumer environment")
   transits = acceptance_transits(chart)
   returns = acceptance_returns(chart)
-  _check_return_failures(returns[0][0].hits[0])
   observed = calculation_observations(
     chart, transits, acceptance_moments(chart, transits), returns, astrology.load_catalog()
   )

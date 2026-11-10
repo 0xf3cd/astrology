@@ -1,4 +1,4 @@
-"""Solar and lunar returns to stored natal longitudes. 日月返回已存本命黄经的返照。"""
+"""Solar and lunar returns to stored natal longitudes. 针对已存本命黄经的日月返照。"""
 
 from datetime import datetime
 
