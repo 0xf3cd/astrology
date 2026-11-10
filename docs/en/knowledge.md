@@ -27,13 +27,13 @@ True
 >>> catalog.concept("body.sun").configuration.name
 'SUN'
 >>> [rule.identifier for rule in catalog.list_variants(concept_id="body.sun")]
-['rule.lilly1647.essential_dignities', 'rule.project.dispositor_chains']
+['rule.project.solar_lunar_returns', 'rule.lilly1647.essential_dignities', 'rule.project.dispositor_chains']
 >>> [rule.identifier for rule in catalog.list_variants(concept_id="body.uranus")]
 ['rule.project.dispositor_chains']
 >>> catalog.filter_entries(concept_id="body.sun")[0].identifier
-'entry.body_requests'
+'entry.solar_lunar_returns'
 >>> len(catalog.filter_sources(verification=SourceVerification.VERIFIED))
-9
+14
 >>> print(catalog.entry("entry.cross_aspect_evaluation").statement.text("en"))
 Static major cross aspects compare two supplied natal or moment results with distinct left/right endpoints and preserve both complete sources, without a motion field.
 >>> print(catalog.variant("rule.project.cusp_ownership").definition.text("en"))
@@ -47,7 +47,8 @@ print those texts in English; use `"zh-CN"` for Chinese.
 Several names can identify one concept: `Sun`, `Sol` and `日轮` all refer to
 `body.sun`. A rule variant records a particular definition, such as a house
 system or lunar-node algorithm. A record that only names a body or a node direction
-does not need a separate rule. Above, the Sun lookup finds two rules.
+does not need a separate rule. Above, the Sun lookup finds three rules.
+`rule.project.solar_lunar_returns` defines the constrained [return workflow](returns.md).
 `rule.lilly1647.essential_dignities` records the signs of domicile, exaltation,
 detriment and fall for the Sun and other classical planets, citing Lilly's work.
 `rule.project.dispositor_chains` defines paths following traditional sign rulers;
@@ -130,6 +131,9 @@ The catalog currently includes:
 - [Traditional sign rulers and four statuses](dignities.md) from William Lilly's
   *Christian Astrology* (1647), with short primary-scan excerpts and a generated
   sign table.
+- [Solar and lunar return definitions](returns.md), with short original quotations,
+  separate translations, different location practices and explicit project conventions
+  in `entry.solar_lunar_returns`.
 
 Configuration entries link to the enum members the program uses; rule descriptions
 link to their implementations. House systems, node definitions and aspect angles

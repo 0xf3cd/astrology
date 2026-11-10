@@ -69,6 +69,7 @@ from astrology.houses import house_of
 from astrology.knowledge import Catalog, load_catalog
 from astrology.lunar_phase import LunarPhaseResult, LunationType, lunar_phase
 from astrology.objects import Axis
+from astrology.returns import return_hits
 from astrology.summaries import (
   SignDistribution,
   chart_sign_distribution,
@@ -189,6 +190,7 @@ __all__ = [
   "natal_lunar_phase",
   "prepare_natal_input",
   "resolve_birth_time",
+  "return_hits",
   "sign_degree",
   "sign_distribution",
   "sign_of",

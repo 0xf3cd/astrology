@@ -130,6 +130,18 @@ UTC 区间搜索及结果字段见[精确行运命中](transits.md)。
    :no-index:
 ```
 
+## 日返照与月返照
+
+事件搜索、显式地点及命盘消费见[返照指南](returns.md)。
+
+```{eval-rst}
+.. automodule:: astrology.returns
+   :members: return_hits
+   :undoc-members:
+   :member-order: bysource
+   :no-index:
+```
+
 ## 双盘落宫
 
 计算方法见[双盘落宫示例](cross_aspects.md#查询对象落入另一张盘的哪一宫)，文本输出见[比较文本示例](cross_aspects.md#输出比较文本)。

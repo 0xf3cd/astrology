@@ -125,6 +125,17 @@ See [exact transit hits](transits.md) for a UTC-interval search and result field
    :member-order: bysource
 ```
 
+## Solar and lunar returns
+
+See [returns](returns.md) for event searches, explicit locations and chart consumers.
+
+```{eval-rst}
+.. automodule:: astrology.returns
+   :members: return_hits
+   :undoc-members:
+   :member-order: bysource
+```
+
 ## Cross-chart house overlays
 
 See the [house-overlay example](cross_aspects.md#find-houses-in-the-other-chart)

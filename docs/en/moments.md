@@ -5,6 +5,7 @@
 Use `moment_chart` for a supplied instant and location. It returns a `MomentChart`,
 with no birth record or inferred location. Use `transit_aspects` to compare that
 moment's moving objects with an existing natal chart's frozen degrees.
+For solar or lunar return searches followed by chart construction, see [returns](returns.md).
 The examples on this page continue in order.
 
 ## Calculate at an instant

@@ -11,6 +11,7 @@
 [时刻盘](moments.md)使用显式时刻及地点，不使用出生记录。本命盘与时刻盘共用校验及具体的
 UTC/地点快照。固定时刻行运相位复用双盘几何，按移动速率对零固定侧速率判断局部运动；
 其给定来源及结果的构造仍不加载原生天文。
+[日月返照](returns.md)选择对本命盘的同星体合相事件，再复用时刻盘入口，按显式地点建盘。
 
 ## 结构组织
 
@@ -29,6 +30,7 @@ src/astrology/
   _comparison.py    来源兼容性与已存命盘对象选择
   cross_aspects.py  静态比较给定命盘，保留双侧来源
   transits.py       移动对固定源盘的精确区间事件
+  returns.py        基于精确行运命中的日月返照选择
   transit_aspects.py 固定时刻移动对本命的几何与局部运动
   house_overlays.py 给定命盘之间的双向落宫
   lunar_phase.py    有向日月弧及具名月相类型
@@ -58,6 +60,10 @@ docs/zh-CN/         对应的中文指南与说明
 `transits.py` 将适配层独立黄经事件查询与所选本命度数、`aspects.py` 的相位分支组合。
 它保留源盘，不为移动侧制造出生记录或宫位几何。
 
+`returns.py` 负责只接纳本命盘、只选择日月的返照规则，委托 `transit_hits` 后原样返回
+`TransitHits`；建盘仍归 `moment_chart`。同时保留两者即可保存参考搜索及所选盘的地点／配置，
+无需单独的返照结果类型。
+
 `dignities.py` 定义星座守护表，以及由此推导的宫主星和定位星结果。
 这些操作读取给定命盘的已有落点，不初始化天文库。
 `summaries.py` 保留星座分布及出生月相。
@@ -68,7 +74,8 @@ docs/zh-CN/         对应的中文指南与说明
 ## 副作用边界
 
 包导入、知识查询、分类、摘要及给定命盘的比较都不初始化原生天文库。
-`natal_chart`、`moment_chart` 和 `transit_hits` 仅在调用时加载天文适配层。`resolve_birth_time` 读取时区数据，
+`natal_chart`、`moment_chart` 和 `transit_hits` 仅在调用时加载天文适配层。
+`return_hits` 校验来源及星体后委托 `transit_hits`。`resolve_birth_time` 读取时区数据，
 `load_catalog` 读取包内知识；格式化函数使用调用方传入的目录，不执行资源 I/O。
 [隔离检查](contributing.md#运行检查)验证这些边界。
 

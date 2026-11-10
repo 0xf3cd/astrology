@@ -248,9 +248,10 @@ def test_installed_comparison_keeps_raw_values_and_metadata(
     chart: astrology.NatalChart,
     transits: astrology.TransitHits,
     moments: tuple[astrology.MomentChart, astrology.MomentChart],
+    returns: tuple[tuple[astrology.TransitHits, astrology.MomentChart], ...],
     catalog: astrology.Catalog,
   ) -> str:
-    packed = original(chart, transits, moments, catalog)
+    packed = original(chart, transits, moments, returns, catalog)
     envelope = json.loads(packed)
     values = envelope["chart"]
     assert set(values) == {field.name for field in fields(chart)}
@@ -312,9 +313,10 @@ def test_installed_consumer_compares_each_moment_field(
     chart: astrology.NatalChart,
     transits: astrology.TransitHits,
     moments: tuple[astrology.MomentChart, astrology.MomentChart],
+    returns: tuple[tuple[astrology.TransitHits, astrology.MomentChart], ...],
     catalog: astrology.Catalog,
   ) -> str:
-    values = json.loads(original(chart, transits, moments, catalog))
+    values = json.loads(original(chart, transits, moments, returns, catalog))
     assert len(values["moments"]) == 2
     assert moments[0].moment.source_jde_tt is None
     assert moments[1].moment.source_jde_tt == transits.hits[0].jde_tt
@@ -326,14 +328,14 @@ def test_installed_consumer_compares_each_moment_field(
     expected.write_text(
       json.dumps(values, ensure_ascii=False, separators=(",", ":")), encoding="utf-8"
     )
-    return original(chart, transits, moments, catalog)
+    return original(chart, transits, moments, returns, catalog)
 
   monkeypatch.setattr(installed_check, "calculation_observations", observe)
   with pytest.raises(ValueError, match="Installed calculation differs"):
     installed_check.main(version("celestial-astrology"), expected_observations=expected)
 
 
-@pytest.mark.parametrize("field", ["fixed_aspects", "fixed_text", "moment_text"])
+@pytest.mark.parametrize("field", ["fixed_aspects", "fixed_text", "moment_text", "returns"])
 def test_installed_consumer_compares_new_operation_outputs(
   consumer: Path, monkeypatch: pytest.MonkeyPatch, field: str
 ) -> None:
@@ -344,9 +346,10 @@ def test_installed_consumer_compares_new_operation_outputs(
     chart: astrology.NatalChart,
     transits: astrology.TransitHits,
     moments: tuple[astrology.MomentChart, astrology.MomentChart],
+    returns: tuple[tuple[astrology.TransitHits, astrology.MomentChart], ...],
     catalog: astrology.Catalog,
   ) -> str:
-    packed = original(chart, transits, moments, catalog)
+    packed = original(chart, transits, moments, returns, catalog)
     values = json.loads(packed)
     values[field] = "corrupted operation output"
     expected.write_text(
@@ -373,10 +376,11 @@ def test_installed_consumer_executes_and_compares_transit_values(
     chart: astrology.NatalChart,
     transits: astrology.TransitHits,
     moments: tuple[astrology.MomentChart, astrology.MomentChart],
+    returns: tuple[tuple[astrology.TransitHits, astrology.MomentChart], ...],
     catalog: astrology.Catalog,
   ) -> str:
     calls.append(transits)
-    packed = original(chart, transits, moments, catalog)
+    packed = original(chart, transits, moments, returns, catalog)
     values = json.loads(packed)
     assert values["transits"] == repr(transits)
     assert transits.chart is chart
