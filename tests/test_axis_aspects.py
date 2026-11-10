@@ -543,5 +543,5 @@ def test_axis_entry_has_a_release_implementation_source_and_no_chart_assessment(
   citation, source = catalog.citations(entry.identifier)[0]
   assert citation.source_id == "source.astrology"
   assert source.url is not None
-  assert source.url.endswith("v0.4.0")
+  assert source.url.endswith("v0.5.0")
   assert "objects.py: Axis" in citation.locator

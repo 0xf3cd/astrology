@@ -2,11 +2,49 @@
 
 [简体中文](../zh-CN/releases.md) · [Documentation](index.md) · [Release procedure](releasing.md)
 
-## Source changes since 0.4.0
+## 0.5.0
 
-The source checkout consolidates project implementation citations under
-`source.astrology`, with module and symbol locators. The following catalog source
-IDs are removed; use `source.astrology` for all six:
+This version adds moment charts, fixed-instant transit-to-natal aspects with
+English/Chinese text, and solar and lunar return workflows.
+Package index: [PyPI](https://pypi.org/project/celestial-astrology/0.5.0/).
+
+### Moment charts and fixed-instant aspects
+
+[`moment_chart`](moments.md) builds a `MomentChart` from an aware `datetime` or a
+retained `TransitHit`, with an explicit location and configuration. It preserves
+the input UTC and any original event TT separately from the calculated time scales,
+without creating a birth record. Cross-chart aspects, house overlays, house rulers,
+dispositors, sign distributions, interval transit searches and chart text accept
+moment charts.
+
+`transit_aspects` compares a moment chart's moving objects with a natal chart's
+frozen degrees, using explicit orb rules and moving rates against zero natal
+motion. `format_transit_aspects` provides English and Chinese tables. The existing
+static cross-chart comparison still has no motion labels.
+
+### Solar and lunar returns
+
+[`return_hits`](returns.md) finds every Sun or Moon return to its stored natal
+longitude in an explicit UTC interval. It delegates to the existing same-body
+conjunction search and returns `TransitHits`; pass a chosen hit to `moment_chart`
+with a location and configuration. Search and chart results together retain the
+natal reference, interval, event models, original event TT and chart settings.
+Location is not inferred, and unavailable requested house geometry still fails
+without a fallback. Return definitions, location practices and project conventions
+are recorded separately in the knowledge catalog.
+
+### Guides and compatibility
+
+The [transit guide](transits.md#search-cost) explains scan cost and how object and
+aspect selections multiply queries. Civil-year limits now come from the upstream
+`house_capability()` result. Existing natal calculation conventions and runtime
+dependency pins remain unchanged: `celestial-calendar==1.1.1` and `tzdata==2026.5`.
+Python 3.11–3.14 and the platform requirements in 0.4.0 are unchanged.
+Orb windows, other planetary returns and interpretation are outside this release.
+
+Project implementation citations use `source.astrology`, referring to the v0.5.0
+release tree with module and symbol locators. The following catalog source IDs are
+removed; callers addressing them must use `source.astrology`:
 
 - `source.astrology.house_overlays.f269d14`
 - `source.astrology.axis_aspects.4cb15cc`
@@ -15,10 +53,8 @@ IDs are removed; use `source.astrology` for all six:
 - `source.astrology.chart.fc845fa`
 - `source.astrology.config.fa2e985`
 
-Their full historical revisions remain in the new source's lineage. This is a
-catalog data change in the source checkout; the published 0.4.0 package retains
-its original catalog. The [project source record](knowledge.md#follow-a-source-to-a-definition)
-identifies the release tree used for implementation references.
+Their full historical revisions remain in the source's lineage. The 0.4.0 package
+retains its original catalog. See the [project source record](knowledge.md#follow-a-source-to-a-definition).
 
 ## 0.4.0
 
