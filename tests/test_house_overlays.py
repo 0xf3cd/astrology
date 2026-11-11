@@ -19,6 +19,7 @@ from astrology import (
   HouseSystem,
   LunarNode,
   MajorAspect,
+  NatalChart,
   cross_chart_house_overlays,
 )
 from astrology.objects import ChartObject
@@ -184,7 +185,7 @@ def test_invalid_selection_even_when_other_direction_is_empty(
 def test_wrong_source_types_are_rejected_even_for_empty_output(side: str) -> None:
   chart = _cross_source(2000, "one", ((Body.SUN, 0),))
   kwargs = {"chart_left": chart, "chart_right": chart, side: cast(Any, None)}
-  with pytest.raises(TypeError, match="must be NatalChart"):
+  with pytest.raises(TypeError, match="must be a NatalChart or MomentChart"):
     cross_chart_house_overlays(**kwargs, left_objects=(), right_objects=())
 
 
@@ -206,6 +207,7 @@ def test_instrumented_future_convention_mismatch_rejects_empty_output(field: str
 
 def test_selections_rows_and_birth_source_mapping_are_isolated() -> None:
   source = acceptance_house_overlays()
+  assert isinstance(source.chart_left, NatalChart)
   record_source = {"record": "synthetic", "side": "before"}
   left = replace(
     source.chart_left,
@@ -231,6 +233,7 @@ def test_selections_rows_and_birth_source_mapping_are_isolated() -> None:
   assert repr(result) == before
   assert reconstructed == result and hash(reconstructed) == hash(result)
   assert result.chart_left is left and result.chart_right is source.chart_right
+  assert isinstance(result.chart_left, NatalChart)
   assert result.chart_left.resolved.record.source["side"] == "before"
   with pytest.raises(FrozenInstanceError):
     cast(Any, result).placements = ()

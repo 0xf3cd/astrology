@@ -40,11 +40,11 @@
    :no-index:
 ```
 
-## 本命盘组合
+## 本命盘与时刻盘组合
 
 ```{eval-rst}
 .. automodule:: astrology.chart
-   :members: ChartDomainError, ChartTimes, EclipticPosition, ChartHouses, Placement, EffectiveConfiguration, ChartProvenance, NatalChart, natal_chart
+   :members: ChartDomainError, ChartTimes, EclipticPosition, ChartHouses, Placement, EffectiveConfiguration, ChartProvenance, NatalChart, MomentInput, MomentChart, Chart, natal_chart, moment_chart
    :undoc-members:
    :member-order: bysource
    :no-index:
@@ -56,11 +56,15 @@
 
 ```{eval-rst}
 .. automodule:: astrology.text
-   :members: format_chart, format_sign_distribution, format_lunar_phase, format_house_rulers, format_house_overlays, format_cross_aspects
+   :members: format_chart, format_sign_distribution, format_lunar_phase, format_house_rulers, format_house_overlays, format_cross_aspects, format_transit_aspects
    :no-index:
 ```
 
 ## 星座归属
+
+`Modality.FIXED` 与 `AshmandSignGroup.FIXED` 的字符串值都是 `"fixed"`，按 `StrEnum`
+语义比较相等，hash 也相同。要在同一 Python 映射中保留二者，请用 `(type(member), member.value)`
+作键，或使用各自带类别前缀的目录 ID。两套分类及其历史含义仍有区别。
 
 ```{eval-rst}
 .. automodule:: astrology.zodiac
@@ -102,6 +106,18 @@
    :no-index:
 ```
 
+## 固定时刻行运相位
+
+固定时刻比较及双语输出见[时刻盘](moments.md)。
+
+```{eval-rst}
+.. automodule:: astrology.transit_aspects
+   :members: TransitAspectHit, TransitAspects, transit_aspects
+   :undoc-members:
+   :member-order: bysource
+   :no-index:
+```
+
 ## 精确行运命中
 
 UTC 区间搜索及结果字段见[精确行运命中](transits.md)。
@@ -109,6 +125,18 @@ UTC 区间搜索及结果字段见[精确行运命中](transits.md)。
 ```{eval-rst}
 .. automodule:: astrology.transits
    :members: TransitDirection, TransitDomainError, TransitSource, TransitHit, TransitHits, transit_hits
+   :undoc-members:
+   :member-order: bysource
+   :no-index:
+```
+
+## 日返照与月返照
+
+事件搜索、显式地点及命盘消费见[返照指南](returns.md)。
+
+```{eval-rst}
+.. automodule:: astrology.returns
+   :members: return_hits
    :undoc-members:
    :member-order: bysource
    :no-index:

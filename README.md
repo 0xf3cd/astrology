@@ -11,24 +11,25 @@ or query the knowledge catalog without a chart. Start with the examples below;
 the [guides](https://0xf3cd.github.io/astrology/docs/en/index.html) and
 [API reference](https://0xf3cd.github.io/astrology/docs/en/reference.html) explain further uses and parameters.
 
-Further features include
-[element/modality distributions and natal lunar
-phase](https://0xf3cd.github.io/astrology/docs/en/summaries.html),
-[traditional sign rulers, four statuses and dispositor chains](https://0xf3cd.github.io/astrology/docs/en/dignities.html),
-[explicit axis aspects for natal and static cross-chart queries](https://0xf3cd.github.io/astrology/docs/en/aspects.html#select-axes-explicitly),
-and [cross-chart house overlays and bilingual comparison text](https://0xf3cd.github.io/astrology/docs/en/cross_aspects.html).
-Axes (Ascendant, Midheaven, Descendant and
-Imum Coeli) participate in aspects only when explicitly selected.
+The library provides:
 
-The library also provides:
-
+- [Solar and lunar returns](https://0xf3cd.github.io/astrology/docs/en/returns.html): find every event in an explicit interval, then build its chart at a supplied location.
+- [Moment charts and fixed-instant transit-to-natal aspects](https://0xf3cd.github.io/astrology/docs/en/moments.html), including direct construction from a retained exact hit and bilingual text.
+- [Element/modality distributions and natal lunar phase](https://0xf3cd.github.io/astrology/docs/en/summaries.html).
+- [Traditional sign rulers, four statuses and dispositor chains](https://0xf3cd.github.io/astrology/docs/en/dignities.html).
+- [Explicit axis aspects](https://0xf3cd.github.io/astrology/docs/en/aspects.html#select-axes-explicitly)
+  for natal and static cross-chart queries.
+- [Cross-chart house overlays and bilingual comparison text](https://0xf3cd.github.io/astrology/docs/en/cross_aspects.html).
 - [Static cross-chart aspects](https://0xf3cd.github.io/astrology/docs/en/cross_aspects.html)
-  between two natal charts, retaining both source charts and distinct left/right
+  between natal or moment charts, retaining both source charts and distinct left/right
   objects, without applying/separating labels.
 - [Exact transit hits](https://0xf3cd.github.io/astrology/docs/en/transits.html)
   over a UTC interval, retaining repeated retrograde hits, native rates and directions.
 - `ashmand_sign_group(Sign.ARIES)` queries the twelve signs' four groups in
   Ashmand's 1822 edition. See [the source and lookup example](https://0xf3cd.github.io/astrology/docs/en/knowledge.html#ashmand-1822-sign-groups).
+
+Axes (Ascendant, Midheaven, Descendant and Imum Coeli) participate in aspects only
+when explicitly selected.
 
 ## Install a release
 
@@ -155,11 +156,13 @@ To calculate aspects, supply orb rules in `aspects` and select participants with
 | Select objects, participants and orbs | [Configuration](https://0xf3cd.github.io/astrology/docs/en/configuration.html) |
 | Compare two charts | [Cross-chart aspects and house overlays](https://0xf3cd.github.io/astrology/docs/en/cross_aspects.html) |
 | Search an interval for exact transits | [Exact transit hits](https://0xf3cd.github.io/astrology/docs/en/transits.html) |
+| Find solar/lunar returns and build their charts | [Returns](https://0xf3cd.github.io/astrology/docs/en/returns.html) |
 
 ## First knowledge lookup
 
 Save this separate script as `first_knowledge.py` and run it with the same
-virtual-environment Python. This example finds the Sun by name and alias:
+virtual-environment Python. This example retrieves the Sun by its stable ID,
+then finds the same concept by its alias "Sol":
 
 ```python
 from astrology import load_catalog
@@ -199,14 +202,13 @@ unrounded astronomy and named models.
 ## Later work
 
 - [Techniques and presentation](https://github.com/0xf3cd/astrology/milestone/2):
-  fixed-instant transits, orb windows and returns, relationship charts, tradition-specific rules, additional
+  orb windows and other planetary returns, relationship charts, tradition-specific rules, additional
   objects, and chart views.
 - [Advanced and historical research](https://github.com/0xf3cd/astrology/milestone/3):
   directions, progressions, uncertain birth times, historical inputs, spatial
   house placement, and sourced interpretation.
 
-These milestones track directions without assigning release dates. Each technique
-needs a named definition, sources, and reference cases before implementation.
+These milestones track directions without assigning release dates.
 
 ## License
 

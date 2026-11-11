@@ -77,12 +77,13 @@ def test_query_contracts(catalog: Catalog) -> None:
     "rule.ptolemy_ashmand.sign_groups",
   ]
   assert [v.identifier for v in catalog.list_variants(concept_id="body.sun")] == [
+    "rule.project.solar_lunar_returns",
     "rule.lilly1647.essential_dignities",
     "rule.project.dispositor_chains",
   ]
   vocabulary = catalog.entry("entry.sign_vocabulary")
   assert "rule.ptolemy_ashmand.sign_groups" in vocabulary.rule_ids
-  assert "source.astrology.sign_groups.c92ac82" in {c.source_id for c in vocabulary.citations}
+  assert "source.astrology" in {c.source_id for c in vocabulary.citations}
   assert catalog.concept("body.sun").configuration is Body.SUN
   assert len(catalog.list_variants()) == len(catalog.variants)
   assert catalog.filter_entries() == tuple(catalog.entries)
@@ -123,6 +124,9 @@ def test_query_contracts(catalog: Catalog) -> None:
     "entry.essential_dignities",
     "entry.dispositor_chains",
     "entry.transit_hits",
+    "entry.moment_charts",
+    "entry.transit_aspects",
+    "entry.solar_lunar_returns",
   }
   assert all(
     entry.prerequisite_status is PrerequisiteStatus.UNRESOLVED
@@ -192,10 +196,13 @@ def test_ashmand_groups_have_names_sources_and_separate_states(catalog: Catalog)
   citations = catalog.citations(entry.identifier)
   assert sum(source.identifier == "source.ptolemy.ashmand1822" for _, source in citations) == 4
   citation, implementation = citations[-1]
-  assert implementation.identifier == "source.astrology.sign_groups.c92ac82"
-  assert implementation.url.endswith("/c92ac826c3065fc9e4a2cc949cf87c64c79c0c63")
+  assert implementation.identifier == "source.astrology"
+  assert implementation.url.endswith("/v0.5.0")
   assert "ashmand_sign_group" in citation.locator
-  assert "not independent historical" in implementation.scope.en
+  assert (
+    "not independent astronomical corroboration, historical corroboration"
+    in implementation.scope.en
+  )
   excerpts = [c for c, _ in citations if c.excerpt is not None]
   assert len(excerpts) == 3
   assert all(c.excerpt is not None and c.excerpt.zh for c in excerpts)
@@ -237,6 +244,48 @@ def test_partial_computation_cannot_promote_retrieval(catalog: Catalog) -> None:
     == "not_assessed"
   )
   assert entry in catalog.filter_entries(concept_id="sign.aries")
+
+
+@pytest.mark.parametrize(
+  "identifier", ["essential_dignities", "cross_house_overlays", "dispositor_chains"]
+)
+def test_existing_consumer_entries_admit_moment_charts_in_both_languages(
+  catalog: Catalog, identifier: str
+) -> None:
+  (prerequisite,) = catalog.entry(f"entry.{identifier}").prerequisites
+  for text in (prerequisite.text("en"), prerequisite.text("zh-CN")):
+    assert text is not None and "NatalChart" in text and "MomentChart" in text
+  assert prerequisite.revision == prerequisite.zh_revision == 2
+
+
+def test_axis_entry_describes_the_shared_single_chart_contract(catalog: Catalog) -> None:
+  entry = catalog.entry("entry.axis_aspects")
+  for text in (entry.statement, entry.exceptions, entry.limits):
+    english, chinese = text.text("en"), text.text("zh-CN")
+    assert english is not None and "single-chart" in english.lower()
+    assert chinese is not None and "单盘" in chinese
+    assert text.revision == text.zh_revision == 2
+
+
+@pytest.mark.parametrize("identifier", ["moment_charts", "transit_aspects"])
+def test_moment_entries_are_reference_rules_not_chart_matches(
+  catalog: Catalog, identifier: str
+) -> None:
+  entry = catalog.entry(f"entry.{identifier}")
+  assert f"rule.project.{identifier}" in entry.rule_ids
+  assert entry.prerequisite_status is PrerequisiteStatus.COMPLETE
+  assert entry.output_eligibility is OutputEligibility.REFERENCE_ONLY
+  assert entry.chart_applicability == "not_assessed"
+  for text in (entry.statement, entry.exceptions, entry.limits, *entry.prerequisites):
+    assert text.text("en") and text.text("zh-CN")
+  assert catalog.citations(entry.identifier)
+  if identifier == "moment_charts":
+    assert {citation.source_id for citation in entry.citations} == {
+      "source.celestial-calendar.events.1.1.1"
+    }
+  else:
+    assert {citation.source_id for citation in entry.citations} == {"source.astrology"}
+    assert all("transit_aspects.py" not in citation.locator for citation in entry.citations)
 
 
 def test_container_ownership(catalog: Catalog) -> None:
@@ -596,11 +645,18 @@ def test_retired_identity_variants_keep_their_concepts(catalog: Catalog, identif
     else ()
   )
   assert tuple(v.identifier for v in catalog.list_variants(concept_id=concept_id)) == (
+    *(
+      ("rule.project.solar_lunar_returns",)
+      if concept.configuration in (Body.SUN, Body.MOON)
+      else ()
+    ),
     *expected,
     "rule.project.dispositor_chains",
   )
-  assert catalog.filter_entries(concept_id=concept_id)[0].rule_ids == ()
-  entry = catalog.filter_entries(concept_id=concept_id)[0]
+  entry = catalog.entry(
+    "entry.body_requests" if concept_id.startswith("body.") else "entry.node_directions"
+  )
+  assert concept_id in entry.concept_ids and entry.rule_ids == ()
   with pytest.raises(ValueError, match="Dangling"):
     replace(catalog, entries=(replace(entry, rule_ids=(identifier,)),))
 
@@ -623,6 +679,7 @@ def test_retained_rule_ids_and_order(catalog: Catalog) -> None:
     for v in catalog.variants
     if v.identifier
     not in (
+      "rule.project.solar_lunar_returns",
       "rule.zodiac.elements",
       "rule.zodiac.modalities",
       "rule.lunation.rudhyar1950",
@@ -644,6 +701,8 @@ def test_retained_rule_ids_and_order(catalog: Catalog) -> None:
     "rule.project.cross_aspect_evaluation",
     "rule.project.cross_house_overlays",
     "rule.project.dispositor_chains",
+    "rule.project.moment_charts",
+    "rule.project.transit_aspects",
     "rule.project.exact_transit_hits",
   ]
   for identifier, configuration in expected:
@@ -668,8 +727,8 @@ def test_cross_policy_is_independently_retrievable_without_chart_applicability(
   assert entry.output_eligibility is OutputEligibility.REFERENCE_ONLY
   assert entry.chart_applicability == "not_assessed"
   citation, source = catalog.citations(entry.identifier)[0]
-  assert source.identifier == "source.astrology.cross_aspects.0d7122a"
-  assert source.url.endswith("/0d7122a7f7ef86ecc5798c9ea12668c68bb4a516")
+  assert source.identifier == "source.astrology"
+  assert source.url.endswith("/v0.5.0")
   assert "src/astrology/cross_aspects.py" in citation.locator
   assert source.verification is SourceVerification.VERIFIED
   assert citation.excerpt is None
@@ -678,7 +737,7 @@ def test_cross_policy_is_independently_retrievable_without_chart_applicability(
   assert "one shared instant" in catalog.variant("rule.project.aspect_motion").definition.en
 
 
-def test_overlay_policy_has_fixed_source_and_separate_editorial_states(catalog: Catalog) -> None:
+def test_overlay_policy_has_release_source_and_separate_editorial_states(catalog: Catalog) -> None:
   entry = catalog.entry("entry.cross_house_overlays")
   rule = catalog.variant("rule.project.cross_house_overlays")
   expected_ids = {f"house.{system.value}" for system in HouseSystem} | {
@@ -693,14 +752,13 @@ def test_overlay_policy_has_fixed_source_and_separate_editorial_states(catalog: 
   assert entry.output_eligibility is OutputEligibility.REFERENCE_ONLY
   assert entry.chart_applicability == "not_assessed"
   citation, source = catalog.citations(entry.identifier)[0]
-  commit = "f269d148b8a3e58bc559e7d89be77a03aae6b289"
-  assert source.identifier == "source.astrology.house_overlays.f269d14"
-  assert source.url == f"https://github.com/0xf3cd/astrology/tree/{commit}"
-  assert commit in source.edition
+  assert source.identifier == "source.astrology"
+  assert source.url == "https://github.com/0xf3cd/astrology/tree/v0.5.0"
+  assert "v0.5.0" in source.edition
   assert entry in catalog.filter_entries(source_id=source.identifier)
   assert source.verification is SourceVerification.VERIFIED
   assert citation.excerpt is None
-  for name in ("house_overlays.py", "houses.house_of", "tests/test_house_overlays.py"):
+  for name in ("house_overlays.py", "houses.py: house_of", "tests/test_house_overlays.py"):
     assert name in citation.locator
   assert "not independent astronomical corroboration" in source.scope.en
   assert "without common-epoch conversion or three-dimensional placement" in rule.limits.en
@@ -714,11 +772,10 @@ def test_overlay_policy_has_fixed_source_and_separate_editorial_states(catalog: 
   assert rule.definition.status("zh-CN") is TranslationStatus.CURRENT
 
 
-def test_fixed_implementation_source_and_node_test_locator(catalog: Catalog) -> None:
-  source = catalog.source("source.astrology.chart.fc845fa")
-  commit = "fc845fa1aa786f7e1eda7b4d901e70e9a505add5"
-  assert source.url == f"https://github.com/0xf3cd/astrology/tree/{commit}"
-  assert commit in source.edition
+def test_release_implementation_source_and_node_test_locator(catalog: Catalog) -> None:
+  source = catalog.source("source.astrology")
+  assert source.url == "https://github.com/0xf3cd/astrology/tree/v0.5.0"
+  assert "v0.5.0" in source.edition
   citation = catalog.entry("entry.node_definitions").citations[1]
   assert citation.source_id == source.identifier
   assert "tests/test_reference.py" in citation.locator
@@ -732,6 +789,52 @@ def test_fixed_implementation_source_and_node_test_locator(catalog: Catalog) -> 
   assert (
     catalog.entry("entry.node_definitions").prerequisite_status is PrerequisiteStatus.UNRESOLVED
   )
+
+
+def test_project_source_consolidation_preserves_lineage_and_citation_coverage(
+  catalog: Catalog,
+) -> None:
+  source = catalog.source("source.astrology")
+  assert [
+    item.identifier for item in catalog.sources if item.identifier.startswith("source.astrology")
+  ] == [source.identifier]
+  former = {
+    "house_overlays.f269d14": "f269d148b8a3e58bc559e7d89be77a03aae6b289",
+    "axis_aspects.4cb15cc": "4cb15cc2f63a67ba804c04840f255ffff1209382",
+    "sign_groups.c92ac82": "c92ac826c3065fc9e4a2cc949cf87c64c79c0c63",
+    "cross_aspects.0d7122a": "0d7122a7f7ef86ecc5798c9ea12668c68bb4a516",
+    "chart.fc845fa": "fc845fa1aa786f7e1eda7b4d901e70e9a505add5",
+    "config.fa2e985": "fa2e985c964dab653a6aa0f5771062ad9fd956dc",
+  }
+  for suffix, revision in former.items():
+    identifier = f"source.astrology.{suffix}"
+    for text in (source.lineage.en, source.lineage.zh or ""):
+      assert identifier in text and revision in text
+    with pytest.raises(KeyError):
+      catalog.source(identifier)
+  expected = {
+    "body_requests": 2,
+    "house_requests": 2,
+    "node_definitions": 2,
+    "node_directions": 1,
+    "aspect_requests": 1,
+    "aspect_evaluation": 1,
+    "cross_aspect_evaluation": 1,
+    "sign_vocabulary": 2,
+    "ashmand_sign_groups": 1,
+    "cross_house_overlays": 1,
+    "axis_aspects": 1,
+    "transit_hits": 1,
+    "transit_aspects": 1,
+    "dispositor_chains": 1,
+  }
+  actual = {
+    entry.identifier.removeprefix("entry."): sum(
+      citation.source_id == source.identifier for citation in entry.citations
+    )
+    for entry in catalog.filter_entries(source_id=source.identifier)
+  }
+  assert actual == expected
 
 
 @pytest.mark.parametrize(

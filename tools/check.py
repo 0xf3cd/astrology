@@ -68,9 +68,11 @@ PACKAGE_FILES = (
   "astrology/houses.py",
   "astrology/lunar_phase.py",
   "astrology/objects.py",
+  "astrology/returns.py",
   "astrology/summaries.py",
   "astrology/text.py",
   "astrology/transits.py",
+  "astrology/transit_aspects.py",
   "astrology/zodiac.py",
   "astrology/knowledge/__init__.py",
   "astrology/knowledge/records.py",
@@ -722,6 +724,8 @@ def check_installed_wheel(source: Path, wheel: Path, version: str, directory: Pa
     acceptance_chart,
     acceptance_cross_aspects,
     acceptance_house_overlays,
+    acceptance_moments,
+    acceptance_returns,
     acceptance_transits,
     calculation_observations,
     comparison_observations,
@@ -734,8 +738,12 @@ def check_installed_wheel(source: Path, wheel: Path, version: str, directory: Pa
   catalog = load_catalog()
   observations = directory / "expected-observations.json"
   chart = acceptance_chart()
+  transits = acceptance_transits(chart)
   observations.write_text(
-    calculation_observations(chart, acceptance_transits(chart)), encoding="utf-8"
+    calculation_observations(
+      chart, transits, acceptance_moments(chart, transits), acceptance_returns(chart), catalog
+    ),
+    encoding="utf-8",
   )
   cross_values = directory / "expected-cross-observations.json"
   cross_values.write_text(

@@ -64,13 +64,15 @@ def acceptance_chart() -> astrology.NatalChart:
   return astrology.natal_chart(astrology.prepare_natal_input(record, fold=0), config)
 
 
-def chart_observations(chart: astrology.NatalChart) -> str:
+def chart_observations(chart: astrology.Chart) -> str:
   """Capture exact same-revision check values.
 
   取得同一源码修订的精确检查值。
   """
   values = {
-    "resolved": repr(chart.resolved),
+    ("resolved" if isinstance(chart, astrology.NatalChart) else "moment"): repr(
+      chart.resolved if isinstance(chart, astrology.NatalChart) else chart.moment
+    ),
     "requested": repr(chart.requested),
     "effective": repr(chart.effective),
     "provenance": repr(chart.provenance),
@@ -127,16 +129,102 @@ def acceptance_transits(chart: astrology.NatalChart) -> astrology.TransitHits:
   )
 
 
+def acceptance_moments(
+  chart: astrology.NatalChart, transits: astrology.TransitHits
+) -> tuple[astrology.MomentChart, astrology.MomentChart]:
+  """Exercise datetime and retained-hit calculation paths at an explicit synthetic site.
+
+  在显式的合成地点分别执行 datetime 与保留命中的排盘路径。
+  """
+  site = astrology.Location(0, 0)
+  return (
+    astrology.moment_chart(datetime(2024, 1, 1, tzinfo=UTC), site, chart.requested),
+    astrology.moment_chart(transits.hits[0], site, chart.requested),
+  )
+
+
+def acceptance_returns(
+  chart: astrology.NatalChart,
+) -> tuple[tuple[astrology.TransitHits, astrology.MomentChart], ...]:
+  """Calculate each luminary's return search and a chart at its first hit.
+
+  分别搜索日月返照，并为各自的第一次命中建盘。
+  """
+  results = []
+  for body in (astrology.Body.SUN, astrology.Body.MOON):
+    events = astrology.return_hits(
+      chart,
+      body,
+      start_utc=datetime(2024, 1, 1, tzinfo=UTC),
+      end_utc=datetime(2024, 5, 1, tzinfo=UTC),
+    )
+    moving = astrology.moment_chart(events.hits[0], astrology.Location(40, 100), chart.requested)
+    results.append((events, moving))
+  return tuple(results)
+
+
 def calculation_observations(
   chart: astrology.NatalChart,
   transits: astrology.TransitHits,
+  moments: tuple[astrology.MomentChart, astrology.MomentChart],
+  returns: tuple[tuple[astrology.TransitHits, astrology.MomentChart], ...],
+  catalog: Catalog,
 ) -> str:
-  """Capture supplied natal and transit values without recalculating them.
+  """Capture supplied astronomy values and their pure comparison/text outputs.
 
-  记录给定的本命及行运值，不重新计算。
+  记录给定天文值及其纯规则比较与文本输出。
   """
+  fixed = astrology.transit_aspects(
+    moments[0], chart, (astrology.AspectRule(astrology.MajorAspect.CONJUNCTION, 3),)
+  )
+  languages: tuple[Literal["en", "zh-CN"], ...] = ("en", "zh-CN")
   return json.dumps(
-    {"chart": json.loads(chart_observations(chart)), "transits": repr(transits)},
+    {
+      "chart": json.loads(chart_observations(chart)),
+      "transits": repr(transits),
+      "moments": [json.loads(chart_observations(moment)) for moment in moments],
+      "fixed_aspects": repr(fixed),
+      "returns": [
+        {
+          "search": repr(events),
+          "chart": json.loads(chart_observations(moving)),
+          "comparison": repr(
+            astrology.cross_chart_aspects(
+              moving,
+              events.chart,
+              chart.requested.aspects,
+              combination=chart.requested.orb_combination,
+            )
+          ),
+          "overlays": repr(astrology.cross_chart_house_overlays(moving, events.chart)),
+          "transits": repr(
+            astrology.transit_aspects(
+              moving, chart, chart.requested.aspects, combination=chart.requested.orb_combination
+            )
+          ),
+          "rulers": repr(astrology.HouseRulers(moving)),
+          "dispositors": repr(
+            astrology.chart_dispositors(moving, objects=moving.requested.objects)
+          ),
+          "distribution": repr(
+            astrology.chart_sign_distribution(moving, objects=moving.requested.objects)
+          ),
+          "text": {
+            language: astrology.format_chart(moving, catalog, language=language)
+            for language in languages
+          },
+        }
+        for events, moving in returns
+      ],
+      "moment_text": {
+        language: [astrology.format_chart(moment, catalog, language=language) for moment in moments]
+        for language in languages
+      },
+      "fixed_text": {
+        language: astrology.format_transit_aspects(fixed, catalog, language=language)
+        for language in languages
+      },
+    },
     sort_keys=True,
     allow_nan=False,
   )
@@ -359,6 +447,7 @@ def _check_knowledge() -> None:
   catalog.lookup("Sol")
   catalog.lookup("日轮")
   catalog.citations("entry.equinoctial_example")
+  catalog.citations("entry.solar_lunar_returns")
   if any(
     name.startswith(("tzdata", "zoneinfo", "celestial", "ctypes"))
     for name in set(sys.modules) - before
@@ -386,9 +475,13 @@ def _check_natal_chart(expected_observations: Path | None = None) -> None:
   if not adapter.is_relative_to(Path(sys.prefix).resolve()):
     raise ValueError("Imported astrology.celestial from outside the consumer environment")
   transits = acceptance_transits(chart)
-  if expected_observations is not None and calculation_observations(
-    chart, transits
-  ) != expected_observations.read_text(encoding="utf-8"):
+  returns = acceptance_returns(chart)
+  observed = calculation_observations(
+    chart, transits, acceptance_moments(chart, transits), returns, astrology.load_catalog()
+  )
+  if expected_observations is not None and observed != expected_observations.read_text(
+    encoding="utf-8"
+  ):
     raise ValueError("Installed calculation differs from the development entry point")
 
 

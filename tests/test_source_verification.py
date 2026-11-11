@@ -111,10 +111,13 @@ def test_source_addenda_keep_attribution_and_locators_bounded() -> None:
   assert "printed p.104" not in tradition.en
   assert "印刷第104页" not in "".join((tradition.zh or "").split())
   citations = catalog.entry("entry.dispositor_chains").citations
-  assert len(citations) == 2
+  assert len(citations) == 3
+  assert citations[0].source_id == citations[1].source_id == lilly.identifier
   assert "p.104" in citations[0].locator and "leaf138" in citations[0].locator
   assert "p.112" in citations[1].locator and "leaf146" in citations[1].locator
   assert "label only" in citations[1].locator
+  assert citations[2].source_id == "source.astrology"
+  assert "dignities.py: Dispositors, chart_dispositors" in citations[2].locator
 
 
 def test_verified_definitions_render_in_both_catalogs() -> None:

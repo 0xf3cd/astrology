@@ -261,6 +261,20 @@ def _require_modern_utc(instant: datetime) -> None:
     raise HistoricalTimeError("UTC before 1972-01-01 requires an explicit historical-time contract")
 
 
+def _normalize_utc(value: datetime, name: str) -> datetime:
+  if type(value) is not datetime:
+    raise TypeError(f"{name} must be a built-in datetime")
+  offset = value.utcoffset()
+  if value.tzinfo is None or offset is None:
+    raise ValueError(f"{name} must have a defined UTC offset")
+  try:
+    normalized = value.replace(tzinfo=timezone(offset), fold=0).astimezone(UTC)
+  except OverflowError as exc:
+    raise ValueError(f"{name} is outside the datetime range after UTC normalization") from exc
+  _require_modern_utc(normalized)
+  return normalized
+
+
 def _load_iana_zone(key: str) -> tuple[tzinfo, str, str]:
   from importlib import import_module
   from importlib.resources import files

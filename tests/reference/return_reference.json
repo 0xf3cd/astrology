@@ -1,0 +1,254 @@
+{
+  "source": {
+    "pyswisseph_version": "2.10.3.2",
+    "library_version": "2.10.03",
+    "ephemeris": "Moshier analytical, explicitly selected; no Swiss/JPL data-file fallback",
+    "requested_flags": 260,
+    "verified_calculation_flags": 260,
+    "coordinates": "apparent geocentric tropical longitude, true equinox/ecliptic of date",
+    "time_scale": "TT through solcross/mooncross ET entry points",
+    "birth_tt_minus_utc_seconds": 64.184,
+    "search_tt_minus_utc_seconds": 69.184,
+    "manual": "https://www.astro.com/swisseph/swephprg.htm",
+    "recipe_sha256": "23324b39a8e5c76d3c1980e81f104ec143afc8d0904d5a54443707f55be99563"
+  },
+  "calibration": {
+    "native_version": "1.1.1",
+    "maximum_observed_time_difference_seconds": {
+      "sun": 1.3446718454360962,
+      "moon": 11.77133023738861
+    },
+    "fixture_time_tolerance_seconds": {
+      "sun": 5,
+      "moon": 30
+    },
+    "scope": "These synthetic 2000 natal instants and 2023-2024 return intervals only; cross-model agreement is not a general astronomical accuracy bound."
+  },
+  "cases": [
+    {
+      "name": "leap_birth_sun_2024-01-01",
+      "body": "sun",
+      "birth_utc": "2000-02-29T12:00:00+00:00",
+      "birth_jde_tt": 2451604.0007428704,
+      "natal_longitude_deg": 340.2058332372515,
+      "start_utc": "2024-01-01T00:00:00+00:00",
+      "end_utc": "2025-01-01T00:00:00+00:00",
+      "hits": [
+        {
+          "jde_tt": 2460369.8197051515,
+          "longitude_deg": 340.2058332370411,
+          "rate_deg_per_tt_day": 1.0038941438552043,
+          "residual_deg": -2.1043433662271127e-10
+        }
+      ]
+    },
+    {
+      "name": "leap_birth_moon_2023-12-01",
+      "body": "moon",
+      "birth_utc": "2000-02-29T12:00:00+00:00",
+      "birth_jde_tt": 2451604.0007428704,
+      "natal_longitude_deg": 275.5361750981475,
+      "start_utc": "2023-12-01T00:00:00+00:00",
+      "end_utc": "2024-03-01T00:00:00+00:00",
+      "hits": [
+        {
+          "jde_tt": 2460292.539272878,
+          "longitude_deg": 275.5361750956348,
+          "rate_deg_per_tt_day": 14.180474430333541,
+          "residual_deg": -2.5127064873231575e-09
+        },
+        {
+          "jde_tt": 2460319.953015897,
+          "longitude_deg": 275.53617510021246,
+          "rate_deg_per_tt_day": 14.364047285208015,
+          "residual_deg": 2.0649508769565728e-09
+        },
+        {
+          "jde_tt": 2460347.400486393,
+          "longitude_deg": 275.53617509909947,
+          "rate_deg_per_tt_day": 14.158325872680509,
+          "residual_deg": 9.519567356619518e-10
+        }
+      ]
+    },
+    {
+      "name": "leap_birth_moon_2024-01-01",
+      "body": "moon",
+      "birth_utc": "2000-02-29T12:00:00+00:00",
+      "birth_jde_tt": 2451604.0007428704,
+      "natal_longitude_deg": 275.5361750981475,
+      "start_utc": "2024-01-01T00:00:00+00:00",
+      "end_utc": "2024-04-01T00:00:00+00:00",
+      "hits": [
+        {
+          "jde_tt": 2460319.953015897,
+          "longitude_deg": 275.53617510021246,
+          "rate_deg_per_tt_day": 14.364047285208015,
+          "residual_deg": 2.0649508769565728e-09
+        },
+        {
+          "jde_tt": 2460347.400486393,
+          "longitude_deg": 275.53617509909947,
+          "rate_deg_per_tt_day": 14.158325872680509,
+          "residual_deg": 9.519567356619518e-10
+        },
+        {
+          "jde_tt": 2460374.79325041,
+          "longitude_deg": 275.5361750991983,
+          "rate_deg_per_tt_day": 13.698506061543341,
+          "residual_deg": 1.050807441060897e-09
+        }
+      ]
+    },
+    {
+      "name": "year_end_sun_2024-01-01",
+      "body": "sun",
+      "birth_utc": "2000-12-31T23:00:00+00:00",
+      "birth_jde_tt": 2451910.459076204,
+      "natal_longitude_deg": 280.59092315537976,
+      "start_utc": "2024-01-01T00:00:00+00:00",
+      "end_utc": "2025-01-01T00:00:00+00:00",
+      "hits": [
+        {
+          "jde_tt": 2460311.0424459465,
+          "longitude_deg": 280.590923155328,
+          "rate_deg_per_tt_day": 1.0190250192500396,
+          "residual_deg": -5.1727511163335294e-11
+        },
+        {
+          "jde_tt": 2460676.282402917,
+          "longitude_deg": 280.59092315560997,
+          "rate_deg_per_tt_day": 1.0196459285928055,
+          "residual_deg": 2.3021584638627246e-10
+        }
+      ]
+    },
+    {
+      "name": "year_end_moon_2023-12-01",
+      "body": "moon",
+      "birth_utc": "2000-12-31T23:00:00+00:00",
+      "birth_jde_tt": 2451910.459076204,
+      "natal_longitude_deg": 348.2023866318313,
+      "start_utc": "2023-12-01T00:00:00+00:00",
+      "end_utc": "2024-03-01T00:00:00+00:00",
+      "hits": [
+        {
+          "jde_tt": 2460297.6117204577,
+          "longitude_deg": 348.2023866300504,
+          "rate_deg_per_tt_day": 14.141939027218378,
+          "residual_deg": -1.7809043129091151e-09
+        },
+        {
+          "jde_tt": 2460324.884638212,
+          "longitude_deg": 348.20238663334686,
+          "rate_deg_per_tt_day": 14.558271639878843,
+          "residual_deg": 1.5155592336668633e-09
+        },
+        {
+          "jde_tt": 2460352.2728827302,
+          "longitude_deg": 348.2023866327796,
+          "rate_deg_per_tt_day": 15.073394766178097,
+          "residual_deg": 9.483187568548601e-10
+        }
+      ]
+    },
+    {
+      "name": "solar_zero_sun_2024-01-01",
+      "body": "sun",
+      "birth_utc": "2000-03-20T07:35:15.542003+00:00",
+      "birth_jde_tt": 2451623.816894977,
+      "natal_longitude_deg": 1.1039425401977933e-10,
+      "start_utc": "2024-01-01T00:00:00+00:00",
+      "end_utc": "2025-01-01T00:00:00+00:00",
+      "hits": [
+        {
+          "jde_tt": 2460389.6302467845,
+          "longitude_deg": 359.9999999998866,
+          "rate_deg_per_tt_day": 0.9934862645708891,
+          "residual_deg": -2.2373569663614035e-10
+        }
+      ]
+    },
+    {
+      "name": "solar_zero_moon_2023-12-01",
+      "body": "moon",
+      "birth_utc": "2000-03-20T07:35:15.542003+00:00",
+      "birth_jde_tt": 2451623.816894977,
+      "natal_longitude_deg": 181.49138862222455,
+      "start_utc": "2023-12-01T00:00:00+00:00",
+      "end_utc": "2024-03-01T00:00:00+00:00",
+      "hits": [
+        {
+          "jde_tt": 2460285.3162778453,
+          "longitude_deg": 181.49138862480928,
+          "rate_deg_per_tt_day": 11.961333518774602,
+          "residual_deg": 2.5847270990198012e-09
+        },
+        {
+          "jde_tt": 2460312.6593202516,
+          "longitude_deg": 181.49138862351668,
+          "rate_deg_per_tt_day": 11.841905390772936,
+          "residual_deg": 1.2921361758344574e-09
+        },
+        {
+          "jde_tt": 2460339.9635764766,
+          "longitude_deg": 181.491388623502,
+          "rate_deg_per_tt_day": 11.789190710144162,
+          "residual_deg": 1.2774421520589385e-09
+        },
+        {
+          "jde_tt": 2460367.230887217,
+          "longitude_deg": 181.49138861950507,
+          "rate_deg_per_tt_day": 11.805013776776637,
+          "residual_deg": -2.7194744234293466e-09
+        }
+      ]
+    },
+    {
+      "name": "lunar_zero_sun_2024-01-01",
+      "body": "sun",
+      "birth_utc": "2000-03-07T06:54:09.663525+00:00",
+      "birth_jde_tt": 2451610.7883547167,
+      "natal_longitude_deg": 347.0107676577282,
+      "start_utc": "2024-01-01T00:00:00+00:00",
+      "end_utc": "2025-01-01T00:00:00+00:00",
+      "hits": [
+        {
+          "jde_tt": 2460376.6077361307,
+          "longitude_deg": 347.01076765775895,
+          "rate_deg_per_tt_day": 1.00102736172641,
+          "residual_deg": 3.0752289603697136e-11
+        }
+      ]
+    },
+    {
+      "name": "lunar_zero_moon_2023-12-01",
+      "body": "moon",
+      "birth_utc": "2000-03-07T06:54:09.663525+00:00",
+      "birth_jde_tt": 2451610.7883547167,
+      "natal_longitude_deg": 359.99999999967866,
+      "start_utc": "2023-12-01T00:00:00+00:00",
+      "end_utc": "2024-03-01T00:00:00+00:00",
+      "hits": [
+        {
+          "jde_tt": 2460298.4498884245,
+          "longitude_deg": 5.970833052149535e-10,
+          "rate_deg_per_tt_day": 14.00775925597364,
+          "residual_deg": 9.184191185340751e-10
+        },
+        {
+          "jde_tt": 2460325.7011651173,
+          "longitude_deg": 2.2593870610472113e-10,
+          "rate_deg_per_tt_day": 14.333374040780512,
+          "residual_deg": 5.472884367918596e-10
+        },
+        {
+          "jde_tt": 2460353.0603853655,
+          "longitude_deg": 2.216527382271658e-09,
+          "rate_deg_per_tt_day": 14.875802994956455,
+          "residual_deg": 2.5378881218784954e-09
+        }
+      ]
+    }
+  ]
+}

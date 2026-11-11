@@ -5,6 +5,11 @@
 `natal_chart` 返回内存中的不可变 `NatalChart`。可以直接查看结构化结果，或显式提供知识目录，
 交给 `format_chart` 显示。包不提供命盘存取接口或保存格式；接口撤回说明见[发行说明](releases.md)。
 
+`moment_chart` 返回不可变 `MomentChart`，以 `moment` 代替已解析出生输入。
+`moment.utc` 与 `moment.location` 标明给定时刻及地点；可选的 `moment.source_jde_tt`
+保留来源事件的原始 TT，与 `times.jde_tt` 分开。其他结果字段沿用下文的命盘合同。
+`format_chart` 将其标为时刻盘，不显示出生或时区来源资料。见[时刻盘示例](moments.md)。
+
 ## 一个完整例子
 
 <!-- usage: records.output -->
@@ -55,14 +60,17 @@
 - `positions` 保留未舍入的黄经、黄纬（度）、物理距离（AU）和黄经速率（度/TT 日）。
   月交点没有距离（`None`）。`times` 保留 JD(UT1) 和 JDE(TT)。`houses` 保留四轴黄经与十二宫头，
   单位为度；`placements` 给出星座与落宫。每条相位都保留分支、带符号偏差、上限和运动状态。
-- `provenance` 保留 astrology、celestial-calendar 版本、位置坐标约定及 UT1 推导方式；
+- `provenance` 保留 astrology、celestial-calendar 版本、位置参考系及 UT1 推导方式；
   `effective` 保留已确定的 ΔT 模型及求值方式。
+
+中文表格中的 `位置坐标约定` 标签指这里的同一个位置参考系值。
 
 直接构造 `NatalChart` 时，会检查字段类型、范围，以及星座、落宫和相位是否与传入的位置、四轴、宫头及规则一致。
 这些检查能确认什么，见[校验边界](architecture.md#可复现性)。从已解析输入计算天文值，请使用 `natal_chart`。
 
 参与对象、容许度覆盖及命中中用到的轴名与天体名一样，取自传入目录。
-原有只含天体或交点的请求不要求目录提供轴概念；四轴几何行仍使用已有的固定双语标签。
+原有只含天体或交点的请求不要求目录提供轴概念；“四轴与宫头”中的上升点、中天、下降点、天底
+四行按所选语言使用固定标签，不从传入目录取名。
 
 调用 `natal_chart(chart.resolved, chart.requested)` 按当前实现计算新结果，并记录本次来源。
 它保留已解析出生输入，不再查时区。新结果可能与用不同代码算得的旧结果不同。

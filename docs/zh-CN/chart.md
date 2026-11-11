@@ -8,6 +8,8 @@
 
 ## 计算一张盘
 
+给定时刻与地点、无需出生记录的排盘，使用 [moment_chart](moments.md)。
+
 <!-- usage: chart.calculation -->
 
 先准备输入。排盘需要已知钟点、显式时区和地点；[出生指南](birth.md)说明这一步。
@@ -185,13 +187,19 @@ True
 |---|---|
 | 记录没有地点 | `MissingBirthDataError` |
 | 纬度在两极 | `ChartDomainError`，不带上游细节 |
-| 民用年份 2100 及以后 | `ChartDomainError`，不带上游细节 |
+| 民用年达到或超过上游有效范围的结束年（不含该年） | `ChartDomainError`，不带上游细节 |
 | 时刻超出支持的星历范围 | `ChartDomainError`，携带上游消息 |
 | 该纬度下请求的几何无定义 | `ChartDomainError`，携带上游消息 |
 
-`house_system` 标明请求的宫制。调用前的拒绝将 `upstream_message` 留为 None；天文库报告的失败在该字段保留异常文本，
-即使文本为空。上游异常提供诊断字段时，`operation` 是上游的操作名，`recorded` 表示原生代码是否报告了已识别的错误类别。
-域拒绝将两者留为 None。错误类型不靠解析消息文本决定。
+`house_system` 标明请求的宫制，其他字段区分失败来自哪里：
+
+- 地点、极点纬度和民用年校验拒绝时，`upstream_message`、`operation`、`recorded` 都为 `None`。
+- 上游以 `ValueError` 拒绝时，例如 Placidus 几何无定义，会保留 `upstream_message`，
+  而 `operation`、`recorded` 仍为 `None`。
+- 能力查询或排盘抛出上游 `CelestialError` 时，保留这三个字段。`operation` 标明失败的上游操作；
+  `recorded=True` 表示原生代码提供了已识别的错误种类，`False` 表示没有。两者都不表示计算成功。
+
+上游异常文本即使为空也会保留。适配层按异常类型和字段分类，不解析消息文本。
 
 ```{doctest}
 >>> high = prepare_natal_input(BirthRecord(
@@ -229,8 +237,19 @@ True
 
 ## 限度
 
+适配层用固定的 Algo5 ΔT 模型查询上游 `house_capability`，读取民用年上界。
+例如，celestial-calendar 1.1.1 返回：
+
+```{doctest}
+>>> from celestial_calendar import DeltaTModel, house_capability
+>>> capability = house_capability(delta_t_model=DeltaTModel.ALGO5)
+>>> capability.civil_start_year, capability.civil_end_year_exclusive, capability.utc_start_date
+(1885, 2100, (1972, 1, 1))
+```
+
+结束年不包含在有效范围内。出生时间准备另行要求现代 UTC，本命适配层不增加年份下界政策。
+原生快照仍检查更窄的 TT 与几何有效域，因此民用年通过不保证能够排盘。
+
 - 请求的相位在参与的对象之间判断；规则和限度见[相位指南](aspects.md)。
-- 天文库支持 1885 至 2099 民用年，UTC 输入起于 1972-01-01；
-  星历有效域比民用年范围更窄，超出即显式失败。
 - 安装需要有 celestial-calendar 轮子的平台；见
   [安装说明](../../README.zh-CN.md#安装发行版)。

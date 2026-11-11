@@ -11,7 +11,7 @@ from enum import StrEnum
 from types import MappingProxyType
 from typing import Final, cast
 
-from astrology.chart import NatalChart, Placement
+from astrology.chart import Chart, Placement, _require_chart
 from astrology.config import Body
 from astrology.houses import _require_house_number
 from astrology.objects import AstronomicalObject, _is_astronomical_object
@@ -134,22 +134,21 @@ class HouseRuler:
 
 @dataclass(frozen=True, slots=True)
 class HouseRulers:
-  """Derive twelve house-ruler records from one retained NatalChart.
+  """Derive twelve house-ruler records from one retained natal or moment chart.
 
   Use actual cusps, not axes; keep repeated signs and missing ruler placements.
-  A non-NatalChart raises TypeError. Repeated houses accesses return new records that compare equal;
+  Invalid chart types raise TypeError. Repeated houses accesses return new records that compare equal;
   existing placements and the source chart are retained by identity.
 
-  从保留的 NatalChart 推导十二宫主星记录。使用实际宫头，不以轴代替；保留重复
-  星座及缺失的宫主星落点。非 NatalChart 输入抛出 TypeError。两次读取 houses 所得元组相等，
+  从保留的本命盘或时刻盘推导十二宫主星记录。使用实际宫头，不以轴代替；保留重复
+  星座及缺失的宫主星落点。命盘类型错误时抛出 TypeError。两次读取 houses 所得元组相等，
   但其中的记录不是同一批对象；已有落点及源盘保留原对象。
   """
 
-  chart: NatalChart
+  chart: Chart
 
   def __post_init__(self) -> None:
-    if type(self.chart) is not NatalChart:
-      raise TypeError("chart must be a NatalChart")
+    _require_chart(self.chart)
 
   @property
   def houses(self) -> tuple[HouseRuler, ...]:
@@ -184,7 +183,7 @@ class Dispositors:
   见 entry.dispositor_chains。
   """
 
-  chart: NatalChart
+  chart: Chart
   objects: tuple[AstronomicalObject, ...]
   #: Reached object-to-ruler edges, including absent targets. 已到达对象到守护星的边，含缺失目标。
   edges: Mapping[AstronomicalObject, Body] = field(init=False, hash=False)
@@ -199,9 +198,8 @@ class Dispositors:
   #: Each affected root's absent next ruler. 各受影响根对象缺失的下一颗守护星。
   missing_rulers: Mapping[AstronomicalObject, Body] = field(init=False, hash=False)
 
-  def __init__(self, chart: NatalChart, objects: Sequence[AstronomicalObject]) -> None:
-    if type(chart) is not NatalChart:
-      raise TypeError("chart must be a NatalChart")
+  def __init__(self, chart: Chart, objects: Sequence[AstronomicalObject]) -> None:
+    _require_chart(chart)
     if not isinstance(objects, Sequence) or isinstance(objects, (str, bytes)):
       raise TypeError("objects must be a sequence")
     selected = tuple(objects)
@@ -262,7 +260,7 @@ class Dispositors:
     return _DISPOSITOR_RULE_ID
 
 
-def chart_dispositors(chart: NatalChart, *, objects: Sequence[AstronomicalObject]) -> Dispositors:
+def chart_dispositors(chart: Chart, *, objects: Sequence[AstronomicalObject]) -> Dispositors:
   """Follow Lilly sign rulers from selected chart placements; see Dispositors.
 
   从选定的命盘落点沿 Lilly 星座守护表遍历；详见 Dispositors。

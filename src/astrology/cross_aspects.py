@@ -1,6 +1,6 @@
-"""Static major aspects between two supplied natal results.
+"""Static major aspects between two supplied charts.
 
-对两张给定本命盘结果判断静态主要相位。
+对两张给定命盘判断静态主要相位。
 """
 
 from __future__ import annotations
@@ -10,7 +10,7 @@ from dataclasses import dataclass
 
 from astrology._comparison import _require_comparable_sources, _selection_for_chart
 from astrology.aspects import _geometry_values, _pair_geometry, aspect_angle
-from astrology.chart import NatalChart, _aspect_positions
+from astrology.chart import Chart, _aspect_positions
 from astrology.config import AspectRule, MajorAspect, OrbCombination
 from astrology.objects import ChartObject, _is_chart_object
 
@@ -60,8 +60,8 @@ class CrossChartAspects:
   构造时按两侧来源、选择和规则重算全部命中，拒绝任何差异。
   """
 
-  chart_left: NatalChart
-  chart_right: NatalChart
+  chart_left: Chart
+  chart_right: Chart
   left_objects: tuple[ChartObject, ...]
   right_objects: tuple[ChartObject, ...]
   rules: tuple[AspectRule, ...]
@@ -116,8 +116,8 @@ def _rules(
 
 
 def _hits(
-  chart_left: NatalChart,
-  chart_right: NatalChart,
+  chart_left: Chart,
+  chart_right: Chart,
   left_objects: tuple[ChartObject, ...],
   right_objects: tuple[ChartObject, ...],
   rules: tuple[AspectRule, ...],
@@ -142,8 +142,8 @@ def _hits(
 
 
 def cross_chart_aspects(
-  chart_left: NatalChart,
-  chart_right: NatalChart,
+  chart_left: Chart,
+  chart_right: Chart,
   rules: Sequence[AspectRule],
   *,
   left_objects: Sequence[ChartObject] | None = None,
@@ -152,8 +152,9 @@ def cross_chart_aspects(
 ) -> CrossChartAspects:
   """Compare each selected left position with every selected right position, without motion.
 
-  None selects all bodies/nodes on that side and no axes, independently of natal participants;
-  explicit selections may include any of its stored axes, even if absent from natal
+  None selects all bodies/nodes on that side and no axes, independently of the
+  source chart's aspect selection. Explicit selections may include any axis stored
+  in that side's chart, even if the axis did not participate in that chart's own
   aspects. Read the actual axis fields, never cusps or synthesized opposite axes.
   An empty selection or rule sequence is valid. Same identities, node-node pairs
   and the same chart in both roles are allowed. Rules are explicit and never
@@ -171,8 +172,8 @@ def cross_chart_aspects(
   not automatically rejected. Source charts are retained unchanged.
 
   将每个所选左盘位置与每个所选右盘位置比较，不判断运动状态。None 选该侧全部天体和交点，不加入四轴；
-  显式选择可含该盘任一已存轴，即使未参与本命相位。直接读取轴字段，不使用宫头或合成对轴。
-  不继承本命相位参与者；空选择和空规则合法。允许同名对象、跨盘交点配对及同一张盘占两个角色。
+  显式选择可含该盘任一已存轴，即使未参与盘内相位。直接读取轴字段，不使用宫头或合成对轴。
+  不继承源盘的相位对象选择；空选择和空规则合法。允许同名对象、跨盘交点配对及同一张盘占两个角色。
   规则须显式给出，不继承源盘规则。对象容许度按标识作用于两侧，只能指向所选对象；有覆盖时
   必须给合成方式，无覆盖时不能给。拒绝重复规则、重复参与对象及源盘没有的对象。
   所选四轴在天体和交点之后按上升、中天、下降、天底顺序排列。保留轴间及对轴配对，不折叠身份。

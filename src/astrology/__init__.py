@@ -25,14 +25,18 @@ from astrology.birth import (
   resolve_birth_time,
 )
 from astrology.chart import (
+  Chart,
   ChartDomainError,
   ChartHouses,
   ChartProvenance,
   ChartTimes,
   EclipticPosition,
   EffectiveConfiguration,
+  MomentChart,
+  MomentInput,
   NatalChart,
   Placement,
+  moment_chart,
   natal_chart,
 )
 from astrology.config import (
@@ -65,6 +69,7 @@ from astrology.houses import house_of
 from astrology.knowledge import Catalog, load_catalog
 from astrology.lunar_phase import LunarPhaseResult, LunationType, lunar_phase
 from astrology.objects import Axis
+from astrology.returns import return_hits
 from astrology.summaries import (
   SignDistribution,
   chart_sign_distribution,
@@ -78,7 +83,9 @@ from astrology.text import (
   format_house_rulers,
   format_lunar_phase,
   format_sign_distribution,
+  format_transit_aspects,
 )
+from astrology.transit_aspects import TransitAspectHit, TransitAspects, transit_aspects
 from astrology.transits import (
   TransitDirection,
   TransitDomainError,
@@ -111,6 +118,7 @@ __all__ = [
   "BirthRecord",
   "Body",
   "Catalog",
+  "Chart",
   "ChartConfig",
   "ChartDomainError",
   "ChartHouses",
@@ -138,6 +146,8 @@ __all__ = [
   "MajorAspect",
   "MissingBirthDataError",
   "Modality",
+  "MomentChart",
+  "MomentInput",
   "NatalChart",
   "NodeDefinition",
   "NonexistentBirthTimeError",
@@ -148,6 +158,8 @@ __all__ = [
   "Sign",
   "SignDistribution",
   "TimePrecision",
+  "TransitAspectHit",
+  "TransitAspects",
   "TransitDirection",
   "TransitDomainError",
   "TransitHit",
@@ -168,18 +180,22 @@ __all__ = [
   "format_house_rulers",
   "format_lunar_phase",
   "format_sign_distribution",
+  "format_transit_aspects",
   "house_of",
   "load_catalog",
   "lunar_phase",
   "modality_of",
+  "moment_chart",
   "natal_chart",
   "natal_lunar_phase",
   "prepare_natal_input",
   "resolve_birth_time",
+  "return_hits",
   "sign_degree",
   "sign_distribution",
   "sign_of",
   "sign_ruler",
+  "transit_aspects",
   "transit_hits",
   "truncate_display",
 ]

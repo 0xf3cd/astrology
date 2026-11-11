@@ -7,6 +7,13 @@ values or pass it to `format_chart` with an explicit knowledge catalog. The
 package provides no chart save/restore API or storage schema; see the
 [release notes](releases.md) for the API removal.
 
+`moment_chart` returns an immutable `MomentChart` with `moment` instead of a
+resolved birth input. `moment.utc` and `moment.location` identify the supplied
+instant/site; optional `moment.source_jde_tt` retains a source event's original TT,
+separately from `times.jde_tt`. Its other result fields share the chart contracts
+below. `format_chart` labels it as a moment chart and omits birth/timezone
+provenance. See the [moment examples](moments.md).
+
 ## A complete example
 
 <!-- usage: records.output -->
@@ -71,6 +78,9 @@ Loading the catalog is explicit; formatting itself performs no resource I/O.
 - `provenance` keeps astrology/celestial-calendar versions, position frame and
   UT1 derivation; `effective` keeps the resolved Delta-T model and evaluation.
 
+The Chinese tables label the position frame as `位置坐标约定`; this is the same
+value described as 位置参考系 in the Chinese guides.
+
 Constructing `NatalChart` directly checks field types, ranges, and whether signs,
 house membership and aspects agree with the supplied positions, axes, cusps and rules.
 See the [validation boundary](architecture.md#reproducibility) for what these checks
@@ -78,7 +88,8 @@ establish. Use `natal_chart` to calculate values from resolved input.
 
 Selected axis names in participants, orb overrides and hits come from the supplied
 catalog, just like body names. An old body/node-only request needs no axis concepts:
-the existing four axis-geometry row labels remain fixed bilingual labels.
+the Ascendant, Midheaven, Descendant and Imum Coeli rows in "Axes and house cusps"
+use fixed labels in the selected language, independent of the supplied catalog.
 
 Calling `natal_chart(chart.resolved, chart.requested)` calculates a fresh result
 with the current implementation and records its provenance. It keeps the resolved
