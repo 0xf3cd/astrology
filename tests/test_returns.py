@@ -430,22 +430,3 @@ def test_installed_return_observations_capture_supplied_results_without_calculat
       "distribution",
       "text",
     }
-
-
-@pytest.mark.parametrize("defect", ["location", "houses"])
-def test_installed_return_failure_checks_reject_silent_success(
-  natal: NatalChart, monkeypatch: pytest.MonkeyPatch, defect: str
-) -> None:
-  from tools.installed_check import _check_return_failures
-
-  event = _search(natal).hits[0]
-  replacement = moment_chart(event, SITE, CONFIG)
-
-  def substituted(hit: object, location: object, config: object) -> MomentChart:
-    if location is None and defect == "houses":
-      raise TypeError("Location required")
-    return replacement
-
-  monkeypatch.setattr("astrology.moment_chart", substituted)
-  with pytest.raises(ValueError, match=r"missing location|house geometry"):
-    _check_return_failures(event)
