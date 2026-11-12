@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Release notes &#8212; celestial-astrology 0.4.0 documentation / 文档</title>
+    <title>Release notes &#8212; celestial-astrology 0.5.0 documentation / 文档</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
-    <script src="../../_static/documentation_options.js?v=6c02275b"></script>
+    <script src="../../_static/documentation_options.js?v=1dd76d02"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/en/releases.html" />
@@ -38,7 +38,59 @@
 <h1>Release notes<a class="headerlink" href="#release-notes" title="Link to this heading">¶</a></h1>
 <p><a class="reference internal" href="../zh-CN/releases.html"><span class="std std-doc">简体中文</span></a> · <a class="reference internal" href="index.html"><span class="std std-doc">Documentation</span></a> · <a class="reference internal" href="releasing.html"><span class="std std-doc">Release procedure</span></a></p>
 <section id="id1">
-<h2>0.4.0<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
+<h2>0.5.0<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
+<p>This version adds moment charts, fixed-instant transit-to-natal aspects with
+English/Chinese text, and solar and lunar return workflows.
+Package index: <a class="reference external" href="https://pypi.org/project/celestial-astrology/0.5.0/">PyPI</a>.</p>
+<section id="moment-charts-and-fixed-instant-aspects">
+<h3>Moment charts and fixed-instant aspects<a class="headerlink" href="#moment-charts-and-fixed-instant-aspects" title="Link to this heading">¶</a></h3>
+<p><a class="reference internal" href="moments.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">moment_chart</span></code></span></a> builds a <code class="docutils literal notranslate"><span class="pre">MomentChart</span></code> from an aware <code class="docutils literal notranslate"><span class="pre">datetime</span></code> or a
+retained <code class="docutils literal notranslate"><span class="pre">TransitHit</span></code>, with an explicit location and configuration. It preserves
+the input UTC and any original event TT separately from the calculated time scales,
+without creating a birth record. Cross-chart aspects, house overlays, house rulers,
+dispositors, sign distributions, interval transit searches and chart text accept
+moment charts.</p>
+<p><code class="docutils literal notranslate"><span class="pre">transit_aspects</span></code> compares a moment chart’s moving objects with a natal chart’s
+frozen degrees, using explicit orb rules and moving rates against zero natal
+motion. <code class="docutils literal notranslate"><span class="pre">format_transit_aspects</span></code> provides English and Chinese tables. The existing
+static cross-chart comparison still has no motion labels.</p>
+</section>
+<section id="solar-and-lunar-returns">
+<h3>Solar and lunar returns<a class="headerlink" href="#solar-and-lunar-returns" title="Link to this heading">¶</a></h3>
+<p><a class="reference internal" href="returns.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">return_hits</span></code></span></a> finds every Sun or Moon return to its stored natal
+longitude in an explicit UTC interval. It delegates to the existing same-body
+conjunction search and returns <code class="docutils literal notranslate"><span class="pre">TransitHits</span></code>; pass a chosen hit to <code class="docutils literal notranslate"><span class="pre">moment_chart</span></code>
+with a location and configuration. Search and chart results together retain the
+natal reference, interval, event models, original event TT and chart settings.
+Location is not inferred, and unavailable requested house geometry still fails
+without a fallback. Return definitions, location practices and project conventions
+are recorded separately in the knowledge catalog.</p>
+</section>
+<section id="guides-and-compatibility">
+<h3>Guides and compatibility<a class="headerlink" href="#guides-and-compatibility" title="Link to this heading">¶</a></h3>
+<p>The <a class="reference internal" href="transits.html#search-cost"><span class="std std-ref">transit guide</span></a> explains scan cost and how object and
+aspect selections multiply queries. Civil-year limits now come from the upstream
+<code class="docutils literal notranslate"><span class="pre">house_capability()</span></code> result. Existing natal calculation conventions and runtime
+dependency pins remain unchanged: <code class="docutils literal notranslate"><span class="pre">celestial-calendar==1.1.1</span></code> and <code class="docutils literal notranslate"><span class="pre">tzdata==2026.5</span></code>.
+Python 3.11–3.14 and the platform requirements in 0.4.0 are unchanged.
+Orb windows, other planetary returns and interpretation are outside this release.</p>
+<p>Project implementation citations use <code class="docutils literal notranslate"><span class="pre">source.astrology</span></code>, referring to the v0.5.0
+release tree with module and symbol locators. The following catalog source IDs are
+removed; callers addressing them must use <code class="docutils literal notranslate"><span class="pre">source.astrology</span></code>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">source.astrology.house_overlays.f269d14</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">source.astrology.axis_aspects.4cb15cc</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">source.astrology.sign_groups.c92ac82</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">source.astrology.cross_aspects.0d7122a</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">source.astrology.chart.fc845fa</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">source.astrology.config.fa2e985</span></code></p></li>
+</ul>
+<p>Their full historical revisions remain in the source’s lineage. The 0.4.0 package
+retains its original catalog. See the <a class="reference internal" href="knowledge.html#follow-a-source-to-a-definition"><span class="std std-ref">project source record</span></a>.</p>
+</section>
+</section>
+<section id="id2">
+<h2>0.4.0<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
 <p>This version adds dispositor chains and exact transit-to-natal hits, upgrades
 celestial-calendar to 1.1.1 and removes the independent catalog version.
 Package index: <a class="reference external" href="https://pypi.org/project/celestial-astrology/0.4.0/">PyPI</a>.</p>
@@ -88,8 +140,8 @@ compatibility change; source revisions, bibliographic editions and chart
 provenance remain.</p>
 </section>
 </section>
-<section id="id2">
-<h2>0.3.0<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<section id="id3">
+<h2>0.3.0<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
 <p>This version adds natal analysis, axis aspect selection and cross-chart house overlays.
 Package index: <a class="reference external" href="https://pypi.org/project/celestial-astrology/0.3.0/">PyPI</a>.</p>
 <ul class="simple">
@@ -116,8 +168,8 @@ recovery without replacing published files.</p>
 unchanged from 0.2.0. This version does not add transits, returns, constructed
 relationship charts or an interactive chart UI.</p>
 </section>
-<section id="id3">
-<h2>0.2.0<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
+<section id="id4">
+<h2>0.2.0<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h2>
 <section id="static-cross-chart-aspects">
 <h3>Static cross-chart aspects<a class="headerlink" href="#static-cross-chart-aspects" title="Link to this heading">¶</a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">cross_chart_aspects</span></code> compares two in-memory natal results with explicit rules.
@@ -148,8 +200,8 @@ remain. This removal does not change the astronomy, timezone policy or dependenc
 pins.</p>
 </section>
 </section>
-<section id="id4">
-<h2>0.1.0<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h2>
+<section id="id5">
+<h2>0.1.0<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h2>
 <p>The first release provides modern tropical, geocentric natal charts and an
 independently browsable English/Chinese knowledge catalog. Install the distribution
 <code class="docutils literal notranslate"><span class="pre">celestial-astrology</span></code>; Python imports remain <code class="docutils literal notranslate"><span class="pre">astrology</span></code>.</p>
@@ -250,9 +302,11 @@ additional objects, interpretation and a chart-wheel UI are outside this release
 <li class="toctree-l2"><a class="reference internal" href="birth.html">Birth records and modern time resolution</a></li>
 <li class="toctree-l2"><a class="reference internal" href="configuration.html">Requested chart configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="chart.html">Natal charts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="moments.html">Moment charts and fixed-instant transits</a></li>
 <li class="toctree-l2"><a class="reference internal" href="aspects.html">Aspects</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cross_aspects.html">Cross-chart aspects and house overlays</a></li>
 <li class="toctree-l2"><a class="reference internal" href="transits.html">Exact transit hits</a></li>
+<li class="toctree-l2"><a class="reference internal" href="returns.html">Solar and lunar returns</a></li>
 <li class="toctree-l2"><a class="reference internal" href="summaries.html">Sign distributions and natal lunar phase</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dignities.html">Traditional rulership, dignities and dispositor chains</a></li>
 <li class="toctree-l2"><a class="reference internal" href="records.html">Chart results and text</a></li>

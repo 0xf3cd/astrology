@@ -2,15 +2,21 @@
 
 [简体中文](../zh-CN/architecture.md) · [Project](../../README.md) · [Knowledge](knowledge.md)
 
-Birth records, modern time resolution, requested configuration, the tropical
-natal chart, major aspects, text output and independent knowledge are implemented; their
+Birth records, modern time resolution, requested configuration, tropical natal and
+moment charts, major aspects, text output and independent knowledge are implemented; their
 usage and constraints are in the [birth](birth.md), [configuration](configuration.md),
 [chart](chart.md), [aspect](aspects.md), [cross-chart](cross_aspects.md), [result](records.md)
 and [knowledge](knowledge.md) guides. [Exact transit hits](transits.md) search
-moving objects against fixed natal degrees over a UTC interval.
-The current chart is
-a reproducible modern tropical, geocentric natal chart, with independent access
-to its underlying knowledge.
+moving objects against fixed source-chart degrees over a UTC interval.
+Charts use modern tropical, geocentric coordinates; the underlying knowledge can
+also be queried without a chart.
+
+[Moment charts](moments.md) use explicit instants/locations instead of birth
+records. Natal and moment results share validation and the concrete UTC/location
+snapshot. Fixed-instant transit aspects reuse cross geometry, with local motion
+against zero fixed-side rates; their source/result construction remains native-free.
+[Solar and lunar returns](returns.md) select same-body conjunction events against
+a natal chart, then reuse the moment-chart boundary for an explicit location.
 
 ## Organization
 
@@ -29,7 +35,9 @@ src/astrology/
   chart.py          Composition and immutable chart results
   _comparison.py    Source compatibility and stored-chart object selection
   cross_aspects.py  Static comparison of supplied charts, retaining both sources
-  transits.py       Exact moving-to-fixed-natal interval events
+  transits.py       Exact moving-to-fixed-source interval events
+  returns.py        Solar/lunar return selection over exact transit hits
+  transit_aspects.py Fixed-instant moving-to-natal geometry and local motion
   house_overlays.py Directional house placement between supplied charts
   lunar_phase.py    Oriented solar/lunar arc and named lunation types
   dignities.py      Traditional dignities, house rulers and dispositor chains
@@ -65,6 +73,11 @@ for both cross-chart consumers and validates natal target selections for transit
 selected natal degrees and the aspect branches in `aspects.py`. It retains the
 source chart without creating a moving-side birth record or house geometry.
 
+`returns.py` owns the natal-only, Sun/Moon-only return selection. It delegates to
+`transit_hits` and returns the same `TransitHits`; chart construction stays with
+`moment_chart`. Retaining both results preserves the reference search and the
+chosen chart's location/configuration without a separate return-result family.
+
 `dignities.py` owns the sign-ruler table and the house-ruler and dispositor results
 derived from it. These supplied-chart operations use existing placements without
 initializing astronomy. `summaries.py` keeps sign distributions and natal lunar phase.
@@ -76,8 +89,9 @@ the result later without moving calculation into a frontend.
 ## Effects boundary
 
 Package imports, knowledge queries, classifications, summaries and supplied-chart
-comparisons do not initialize native astronomy. `natal_chart` and `transit_hits`
-load the astronomy adapter only when called. `resolve_birth_time` reads timezone data,
+comparisons do not initialize native astronomy. `natal_chart`, `moment_chart` and `transit_hits`
+load the astronomy adapter only when called. `return_hits` delegates to `transit_hits`
+after validating its source/body. `resolve_birth_time` reads timezone data,
 and `load_catalog` reads packaged knowledge; formatters use a caller-supplied catalog
 without resource I/O. The [isolation checks](contributing.md#run-the-checks)
 exercise these boundaries.
@@ -162,6 +176,6 @@ Birth/configuration values, the independent knowledge catalog, the tropical
 natal chart, major aspects and text output are implemented,
 with bilingual documentation and installed-package verification.
 
-The [v0.1.0 milestone](https://github.com/0xf3cd/astrology/milestone/1) owns task
+The [project milestones](https://github.com/0xf3cd/astrology/milestones) track task
 status. The source layout can evolve as these concrete implementations reveal
 shared needs; a general backend/plugin framework is not a prerequisite.

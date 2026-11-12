@@ -5,18 +5,18 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>星座分布与出生月相 &#8212; celestial-astrology 0.4.0 documentation / 文档</title>
+    <title>星座分布与出生月相 &#8212; celestial-astrology 0.5.0 documentation / 文档</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
-    <script src="../../_static/documentation_options.js?v=6c02275b"></script>
+    <script src="../../_static/documentation_options.js?v=1dd76d02"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/zh-CN/summaries.html" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="传统守护、尊贵状态与定位星链" href="dignities.html" />
-    <link rel="prev" title="精确行运命中" href="transits.html" />
+    <link rel="prev" title="日返照与月返照" href="returns.html" />
    
   <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
   
@@ -81,7 +81,7 @@
 <p>传入非空、身份各不相同的 <code class="docutils literal notranslate"><span class="pre">Placement</span></code> 记录序列，并自行确认它们来自同一来源，例如同一张盘。
 校验的范围见<a class="reference internal" href="architecture.html#id7"><span class="std std-ref">校验边界</span></a>。
 <code class="docutils literal notranslate"><span class="pre">SignDistribution</span></code> 按输入顺序将其复制为不可变元组，计数、比例和总数都由这个快照推导。
-<code class="docutils literal notranslate"><span class="pre">element_of</span></code> 和 <code class="docutils literal notranslate"><span class="pre">modality_of</span></code> 接受 <code class="docutils literal notranslate"><span class="pre">Sign</span></code> 成员。校验错误见<a class="reference internal" href="reference.html#id11"><span class="std std-ref">摘要 API 参考</span></a>。</p>
+<code class="docutils literal notranslate"><span class="pre">element_of</span></code> 和 <code class="docutils literal notranslate"><span class="pre">modality_of</span></code> 接受 <code class="docutils literal notranslate"><span class="pre">Sign</span></code> 成员。校验错误见<a class="reference internal" href="reference.html#id13"><span class="std std-ref">摘要 API 参考</span></a>。</p>
 <!-- /usage: summaries.population -->
 <p>分类来源及它们与历史星座分组的区别，见<a class="reference internal" href="knowledge.html#id6"><span class="std std-ref">知识说明</span></a>。</p>
 </section>
@@ -140,7 +140,7 @@
 结果按源盘顺序，而非选择顺序排列。统计全部请求对象时，须显式传
 <code class="docutils literal notranslate"><span class="pre">objects=chart.requested.objects</span></code>。不加入未选天体、交点或四轴。四轴不是落点，即使显式选择也不能参与这项统计。
 <code class="docutils literal notranslate"><span class="pre">natal_lunar_phase</span></code> 要求日月齐备；缺位置时会报错并列出缺失身份，不补算。
-完整错误契约见<a class="reference internal" href="reference.html#id11"><span class="std std-ref">摘要 API 参考</span></a>。</p>
+完整错误契约见<a class="reference internal" href="reference.html#id13"><span class="std std-ref">摘要 API 参考</span></a>。</p>
 <p>目录条目仍是 <code class="docutils literal notranslate"><span class="pre">reference_only</span></code>，已声明完整前提 <code class="docutils literal notranslate"><span class="pre">complete</span></code>，而命盘适用性为 <code class="docutils literal notranslate"><span class="pre">not_assessed</span></code>。
 来源已核不代表目录查询会判断命盘。</p>
 </section>
@@ -190,9 +190,11 @@
 <li class="toctree-l2"><a class="reference internal" href="birth.html">出生记录与现代时刻解析</a></li>
 <li class="toctree-l2"><a class="reference internal" href="configuration.html">排盘请求配置</a></li>
 <li class="toctree-l2"><a class="reference internal" href="chart.html">本命盘</a></li>
+<li class="toctree-l2"><a class="reference internal" href="moments.html">时刻盘与固定时刻行运相位</a></li>
 <li class="toctree-l2"><a class="reference internal" href="aspects.html">相位</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cross_aspects.html">双盘相位与落宫</a></li>
 <li class="toctree-l2"><a class="reference internal" href="transits.html">精确行运命中</a></li>
+<li class="toctree-l2"><a class="reference internal" href="returns.html">日返照与月返照</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">星座分布与出生月相</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dignities.html">传统守护、尊贵状态与定位星链</a></li>
 <li class="toctree-l2"><a class="reference internal" href="records.html">命盘结果与文本显示</a></li>
@@ -212,7 +214,7 @@
 <ul>
   <li><a href="../index.html">Documentation overview</a><ul>
   <li><a href="index.html">文档入口</a><ul>
-      <li>Previous: <a href="transits.html" title="previous chapter">精确行运命中</a></li>
+      <li>Previous: <a href="returns.html" title="previous chapter">日返照与月返照</a></li>
       <li>Next: <a href="dignities.html" title="next chapter">传统守护、尊贵状态与定位星链</a></li>
   </ul></li>
   </ul></li>

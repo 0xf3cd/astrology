@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Knowledge catalog reference &#8212; celestial-astrology 0.4.0 documentation / 文档</title>
+    <title>Knowledge catalog reference &#8212; celestial-astrology 0.5.0 documentation / 文档</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
-    <script src="../../_static/documentation_options.js?v=6c02275b"></script>
+    <script src="../../_static/documentation_options.js?v=1dd76d02"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/en/catalog.html" />
@@ -47,7 +47,7 @@ revisions and search limits. Original excerpts, project translations and authore
 statements are labeled separately. Retrieval never establishes chart applicability.
 The guide explains the <a class="reference internal" href="knowledge.html#status-has-several-dimensions"><span class="std std-ref">source, prerequisite, output and chart states</span></a>
 and <a class="reference internal" href="knowledge.html#translation-revisions-and-search"><span class="std std-ref">translation revisions</span></a> shown below.</p>
-<p>Package version: <code class="docutils literal notranslate"><span class="pre">0.4.0</span></code></p>
+<p>Package version: <code class="docutils literal notranslate"><span class="pre">0.5.0</span></code></p>
 <section id="axis-ascendant-ascendant">
 <span id="catalog-en-axis-ascendant"></span><h2>axis.ascendant · Ascendant<a class="headerlink" href="#axis-ascendant-ascendant" title="Link to this heading">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">kind=axis</span></code></p>
@@ -528,6 +528,13 @@ and <a class="reference internal" href="knowledge.html#translation-revisions-and
 <p>English names / 英文名称：Bicorporeal signs</p>
 <p>Chinese names / 中文名称：双体星座</p>
 </section>
+<section id="rule-project-solar-lunar-returns-solar-and-lunar-returns-to-natal-longitude">
+<span id="catalog-en-rule-project-solar-lunar-returns"></span><h2>rule.project.solar_lunar_returns · Solar and lunar returns to natal longitude<a class="headerlink" href="#rule-project-solar-lunar-returns-solar-and-lunar-returns-to-natal-longitude" title="Link to this heading">¶</a></h2>
+<p>A solar or lunar return is the moving Sun or Moon reaching the stored natal longitude of that same body. astrology.returns.return_hits selects a same-body conjunction through transit_hits and returns its TransitHits unchanged. The explicit half-open UTC interval selects all occurrences, including an empty result. Each retained hit can be passed to moment_chart with a caller-supplied location and ChartConfig.</p>
+<p>Modern return definitions in Astrowiki, Mary Shea and Isabelle Ghaneh; the own-date apparent geocentric tropical comparison and explicit-location interface are project conventions. Birthplace and residence practices remain distinct choices made by the caller.</p>
+<p>No common-epoch or sidereal transformation, calendar-anniversary shortcut or location inference. A calendar year can contain two solar returns; all events in the interval are retained. Search and chart construction are separate: a valid event need not admit the requested house geometry. Numerical reproducibility does not establish forecasting efficacy.</p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-en-body-sun"><span class="std std-ref">body.sun</span></a>, <a class="reference internal" href="#catalog-en-body-moon"><span class="std std-ref">body.moon</span></a>, <a class="reference internal" href="#catalog-en-aspect-conjunction"><span class="std std-ref">aspect.conjunction</span></a></p>
+</section>
 <section id="rule-lilly1647-essential-dignities-lilly-1647-seven-planet-rulership-and-four-statuses">
 <span id="catalog-en-rule-lilly1647-essential-dignities"></span><h2>rule.lilly1647.essential_dignities · Lilly 1647 seven-planet rulership and four statuses<a class="headerlink" href="#rule-lilly1647-essential-dignities-lilly-1647-seven-planet-rulership-and-four-statuses" title="Link to this heading">¶</a></h2>
 <p>astrology.dignities owns the seven-planet domicile and sign-wide exaltation assignments. Detriment is opposite a domicile and fall opposite exaltation. essential_dignities returns all matches in domicile, exaltation, detriment, fall order; an empty tuple means none of these four. HouseRulers applies sign_ruler to each supplied cusp sign and retains existing ruler placements without recalculation; this composition policy is project-authored.</p>
@@ -984,12 +991,71 @@ and <a class="reference internal" href="knowledge.html#translation-revisions-and
 <p>Bodies and named lunar nodes can be roots; every successor is one of the seven classical rulers. Axes and cusps are not roots. An unavailable root is rejected rather than reported as an absent successor. No missing position is calculated, and only reached components are reported. Domicile-based mutual reception here does not assess aspects, exaltation reception or other traditions’ conditions. Several endpoints do not establish a unique chart-wide ruler. No scoring, interpretation or modern co-rulers are supplied.</p>
 <p>Concepts / 概念：<a class="reference internal" href="#catalog-en-body-sun"><span class="std std-ref">body.sun</span></a>, <a class="reference internal" href="#catalog-en-body-moon"><span class="std std-ref">body.moon</span></a>, <a class="reference internal" href="#catalog-en-body-mercury"><span class="std std-ref">body.mercury</span></a>, <a class="reference internal" href="#catalog-en-body-venus"><span class="std std-ref">body.venus</span></a>, <a class="reference internal" href="#catalog-en-body-mars"><span class="std std-ref">body.mars</span></a>, <a class="reference internal" href="#catalog-en-body-jupiter"><span class="std std-ref">body.jupiter</span></a>, <a class="reference internal" href="#catalog-en-body-saturn"><span class="std std-ref">body.saturn</span></a>, <a class="reference internal" href="#catalog-en-body-uranus"><span class="std std-ref">body.uranus</span></a>, <a class="reference internal" href="#catalog-en-body-neptune"><span class="std std-ref">body.neptune</span></a>, <a class="reference internal" href="#catalog-en-body-pluto"><span class="std std-ref">body.pluto</span></a>, <a class="reference internal" href="#catalog-en-node-mean-ascending"><span class="std std-ref">node.mean_ascending</span></a>, <a class="reference internal" href="#catalog-en-node-mean-descending"><span class="std std-ref">node.mean_descending</span></a>, <a class="reference internal" href="#catalog-en-node-meeus-five-term-true-ascending"><span class="std std-ref">node.meeus_five_term_true_ascending</span></a>, <a class="reference internal" href="#catalog-en-node-meeus-five-term-true-descending"><span class="std std-ref">node.meeus_five_term_true_descending</span></a></p>
 </section>
+<section id="rule-project-moment-charts-supplied-instant-charts">
+<span id="catalog-en-rule-project-moment-charts"></span><h2>rule.project.moment_charts · Supplied-instant charts<a class="headerlink" href="#rule-project-moment-charts-supplied-instant-charts" title="Link to this heading">¶</a></h2>
+<p>A MomentChart uses an explicitly supplied aware UTC instant, location and ChartConfig without creating a birth record. MomentInput retains normalized UTC and location; when the input is a TransitHit it also retains the unchanged source event JDE(TT), separately from the snapshot’s derived ChartTimes. Internal chart aspects use the requested single-chart rules. Chart text identifies the moment input rather than claiming recorded birth or timezone provenance.</p>
+<p>Project input and result conventions over the concrete celestial adapter.</p>
+<p>Location is required, not inferred. The normalized or converted UTC must be modern and the complete joint snapshot must admit it. The upstream fixed leap table and Python datetime precision can make source-event TT differ from calculation TT, including around leap steps and the 1972 boundary. These are calculation/input conventions, not interpretation.</p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-en-house-whole-sign"><span class="std std-ref">house.whole_sign</span></a>, <a class="reference internal" href="#catalog-en-house-equal"><span class="std std-ref">house.equal</span></a>, <a class="reference internal" href="#catalog-en-house-placidus"><span class="std std-ref">house.placidus</span></a></p>
+</section>
+<section id="rule-project-transit-aspects-fixed-instant-transit-to-natal-aspects">
+<span id="catalog-en-rule-project-transit-aspects"></span><h2>rule.project.transit_aspects · Fixed-instant transit-to-natal aspects<a class="headerlink" href="#rule-project-transit-aspects-fixed-instant-transit-to-natal-aspects" title="Link to this heading">¶</a></h2>
+<p>Pair each selected moving MomentChart object with each selected fixed NatalChart degree. Use the same oriented geometry, explicit orbs and canonical ordering as cross-chart aspects, retaining moving/natal roles. Same identities, node-node and axis-axis pairs are allowed. Local motion uses the moving rate against zero natal motion, including zero for fixed natal axes; moving axes have no supplied rate. Zero deviation is exact, missing rates are indeterminate, and other states follow the shared local-motion definition. Bilingual text truncates displayed angles without changing hits or motion.</p>
+<p>Project composition of cross-chart geometry and a frozen-reference derivative; no interpretive tradition is selected.</p>
+<p>Compare own-date tropical degrees without common-epoch conversion or a simultaneous spatial-angle claim. Applying is a local derivative, not a promise of a later exact event. Empty selections or rules yield no hits; no default orb, event search, orb window or interpretation is supplied.</p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-en-aspect-conjunction"><span class="std std-ref">aspect.conjunction</span></a>, <a class="reference internal" href="#catalog-en-aspect-sextile"><span class="std std-ref">aspect.sextile</span></a>, <a class="reference internal" href="#catalog-en-aspect-square"><span class="std std-ref">aspect.square</span></a>, <a class="reference internal" href="#catalog-en-aspect-trine"><span class="std std-ref">aspect.trine</span></a>, <a class="reference internal" href="#catalog-en-aspect-opposition"><span class="std std-ref">aspect.opposition</span></a></p>
+</section>
 <section id="rule-project-exact-transit-hits-exact-transit-to-natal-hits">
 <span id="catalog-en-rule-project-exact-transit-hits"></span><h2>rule.project.exact_transit_hits · Exact transit-to-natal hits<a class="headerlink" href="#rule-project-exact-transit-hits-exact-transit-to-natal-hits" title="Link to this heading">¶</a></h2>
 <p>Hold the selected natal longitude fixed with zero derivative. For each major-aspect angle from astrology.aspects.aspect_angle, search the moving apparent longitude at the natal degree plus each oriented branch, modulo one turn. Coincident conjunction/opposition branches are searched once. astrology.transits.transit_hits composes the native events and retains their moving rate and contact direction.</p>
 <p>Project-defined composition of exact longitude aspects; no interpretive tradition is selected.</p>
 <p>Natal and moving tropical degrees retain their own dates, without a common-epoch transformation or a simultaneous spatial-angle claim. A natal axis is a stored house-geometry point, not an apparent geocentric body position. Named mean and Meeus five-term nodes retain their definitions, not an osculating-node substitute. Exact means the native numerical root/contact contract, not an astronomical accuracy guarantee or a bitwise-zero tangent rate. No orb window, applying/separating label or interpretation follows from an exact hit.</p>
 <p>Concepts / 概念：<a class="reference internal" href="#catalog-en-aspect-conjunction"><span class="std std-ref">aspect.conjunction</span></a>, <a class="reference internal" href="#catalog-en-aspect-sextile"><span class="std std-ref">aspect.sextile</span></a>, <a class="reference internal" href="#catalog-en-aspect-square"><span class="std std-ref">aspect.square</span></a>, <a class="reference internal" href="#catalog-en-aspect-trine"><span class="std std-ref">aspect.trine</span></a>, <a class="reference internal" href="#catalog-en-aspect-opposition"><span class="std std-ref">aspect.opposition</span></a></p>
+</section>
+<section id="source-astrowiki-solar-return-10448-solar-return-chart">
+<span id="catalog-en-source-astrowiki-solar-return-10448"></span><h2>source.astrowiki.solar_return.10448 · Solar Return Chart<a class="headerlink" href="#source-astrowiki-solar-return-10448-solar-return-chart" title="Link to this heading">¶</a></h2>
+<p>Astrodienst Astrowiki contributors. Revision 10448; Wayback capture 2025-05-24T23:01:38Z. <code class="docutils literal notranslate"><span class="pre">language=en</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">source_verification=verified</span></code></p>
+<p><a class="reference external" href="https://web.archive.org/web/20250524230138/https://www.astro.com/astrowiki/en/Solar_Return_Chart"><code class="docutils literal notranslate"><span class="pre">https://web.archive.org/web/20250524230138/https://www.astro.com/astrowiki/en/Solar_Return_Chart</span></code></a></p>
+<p>Inspected retained HTML on 2026-11-09, SHA-256 81284cb34235c36980397ed72a805879b257a3c3d5f60b32dfbba9f14115fa10. Linked assets were not retained. Same editorial publisher as the lunar page and return FAQ; those pages are not additional independent authors for the solar definition.</p>
+<p>Third-party text; only a short attributed definition and project Chinese translation are included. No HTML or linked assets are redistributed.</p>
+<p>Defines the exact solar return to natal position and discusses birthplace versus residence. Does not specify this project’s full coordinate, time-scale, interval or error contracts. Interpretive claims are not adopted.</p>
+</section>
+<section id="source-shea-solar-returns-introduction-to-solar-returns">
+<span id="catalog-en-source-shea-solar-returns"></span><h2>source.shea.solar_returns · Introduction to Solar Returns<a class="headerlink" href="#source-shea-solar-returns-introduction-to-solar-returns" title="Link to this heading">¶</a></h2>
+<p>Mary Shea. Author’s webpage inspected 2026-11-09; publication date not stated. <code class="docutils literal notranslate"><span class="pre">language=en</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">source_verification=verified</span></code></p>
+<p><a class="reference external" href="https://www.maryshea.com/introduction-to-solar-returns"><code class="docutils literal notranslate"><span class="pre">https://www.maryshea.com/introduction-to-solar-returns</span></code></a></p>
+<p>Retained response HTML SHA-256 d194d7f481719eafdceaec3188060fa5729bdb7dc0376c7f85a51dc84233d158. Linked assets were not retained. The footer says © 2020 by Mary Shea; this is a copyright marker, not a stated publication date. A separately authored practitioner explanation, not evidence for an independent historical lineage.</p>
+<p>Copyrighted author webpage; only a short attributed definition and project Chinese translation are included, not the article or assets.</p>
+<p>Defines the transiting Sun’s return to natal degree, minute and second. Does not establish numerical accuracy bounds or the project’s API policies; predictions are outside scope.</p>
+</section>
+<section id="source-astrowiki-lunar-return-12661-lunar-return-chart">
+<span id="catalog-en-source-astrowiki-lunar-return-12661"></span><h2>source.astrowiki.lunar_return.12661 · Lunar Return Chart<a class="headerlink" href="#source-astrowiki-lunar-return-12661-lunar-return-chart" title="Link to this heading">¶</a></h2>
+<p>Astrodienst Astrowiki contributors. Fixed revision 12661, inspected 2026-11-09. <code class="docutils literal notranslate"><span class="pre">language=en</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">source_verification=verified</span></code></p>
+<p><a class="reference external" href="https://www.astro.com/wiki/astrowiki-en/index.php?title=Lunar_Return_Chart&amp;oldid=12661"><code class="docutils literal notranslate"><span class="pre">https://www.astro.com/wiki/astrowiki-en/index.php?title=Lunar_Return_Chart&amp;oldid=12661</span></code></a></p>
+<p>Retained response HTML SHA-256 5e5b76a7f32db8cdfe4e134972d15860e23b5083b42e37e65255a1d6c3e9379e. Linked assets were not retained. Same editorial publisher as the solar page and FAQ.</p>
+<p>Third-party text; only a short attributed definition and project Chinese translation are included. No HTML or linked assets are redistributed.</p>
+<p>Defines the Moon’s exact return to its birth position and discusses birthplace/residence. Its approximate 27.3-day recurrence is not a calendar-month selection rule or a specification of this project’s complete coordinate conventions. Interpretations are not adopted.</p>
+</section>
+<section id="source-ghaneh-lunar-return-2005-how-to-read-a-lunar-returnyours-or-anyones">
+<span id="catalog-en-source-ghaneh-lunar-return-2005"></span><h2>source.ghaneh.lunar_return.2005 · How to Read a Lunar Return—Yours or Anyone’s<a class="headerlink" href="#source-ghaneh-lunar-return-2005-how-to-read-a-lunar-returnyours-or-anyones" title="Link to this heading">¶</a></h2>
+<p>Isabelle Ghaneh. Llewellyn Journal, 2005-02-21. <code class="docutils literal notranslate"><span class="pre">language=en</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">source_verification=verified</span></code></p>
+<p><a class="reference external" href="https://www.llewellyn.com/journal/article/780"><code class="docutils literal notranslate"><span class="pre">https://www.llewellyn.com/journal/article/780</span></code></a></p>
+<p>Author’s article inspected 2026-11-09; retained HTML SHA-256 b9adb65e4cf0295ecd784141eb387c6967afc99ae24f5d4fd722c23c077f5a40. Linked assets were not retained. A separately authored modern explanation, not proof of an independent historical tradition.</p>
+<p>Copyright Llewellyn Worldwide; only one short attributed definition and project Chinese translation are included. No article, biographical example or linked assets are redistributed.</p>
+<p>Defines the Moon’s return to its natal position; the author uses current residence. Monthly wording is descriptive, not one event per calendar month. Interpretations, personal examples and forecasting claims are not adopted.</p>
+</section>
+<section id="source-astrodienst-return-faq-20260104-return-charts-faq">
+<span id="catalog-en-source-astrodienst-return-faq-20260104"></span><h2>source.astrodienst.return_faq.20260104 · Return charts FAQ<a class="headerlink" href="#source-astrodienst-return-faq-20260104-return-charts-faq" title="Link to this heading">¶</a></h2>
+<p>Astrodienst. Wayback capture 2026-01-04T10:38:02Z, inspected 2026-11-09. <code class="docutils literal notranslate"><span class="pre">language=en</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">source_verification=verified</span></code></p>
+<p><a class="reference external" href="https://web.archive.org/web/20260104103802/https://www.astro.com/faq/fq_fh_return_e.htm"><code class="docutils literal notranslate"><span class="pre">https://web.archive.org/web/20260104103802/https://www.astro.com/faq/fq_fh_return_e.htm</span></code></a></p>
+<p>Original gzip response SHA-256 bbfcbed43f16ebd2e085be1b7b411f3466045f44468e6be754b046ab757c89ea; decoded HTML SHA-256 1109099624c3a226d3ae5054d7dbba7d0522478028d31b73b4cc8e099e36c6b3. Linked assets were not retained. Same publisher as Astrowiki, not another independent definition source.</p>
+<p>Copyrighted service documentation, cited with project paraphrases only; no response HTML or assets are redistributed.</p>
+<p>Documents exact-transit return timing and birthplace/relocation calculator choices. Supports recording location practice, not a universal preferred location, this project’s API or astronomical error bounds.</p>
 </section>
 <section id="source-celestial-calendar-events-1-1-1-celestial-calendar-longitude-events-and-utc-conversion">
 <span id="catalog-en-source-celestial-calendar-events-1-1-1"></span><h2>source.celestial-calendar.events.1.1.1 · celestial-calendar longitude events and UTC conversion<a class="headerlink" href="#source-celestial-calendar-events-1-1-1-celestial-calendar-longitude-events-and-utc-conversion" title="Link to this heading">¶</a></h2>
@@ -1027,14 +1093,14 @@ and <a class="reference internal" href="knowledge.html#translation-revisions-and
 <p>Astrodienst copyright; retained privately. Only project-authored descriptions of the documented settings are included.</p>
 <p>Documents one drawing style: five named aspects, Moon orb 13°, Sun/planet orb 3°, a half-solid/half-dashed example where only the Moon’s orb is met, no node orb/aspects, and distinct dotted whole-sign aspects. The FAQ credits the orb and node-exclusion settings to a recommendation of Chris Brennan; that credit does not extend to the following dotted whole-sign aspect paragraph. This is context for the reference fixture, not a universal orb standard or an independent source for all three project combination policies. These values and whole-sign aspects are not adopted as API defaults.</p>
 </section>
-<section id="source-astrology-house-overlays-f269d14-astrology-house-overlay-and-comparison-text-implementation">
-<span id="catalog-en-source-astrology-house-overlays-f269d14"></span><h2>source.astrology.house_overlays.f269d14 · astrology house-overlay and comparison-text implementation<a class="headerlink" href="#source-astrology-house-overlays-f269d14-astrology-house-overlay-and-comparison-text-implementation" title="Link to this heading">¶</a></h2>
-<p>astrology contributors. src/astrology/house_overlays.py, chart.py, text.py and comparison tests at f269d148b8a3e58bc559e7d89be77a03aae6b289. <code class="docutils literal notranslate"><span class="pre">language=en</span></code></p>
+<section id="source-astrology-astrology-project-implementation">
+<span id="catalog-en-source-astrology"></span><h2>source.astrology · astrology project implementation<a class="headerlink" href="#source-astrology-astrology-project-implementation" title="Link to this heading">¶</a></h2>
+<p>astrology contributors. celestial-astrology v0.5.0; cited modules and symbols in the release tree. <code class="docutils literal notranslate"><span class="pre">language=en</span></code></p>
 <p><code class="docutils literal notranslate"><span class="pre">source_verification=verified</span></code></p>
-<p><a class="reference external" href="https://github.com/0xf3cd/astrology/tree/f269d148b8a3e58bc559e7d89be77a03aae6b289"><code class="docutils literal notranslate"><span class="pre">https://github.com/0xf3cd/astrology/tree/f269d148b8a3e58bc559e7d89be77a03aae6b289</span></code></a></p>
-<p>Project-authored directional composition and bilingual rendering of supplied results, reusing houses.house_of and stored chart geometry. Tests include hand-worked synthetic placements and explicit effect boundaries.</p>
+<p><a class="reference external" href="https://github.com/0xf3cd/astrology/tree/v0.5.0"><code class="docutils literal notranslate"><span class="pre">https://github.com/0xf3cd/astrology/tree/v0.5.0</span></code></a></p>
+<p>Project-authored code and tests for the v0.5.0 release tree. The v0.4.0 inspection and former records remain historical. Former records and their inspected revisions: source.astrology.house_overlays.f269d14 at f269d148b8a3e58bc559e7d89be77a03aae6b289; source.astrology.axis_aspects.4cb15cc at 4cb15cc2f63a67ba804c04840f255ffff1209382; source.astrology.sign_groups.c92ac82 at c92ac826c3065fc9e4a2cc949cf87c64c79c0c63; source.astrology.cross_aspects.0d7122a at 0d7122a7f7ef86ecc5798c9ea12668c68bb4a516; source.astrology.chart.fc845fa at fc845fa1aa786f7e1eda7b4d901e70e9a505add5; source.astrology.config.fa2e985 at fa2e985c964dab653a6aa0f5771062ad9fd956dc. Those historical inspections do not cover later extensions. The release tree, rather than source-only changes after that tag, is the reference here.</p>
 <p>Project-authored code, translations and explanations under the repository MIT license.</p>
-<p>Supports selection, ownership, receiving-cusp placement, immutable result validation and comparison text at this fixed commit. This is implementation evidence, not independent astronomical corroboration, authentication of supplied charts or a traditional relationship interpretation.</p>
+<p>Supports the cited request identities, adapter composition, sign sectors and groups, cusp placement, aspects, comparison text, dispositor traversal and transit composition at the release tag. This is implementation evidence, not independent astronomical corroboration, historical corroboration, authentication of supplied charts or interpretation. It does not verify printed Meeus formulas or establish error bounds; the node rules retain their specific comparison limits and unresolved prerequisites. Historical sign-group definitions remain attributed to source.ptolemy.ashmand1822, and traditional rulership to source.lilly.christian-astrology-1647.</p>
 </section>
 <section id="source-lilly-christian-astrology-1647-christian-astrology-modestly-treated-of-in-three-books">
 <span id="catalog-en-source-lilly-christian-astrology-1647"></span><h2>source.lilly.christian-astrology-1647 · Christian Astrology, Modestly Treated of in Three Books<a class="headerlink" href="#source-lilly-christian-astrology-1647-christian-astrology-modestly-treated-of-in-three-books" title="Link to this heading">¶</a></h2>
@@ -1063,51 +1129,6 @@ and <a class="reference internal" href="knowledge.html#translation-revisions-and
 <p>The site asserts copyright and prohibits redistribution of the article. Only type names, angular ranges and project paraphrases are included; no article excerpts or paragraph translations.</p>
 <p>Eight lunation type headings and their Soli-Lunar Arc ranges. No personality, biological or photometric claims are adopted.</p>
 </section>
-<section id="source-astrology-axis-aspects-4cb15cc-astrology-axis-aspect-implementation">
-<span id="catalog-en-source-astrology-axis-aspects-4cb15cc"></span><h2>source.astrology.axis_aspects.4cb15cc · astrology axis-aspect implementation<a class="headerlink" href="#source-astrology-axis-aspects-4cb15cc-astrology-axis-aspect-implementation" title="Link to this heading">¶</a></h2>
-<p>astrology contributors. src/astrology/objects.py, chart.py, cross_aspects.py and tests/test_axis_aspects.py at 4cb15cc2f63a67ba804c04840f255ffff1209382. <code class="docutils literal notranslate"><span class="pre">language=en</span></code></p>
-<p><code class="docutils literal notranslate"><span class="pre">source_verification=verified</span></code></p>
-<p><a class="reference external" href="https://github.com/0xf3cd/astrology/tree/4cb15cc2f63a67ba804c04840f255ffff1209382"><code class="docutils literal notranslate"><span class="pre">https://github.com/0xf3cd/astrology/tree/4cb15cc2f63a67ba804c04840f255ffff1209382</span></code></a></p>
-<p>Project-authored identities, explicit selection and composition from stored axis fields, with hand-worked synthetic expectations. Earlier body/node aspect sources remain pinned to their original revisions.</p>
-<p>Project-authored code, translations and explanations under the repository MIT license.</p>
-<p>Supports the axis selection, ordering, stored-field geometry, pairing and missing-rate policies at this fixed commit. This is implementation evidence, not independent astronomical corroboration, a traditional orb prescription or chart interpretation.</p>
-</section>
-<section id="source-astrology-sign-groups-c92ac82-astrology-ashmand-sign-group-implementation">
-<span id="catalog-en-source-astrology-sign-groups-c92ac82"></span><h2>source.astrology.sign_groups.c92ac82 · astrology Ashmand sign-group implementation<a class="headerlink" href="#source-astrology-sign-groups-c92ac82-astrology-ashmand-sign-group-implementation" title="Link to this heading">¶</a></h2>
-<p>astrology contributors. src/astrology/zodiac.py and tests/test_zodiac.py at c92ac826c3065fc9e4a2cc949cf87c64c79c0c63. <code class="docutils literal notranslate"><span class="pre">language=en</span></code></p>
-<p><code class="docutils literal notranslate"><span class="pre">source_verification=verified</span></code></p>
-<p><a class="reference external" href="https://github.com/0xf3cd/astrology/tree/c92ac826c3065fc9e4a2cc949cf87c64c79c0c63"><code class="docutils literal notranslate"><span class="pre">https://github.com/0xf3cd/astrology/tree/c92ac826c3065fc9e4a2cc949cf87c64c79c0c63</span></code></a></p>
-<p>Project-authored expansion of the source’s explicit pairs and ordering relations, with membership and type-boundary tests. The historical definition remains attributed to source.ptolemy.ashmand1822.</p>
-<p>Project-authored code, translations and explanations under the repository MIT license.</p>
-<p>Supports the immutable sign-group definition, pure lookup and source-derived test expectations at this fixed commit. This is project implementation evidence, not independent historical corroboration, a physical-season model or a chart interpretation.</p>
-</section>
-<section id="source-astrology-cross-aspects-0d7122a-astrology-static-cross-chart-implementation">
-<span id="catalog-en-source-astrology-cross-aspects-0d7122a"></span><h2>source.astrology.cross_aspects.0d7122a · astrology static cross-chart implementation<a class="headerlink" href="#source-astrology-cross-aspects-0d7122a-astrology-static-cross-chart-implementation" title="Link to this heading">¶</a></h2>
-<p>astrology contributors. src/astrology/cross_aspects.py, shared aspects.py arithmetic and tests at 0d7122a7f7ef86ecc5798c9ea12668c68bb4a516. <code class="docutils literal notranslate"><span class="pre">language=en</span></code></p>
-<p><code class="docutils literal notranslate"><span class="pre">source_verification=verified</span></code></p>
-<p><a class="reference external" href="https://github.com/0xf3cd/astrology/tree/0d7122a7f7ef86ecc5798c9ea12668c68bb4a516"><code class="docutils literal notranslate"><span class="pre">https://github.com/0xf3cd/astrology/tree/0d7122a7f7ef86ecc5798c9ea12668c68bb4a516</span></code></a></p>
-<p>Project-authored static cross-chart composition and hand-worked synthetic tests, separate from source.astrology.chart.fc845fa, the single-chart implementation source.</p>
-<p>Project-authored text under the repository MIT license.</p>
-<p>Supports the cross pairing, explicit orb selection, static geometry and provenance retention at this fixed commit. It is not independent astronomical corroboration and establishes no traditional interpretation or accuracy bound.</p>
-</section>
-<section id="source-astrology-chart-fc845fa-astrology-chart-implementation">
-<span id="catalog-en-source-astrology-chart-fc845fa"></span><h2>source.astrology.chart.fc845fa · astrology chart implementation<a class="headerlink" href="#source-astrology-chart-fc845fa-astrology-chart-implementation" title="Link to this heading">¶</a></h2>
-<p>astrology contributors. Development package 0.0.0; src/astrology/ and tests/test_reference.py at fc845fa1aa786f7e1eda7b4d901e70e9a505add5. <code class="docutils literal notranslate"><span class="pre">language=en</span></code></p>
-<p><code class="docutils literal notranslate"><span class="pre">source_verification=verified</span></code></p>
-<p><a class="reference external" href="https://github.com/0xf3cd/astrology/tree/fc845fa1aa786f7e1eda7b4d901e70e9a505add5"><code class="docutils literal notranslate"><span class="pre">https://github.com/0xf3cd/astrology/tree/fc845fa1aa786f7e1eda7b4d901e70e9a505add5</span></code></a></p>
-<p>Project-authored adapter, sign sectors, supplied-cusp placement, aspect classification and node comparison tests. These are not independent astronomical or traditional corroboration.</p>
-<p>Project-authored text under the repository MIT license.</p>
-<p>Supports the executable sign, placement, adapter and aspect rules at this fixed commit, plus the existence of its node comparison test. It does not verify printed Meeus formulas, error bounds, historical definitions or interpretations.</p>
-</section>
-<section id="source-astrology-config-fa2e985-astrology-configuration-contracts">
-<span id="catalog-en-source-astrology-config-fa2e985"></span><h2>source.astrology.config.fa2e985 · astrology configuration contracts<a class="headerlink" href="#source-astrology-config-fa2e985-astrology-configuration-contracts" title="Link to this heading">¶</a></h2>
-<p>astrology contributors. Development package 0.0.0; config.py at fa2e985c964dab653a6aa0f5771062ad9fd956dc. <code class="docutils literal notranslate"><span class="pre">language=en</span></code></p>
-<p><code class="docutils literal notranslate"><span class="pre">source_verification=verified</span></code></p>
-<p><a class="reference external" href="https://github.com/0xf3cd/astrology/blob/fa2e985c964dab653a6aa0f5771062ad9fd956dc/src/astrology/config.py"><code class="docutils literal notranslate"><span class="pre">https://github.com/0xf3cd/astrology/blob/fa2e985c964dab653a6aa0f5771062ad9fd956dc/src/astrology/config.py</span></code></a></p>
-<p>Project-authored request identifiers and bilingual contracts; not independent astronomical or traditional corroboration.</p>
-<p>Project-authored text under the repository MIT license.</p>
-<p>Supports existing configuration identities and validation contracts only, not the chart calculation, which is implemented elsewhere, and not historical definitions.</p>
-</section>
 <section id="source-ptolemy-ashmand1822-ptolemy-s-tetrabiblos-or-quadripartite">
 <span id="catalog-en-source-ptolemy-ashmand1822"></span><h2>source.ptolemy.ashmand1822 · Ptolemy’s Tetrabiblos, or Quadripartite<a class="headerlink" href="#source-ptolemy-ashmand1822-ptolemy-s-tetrabiblos-or-quadripartite" title="Link to this heading">¶</a></h2>
 <p>Ptolemy; paraphrase attributed to Proclus; English translator J. M. Ashmand. Davis and Dickson, London, 1822. <code class="docutils literal notranslate"><span class="pre">language=en</span></code></p>
@@ -1117,6 +1138,85 @@ and <a class="reference internal" href="knowledge.html#translation-revisions-and
 <p>Underlying 1822 text: Commons file revision 1078168290 records public-domain status in its country of origin, life-plus-70-or-shorter jurisdictions and the USA (template PD-old-70-1923, with a displayed Public Domain Mark 1.0 notice). No worldwide rights guarantee. Only bounded manually transcribed passages are included; scan images, watermarks and site prose are not redistributed. Project Chinese translation and authored explanations are MIT.</p>
 <p>The four sign groups in Book I, chapter XIV: the explicitly named tropical/equinoctial pairs and the ordering relations defining fixed/bicorporeal membership. Includes a complete equinoctial sentence and bounded definition excerpts, with fragment boundaries recorded in each locator. The expanded twelve-sign table is project-derived. This is not an empirical claim, independent multi-source consensus or applicable chart conclusion.</p>
 </section>
+<section id="entry-solar-lunar-returns-statement">
+<span id="catalog-en-entry-solar-lunar-returns"></span><h2>entry.solar_lunar_returns · Statement / 陈述<a class="headerlink" href="#entry-solar-lunar-returns-statement" title="Link to this heading">¶</a></h2>
+<p>Solar and lunar returns find the Sun or Moon at its stored natal longitude. Search every occurrence in an explicit interval, then construct a moment chart at a chosen event with an explicit location and configuration.</p>
+<p><code class="docutils literal notranslate"><span class="pre">prerequisites=complete</span></code> · <code class="docutils literal notranslate"><span class="pre">output=reference_only</span></code> · <code class="docutils literal notranslate"><span class="pre">chart=not_assessed</span></code></p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-en-body-sun"><span class="std std-ref">body.sun</span></a>, <a class="reference internal" href="#catalog-en-body-moon"><span class="std std-ref">body.moon</span></a>, <a class="reference internal" href="#catalog-en-aspect-conjunction"><span class="std std-ref">aspect.conjunction</span></a></p>
+<p>Variants / 变体：<a class="reference internal" href="#catalog-en-rule-project-solar-lunar-returns"><span class="std std-ref">rule.project.solar_lunar_returns</span></a>, <a class="reference internal" href="#catalog-en-rule-project-exact-transit-hits"><span class="std std-ref">rule.project.exact_transit_hits</span></a>, <a class="reference internal" href="#catalog-en-rule-project-moment-charts"><span class="std std-ref">rule.project.moment_charts</span></a></p>
+<p>Prerequisites / 前提：</p>
+<ul class="simple">
+<li><p>A NatalChart storing the selected Sun or Moon and an explicit nonempty modern UTC search interval admitted by that body’s event model.</p></li>
+<li><p>For each chart, an explicit Location and ChartConfig, plus a converted UTC instant admitted by the complete snapshot and requested houses.</p></li>
+</ul>
+<p>Exceptions / 例外：No hit is a valid search result. A found event remains available if chart construction fails; no location, birth record, anniversary time or replacement house system is manufactured.</p>
+<p>Limits / 限度：The cited definitions and location practices do not specify the project’s own-date apparent geocentric tropical model, all-occurrence half-open interval or failure policy; these are named project conventions. Keep TransitHits for the natal reference, body, interval, event models and versions, and MomentChart for event source TT, location, requested/effective chart configuration and provenance. Source-event TT and derived calculation TT remain distinct. No return interpretation, precession-corrected or sidereal variant, other planetary return or efficacy claim is supplied. Retrieval does not calculate or assess a chart.</p>
+<p><a class="reference internal" href="#catalog-en-source-astrowiki-solar-return-10448"><span class="std std-ref">source.astrowiki.solar_return.10448</span></a>: Opening definition; post-colon span after ‘A return chart, or to be more precise:’. Later location discussion distinguishes birthplace and residence.</p>
+<p>Original excerpt (English) / 原文引述（英文）：</p>
+<blockquote>
+<div><p>A chart erected for the exact moment when the Sun returns to its position in the natal chart.</p>
+</div></blockquote>
+<p>Chinese translation / 中文译文: <code class="docutils literal notranslate"><span class="pre">current</span></code>, revision=1; astrology contributors</p>
+<blockquote>
+<div><p>为太阳精确返回本命盘中自身位置的时刻所建立的盘。</p>
+</div></blockquote>
+<p><a class="reference internal" href="#catalog-en-source-shea-solar-returns"><span class="std std-ref">source.shea.solar_returns</span></a>: Opening definition under Introduction to Solar Returns; complete sentence.</p>
+<p>Original excerpt (English) / 原文引述（英文）：</p>
+<blockquote>
+<div><p>A solar returns chart is a chart erected for the moment the transiting Sun returns to the natal position of the Sun (degree, minute, and second).</p>
+</div></blockquote>
+<p>Chinese translation / 中文译文: <code class="docutils literal notranslate"><span class="pre">current</span></code>, revision=1; astrology contributors</p>
+<blockquote>
+<div><p>日返照盘是为移动太阳返回太阳本命位置（度、分、秒）的时刻所建立的盘。</p>
+</div></blockquote>
+<p><a class="reference internal" href="#catalog-en-source-astrowiki-lunar-return-12661"><span class="std std-ref">source.astrowiki.lunar_return.12661</span></a>: Opening definition; complete sentence.</p>
+<p>Original excerpt (English) / 原文引述（英文）：</p>
+<blockquote>
+<div><p>A horoscope erected for the time the Moon reaches the exact position it had at the time of birth.</p>
+</div></blockquote>
+<p>Chinese translation / 中文译文: <code class="docutils literal notranslate"><span class="pre">current</span></code>, revision=1; astrology contributors</p>
+<blockquote>
+<div><p>为月亮到达其出生时精确位置的时刻所建立的命盘。</p>
+</div></blockquote>
+<p><a class="reference internal" href="#catalog-en-source-ghaneh-lunar-return-2005"><span class="std std-ref">source.ghaneh.lunar_return.2005</span></a>: First paragraph after the opening question; complete sentence. The next sentence uses current residence.</p>
+<p>Original excerpt (English) / 原文引述（英文）：</p>
+<blockquote>
+<div><p>Every month, the moon returns to the exact position it held in your natal chart at your time of birth.</p>
+</div></blockquote>
+<p>Chinese translation / 中文译文: <code class="docutils literal notranslate"><span class="pre">current</span></code>, revision=1; astrology contributors</p>
+<blockquote>
+<div><p>每月，月亮都会返回它在你出生时的本命盘中所处的精确位置。</p>
+</div></blockquote>
+<p><a class="reference internal" href="#catalog-en-source-astrodienst-return-faq-20260104"><span class="std std-ref">source.astrodienst.return_faq.20260104</span></a>: Return-chart questions about birthplace, relocation and exact transit timing; paraphrase only.</p>
+</section>
+<section id="entry-moment-charts-statement">
+<span id="catalog-en-entry-moment-charts"></span><h2>entry.moment_charts · Statement / 陈述<a class="headerlink" href="#entry-moment-charts-statement" title="Link to this heading">¶</a></h2>
+<p>A moment chart retains an explicit instant and location without birth metadata; a retained transit hit can supply its source time through the public chart entry.</p>
+<p><code class="docutils literal notranslate"><span class="pre">prerequisites=complete</span></code> · <code class="docutils literal notranslate"><span class="pre">output=reference_only</span></code> · <code class="docutils literal notranslate"><span class="pre">chart=not_assessed</span></code></p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-en-house-whole-sign"><span class="std std-ref">house.whole_sign</span></a>, <a class="reference internal" href="#catalog-en-house-equal"><span class="std std-ref">house.equal</span></a>, <a class="reference internal" href="#catalog-en-house-placidus"><span class="std std-ref">house.placidus</span></a></p>
+<p>Variants / 变体：<a class="reference internal" href="#catalog-en-rule-project-moment-charts"><span class="std std-ref">rule.project.moment_charts</span></a></p>
+<p>Prerequisites / 前提：</p>
+<ul class="simple">
+<li><p>An explicit location and ChartConfig, and an aware modern datetime or a retained TransitHit whose converted UTC and joint snapshot are admitted.</p></li>
+</ul>
+<p>Exceptions / 例外：A valid event-source TT is not sufficient to admit a complete chart; converted UTC can leave the modern domain or cross the house-year ceiling.</p>
+<p>Limits / 限度：Project-defined input/result policy. The upstream citation covers time conversion, not an independent numerical reference or the project’s chart composition. Retrieval performs no chart calculation or chart matching.</p>
+<p><a class="reference internal" href="#catalog-en-source-celestial-calendar-events-1-1-1"><span class="std std-ref">source.celestial-calendar.events.1.1.1</span></a>: jde_to_utc and utc_to_jde Python contracts and retained fixed leap offsets; the moment input/result composition is project-defined</p>
+</section>
+<section id="entry-transit-aspects-statement">
+<span id="catalog-en-entry-transit-aspects"></span><h2>entry.transit_aspects · Statement / 陈述<a class="headerlink" href="#entry-transit-aspects-statement" title="Link to this heading">¶</a></h2>
+<p>Fixed-instant aspects retain moving/natal roles, raw geometry, explicit orb limits and local motion against frozen natal degrees; bilingual display does not reclassify them.</p>
+<p><code class="docutils literal notranslate"><span class="pre">prerequisites=complete</span></code> · <code class="docutils literal notranslate"><span class="pre">output=reference_only</span></code> · <code class="docutils literal notranslate"><span class="pre">chart=not_assessed</span></code></p>
+<p>Concepts / 概念：<a class="reference internal" href="#catalog-en-aspect-conjunction"><span class="std std-ref">aspect.conjunction</span></a>, <a class="reference internal" href="#catalog-en-aspect-sextile"><span class="std std-ref">aspect.sextile</span></a>, <a class="reference internal" href="#catalog-en-aspect-square"><span class="std std-ref">aspect.square</span></a>, <a class="reference internal" href="#catalog-en-aspect-trine"><span class="std std-ref">aspect.trine</span></a>, <a class="reference internal" href="#catalog-en-aspect-opposition"><span class="std std-ref">aspect.opposition</span></a></p>
+<p>Variants / 变体：<a class="reference internal" href="#catalog-en-rule-project-transit-aspects"><span class="std std-ref">rule.project.transit_aspects</span></a>, <a class="reference internal" href="#catalog-en-rule-project-aspect-deviation"><span class="std std-ref">rule.project.aspect_deviation</span></a>, <a class="reference internal" href="#catalog-en-rule-project-aspect-motion"><span class="std std-ref">rule.project.aspect_motion</span></a></p>
+<p>Prerequisites / 前提：</p>
+<ul class="simple">
+<li><p>A supplied MomentChart and NatalChart with matching zodiac, center and position-frame conventions, explicit aspect rules, and valid source-specific selections.</p></li>
+</ul>
+<p>Exceptions / 例外：Same-identity and cross-node pairs are allowed. Moving axes have no supplied rate; their non-exact hits are indeterminate, while zero deviation is exact.</p>
+<p>Limits / 限度：Project-defined frozen-reference composition over the cited shared geometry and motion functions, not a traditional interpretation or independent corroboration. Own-date coordinates are retained. This query performs no astronomy or event search; catalog retrieval itself evaluates no chart.</p>
+<p><a class="reference internal" href="#catalog-en-source-astrology"><span class="std std-ref">source.astrology</span></a>: src/astrology/aspects.py: _pair_geometry, _motion; src/astrology/cross_aspects.py: _rules</p>
+</section>
 <section id="entry-transit-hits-statement">
 <span id="catalog-en-entry-transit-hits"></span><h2>entry.transit_hits · Statement / 陈述<a class="headerlink" href="#entry-transit-hits-statement" title="Link to this heading">¶</a></h2>
 <p>Exact transit hits compare moving apparent longitudes with selected fixed natal degrees and retain every native crossing/contact with its rate and direction.</p>
@@ -1125,12 +1225,13 @@ and <a class="reference internal" href="knowledge.html#translation-revisions-and
 <p>Variants / 变体：<a class="reference internal" href="#catalog-en-rule-project-exact-transit-hits"><span class="std std-ref">rule.project.exact_transit_hits</span></a>, <a class="reference internal" href="#catalog-en-rule-project-aspect-deviation"><span class="std std-ref">rule.project.aspect_deviation</span></a></p>
 <p>Prerequisites / 前提：</p>
 <ul class="simple">
-<li><p>A supplied NatalChart, explicit available natal targets, moving body/node identities, major-aspect identities and a modern UTC interval admitted by every selected event source.</p></li>
+<li><p>A supplied NatalChart or MomentChart, explicit available fixed targets, moving body/node identities, major-aspect identities and a modern UTC interval admitted by every selected event source. The retained epoch_policy’s natal token names the fixed-reference role; source kind remains in the chart type.</p></li>
 </ul>
 <p>Exceptions / 例外：Retrograde loops can produce repeated hits. Tangent is an exact numerical contact, not a promise of a zero rate. Simultaneous different endpoint identities remain separate.</p>
 <p>Limits / 限度：The composition and own-date fixed-target convention are project definitions, not attributed to Lilly. The upstream contract is not an independent accuracy reference. Scope and coordinate limits are in rule.project.exact_transit_hits; catalog retrieval performs no event search or chart-applicability judgment. This is reference information, not an eligible default interpretation.</p>
 <p><a class="reference internal" href="#catalog-en-source-celestial-calendar-events-1-1-1"><span class="std std-ref">source.celestial-calendar.events.1.1.1</span></a>: longitude_events and LongitudeEvent contracts; EVENTS capabilities and model identity descriptions; utc_to_jde</p>
 <p><a class="reference internal" href="#catalog-en-source-lilly-christian-astrology-1647"><span class="std std-ref">source.lilly.christian-astrology-1647</span></a>: Book I, chapter I, p.26: exact longitude angles only, not this project’s time search, participant policy or interpretation</p>
+<p><a class="reference internal" href="#catalog-en-source-astrology"><span class="std std-ref">source.astrology</span></a>: src/astrology/transits.py: transit_hits, TransitHits; src/astrology/celestial.py: transit_interval, transit_source, transit_events; tests/test_transits.py</p>
 </section>
 <section id="entry-sign-elements-statement">
 <span id="catalog-en-entry-sign-elements"></span><h2>entry.sign_elements · Statement / 陈述<a class="headerlink" href="#entry-sign-elements-statement" title="Link to this heading">¶</a></h2>
@@ -1184,8 +1285,8 @@ and <a class="reference internal" href="knowledge.html#translation-revisions-and
 <p>No prerequisites recorded / 未记录前提</p>
 <p>Exceptions / 例外：A mathematical node must not be passed as a Body.</p>
 <p>Limits / 限度：These are request identities. The chart adapter calculates the positions; this entry states no position and no classification table.</p>
-<p><a class="reference internal" href="#catalog-en-source-astrology-config-fa2e985"><span class="std std-ref">source.astrology.config.fa2e985</span></a>: astrology 0.0.0 / config.Body and config.LunarNode at the recorded commit</p>
-<p><a class="reference internal" href="#catalog-en-source-astrology-chart-fc845fa"><span class="std std-ref">source.astrology.chart.fc845fa</span></a>: astrology 0.0.0 / src/astrology/celestial.py and src/astrology/chart.py at the recorded commit</p>
+<p><a class="reference internal" href="#catalog-en-source-astrology"><span class="std std-ref">source.astrology</span></a>: src/astrology/objects.py: Body, LunarNode</p>
+<p><a class="reference internal" href="#catalog-en-source-astrology"><span class="std std-ref">source.astrology</span></a>: src/astrology/celestial.py: _BODY_TARGETS, snapshot; src/astrology/chart.py: natal_chart</p>
 </section>
 <section id="entry-house-requests-statement">
 <span id="catalog-en-entry-house-requests"></span><h2>entry.house_requests · Statement / 陈述<a class="headerlink" href="#entry-house-requests-statement" title="Link to this heading">¶</a></h2>
@@ -1199,8 +1300,8 @@ and <a class="reference internal" href="knowledge.html#translation-revisions-and
 </ul>
 <p>Exceptions / 例外：The request contract does not supply house geometry; the chart adapter does.</p>
 <p>Limits / 限度：The external source defines Whole Sign from the Ascendant’s sign, Equal from the Ascendant, and Placidus by each cusp point’s own time arcs. The adapter still owns the algorithm and calculation domain; rule.project.cusp_ownership owns exact-boundary placement. The source’s alternative equal systems and Porphyry fallback are not selected. There is no default house system.</p>
-<p><a class="reference internal" href="#catalog-en-source-astrology-config-fa2e985"><span class="std std-ref">source.astrology.config.fa2e985</span></a>: astrology 0.0.0 / config.HouseSystem and config.ChartConfig at the recorded commit</p>
-<p><a class="reference internal" href="#catalog-en-source-astrology-chart-fc845fa"><span class="std std-ref">source.astrology.chart.fc845fa</span></a>: astrology 0.0.0 / src/astrology/houses.py at the recorded commit</p>
+<p><a class="reference internal" href="#catalog-en-source-astrology"><span class="std std-ref">source.astrology</span></a>: src/astrology/config.py: HouseSystem, ChartConfig</p>
+<p><a class="reference internal" href="#catalog-en-source-astrology"><span class="std std-ref">source.astrology</span></a>: src/astrology/houses.py: house_of</p>
 <p><a class="reference internal" href="#catalog-en-source-astrodienst-swisseph-house-definitions"><span class="std std-ref">source.astrodienst.swisseph-house-definitions</span></a>: General documentation 6.2.1 Placidus; 6.2.5 item 1 Equal houses from Ascendant and item 4 Whole Sign houses; retained 2026-11-04 HTML</p>
 </section>
 <section id="entry-node-definitions-statement">
@@ -1215,8 +1316,8 @@ and <a class="reference internal" href="knowledge.html#translation-revisions-and
 </ul>
 <p>Exceptions / 例外：Neither definition is silently substituted for another.</p>
 <p>Limits / 限度：Printed mean-node and five-term coefficients and arguments match the implementation. The five-term truncation does not contain the full instantaneous-node series; no error bound or full osculating-node equivalence was verified. Native output uses IAU 1980 nutation, while the test reference uses a low-accuracy frame correction. Source verification does not resolve this entry’s computational prerequisites or assess a chart.</p>
-<p><a class="reference internal" href="#catalog-en-source-astrology-config-fa2e985"><span class="std std-ref">source.astrology.config.fa2e985</span></a>: astrology 0.0.0 / config.NodeDefinition at the recorded commit</p>
-<p><a class="reference internal" href="#catalog-en-source-astrology-chart-fc845fa"><span class="std std-ref">source.astrology.chart.fc845fa</span></a>: astrology 0.0.0 / src/astrology/celestial.py (_NODE_TARGETS); tests/test_reference.py (_meeus_nodes, _nodes_agree, test_the_lunar_nodes_agree_with_the_meeus_definition) at fc845fa1aa786f7e1eda7b4d901e70e9a505add5</p>
+<p><a class="reference internal" href="#catalog-en-source-astrology"><span class="std std-ref">source.astrology</span></a>: src/astrology/objects.py: NodeDefinition</p>
+<p><a class="reference internal" href="#catalog-en-source-astrology"><span class="std std-ref">source.astrology</span></a>: src/astrology/celestial.py: _NODE_TARGETS; tests/test_reference.py: _meeus_nodes, _nodes_agree, test_the_lunar_nodes_agree_with_the_meeus_definition</p>
 <p><a class="reference internal" href="#catalog-en-source-meeus-astronomical-algorithms-1998"><span class="std std-ref">source.meeus.astronomical-algorithms-1998</span></a>: Second English edition (1998), chapter 47 printed pp.337–338, 343–344 / PDF pp.345–346, 351–352: (47.2)–(47.5), (47.7), five principal corrections; chapter 22 pp.143–144 / PDF pp.151–152 for time and nutation context</p>
 </section>
 <section id="entry-node-directions-statement">
@@ -1229,7 +1330,7 @@ and <a class="reference internal" href="knowledge.html#translation-revisions-and
 <p>No prerequisites recorded / 未记录前提</p>
 <p>Exceptions / 例外：Physical-body identities do not carry a node definition.</p>
 <p>Limits / 限度：Naming a direction does not define the node’s motion; the chart adapter calculates the node and its longitude rate.</p>
-<p><a class="reference internal" href="#catalog-en-source-astrology-config-fa2e985"><span class="std std-ref">source.astrology.config.fa2e985</span></a>: astrology 0.0.0 / config.LunarNode.definition at the recorded commit</p>
+<p><a class="reference internal" href="#catalog-en-source-astrology"><span class="std std-ref">source.astrology</span></a>: src/astrology/objects.py: LunarNode.definition</p>
 </section>
 <section id="entry-aspect-requests-statement">
 <span id="catalog-en-entry-aspect-requests"></span><h2>entry.aspect_requests · Statement / 陈述<a class="headerlink" href="#entry-aspect-requests-statement" title="Link to this heading">¶</a></h2>
@@ -1243,7 +1344,7 @@ and <a class="reference internal" href="knowledge.html#translation-revisions-and
 </ul>
 <p>Exceptions / 例外：An empty aspect request sequence is allowed by ChartConfig.</p>
 <p>Limits / 限度：Lilly supplies the exact longitude definitions, not the project’s orb or motion policy; his terminology qualifies conjunction as an aspect. The FAQ describes one software style, including whole-sign aspects distinct from this API’s longitude tests. Neither source selects default orbs, node/axis participation, strength or interpretation here. Evaluation remains in entry.aspect_evaluation.</p>
-<p><a class="reference internal" href="#catalog-en-source-astrology-config-fa2e985"><span class="std std-ref">source.astrology.config.fa2e985</span></a>: astrology 0.0.0 / config.MajorAspect and config.AspectRule at the recorded commit</p>
+<p><a class="reference internal" href="#catalog-en-source-astrology"><span class="std std-ref">source.astrology</span></a>: src/astrology/config.py: MajorAspect, AspectRule</p>
 <p><a class="reference internal" href="#catalog-en-source-lilly-christian-astrology-1647"><span class="std std-ref">source.lilly.christian-astrology-1647</span></a>: Book I, chapter I, printed p.26 / zero-based Wellcome leaf60: exact conjunction, sextile, quartile (square), trine and opposition; chapter XIX p.105 / leaf139 qualifies conjunction terminology</p>
 <p><a class="reference internal" href="#catalog-en-source-astrodienst-hellenistic-style-faq"><span class="std std-ref">source.astrodienst.hellenistic-style-faq</span></a>: Chart drawing style: Hellenistic, five aspects and Moon/planet orb display; Wayback 2026-01-05 02:51:55 UTC</p>
 </section>
@@ -1260,22 +1361,22 @@ and <a class="reference internal" href="knowledge.html#translation-revisions-and
 </ul>
 <p>Exceptions / 例外：Two lunar nodes never form an aspect with each other in this single-chart evaluation.</p>
 <p>Limits / 限度：This entry is a project definition, not an independent corroboration or a traditional rule. It supplies no default orb, strength or interpretation, and a retrieval never assesses a chart.</p>
-<p><a class="reference internal" href="#catalog-en-source-astrology-chart-fc845fa"><span class="std std-ref">source.astrology.chart.fc845fa</span></a>: astrology 0.0.0 / src/astrology/aspects.py at the recorded commit</p>
+<p><a class="reference internal" href="#catalog-en-source-astrology"><span class="std std-ref">source.astrology</span></a>: src/astrology/aspects.py: find_aspects, _branches, _deviation, _motion</p>
 </section>
 <section id="entry-cross-aspect-evaluation-statement">
 <span id="catalog-en-entry-cross-aspect-evaluation"></span><h2>entry.cross_aspect_evaluation · Statement / 陈述<a class="headerlink" href="#entry-cross-aspect-evaluation-statement" title="Link to this heading">¶</a></h2>
-<p>Static major cross aspects compare two supplied natal results with distinct left/right endpoints and preserve both complete sources, without a motion field.</p>
+<p>Static major cross aspects compare two supplied natal or moment results with distinct left/right endpoints and preserve both complete sources, without a motion field.</p>
 <p><code class="docutils literal notranslate"><span class="pre">prerequisites=complete</span></code> · <code class="docutils literal notranslate"><span class="pre">output=reference_only</span></code> · <code class="docutils literal notranslate"><span class="pre">chart=not_assessed</span></code></p>
 <p>Concepts / 概念：<a class="reference internal" href="#catalog-en-aspect-conjunction"><span class="std std-ref">aspect.conjunction</span></a>, <a class="reference internal" href="#catalog-en-aspect-sextile"><span class="std std-ref">aspect.sextile</span></a>, <a class="reference internal" href="#catalog-en-aspect-square"><span class="std std-ref">aspect.square</span></a>, <a class="reference internal" href="#catalog-en-aspect-trine"><span class="std std-ref">aspect.trine</span></a>, <a class="reference internal" href="#catalog-en-aspect-opposition"><span class="std std-ref">aspect.opposition</span></a></p>
 <p>Variants / 变体：<a class="reference internal" href="#catalog-en-rule-project-cross-aspect-evaluation"><span class="std std-ref">rule.project.cross_aspect_evaluation</span></a>, <a class="reference internal" href="#catalog-en-rule-project-aspect-deviation"><span class="std std-ref">rule.project.aspect_deviation</span></a>, <a class="reference internal" href="#catalog-en-rule-project-orb-either-within-own-orb"><span class="std std-ref">rule.project.orb_either_within_own_orb</span></a>, <a class="reference internal" href="#catalog-en-rule-project-orb-both-within-own-orb"><span class="std std-ref">rule.project.orb_both_within_own_orb</span></a>, <a class="reference internal" href="#catalog-en-rule-project-orb-mean-of-orbs"><span class="std std-ref">rule.project.orb_mean_of_orbs</span></a></p>
 <p>Prerequisites / 前提：</p>
 <ul class="simple">
-<li><p>Two supplied immutable natal results with matching zodiac, center and position-frame conventions, plus explicit caller-supplied aspect rules.</p></li>
+<li><p>Two supplied immutable natal or moment results with matching zodiac, center and position-frame conventions, plus explicit caller-supplied aspect rules.</p></li>
 <li><p>An orb combination is required exactly when object overrides exist; overrides may name only selected identities from either side.</p></li>
 </ul>
 <p>Exceptions / 例外：Same-named objects, node-node cross pairs, the same chart in both roles, empty selections and empty rules are admitted. The single-chart node exclusion does not apply.</p>
 <p>Limits / 限度：Project-defined geometry, not independent corroboration or traditional interpretation. Own-date longitudes are not transformed to a common epoch. No native astronomy or time resolution is needed for comparison; catalog retrieval itself never evaluates charts.</p>
-<p><a class="reference internal" href="#catalog-en-source-astrology-cross-aspects-0d7122a"><span class="std std-ref">source.astrology.cross_aspects.0d7122a</span></a>: src/astrology/cross_aspects.py; src/astrology/aspects.py shared geometry; tests/test_cross_aspects.py at 0d7122a7f7ef86ecc5798c9ea12668c68bb4a516</p>
+<p><a class="reference internal" href="#catalog-en-source-astrology"><span class="std std-ref">source.astrology</span></a>: src/astrology/cross_aspects.py: cross_chart_aspects, _hits; src/astrology/aspects.py: _branches, _deviation; tests/test_cross_aspects.py</p>
 </section>
 <section id="entry-sign-vocabulary-statement">
 <span id="catalog-en-entry-sign-vocabulary"></span><h2>entry.sign_vocabulary · Statement / 陈述<a class="headerlink" href="#entry-sign-vocabulary-statement" title="Link to this heading">¶</a></h2>
@@ -1288,8 +1389,8 @@ and <a class="reference internal" href="knowledge.html#translation-revisions-and
 <p>Exceptions / 例外：The source is a named historical edition, not a universal definition across traditions.</p>
 <p>Limits / 限度：All twelve signs have a historical group in rule.ptolemy_ashmand.sign_groups. Longitude-sector boundaries remain a separate project convention, not a claim from the cited edition.</p>
 <p><a class="reference internal" href="#catalog-en-source-ptolemy-ashmand1822"><span class="std std-ref">source.ptolemy.ashmand1822</span></a>: Book I, chapter XIV, printed pp. 34–35; PDF pages 72–73</p>
-<p><a class="reference internal" href="#catalog-en-source-astrology-chart-fc845fa"><span class="std std-ref">source.astrology.chart.fc845fa</span></a>: astrology 0.0.0 / src/astrology/zodiac.py at the recorded commit</p>
-<p><a class="reference internal" href="#catalog-en-source-astrology-sign-groups-c92ac82"><span class="std std-ref">source.astrology.sign_groups.c92ac82</span></a>: src/astrology/zodiac.py: AshmandSignGroup and ashmand_sign_group; tests/test_zodiac.py at c92ac826c3065fc9e4a2cc949cf87c64c79c0c63</p>
+<p><a class="reference internal" href="#catalog-en-source-astrology"><span class="std std-ref">source.astrology</span></a>: src/astrology/zodiac.py: Sign, sign_of, sign_degree</p>
+<p><a class="reference internal" href="#catalog-en-source-astrology"><span class="std std-ref">source.astrology</span></a>: src/astrology/zodiac.py: AshmandSignGroup, ashmand_sign_group; tests/test_zodiac.py</p>
 </section>
 <section id="entry-equinoctial-example-statement">
 <span id="catalog-en-entry-equinoctial-example"></span><h2>entry.equinoctial_example · Statement / 陈述<a class="headerlink" href="#entry-equinoctial-example-statement" title="Link to this heading">¶</a></h2>
@@ -1353,7 +1454,7 @@ and <a class="reference internal" href="knowledge.html#translation-revisions-and
 <blockquote>
 <div><p>双体星座分别位于固定星座之后；</p>
 </div></blockquote>
-<p><a class="reference internal" href="#catalog-en-source-astrology-sign-groups-c92ac82"><span class="std std-ref">source.astrology.sign_groups.c92ac82</span></a>: src/astrology/zodiac.py: AshmandSignGroup and ashmand_sign_group; tests/test_zodiac.py at c92ac826c3065fc9e4a2cc949cf87c64c79c0c63</p>
+<p><a class="reference internal" href="#catalog-en-source-astrology"><span class="std std-ref">source.astrology</span></a>: src/astrology/zodiac.py: AshmandSignGroup, ashmand_sign_group; tests/test_zodiac.py</p>
 </section>
 <section id="entry-essential-dignities-statement">
 <span id="catalog-en-entry-essential-dignities"></span><h2>entry.essential_dignities · Statement / 陈述<a class="headerlink" href="#entry-essential-dignities-statement" title="Link to this heading">¶</a></h2>
@@ -1363,7 +1464,7 @@ and <a class="reference internal" href="knowledge.html#translation-revisions-and
 <p>Variants / 变体：<a class="reference internal" href="#catalog-en-rule-lilly1647-essential-dignities"><span class="std std-ref">rule.lilly1647.essential_dignities</span></a></p>
 <p>Prerequisites / 前提：</p>
 <ul class="simple">
-<li><p>Supply an exact Sign and, for status assessment, a supported Body. HouseRulers requires a supplied NatalChart; existing placements are reused and absent ruler placements remain absent.</p></li>
+<li><p>Supply an exact Sign and, for status assessment, a supported Body. HouseRulers requires a supplied NatalChart or MomentChart; existing placements are reused and absent ruler placements remain absent.</p></li>
 </ul>
 <p>Exceptions / 例外：Wrong types and unsupported outer planets are rejected explicitly; supported no-match is an empty tuple. An uncalculated ruler placement is None, not no-match. Four-status emptiness is not a peregrine judgment.</p>
 <p>Limits / 限度：One named historical set. No reception, aggregate strength, modern rulership or interpretation. The source’s day/night house labels and other dignities are not conditions on these four queries. Catalog retrieval never evaluates chart applicability.</p>
@@ -1399,21 +1500,21 @@ and <a class="reference internal" href="knowledge.html#translation-revisions-and
 </section>
 <section id="entry-cross-house-overlays-statement">
 <span id="catalog-en-entry-cross-house-overlays"></span><h2>entry.cross_house_overlays · Statement / 陈述<a class="headerlink" href="#entry-cross-house-overlays-statement" title="Link to this heading">¶</a></h2>
-<p>Directional house overlays preserve two supplied natal results and distinguish an object’s owner from the chart whose houses receive it. Each side can select bodies, named lunar nodes and stored axes independently.</p>
+<p>Directional house overlays preserve two supplied natal or moment results and distinguish an object’s owner from the chart whose houses receive it. Each side can select bodies, named lunar nodes and stored axes independently.</p>
 <p><code class="docutils literal notranslate"><span class="pre">prerequisites=complete</span></code> · <code class="docutils literal notranslate"><span class="pre">output=reference_only</span></code> · <code class="docutils literal notranslate"><span class="pre">chart=not_assessed</span></code></p>
 <p>Concepts / 概念：<a class="reference internal" href="#catalog-en-house-whole-sign"><span class="std std-ref">house.whole_sign</span></a>, <a class="reference internal" href="#catalog-en-house-equal"><span class="std std-ref">house.equal</span></a>, <a class="reference internal" href="#catalog-en-house-placidus"><span class="std std-ref">house.placidus</span></a>, <a class="reference internal" href="#catalog-en-axis-ascendant"><span class="std std-ref">axis.ascendant</span></a>, <a class="reference internal" href="#catalog-en-axis-midheaven"><span class="std std-ref">axis.midheaven</span></a>, <a class="reference internal" href="#catalog-en-axis-descendant"><span class="std std-ref">axis.descendant</span></a>, <a class="reference internal" href="#catalog-en-axis-imum-coeli"><span class="std std-ref">axis.imum_coeli</span></a></p>
 <p>Variants / 变体：<a class="reference internal" href="#catalog-en-rule-project-cross-house-overlays"><span class="std std-ref">rule.project.cross_house_overlays</span></a>, <a class="reference internal" href="#catalog-en-rule-project-cusp-ownership"><span class="std std-ref">rule.project.cusp_ownership</span></a></p>
 <p>Prerequisites / 前提：</p>
 <ul class="simple">
-<li><p>Supply two immutable NatalChart results with matching zodiac, center and position-frame conventions and stored cusp geometry. Select objects independently, or use each source’s default bodies/nodes without axes.</p></li>
+<li><p>Supply two immutable NatalChart or MomentChart results with matching zodiac, center and position-frame conventions and stored cusp geometry. Select objects independently, or use each source’s default bodies/nodes without axes.</p></li>
 </ul>
 <p>Exceptions / 例外：Different house systems, dates, models and versions are retained. Same-named objects, the same chart in both roles and empty selections are allowed; an empty side still supplies its houses to the other direction.</p>
 <p>Limits / 限度：Project geometry, without common-epoch conversion, three-dimensional placement or relationship interpretation. The fixed source documents implementation, not independent corroboration. Catalog retrieval does not evaluate charts or make this reference entry eligible for default interpretation output.</p>
-<p><a class="reference internal" href="#catalog-en-source-astrology-house-overlays-f269d14"><span class="std std-ref">source.astrology.house_overlays.f269d14</span></a>: src/astrology/house_overlays.py; chart._require_comparable_sources, _selection_for_chart and _selected_longitudes; houses.house_of; text.format_house_overlays and format_cross_aspects; tests/test_house_overlays.py and tests/test_comparison_text.py at the recorded commit</p>
+<p><a class="reference internal" href="#catalog-en-source-astrology"><span class="std std-ref">source.astrology</span></a>: src/astrology/house_overlays.py: cross_chart_house_overlays; src/astrology/_comparison.py: _require_comparable_sources, _selection_for_chart; src/astrology/chart.py: _selected_longitudes; src/astrology/houses.py: house_of; src/astrology/text.py: format_house_overlays, format_cross_aspects; tests/test_house_overlays.py; tests/test_comparison_text.py</p>
 </section>
 <section id="entry-axis-aspects-statement">
 <span id="catalog-en-entry-axis-aspects"></span><h2>entry.axis_aspects · Statement / 陈述<a class="headerlink" href="#entry-axis-aspects-statement" title="Link to this heading">¶</a></h2>
-<p>Stored chart axes have distinct identities and participate in natal or static cross-chart aspects only when explicitly selected. Chart composition reads the corresponding axis fields, not house cusps or synthesized opposite axes.</p>
+<p>Stored chart axes have distinct identities and participate in single-chart or static cross-chart aspects only when explicitly selected. Chart composition reads the corresponding axis fields, not house cusps or synthesized opposite axes.</p>
 <p><code class="docutils literal notranslate"><span class="pre">prerequisites=complete</span></code> · <code class="docutils literal notranslate"><span class="pre">output=reference_only</span></code> · <code class="docutils literal notranslate"><span class="pre">chart=not_assessed</span></code></p>
 <p>Concepts / 概念：<a class="reference internal" href="#catalog-en-axis-ascendant"><span class="std std-ref">axis.ascendant</span></a>, <a class="reference internal" href="#catalog-en-axis-midheaven"><span class="std std-ref">axis.midheaven</span></a>, <a class="reference internal" href="#catalog-en-axis-descendant"><span class="std std-ref">axis.descendant</span></a>, <a class="reference internal" href="#catalog-en-axis-imum-coeli"><span class="std std-ref">axis.imum_coeli</span></a></p>
 <p>Variants / 变体：<a class="reference internal" href="#catalog-en-rule-project-aspect-participation"><span class="std std-ref">rule.project.aspect_participation</span></a>, <a class="reference internal" href="#catalog-en-rule-project-aspect-deviation"><span class="std std-ref">rule.project.aspect_deviation</span></a>, <a class="reference internal" href="#catalog-en-rule-project-aspect-motion"><span class="std std-ref">rule.project.aspect_motion</span></a>, <a class="reference internal" href="#catalog-en-rule-project-cross-aspect-evaluation"><span class="std std-ref">rule.project.cross_aspect_evaluation</span></a></p>
@@ -1421,9 +1522,9 @@ and <a class="reference internal" href="knowledge.html#translation-revisions-and
 <ul class="simple">
 <li><p>Supply explicit participants and aspect rules with caller-selected orbs. Chart composition requires stored axis geometry; cross-chart sources retain their own axis fields.</p></li>
 </ul>
-<p>Exceptions / 例外：Axis-axis and opposite-axis pairs are admitted without folding identities. The natal node-node exclusion remains specific to lunar nodes; static cross-chart pairs have no motion field.</p>
-<p>Limits / 限度：A project policy, not a universal traditional rule or astronomical authentication. Chart composition supplies no axis rate, so non-exact axis hits are indeterminate; zero deviation still gives exact. Scalar callers may supply a meaningful finite rate. Axes have no native-output target, physical distance, raw position or statistical placement. Catalog retrieval never evaluates chart applicability.</p>
-<p><a class="reference internal" href="#catalog-en-source-astrology-axis-aspects-4cb15cc"><span class="std std-ref">source.astrology.axis_aspects.4cb15cc</span></a>: objects.Axis; config.ChartConfig.aspect_participants; chart._AXIS_FIELDS and _aspect_positions; cross_aspects._selection and _hits; tests/test_axis_aspects.py at the recorded commit</p>
+<p>Exceptions / 例外：Axis-axis and opposite-axis pairs are admitted without folding identities. The single-chart node-node exclusion remains specific to lunar nodes; static cross-chart pairs have no motion field.</p>
+<p>Limits / 限度：A project policy, not a universal traditional rule or astronomical authentication. Single-chart composition supplies no axis rate, so non-exact axis hits are indeterminate; zero deviation still gives exact. Scalar callers may supply a meaningful finite rate. Axes have no native-output target, physical distance, raw position or statistical placement. Catalog retrieval never evaluates chart applicability.</p>
+<p><a class="reference internal" href="#catalog-en-source-astrology"><span class="std std-ref">source.astrology</span></a>: src/astrology/objects.py: Axis; src/astrology/config.py: ChartConfig.aspect_participants; src/astrology/chart.py: _AXIS_FIELDS, _aspect_positions; src/astrology/_comparison.py: _selection_for_chart; src/astrology/cross_aspects.py: _hits; tests/test_axis_aspects.py</p>
 </section>
 <section id="entry-dispositor-chains-statement">
 <span id="catalog-en-entry-dispositor-chains"></span><h2>entry.dispositor_chains · Statement / 陈述<a class="headerlink" href="#entry-dispositor-chains-statement" title="Link to this heading">¶</a></h2>
@@ -1433,12 +1534,13 @@ and <a class="reference internal" href="knowledge.html#translation-revisions-and
 <p>Variants / 变体：<a class="reference internal" href="#catalog-en-rule-project-dispositor-chains"><span class="std std-ref">rule.project.dispositor_chains</span></a></p>
 <p>Prerequisites / 前提：</p>
 <ul class="simple">
-<li><p>Supply a NatalChart and a nonempty, duplicate-free sequence of available Body/LunarNode identities. Selection is copied into source-chart order; it selects roots, not the available intermediate rulers.</p></li>
+<li><p>Supply a NatalChart or MomentChart and a nonempty, duplicate-free sequence of available Body/LunarNode identities. Selection is copied into source-chart order; it selects roots, not the available intermediate rulers.</p></li>
 </ul>
 <p>Exceptions / 例外：A missing successor remains an explicit identity without a fabricated placement. A root already in a cycle has no prefix before the cycle; several roots may share an endpoint or reach different components.</p>
 <p>Limits / 限度：The source supports the unchanged sign-ruler table. Traversal, ordering and output conventions are project definitions, with the limits in rule.project.dispositor_chains. This entry supplies no score, interpretation or assessment of chart applicability.</p>
 <p><a class="reference internal" href="#catalog-en-source-lilly-christian-astrology-1647"><span class="std std-ref">source.lilly.christian-astrology-1647</span></a>: Book I, p.104 / zero-based Wellcome leaf138, Houses of the Planets column and The Use of the Table: sign-ruler assignments only, not the project’s traversal algorithm</p>
 <p><a class="reference internal" href="#catalog-en-source-lilly-christian-astrology-1647"><span class="std std-ref">source.lilly.christian-astrology-1647</span></a>: Printed p.112 / zero-based Wellcome leaf146 (retained PDF page146), Reception paragraph, Sun in Aries and Mars in Leo: domicile-based mutual reception (Lilly’s reception by Houses) label only, not traversal, significator judgments or other dignities</p>
+<p><a class="reference internal" href="#catalog-en-source-astrology"><span class="std std-ref">source.astrology</span></a>: src/astrology/dignities.py: Dispositors, chart_dispositors; tests/test_dispositors.py</p>
 </section>
 </section>
 
@@ -1474,9 +1576,11 @@ and <a class="reference internal" href="knowledge.html#translation-revisions-and
 <li class="toctree-l2"><a class="reference internal" href="birth.html">Birth records and modern time resolution</a></li>
 <li class="toctree-l2"><a class="reference internal" href="configuration.html">Requested chart configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="chart.html">Natal charts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="moments.html">Moment charts and fixed-instant transits</a></li>
 <li class="toctree-l2"><a class="reference internal" href="aspects.html">Aspects</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cross_aspects.html">Cross-chart aspects and house overlays</a></li>
 <li class="toctree-l2"><a class="reference internal" href="transits.html">Exact transit hits</a></li>
+<li class="toctree-l2"><a class="reference internal" href="returns.html">Solar and lunar returns</a></li>
 <li class="toctree-l2"><a class="reference internal" href="summaries.html">Sign distributions and natal lunar phase</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dignities.html">Traditional rulership, dignities and dispositor chains</a></li>
 <li class="toctree-l2"><a class="reference internal" href="records.html">Chart results and text</a></li>

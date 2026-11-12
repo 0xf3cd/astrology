@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Repository structure and calculation boundaries &#8212; celestial-astrology 0.4.0 documentation / 文档</title>
+    <title>Repository structure and calculation boundaries &#8212; celestial-astrology 0.5.0 documentation / 文档</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
-    <script src="../../_static/documentation_options.js?v=6c02275b"></script>
+    <script src="../../_static/documentation_options.js?v=1dd76d02"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/en/architecture.html" />
@@ -37,15 +37,20 @@
   <section id="repository-structure-and-calculation-boundaries">
 <h1>Repository structure and calculation boundaries<a class="headerlink" href="#repository-structure-and-calculation-boundaries" title="Link to this heading">¶</a></h1>
 <p><a class="reference internal" href="../zh-CN/architecture.html"><span class="std std-doc">简体中文</span></a> · <a class="reference internal" href="../../README.html"><span class="std std-doc">Project</span></a> · <a class="reference internal" href="knowledge.html"><span class="std std-doc">Knowledge</span></a></p>
-<p>Birth records, modern time resolution, requested configuration, the tropical
-natal chart, major aspects, text output and independent knowledge are implemented; their
+<p>Birth records, modern time resolution, requested configuration, tropical natal and
+moment charts, major aspects, text output and independent knowledge are implemented; their
 usage and constraints are in the <a class="reference internal" href="birth.html"><span class="std std-doc">birth</span></a>, <a class="reference internal" href="configuration.html"><span class="std std-doc">configuration</span></a>,
 <a class="reference internal" href="chart.html"><span class="std std-doc">chart</span></a>, <a class="reference internal" href="aspects.html"><span class="std std-doc">aspect</span></a>, <a class="reference internal" href="cross_aspects.html"><span class="std std-doc">cross-chart</span></a>, <a class="reference internal" href="records.html"><span class="std std-doc">result</span></a>
 and <a class="reference internal" href="knowledge.html"><span class="std std-doc">knowledge</span></a> guides. <a class="reference internal" href="transits.html"><span class="std std-doc">Exact transit hits</span></a> search
-moving objects against fixed natal degrees over a UTC interval.
-The current chart is
-a reproducible modern tropical, geocentric natal chart, with independent access
-to its underlying knowledge.</p>
+moving objects against fixed source-chart degrees over a UTC interval.
+Charts use modern tropical, geocentric coordinates; the underlying knowledge can
+also be queried without a chart.</p>
+<p><a class="reference internal" href="moments.html"><span class="std std-doc">Moment charts</span></a> use explicit instants/locations instead of birth
+records. Natal and moment results share validation and the concrete UTC/location
+snapshot. Fixed-instant transit aspects reuse cross geometry, with local motion
+against zero fixed-side rates; their source/result construction remains native-free.
+<a class="reference internal" href="returns.html"><span class="std std-doc">Solar and lunar returns</span></a> select same-body conjunction events against
+a natal chart, then reuse the moment-chart boundary for an explicit location.</p>
 <section id="organization">
 <h2>Organization<a class="headerlink" href="#organization" title="Link to this heading">¶</a></h2>
 <p>The intended package layout is below. Create modules as their first functionality
@@ -61,7 +66,9 @@ arrives; a name in this map does not require an empty package or an extra layer.
   chart.py          Composition and immutable chart results
   _comparison.py    Source compatibility and stored-chart object selection
   cross_aspects.py  Static comparison of supplied charts, retaining both sources
-  transits.py       Exact moving-to-fixed-natal interval events
+  transits.py       Exact moving-to-fixed-source interval events
+  returns.py        Solar/lunar return selection over exact transit hits
+  transit_aspects.py Fixed-instant moving-to-natal geometry and local motion
   house_overlays.py Directional house placement between supplied charts
   lunar_phase.py    Oriented solar/lunar arc and named lunation types
   dignities.py      Traditional dignities, house rulers and dispositor chains
@@ -93,6 +100,10 @@ for both cross-chart consumers and validates natal target selections for transit
 <p><code class="docutils literal notranslate"><span class="pre">transits.py</span></code> composes the adapter’s independent longitude-event queries with
 selected natal degrees and the aspect branches in <code class="docutils literal notranslate"><span class="pre">aspects.py</span></code>. It retains the
 source chart without creating a moving-side birth record or house geometry.</p>
+<p><code class="docutils literal notranslate"><span class="pre">returns.py</span></code> owns the natal-only, Sun/Moon-only return selection. It delegates to
+<code class="docutils literal notranslate"><span class="pre">transit_hits</span></code> and returns the same <code class="docutils literal notranslate"><span class="pre">TransitHits</span></code>; chart construction stays with
+<code class="docutils literal notranslate"><span class="pre">moment_chart</span></code>. Retaining both results preserves the reference search and the
+chosen chart’s location/configuration without a separate return-result family.</p>
 <p><code class="docutils literal notranslate"><span class="pre">dignities.py</span></code> owns the sign-ruler table and the house-ruler and dispositor results
 derived from it. These supplied-chart operations use existing placements without
 initializing astronomy. <code class="docutils literal notranslate"><span class="pre">summaries.py</span></code> keeps sign distributions and natal lunar phase.</p>
@@ -103,8 +114,9 @@ the result later without moving calculation into a frontend.</p>
 <section id="effects-boundary">
 <h2>Effects boundary<a class="headerlink" href="#effects-boundary" title="Link to this heading">¶</a></h2>
 <p>Package imports, knowledge queries, classifications, summaries and supplied-chart
-comparisons do not initialize native astronomy. <code class="docutils literal notranslate"><span class="pre">natal_chart</span></code> and <code class="docutils literal notranslate"><span class="pre">transit_hits</span></code>
-load the astronomy adapter only when called. <code class="docutils literal notranslate"><span class="pre">resolve_birth_time</span></code> reads timezone data,
+comparisons do not initialize native astronomy. <code class="docutils literal notranslate"><span class="pre">natal_chart</span></code>, <code class="docutils literal notranslate"><span class="pre">moment_chart</span></code> and <code class="docutils literal notranslate"><span class="pre">transit_hits</span></code>
+load the astronomy adapter only when called. <code class="docutils literal notranslate"><span class="pre">return_hits</span></code> delegates to <code class="docutils literal notranslate"><span class="pre">transit_hits</span></code>
+after validating its source/body. <code class="docutils literal notranslate"><span class="pre">resolve_birth_time</span></code> reads timezone data,
 and <code class="docutils literal notranslate"><span class="pre">load_catalog</span></code> reads packaged knowledge; formatters use a caller-supplied catalog
 without resource I/O. The <a class="reference internal" href="contributing.html#run-the-checks"><span class="std std-ref">isolation checks</span></a>
 exercise these boundaries.</p>
@@ -196,7 +208,7 @@ aspects, and undefined house geometry.</p>
 <p>Birth/configuration values, the independent knowledge catalog, the tropical
 natal chart, major aspects and text output are implemented,
 with bilingual documentation and installed-package verification.</p>
-<p>The <a class="reference external" href="https://github.com/0xf3cd/astrology/milestone/1">v0.1.0 milestone</a> owns task
+<p>The <a class="reference external" href="https://github.com/0xf3cd/astrology/milestones">project milestones</a> track task
 status. The source layout can evolve as these concrete implementations reveal
 shared needs; a general backend/plugin framework is not a prerequisite.</p>
 </section>
@@ -234,9 +246,11 @@ shared needs; a general backend/plugin framework is not a prerequisite.</p>
 <li class="toctree-l2"><a class="reference internal" href="birth.html">Birth records and modern time resolution</a></li>
 <li class="toctree-l2"><a class="reference internal" href="configuration.html">Requested chart configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="chart.html">Natal charts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="moments.html">Moment charts and fixed-instant transits</a></li>
 <li class="toctree-l2"><a class="reference internal" href="aspects.html">Aspects</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cross_aspects.html">Cross-chart aspects and house overlays</a></li>
 <li class="toctree-l2"><a class="reference internal" href="transits.html">Exact transit hits</a></li>
+<li class="toctree-l2"><a class="reference internal" href="returns.html">Solar and lunar returns</a></li>
 <li class="toctree-l2"><a class="reference internal" href="summaries.html">Sign distributions and natal lunar phase</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dignities.html">Traditional rulership, dignities and dispositor chains</a></li>
 <li class="toctree-l2"><a class="reference internal" href="records.html">Chart results and text</a></li>

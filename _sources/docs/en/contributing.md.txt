@@ -123,14 +123,14 @@ fail the strict build.
 <!-- usage: contributing.checks -->
 
 Install this development package from the checkout using `uv sync` above. Its
-distribution name/version is `celestial-astrology` / `0.4.0`; the Python import
+distribution name/version is `celestial-astrology` / `0.5.0`; the Python import
 remains `astrology`. The unrelated
 PyPI project `astrology` is not this library. Confirm the installed package and version:
 
 ```{doctest}
 >>> from importlib.metadata import version
 >>> version("celestial-astrology")
-'0.4.0'
+'0.5.0'
 ```
 
 <!-- /usage: contributing.checks -->
@@ -174,6 +174,26 @@ choices and retain requested/effective settings. Avoid implicit global settings,
 silent substitutions, and factories whose return type depends on hidden state.
 
 ## Correctness
+
+Return fixtures in `tests/reference/return_reference.json` use independently
+calculated natal degrees and TT crossings from pyswisseph 2.10.3.2 / Swiss 2.10.03,
+explicit Moshier plus speed flags 260. Regenerate them without project/native
+imports or a dependency change:
+
+```sh
+uv run --no-project --python 3.11 --with pyswisseph==2.10.3.2 python tools/fetch_return_reference.py --output <path>
+```
+
+The recipe pins birth/search TT−UTC offsets to 64.184/69.184 seconds for its 2000
+natal instants and 2023–2024 intervals. The Sun 5-second and Moon 30-second fixture
+tolerances cover measured cross-model differences (maxima 1.344672/11.771331 seconds)
+for these synthetic cases only, not global error bounds. Tests separately recompute
+native wrapped residuals within 1e-6 degree, compare all event counts and exercise
+exact endpoint collisions. Cases include near-zero degrees, leap-day birth and
+two solar returns within calendar 2024. Some overlapping windows repeat events;
+they are not independent observations. The recipe hash binds the fixture to its
+generator. This optional reference environment adds no runtime or locked dependency;
+Swiss code and ephemeris files are not distributed here.
 
 Transit fixtures in `tests/reference/transit_reference.json` use explicitly selected
 Moshier ephemeris calculations through `pyswisseph==2.10.3.2`, not Swiss/JPL data
@@ -316,6 +336,9 @@ This does not change the project's MIT license or constitute a general license a
 
 ## Knowledge and documentation
 
+Each technique needs a named definition, sources and reference cases before
+implementation.
+
 Follow the [knowledge design](knowledge.md). Link explanations to stable concepts,
 rules and sources. Preserve original quotations and label translations; a checked
 source is not evidence that a particular chart meets its prerequisites.
@@ -327,6 +350,31 @@ detect a missing translation file, but cannot establish semantic equivalence.
 The catalog checks also reject stale text revisions, missing record descriptions,
 unknown references and duplicate IDs. Both language views have executable examples;
 source and translation review checks that conditions and limits retain their meaning.
+
+### Add a sourced variant
+
+1. Inspect a retrievable edition and reproduction terms. Record work, author or
+   translator, edition, language, locator, lineage, supported claim and limits.
+   Mark unverified material honestly; two mirrors are not two sources.
+2. Add stable records to `src/astrology/knowledge/catalog.json`. Reference an
+   owning enum class/member instead of copying its value or inventing an algorithm.
+   Add a separate explicit variant only when it carries a rule, with its own
+   definition and limits; configuration links alone do not generate variants.
+   Lunar-node definition links are derived from `LunarNode.definition`, and the
+   loader checks all twelve Sign-to-concept identities in the built-in corpus.
+   Source-only variants have no config reference; entries link variant IDs and citations.
+3. Keep excerpts, translations and authored statements distinct. `text_defaults`
+   supplies initial revision 1 and project translation credit; each text can
+   override them. Increment a changed text's `revision`; retain its old `zh_revision`
+   until translation review, then update revision and credit together.
+4. State prerequisites, exceptions and limits. Select source verification,
+   prerequisite completeness and output eligibility independently. Retrieval must
+   leave chart applicability `not_assessed` even when one condition is computable.
+   Leave unsupported interpretations out of the default corpus.
+5. Add boundary/source tests, run the [complete checks](#run-the-checks) and inspect
+   both generated language pages. Checks cover current translations, complete
+   config/catalog/API references and installed resources. Semantic review still
+   verifies translation meaning and source fidelity.
 
 ## Review evidence
 

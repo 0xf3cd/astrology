@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Cross-chart aspects and house overlays &#8212; celestial-astrology 0.4.0 documentation / 文档</title>
+    <title>Cross-chart aspects and house overlays &#8212; celestial-astrology 0.5.0 documentation / 文档</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
-    <script src="../../_static/documentation_options.js?v=6c02275b"></script>
+    <script src="../../_static/documentation_options.js?v=1dd76d02"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/en/cross_aspects.html" />
@@ -45,9 +45,20 @@ Both operations use the stored longitudes; check the
 <a class="reference internal" href="#source-compatibility-and-calculation-boundaries">coordinate requirements</a> before comparing charts.</p>
 <section id="compare-two-example-charts">
 <h2>Compare two example charts<a class="headerlink" href="#compare-two-example-charts" title="Link to this heading">¶</a></h2>
+<p>Both comparison functions also accept <code class="docutils literal notranslate"><span class="pre">MomentChart</span></code> sources in either role.
+Their comparisons remain static. For a supplied instant and moving-to-natal
+motion labels, use <a class="reference internal" href="moments.html"><span class="std std-doc">moment_chart and transit_aspects</span></a>.</p>
 <p>This example calculates charts from two synthetic birth records, then checks
 whether their Suns form a conjunction within a 3-degree orb. The comparison takes
 its own aspect rules, so the natal charts do not need to include aspects.</p>
+<p>For a fixed-instant transit comparison, use the chart calculated at that instant
+as <code class="docutils literal notranslate"><span class="pre">chart_left</span></code> and the natal chart as <code class="docutils literal notranslate"><span class="pre">chart_right</span></code>. Select <code class="docutils literal notranslate"><span class="pre">Body.SUN</span></code> on each
+side to compare only the transiting and natal Suns. The comparison uses stored
+own-date longitudes under the <a class="reference internal" href="#source-compatibility-and-calculation-boundaries">source-compatibility convention</a>.
+<code class="docutils literal notranslate"><span class="pre">find_aspects</span></code> is a single-chart
+operation: it requires distinct identities and also forms pairs within its input,
+so it cannot represent these two Suns. This static comparison does not search for
+exact hit times; use <a class="reference internal" href="transits.html"><span class="std std-doc">transit hits</span></a> for an interval search.</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">date</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">timedelta</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">astrology</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">AspectRule</span><span class="p">,</span> <span class="n">BirthRecord</span><span class="p">,</span> <span class="n">Body</span><span class="p">,</span> <span class="n">ChartConfig</span><span class="p">,</span> <span class="n">FixedOffset</span><span class="p">,</span>
 <span class="gp">... </span>  <span class="n">HouseSystem</span><span class="p">,</span> <span class="n">Location</span><span class="p">,</span> <span class="n">MajorAspect</span><span class="p">,</span> <span class="n">ObjectOrb</span><span class="p">,</span> <span class="n">OrbCombination</span><span class="p">,</span>
@@ -112,12 +123,9 @@ cusp: the half-open interval <code class="docutils literal notranslate"><span cl
 A longitude exactly on a cusp belongs to the house starting there. Each chart
 keeps its own house system and remains unchanged. Swapping the chart arguments
 swaps the owners in the result; you can also pass the same chart on both sides.</p>
-<p>Selecting an object twice on one side, or selecting an object absent from that
-chart, raises <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>. Non-object values or non-sequence selections raise
-<code class="docutils literal notranslate"><span class="pre">TypeError</span></code>. These checks still run when the other selection is empty.
-Constructing <code class="docutils literal notranslate"><span class="pre">CrossChartHouseOverlays</span></code> directly recomputes the complete placement
-sequence from the charts and selections. Missing records, different house numbers
-or a different order are rejected.</p>
+<p>Both comparisons raise <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> if you select an object twice on one side or
+select an object absent from that chart. Non-object values or non-sequence selections raise
+<code class="docutils literal notranslate"><span class="pre">TypeError</span></code>. These checks still run when the other selection is empty.</p>
 </section>
 <section id="choose-pairs-and-orbs">
 <h2>Choose pairs and orbs<a class="headerlink" href="#choose-pairs-and-orbs" title="Link to this heading">¶</a></h2>
@@ -158,7 +166,6 @@ orb limit also counts as a hit.</p>
 </div>
 <p>The following requests raise <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>, even when there are no pairs to compare:</p>
 <ul class="simple">
-<li><p>Selecting an object twice on one side, or selecting an object absent from that chart.</p></li>
 <li><p>Repeating an aspect in the rules, or overriding an object selected on neither side.</p></li>
 <li><p>Omitting the combination when there are overrides, or supplying one without overrides.</p></li>
 </ul>
@@ -217,8 +224,8 @@ values, model and version labels, and selected objects. The overlay table then l
 the owners and house number for each placement. The aspect table lists every
 matching branch, including multiple hits for one pair, without motion labels such
 as applying or separating. It also shows base orbs, object overrides, the combination
-rule and each hit’s effective orb limit. A deviation whose absolute value equals
-the limit counts as a hit. Empty results still show the selections and aspect rules.</p>
+rule and each hit’s effective orb limit. Empty results still show the selections
+and aspect rules.</p>
 <p>Branches, deviations and orbs are displayed in degrees, minutes and seconds using
 the <a class="reference internal" href="records.html#display-does-not-change-classification"><span class="std std-ref">whole-arcsecond truncation rule</span></a>.
 Truncation affects only the display; it does not re-evaluate aspects or discard
@@ -256,7 +263,7 @@ one moment.</p>
 labels. These are retained and do not by themselves cause rejection. Constructing
 a cross-aspect result recomputes all hits from the charts, selections and rules;
 constructing an overlay result recomputes all placements from the charts and
-selections. Any difference from the supplied records is rejected. See the
+selections. Missing records, different values or a different order are rejected. See the
 <a class="reference internal" href="architecture.html#reproducibility"><span class="std std-ref">validation boundary</span></a> for what these checks establish.</p>
 <p>House overlays likewise compare each object’s stored longitude at its own date
 with the other chart’s cusps. They do not convert to a common epoch or use object
@@ -299,9 +306,11 @@ these operations.</p>
 <li class="toctree-l2"><a class="reference internal" href="birth.html">Birth records and modern time resolution</a></li>
 <li class="toctree-l2"><a class="reference internal" href="configuration.html">Requested chart configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="chart.html">Natal charts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="moments.html">Moment charts and fixed-instant transits</a></li>
 <li class="toctree-l2"><a class="reference internal" href="aspects.html">Aspects</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Cross-chart aspects and house overlays</a></li>
 <li class="toctree-l2"><a class="reference internal" href="transits.html">Exact transit hits</a></li>
+<li class="toctree-l2"><a class="reference internal" href="returns.html">Solar and lunar returns</a></li>
 <li class="toctree-l2"><a class="reference internal" href="summaries.html">Sign distributions and natal lunar phase</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dignities.html">Traditional rulership, dignities and dispositor chains</a></li>
 <li class="toctree-l2"><a class="reference internal" href="records.html">Chart results and text</a></li>

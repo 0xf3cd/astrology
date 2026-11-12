@@ -5,17 +5,17 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Exact transit hits &#8212; celestial-astrology 0.4.0 documentation / 文档</title>
+    <title>Exact transit hits &#8212; celestial-astrology 0.5.0 documentation / 文档</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
-    <script src="../../_static/documentation_options.js?v=6c02275b"></script>
+    <script src="../../_static/documentation_options.js?v=1dd76d02"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/en/transits.html" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Sign distributions and natal lunar phase" href="summaries.html" />
+    <link rel="next" title="Solar and lunar returns" href="returns.html" />
     <link rel="prev" title="Cross-chart aspects and house overlays" href="cross_aspects.html" />
    
   <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
@@ -41,12 +41,19 @@
 a UTC interval. It returns a <code class="docutils literal notranslate"><span class="pre">TransitHits</span></code> result with the original chart, the
 search inputs and model provenance, and each crossing or contact. Hit times are
 JDE(TT): Julian Dates on the TT time scale, not UTC clock readings.</p>
+<p>For the natal-only Sun/Moon convenience <code class="docutils literal notranslate"><span class="pre">return_hits</span></code> and a chart at a chosen
+hit/location, see <a class="reference internal" href="returns.html"><span class="std std-doc">solar and lunar returns</span></a>.</p>
 <section id="search-an-interval">
 <h2>Search an interval<a class="headerlink" href="#search-an-interval" title="Link to this heading">¶</a></h2>
+<p>The fixed source may also be a <code class="docutils literal notranslate"><span class="pre">MomentChart</span></code>; <code class="docutils literal notranslate"><span class="pre">natal_objects</span></code> names its
+fixed-reference role, not its birth-input kind. <code class="docutils literal notranslate"><span class="pre">TransitHits.epoch_policy</span></code> keeps
+<code class="docutils literal notranslate"><span class="pre">fixed_natal_degree_against_moving_of_date_longitude</span></code> for both source types because
+the longitude convention is unchanged. The genuine source type/input remains in
+<code class="docutils literal notranslate"><span class="pre">result.chart</span></code>. For building and reading a moment chart, see <a class="reference internal" href="moments.html"><span class="std std-doc">moment charts</span></a>.</p>
 <!-- usage: transits.hits -->
 <p>This synthetic birth example calculates one stored natal Sun. The moving side
 needs only an object selection and an interval, with no birthplace or houses.
-Both endpoints must be aware built-in <code class="docutils literal notranslate"><span class="pre">datetime</span></code> values at or after
+Both endpoints must be timezone-aware built-in <code class="docutils literal notranslate"><span class="pre">datetime</span></code> values at or after
 1972-01-01 UTC. Local offsets are normalized to UTC; naive values are rejected.</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">UTC</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">timedelta</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">astrology</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
@@ -63,10 +70,11 @@ Both endpoints must be aware built-in <code class="docutils literal notranslate"
 <span class="gp">... </span>  <span class="n">moving_objects</span><span class="o">=</span><span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">MERCURY</span><span class="p">,),</span> <span class="n">natal_objects</span><span class="o">=</span><span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">SUN</span><span class="p">,),</span>
 <span class="gp">... </span>  <span class="n">aspects</span><span class="o">=</span><span class="p">(</span><span class="n">MajorAspect</span><span class="o">.</span><span class="n">CONJUNCTION</span><span class="p">,))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">hit</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">hits</span><span class="p">:</span>
-<span class="gp">... </span>  <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">hit</span><span class="o">.</span><span class="n">jde_tt</span><span class="si">:</span><span class="s2">.5f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">hit</span><span class="o">.</span><span class="n">direction</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">hit</span><span class="o">.</span><span class="n">longitude_rate_deg_per_tt_day</span><span class="si">:</span><span class="s2">+.3f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-<span class="go">2460392.23731 increasing +1.208</span>
-<span class="go">2460414.61236 decreasing -0.744</span>
-<span class="go">2460437.45999 increasing +0.812</span>
+<span class="gp">... </span>  <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">hit</span><span class="o">.</span><span class="n">moving_object</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">hit</span><span class="o">.</span><span class="n">aspect</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">hit</span><span class="o">.</span><span class="n">natal_object</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2"> "</span>
+<span class="gp">... </span>        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">hit</span><span class="o">.</span><span class="n">jde_tt</span><span class="si">:</span><span class="s2">.5f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">hit</span><span class="o">.</span><span class="n">direction</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">hit</span><span class="o">.</span><span class="n">longitude_rate_deg_per_tt_day</span><span class="si">:</span><span class="s2">+.3f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="go">mercury conjunction sun 2460392.23731 increasing +1.208</span>
+<span class="go">mercury conjunction sun 2460414.61236 decreasing -0.744</span>
+<span class="go">mercury conjunction sun 2460437.45999 increasing +0.812</span>
 </pre></div>
 </div>
 <p>Mercury reaches the fixed natal Sun degree three times: once while its longitude
@@ -74,13 +82,19 @@ increases, once during retrograde motion, and once after it increases again.
 Rates are degrees per TT day, copied from the upstream event. A <code class="docutils literal notranslate"><span class="pre">tangent</span></code> event
 touches the requested longitude without crossing it; its reported rate need not
 be exactly zero.</p>
-<p>To display a UTC date, import <code class="docutils literal notranslate"><span class="pre">jde_to_utc</span></code> from <code class="docutils literal notranslate"><span class="pre">celestial_calendar</span></code> and call
-<code class="docutils literal notranslate"><span class="pre">jde_to_utc(hit.jde_tt)</span></code>. It returns UTC civil fields (<code class="docutils literal notranslate"><span class="pre">year</span></code>, <code class="docutils literal notranslate"><span class="pre">month</span></code>, <code class="docutils literal notranslate"><span class="pre">day</span></code>,
-<code class="docutils literal notranslate"><span class="pre">fraction</span></code>), where <code class="docutils literal notranslate"><span class="pre">fraction</span></code> is the elapsed fraction of that UTC day. Retain <code class="docutils literal notranslate"><span class="pre">jde_tt</span></code> as the event
-time: a UTC-to-TT-to-UTC round trip need not recover the original civil fields at
-leap seconds or the 1972 model boundary. After the last leap-second entry, the
-converter retains the last known offset.</p>
 <!-- /usage: transits.hits -->
+<p>For ordinary UTC clock display, convert the civil fields returned by <code class="docutils literal notranslate"><span class="pre">jde_to_utc</span></code>
+to a timezone-aware <code class="docutils literal notranslate"><span class="pre">datetime</span></code>. <code class="docutils literal notranslate"><span class="pre">fraction</span></code> is the elapsed fraction of that UTC day:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">celestial_calendar</span><span class="w"> </span><span class="kn">import</span> <span class="n">jde_to_utc</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">civil</span> <span class="o">=</span> <span class="n">jde_to_utc</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">hits</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">jde_tt</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">displayed</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">(</span><span class="n">civil</span><span class="o">.</span><span class="n">year</span><span class="p">,</span> <span class="n">civil</span><span class="o">.</span><span class="n">month</span><span class="p">,</span> <span class="n">civil</span><span class="o">.</span><span class="n">day</span><span class="p">,</span> <span class="n">tzinfo</span><span class="o">=</span><span class="n">UTC</span><span class="p">)</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="n">civil</span><span class="o">.</span><span class="n">fraction</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">displayed</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(</span><span class="n">timespec</span><span class="o">=</span><span class="s2">"seconds"</span><span class="p">)</span>
+<span class="go">'2024-03-22T17:40:34+00:00'</span>
+</pre></div>
+</div>
+<p>Retain <code class="docutils literal notranslate"><span class="pre">jde_tt</span></code> as the event time; this seconds-only display loses precision.
+A UTC-to-TT-to-UTC round trip need not recover the original civil fields at leap
+seconds or the 1972 model boundary, and Python <code class="docutils literal notranslate"><span class="pre">datetime</span></code> cannot represent a leap second.</p>
 </section>
 <section id="select-targets-and-aspects">
 <h2>Select targets and aspects<a class="headerlink" href="#select-targets-and-aspects" title="Link to this heading">¶</a></h2>
@@ -108,9 +122,28 @@ others. <code class="docutils literal notranslate"><span class="pre">hit.query_l
 longitude the search solves for. <code class="docutils literal notranslate"><span class="pre">hit.longitude_deg</span></code> preserves the raw event
 longitude, which can differ by a small numerical residual or lie on the other
 side of 0°/360°. See the <a class="reference internal" href="catalog.html#catalog-en-rule-project-exact-transit-hits"><span class="std std-ref">rule and coordinate limits</span></a> for the own-date longitude convention.</p>
-<p>Each moving object, natal target and oriented aspect branch requires a separate
-upstream interval scan. Start with the selections you need; expanding all three
-selections multiplies the work.</p>
+</section>
+<section id="search-cost">
+<h2>Search cost<a class="headerlink" href="#search-cost" title="Link to this heading">¶</a></h2>
+<p>The number of upstream interval scans is:</p>
+<p><code class="docutils literal notranslate"><span class="pre">moving</span> <span class="pre">objects</span> <span class="pre">×</span> <span class="pre">natal</span> <span class="pre">targets</span> <span class="pre">×</span> <span class="pre">total</span> <span class="pre">oriented</span> <span class="pre">aspect</span> <span class="pre">branches</span></code></p>
+<p>All five major aspects have eight branches in total, not five. Narrow each
+selection to the question you need, and start with a short interval. The call
+provides no progress callback and returns only after every selected scan succeeds;
+it does not return partial results.</p>
+<p>Measurements on 2026-11-07 with celestial-calendar 1.1.1 and Python 3.14.9 on a
+16-core Linux machine give approximate costs, not timing guarantees. One longitude
+scan over 365 TT days took about 2–11 seconds for Jupiter, Uranus, Venus, Saturn,
+Mars and Mercury; Mercury was slowest. Sun and Moon each took less than 0.1 second.
+A separate one-year search of Saturn and Jupiter against natal Sun, Moon and
+Ascendant, selecting conjunction, square and opposition, took about 74 seconds:
+<code class="docutils literal notranslate"><span class="pre">2</span> <span class="pre">×</span> <span class="pre">3</span> <span class="pre">×</span> <span class="pre">(1</span> <span class="pre">+</span> <span class="pre">2</span> <span class="pre">+</span> <span class="pre">1)</span> <span class="pre">=</span> <span class="pre">24</span></code> scans.</p>
+<p>Ten moving bodies against ten natal bodies plus four axes, with all five aspects,
+require <code class="docutils literal notranslate"><span class="pre">10</span> <span class="pre">×</span> <span class="pre">14</span> <span class="pre">×</span> <span class="pre">8</span> <span class="pre">=</span> <span class="pre">1120</span></code> scans. Extrapolating each moving body’s measured scan
+time equally across all natal targets and branches gives roughly an hour for that
+one-year request; the complete request was not timed. Costs depend on the target,
+interval, machine and load; do not assume that they scale linearly with interval
+length from these samples.</p>
 </section>
 <section id="read-and-retain-the-result">
 <h2>Read and retain the result<a class="headerlink" href="#read-and-retain-the-result" title="Link to this heading">¶</a></h2>
@@ -189,7 +222,11 @@ local clock readings. Resolve daylight-saving gaps or overlaps before supplying
 an endpoint; see the <a class="reference internal" href="birth.html"><span class="std std-doc">birth-time explanation</span></a>.</p>
 <p>This operation finds
 exact moving-to-fixed hits. It does not calculate a fixed-instant transit chart,
-orb-entry windows, returns, moving-to-moving events or interpretation.</p>
+orb-entry windows, moving-to-moving events or interpretation.
+For aspects at one chosen instant with local motion, use <a class="reference internal" href="moments.html"><span class="std std-doc">moment_chart and
+transit_aspects</span></a>. <a class="reference internal" href="cross_aspects.html#compare-two-example-charts"><span class="std std-ref">Static cross-chart aspects</span></a>
+remain available when no motion is wanted; both compare own-date stored longitudes
+under the <a class="reference internal" href="cross_aspects.html#source-compatibility-and-calculation-boundaries"><span class="std std-ref">source-compatibility convention</span></a>.</p>
 </section>
 </section>
 
@@ -225,9 +262,11 @@ orb-entry windows, returns, moving-to-moving events or interpretation.</p>
 <li class="toctree-l2"><a class="reference internal" href="birth.html">Birth records and modern time resolution</a></li>
 <li class="toctree-l2"><a class="reference internal" href="configuration.html">Requested chart configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="chart.html">Natal charts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="moments.html">Moment charts and fixed-instant transits</a></li>
 <li class="toctree-l2"><a class="reference internal" href="aspects.html">Aspects</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cross_aspects.html">Cross-chart aspects and house overlays</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Exact transit hits</a></li>
+<li class="toctree-l2"><a class="reference internal" href="returns.html">Solar and lunar returns</a></li>
 <li class="toctree-l2"><a class="reference internal" href="summaries.html">Sign distributions and natal lunar phase</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dignities.html">Traditional rulership, dignities and dispositor chains</a></li>
 <li class="toctree-l2"><a class="reference internal" href="records.html">Chart results and text</a></li>
@@ -249,7 +288,7 @@ orb-entry windows, returns, moving-to-moving events or interpretation.</p>
   <li><a href="../index.html">Documentation overview</a><ul>
   <li><a href="index.html">Documentation</a><ul>
       <li>Previous: <a href="cross_aspects.html" title="previous chapter">Cross-chart aspects and house overlays</a></li>
-      <li>Next: <a href="summaries.html" title="next chapter">Sign distributions and natal lunar phase</a></li>
+      <li>Next: <a href="returns.html" title="next chapter">Solar and lunar returns</a></li>
   </ul></li>
   </ul></li>
 </ul>

@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Moment charts and fixed-instant transits &#8212; celestial-astrology 0.5.0 documentation / 文档</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
+    <script src="../../_static/documentation_options.js?v=1dd76d02"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/en/moments.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Aspects" href="aspects.html" />
+    <link rel="prev" title="Natal charts" href="chart.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="moment-charts-and-fixed-instant-transits">
+<h1>Moment charts and fixed-instant transits<a class="headerlink" href="#moment-charts-and-fixed-instant-transits" title="Link to this heading">¶</a></h1>
+<p><a class="reference internal" href="../zh-CN/moments.html"><span class="std std-doc">简体中文</span></a> · <a class="reference internal" href="chart.html"><span class="std std-doc">Charts</span></a> · <a class="reference internal" href="transits.html"><span class="std std-doc">Exact transit search</span></a></p>
+<p>Use <code class="docutils literal notranslate"><span class="pre">moment_chart</span></code> for a supplied instant and location. It returns a <code class="docutils literal notranslate"><span class="pre">MomentChart</span></code>,
+with no birth record or inferred location. Use <code class="docutils literal notranslate"><span class="pre">transit_aspects</span></code> to compare that
+moment’s moving objects with an existing natal chart’s frozen degrees.
+For solar or lunar return searches followed by chart construction, see <a class="reference internal" href="returns.html"><span class="std std-doc">returns</span></a>.
+The examples on this page continue in order.</p>
+<section id="calculate-at-an-instant">
+<h2>Calculate at an instant<a class="headerlink" href="#calculate-at-an-instant" title="Link to this heading">¶</a></h2>
+<!-- usage: chart.moment -->
+<p>Supply an aware built-in <code class="docutils literal notranslate"><span class="pre">datetime</span></code>, a <code class="docutils literal notranslate"><span class="pre">Location</span></code> and a <code class="docutils literal notranslate"><span class="pre">ChartConfig</span></code>. Offsets are
+normalized to UTC. The input and calculated times are separate records:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">UTC</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">astrology</span><span class="w"> </span><span class="kn">import</span> <span class="n">Body</span><span class="p">,</span> <span class="n">ChartConfig</span><span class="p">,</span> <span class="n">HouseSystem</span><span class="p">,</span> <span class="n">Location</span><span class="p">,</span> <span class="n">moment_chart</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">site</span> <span class="o">=</span> <span class="n">Location</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config</span> <span class="o">=</span> <span class="n">ChartConfig</span><span class="p">(</span><span class="n">HouseSystem</span><span class="o">.</span><span class="n">WHOLE_SIGN</span><span class="p">,</span> <span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">SUN</span><span class="p">,</span> <span class="n">Body</span><span class="o">.</span><span class="n">MOON</span><span class="p">,</span> <span class="n">Body</span><span class="o">.</span><span class="n">MERCURY</span><span class="p">),</span> <span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">moving</span> <span class="o">=</span> <span class="n">moment_chart</span><span class="p">(</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2024</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">22</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="n">tzinfo</span><span class="o">=</span><span class="n">UTC</span><span class="p">),</span> <span class="n">site</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">moving</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span>
+<span class="go">'MomentChart'</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">moving</span><span class="o">.</span><span class="n">moment</span><span class="o">.</span><span class="n">utc</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
+<span class="go">'2024-03-22T18:00:00+00:00'</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">moving</span><span class="o">.</span><span class="n">moment</span><span class="o">.</span><span class="n">location</span> <span class="o">==</span> <span class="n">site</span> <span class="ow">and</span> <span class="n">moving</span><span class="o">.</span><span class="n">moment</span><span class="o">.</span><span class="n">source_jde_tt</span> <span class="ow">is</span> <span class="kc">None</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">moving</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span>
+<span class="go">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">round</span><span class="p">(</span><span class="n">moving</span><span class="o">.</span><span class="n">positions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">longitude_deg</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+<span class="go">2.60136</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">moving</span><span class="o">.</span><span class="n">placements</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sign</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">moving</span><span class="o">.</span><span class="n">placements</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">house</span>
+<span class="go">('ARIES', 7)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">moving.moment</span></code> holds the normalized UTC, location and optional source-event TT.
+<code class="docutils literal notranslate"><span class="pre">moving.times</span></code> holds the calculated JD(UT1) and JDE(TT). Positions, houses,
+placements, intra-chart aspects, configuration and provenance follow the
+<a class="reference internal" href="records.html#read-the-structured-result"><span class="std std-ref">structured result guide</span></a>.
+This example requests no intra-chart aspects.</p>
+<!-- /usage: chart.moment -->
+<p>The <a class="reference internal" href="chart.html#select-objects-without-widening-the-domain"><span class="std std-ref">joint snapshot domain</span></a> and
+explicit house-system choice still apply. A smaller body selection filters the
+fourteen-object snapshot; it does not narrow its calculation domain. Naive
+datetimes are rejected, and the normalized UTC must be at or after 1972-01-01.</p>
+</section>
+<section id="compare-moving-objects-with-a-natal-chart">
+<h2>Compare moving objects with a natal chart<a class="headerlink" href="#compare-moving-objects-with-a-natal-chart" title="Link to this heading">¶</a></h2>
+<!-- usage: transits.fixed -->
+<p>Build the natal source from a synthetic birth record. Choose the fixed-instant
+rules and each side’s objects explicitly; rules are not inherited from either chart:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">astrology</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">AspectRule</span><span class="p">,</span> <span class="n">BirthRecord</span><span class="p">,</span> <span class="n">FixedOffset</span><span class="p">,</span> <span class="n">MajorAspect</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">format_transit_aspects</span><span class="p">,</span> <span class="n">load_catalog</span><span class="p">,</span> <span class="n">natal_chart</span><span class="p">,</span> <span class="n">prepare_natal_input</span><span class="p">,</span> <span class="n">transit_aspects</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span> <span class="o">=</span> <span class="n">BirthRecord</span><span class="p">(</span><span class="n">date</span><span class="p">(</span><span class="mi">2000</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">time</span><span class="p">(</span><span class="mi">12</span><span class="p">),</span> <span class="n">FixedOffset</span><span class="p">(</span><span class="n">timedelta</span><span class="p">(</span><span class="mi">0</span><span class="p">)),</span> <span class="n">site</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">natal</span> <span class="o">=</span> <span class="n">natal_chart</span><span class="p">(</span><span class="n">prepare_natal_input</span><span class="p">(</span><span class="n">record</span><span class="p">),</span> <span class="n">config</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rules</span> <span class="o">=</span> <span class="p">(</span><span class="n">AspectRule</span><span class="p">(</span><span class="n">MajorAspect</span><span class="o">.</span><span class="n">CONJUNCTION</span><span class="p">,</span> <span class="mi">3</span><span class="p">),)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fixed</span> <span class="o">=</span> <span class="n">transit_aspects</span><span class="p">(</span><span class="n">moving</span><span class="p">,</span> <span class="n">natal</span><span class="p">,</span> <span class="n">rules</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">moving_objects</span><span class="o">=</span><span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">MERCURY</span><span class="p">,),</span> <span class="n">natal_objects</span><span class="o">=</span><span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">SUN</span><span class="p">,))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[(</span><span class="n">hit</span><span class="o">.</span><span class="n">moving_object</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">hit</span><span class="o">.</span><span class="n">natal_object</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">hit</span><span class="o">.</span><span class="n">motion</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">hit</span> <span class="ow">in</span> <span class="n">fixed</span><span class="o">.</span><span class="n">hits</span><span class="p">]</span>
+<span class="go">[('mercury', 'sun', 'separating')]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">catalog</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">format_transit_aspects</span><span class="p">(</span><span class="n">fixed</span><span class="p">,</span> <span class="n">catalog</span><span class="p">)</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+<span class="go">Fixed-instant transit-to-natal aspects</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">line</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">format_transit_aspects</span><span class="p">(</span><span class="n">fixed</span><span class="p">,</span> <span class="n">catalog</span><span class="p">)</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">'Mercury [mercury] |'</span><span class="p">)))</span>
+<span class="go">Mercury [mercury] | Sun [sun] | Conjunction | 0°00'00" | -0°00'58" | 3°00'00" | separating</span>
+</pre></div>
+</div>
+<p>The row retains the moving/natal identities, aspect, <a class="reference internal" href="aspects.html#read-the-branch-and-the-deviation"><span class="std std-ref">oriented branch and signed
+deviation</span></a>, inclusive orb limit and
+<a class="reference internal" href="aspects.html#applying-separating-and-the-other-statuses"><span class="std std-ref">motion status</span></a>. The original unrounded values
+remain in <code class="docutils literal notranslate"><span class="pre">fixed.hits</span></code>; whole-arcsecond display truncation changes neither hit
+membership nor motion, even when a nonzero deviation displays as zero.</p>
+<!-- /usage: transits.fixed -->
+<p><code class="docutils literal notranslate"><span class="pre">None</span></code> selections use each source’s stored bodies/nodes without axes. Explicit
+selections may include any of the four <code class="docutils literal notranslate"><span class="pre">Axis</span></code> members. Empty selections or rules
+produce no hits; invalid inputs are still checked. Same-identity and axis-axis
+pairs are allowed, as is every combination of the nodes selected on each side.
+Ordering and per-object orb
+combinations follow <a class="reference internal" href="cross_aspects.html"><span class="std std-doc">cross-chart aspects</span></a>.</p>
+<p>The moving side must be a <code class="docutils literal notranslate"><span class="pre">MomentChart</span></code>, the fixed side a <code class="docutils literal notranslate"><span class="pre">NatalChart</span></code>. Each pair’s
+raw branch, deviation and orb limit exactly match <code class="docutils literal notranslate"><span class="pre">cross_chart_aspects</span></code> with the
+moment chart on the left, the natal chart on the right and the same object selections.
+Motion uses moving rates against <strong>zero natal motion</strong>,
+including fixed natal axes; it never uses the natal positions’ stored birth-time
+rates. Moving axes have no supplied rate: non-exact hits are indeterminate, while
+zero deviation is exact. Applying describes a local derivative, not a promise of
+a later exact event. Both sides retain their own-date tropical longitudes without
+common-epoch conversion or a simultaneous spatial-angle claim.</p>
+</section>
+<section id="build-from-a-retained-exact-hit">
+<h2>Build from a retained exact hit<a class="headerlink" href="#build-from-a-retained-exact-hit" title="Link to this heading">¶</a></h2>
+<!-- usage: chart.hit_moment -->
+<p>Pass a retained <code class="docutils literal notranslate"><span class="pre">TransitHit</span></code> directly to <code class="docutils literal notranslate"><span class="pre">moment_chart</span></code>; no upstream converter
+import is needed. The explicit location determines the new chart’s houses:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">astrology</span><span class="w"> </span><span class="kn">import</span> <span class="n">transit_hits</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">events</span> <span class="o">=</span> <span class="n">transit_hits</span><span class="p">(</span><span class="n">natal</span><span class="p">,</span> <span class="n">start_utc</span><span class="o">=</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2024</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">tzinfo</span><span class="o">=</span><span class="n">UTC</span><span class="p">),</span>
+<span class="gp">... </span>    <span class="n">end_utc</span><span class="o">=</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2024</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">tzinfo</span><span class="o">=</span><span class="n">UTC</span><span class="p">),</span> <span class="n">moving_objects</span><span class="o">=</span><span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">MERCURY</span><span class="p">,),</span>
+<span class="gp">... </span>    <span class="n">natal_objects</span><span class="o">=</span><span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">SUN</span><span class="p">,),</span> <span class="n">aspects</span><span class="o">=</span><span class="p">(</span><span class="n">MajorAspect</span><span class="o">.</span><span class="n">CONJUNCTION</span><span class="p">,))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">at_hit</span> <span class="o">=</span> <span class="n">moment_chart</span><span class="p">(</span><span class="n">events</span><span class="o">.</span><span class="n">hits</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">site</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">at_hit</span><span class="o">.</span><span class="n">moment</span><span class="o">.</span><span class="n">source_jde_tt</span> <span class="o">==</span> <span class="n">events</span><span class="o">.</span><span class="n">hits</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">jde_tt</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">at_hit</span><span class="o">.</span><span class="n">moment</span><span class="o">.</span><span class="n">utc</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(</span><span class="n">timespec</span><span class="o">=</span><span class="s1">'seconds'</span><span class="p">)</span>
+<span class="go">'2024-03-22T17:40:34+00:00'</span>
+</pre></div>
+</div>
+<p>The retained <code class="docutils literal notranslate"><span class="pre">source_jde_tt</span></code> is the source event’s original JDE(TT).
+<code class="docutils literal notranslate"><span class="pre">at_hit.times.jde_tt</span></code> comes from a new snapshot at the converted Python UTC
+datetime. These times can differ: the fixed upstream leap table and datetime’s
+microsecond representation do not guarantee an exact inverse round trip.</p>
+<!-- /usage: chart.hit_moment -->
+<p>Python cannot represent an inserted leap second. At the first 1972 leap step the
+converted snapshot can be about one second later than its source event. At the
+1972 model boundary a source time can convert to pre-1972 UTC, which raises
+<code class="docutils literal notranslate"><span class="pre">HistoricalTimeError</span></code>; admission is checked on the converted instant. Conversion
+also rounds to datetime precision, possibly carrying into the next day/year.
+The resulting UTC must satisfy the snapshot domain. A valid event in the wider
+event-search domain does not guarantee a valid full chart. Conversion/domain
+failures raise <code class="docutils literal notranslate"><span class="pre">ChartDomainError</span></code> with the requested house system and available
+upstream diagnostics. See the <a class="reference internal" href="transits.html#limits-and-failures"><span class="std std-ref">transit time limits</span></a>
+for the fixed leap table’s future-offset behavior.</p>
+</section>
+<section id="use-existing-consumers">
+<h2>Use existing consumers<a class="headerlink" href="#use-existing-consumers" title="Link to this heading">¶</a></h2>
+<p>Comparisons, house overlays, house rulers, dispositors, sign distributions,
+interval transit searches and chart text accept moment charts. Continuing with
+the supplied charts above:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">astrology</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">Dispositors</span><span class="p">,</span> <span class="n">HouseRulers</span><span class="p">,</span> <span class="n">chart_sign_distribution</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">cross_chart_aspects</span><span class="p">,</span> <span class="n">cross_chart_house_overlays</span><span class="p">,</span> <span class="n">format_chart</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cross</span> <span class="o">=</span> <span class="n">cross_chart_aspects</span><span class="p">(</span><span class="n">moving</span><span class="p">,</span> <span class="n">natal</span><span class="p">,</span> <span class="n">rules</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">left_objects</span><span class="o">=</span><span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">MERCURY</span><span class="p">,),</span> <span class="n">right_objects</span><span class="o">=</span><span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">SUN</span><span class="p">,))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cross</span><span class="o">.</span><span class="n">hits</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">deviation_deg</span> <span class="o">==</span> <span class="n">fixed</span><span class="o">.</span><span class="n">hits</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">deviation_deg</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cross_chart_house_overlays</span><span class="p">(</span><span class="n">natal</span><span class="p">,</span> <span class="n">moving</span><span class="p">)</span><span class="o">.</span><span class="n">chart_right</span> <span class="ow">is</span> <span class="n">moving</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">HouseRulers</span><span class="p">(</span><span class="n">moving</span><span class="p">)</span><span class="o">.</span><span class="n">houses</span><span class="p">)</span>
+<span class="go">12</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Dispositors</span><span class="p">(</span><span class="n">moving</span><span class="p">,</span> <span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">SUN</span><span class="p">,))</span><span class="o">.</span><span class="n">chart</span> <span class="ow">is</span> <span class="n">moving</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">chart_sign_distribution</span><span class="p">(</span><span class="n">moving</span><span class="p">,</span> <span class="n">objects</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">objects</span><span class="p">)</span><span class="o">.</span><span class="n">total</span>
+<span class="go">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">format_chart</span><span class="p">(</span><span class="n">moving</span><span class="p">,</span> <span class="n">catalog</span><span class="p">)</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+<span class="go">Tropical geocentric moment chart</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">line</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">format_chart</span><span class="p">(</span><span class="n">moving</span><span class="p">,</span> <span class="n">catalog</span><span class="p">)</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">'Sun [sun] |'</span><span class="p">)))</span>
+<span class="go">Sun [sun] | Aries 2°36'04" | 7 | D</span>
+</pre></div>
+</div>
+<p>Moment text shows supplied UTC/location and, when present, source-event TT; it
+does not add a recorded birth clock, timezone identity or tzdata/fold provenance.
+<code class="docutils literal notranslate"><span class="pre">natal_lunar_phase</span></code> remains natal-specific; use <code class="docutils literal notranslate"><span class="pre">lunar_phase</span></code> with a moment chart’s
+stored Sun/Moon longitudes. For interval <code class="docutils literal notranslate"><span class="pre">transit_hits</span></code>, <code class="docutils literal notranslate"><span class="pre">natal_objects</span></code> names the
+fixed-reference role even when the supplied source is a moment chart; the existing
+recorded epoch-policy value is explained in the <a class="reference internal" href="transits.html"><span class="std std-doc">transit guide</span></a>.</p>
+<p>The project definitions and their scope are recorded under <code class="docutils literal notranslate"><span class="pre">entry.moment_charts</span></code>
+and <code class="docutils literal notranslate"><span class="pre">entry.transit_aspects</span></code> in the <a class="reference internal" href="catalog.html"><span class="std std-doc">knowledge catalog</span></a>.</p>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">celestial-astrology</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../README.html">celestial-astrology</a></li>
+<li class="toctree-l2"><a class="reference internal" href="birth.html">Birth records and modern time resolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html">Requested chart configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chart.html">Natal charts</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Moment charts and fixed-instant transits</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aspects.html">Aspects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cross_aspects.html">Cross-chart aspects and house overlays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="transits.html">Exact transit hits</a></li>
+<li class="toctree-l2"><a class="reference internal" href="returns.html">Solar and lunar returns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="summaries.html">Sign distributions and natal lunar phase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dignities.html">Traditional rulership, dignities and dispositor chains</a></li>
+<li class="toctree-l2"><a class="reference internal" href="records.html">Chart results and text</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference.html">Public API reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html">Repository structure and calculation boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="knowledge.html">Knowledge organization and bilingual documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="catalog.html">Knowledge catalog reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="releases.html">Release notes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="releasing.html">Release procedure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html">Contributing</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../zh-CN/index.html">文档入口</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Documentation</a><ul>
+      <li>Previous: <a href="chart.html" title="previous chapter">Natal charts</a></li>
+      <li>Next: <a href="aspects.html" title="next chapter">Aspects</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 9.1.0</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../../_sources/docs/en/moments.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

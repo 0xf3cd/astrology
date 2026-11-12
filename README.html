@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>celestial-astrology &#8212; celestial-astrology 0.4.0 documentation / 文档</title>
+    <title>celestial-astrology &#8212; celestial-astrology 0.5.0 documentation / 文档</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
-    <script src="_static/documentation_options.js?v=6c02275b"></script>
+    <script src="_static/documentation_options.js?v=1dd76d02"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="canonical" href="https://0xf3cd.github.io/astrology/README.html" />
@@ -44,24 +44,25 @@ keeps astrological rules, their sources, and their variants in this repository.<
 or query the knowledge catalog without a chart. Start with the examples below;
 the <a class="reference external" href="https://0xf3cd.github.io/astrology/docs/en/index.html">guides</a> and
 <a class="reference external" href="https://0xf3cd.github.io/astrology/docs/en/reference.html">API reference</a> explain further uses and parameters.</p>
-<p>Further features include
-<a class="reference external" href="https://0xf3cd.github.io/astrology/docs/en/summaries.html">element/modality distributions and natal lunar
-phase</a>,
-<a class="reference external" href="https://0xf3cd.github.io/astrology/docs/en/dignities.html">traditional sign rulers, four statuses and dispositor chains</a>,
-<a class="reference external" href="https://0xf3cd.github.io/astrology/docs/en/aspects.html#select-axes-explicitly">explicit axis aspects for natal and static cross-chart queries</a>,
-and <a class="reference external" href="https://0xf3cd.github.io/astrology/docs/en/cross_aspects.html">cross-chart house overlays and bilingual comparison text</a>.
-Axes (Ascendant, Midheaven, Descendant and
-Imum Coeli) participate in aspects only when explicitly selected.</p>
-<p>The library also provides:</p>
+<p>The library provides:</p>
 <ul class="simple">
+<li><p><a class="reference external" href="https://0xf3cd.github.io/astrology/docs/en/returns.html">Solar and lunar returns</a>: find every event in an explicit interval, then build its chart at a supplied location.</p></li>
+<li><p><a class="reference external" href="https://0xf3cd.github.io/astrology/docs/en/moments.html">Moment charts and fixed-instant transit-to-natal aspects</a>, including direct construction from a retained exact hit and bilingual text.</p></li>
+<li><p><a class="reference external" href="https://0xf3cd.github.io/astrology/docs/en/summaries.html">Element/modality distributions and natal lunar phase</a>.</p></li>
+<li><p><a class="reference external" href="https://0xf3cd.github.io/astrology/docs/en/dignities.html">Traditional sign rulers, four statuses and dispositor chains</a>.</p></li>
+<li><p><a class="reference external" href="https://0xf3cd.github.io/astrology/docs/en/aspects.html#select-axes-explicitly">Explicit axis aspects</a>
+for natal and static cross-chart queries.</p></li>
+<li><p><a class="reference external" href="https://0xf3cd.github.io/astrology/docs/en/cross_aspects.html">Cross-chart house overlays and bilingual comparison text</a>.</p></li>
 <li><p><a class="reference external" href="https://0xf3cd.github.io/astrology/docs/en/cross_aspects.html">Static cross-chart aspects</a>
-between two natal charts, retaining both source charts and distinct left/right
+between natal or moment charts, retaining both source charts and distinct left/right
 objects, without applying/separating labels.</p></li>
 <li><p><a class="reference external" href="https://0xf3cd.github.io/astrology/docs/en/transits.html">Exact transit hits</a>
 over a UTC interval, retaining repeated retrograde hits, native rates and directions.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">ashmand_sign_group(Sign.ARIES)</span></code> queries the twelve signs’ four groups in
 Ashmand’s 1822 edition. See <a class="reference external" href="https://0xf3cd.github.io/astrology/docs/en/knowledge.html#ashmand-1822-sign-groups">the source and lookup example</a>.</p></li>
 </ul>
+<p>Axes (Ascendant, Midheaven, Descendant and Imum Coeli) participate in aspects only
+when explicitly selected.</p>
 <section id="install-a-release">
 <h2>Install a release<a class="headerlink" href="#install-a-release" title="Link to this heading">¶</a></h2>
 <p>The celestial-calendar dependency publishes wheels for Linux x86_64 and aarch64,
@@ -180,13 +181,17 @@ To calculate aspects, supply orb rules in <code class="docutils literal notransl
 <tr class="row-odd"><td><p>Search an interval for exact transits</p></td>
 <td><p><a class="reference external" href="https://0xf3cd.github.io/astrology/docs/en/transits.html">Exact transit hits</a></p></td>
 </tr>
+<tr class="row-even"><td><p>Find solar/lunar returns and build their charts</p></td>
+<td><p><a class="reference external" href="https://0xf3cd.github.io/astrology/docs/en/returns.html">Returns</a></p></td>
+</tr>
 </tbody>
 </table>
 </section>
 <section id="first-knowledge-lookup">
 <h2>First knowledge lookup<a class="headerlink" href="#first-knowledge-lookup" title="Link to this heading">¶</a></h2>
 <p>Save this separate script as <code class="docutils literal notranslate"><span class="pre">first_knowledge.py</span></code> and run it with the same
-virtual-environment Python. This example finds the Sun by name and alias:</p>
+virtual-environment Python. This example retrieves the Sun by its stable ID,
+then finds the same concept by its alias “Sol”:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">astrology</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_catalog</span>
 
 <span class="n">catalog</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">()</span>
@@ -225,14 +230,13 @@ unrounded astronomy and named models.</p>
 <h2>Later work<a class="headerlink" href="#later-work" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p><a class="reference external" href="https://github.com/0xf3cd/astrology/milestone/2">Techniques and presentation</a>:
-fixed-instant transits, orb windows and returns, relationship charts, tradition-specific rules, additional
+orb windows and other planetary returns, relationship charts, tradition-specific rules, additional
 objects, and chart views.</p></li>
 <li><p><a class="reference external" href="https://github.com/0xf3cd/astrology/milestone/3">Advanced and historical research</a>:
 directions, progressions, uncertain birth times, historical inputs, spatial
 house placement, and sourced interpretation.</p></li>
 </ul>
-<p>These milestones track directions without assigning release dates. Each technique
-needs a named definition, sources, and reference cases before implementation.</p>
+<p>These milestones track directions without assigning release dates.</p>
 </section>
 <section id="license">
 <h2>License<a class="headerlink" href="#license" title="Link to this heading">¶</a></h2>
@@ -274,9 +278,11 @@ Historical excerpts retain the reproduction status recorded in their
 <li class="toctree-l2"><a class="reference internal" href="docs/en/birth.html">Birth records and modern time resolution</a></li>
 <li class="toctree-l2"><a class="reference internal" href="docs/en/configuration.html">Requested chart configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="docs/en/chart.html">Natal charts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="docs/en/moments.html">Moment charts and fixed-instant transits</a></li>
 <li class="toctree-l2"><a class="reference internal" href="docs/en/aspects.html">Aspects</a></li>
 <li class="toctree-l2"><a class="reference internal" href="docs/en/cross_aspects.html">Cross-chart aspects and house overlays</a></li>
 <li class="toctree-l2"><a class="reference internal" href="docs/en/transits.html">Exact transit hits</a></li>
+<li class="toctree-l2"><a class="reference internal" href="docs/en/returns.html">Solar and lunar returns</a></li>
 <li class="toctree-l2"><a class="reference internal" href="docs/en/summaries.html">Sign distributions and natal lunar phase</a></li>
 <li class="toctree-l2"><a class="reference internal" href="docs/en/dignities.html">Traditional rulership, dignities and dispositor chains</a></li>
 <li class="toctree-l2"><a class="reference internal" href="docs/en/records.html">Chart results and text</a></li>

@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>知识组织与双语文档 &#8212; celestial-astrology 0.4.0 documentation / 文档</title>
+    <title>知识组织与双语文档 &#8212; celestial-astrology 0.5.0 documentation / 文档</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
-    <script src="../../_static/documentation_options.js?v=6c02275b"></script>
+    <script src="../../_static/documentation_options.js?v=1dd76d02"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/zh-CN/knowledge.html" />
@@ -56,15 +56,15 @@
 <span class="gp">&gt;&gt;&gt; </span><span class="n">catalog</span><span class="o">.</span><span class="n">concept</span><span class="p">(</span><span class="s2">"body.sun"</span><span class="p">)</span><span class="o">.</span><span class="n">configuration</span><span class="o">.</span><span class="n">name</span>
 <span class="go">'SUN'</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">rule</span><span class="o">.</span><span class="n">identifier</span> <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="n">catalog</span><span class="o">.</span><span class="n">list_variants</span><span class="p">(</span><span class="n">concept_id</span><span class="o">=</span><span class="s2">"body.sun"</span><span class="p">)]</span>
-<span class="go">['rule.lilly1647.essential_dignities', 'rule.project.dispositor_chains']</span>
+<span class="go">['rule.project.solar_lunar_returns', 'rule.lilly1647.essential_dignities', 'rule.project.dispositor_chains']</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">rule</span><span class="o">.</span><span class="n">identifier</span> <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="n">catalog</span><span class="o">.</span><span class="n">list_variants</span><span class="p">(</span><span class="n">concept_id</span><span class="o">=</span><span class="s2">"body.uranus"</span><span class="p">)]</span>
 <span class="go">['rule.project.dispositor_chains']</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">catalog</span><span class="o">.</span><span class="n">filter_entries</span><span class="p">(</span><span class="n">concept_id</span><span class="o">=</span><span class="s2">"body.sun"</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">identifier</span>
-<span class="go">'entry.body_requests'</span>
+<span class="go">'entry.solar_lunar_returns'</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">catalog</span><span class="o">.</span><span class="n">filter_sources</span><span class="p">(</span><span class="n">verification</span><span class="o">=</span><span class="n">SourceVerification</span><span class="o">.</span><span class="n">VERIFIED</span><span class="p">))</span>
 <span class="go">14</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">catalog</span><span class="o">.</span><span class="n">entry</span><span class="p">(</span><span class="s2">"entry.cross_aspect_evaluation"</span><span class="p">)</span><span class="o">.</span><span class="n">statement</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">"zh-CN"</span><span class="p">))</span>
-<span class="go">静态主要交叉相位比较两张给定本命盘结果，区分左右端点并保留双侧完整来源，不设运动字段。</span>
+<span class="go">静态主要交叉相位比较两张给定本命盘或时刻盘结果，区分左右端点并保留双侧完整来源，不设运动字段。</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">catalog</span><span class="o">.</span><span class="n">variant</span><span class="p">(</span><span class="s2">"rule.project.cusp_ownership"</span><span class="p">)</span><span class="o">.</span><span class="n">definition</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">"zh-CN"</span><span class="p">))</span>
 <span class="go">落宫使用半开区间 [宫头, 下一宫头)：恰好落在宫头上的黄经归入从该宫头开始的宫，成员关系跨 0/360 环绕。</span>
 </pre></div>
@@ -73,7 +73,8 @@
 读取规则定义。上面最后两次调用输出中文正文；传 <code class="docutils literal notranslate"><span class="pre">&quot;en&quot;</span></code> 可读取英文。</p>
 <p>同一个概念可以有多个名称，但只有一个标识。例如，<code class="docutils literal notranslate"><span class="pre">Sun</span></code>、<code class="docutils literal notranslate"><span class="pre">Sol</span></code> 和“日轮”都指向 <code class="docutils literal notranslate"><span class="pre">body.sun</span></code>。
 规则变体记录某套具体定义，例如采用哪种宫制或月交点算法；仅记录天体名称或交点方向时，不另建规则。
-上例查询太阳时得到两条规则。<code class="docutils literal notranslate"><span class="pre">rule.lilly1647.essential_dignities</span></code> 说明太阳等传统星体
+上例查询太阳时得到三条规则。<code class="docutils literal notranslate"><span class="pre">rule.project.solar_lunar_returns</span></code> 定义受限的<a class="reference internal" href="returns.html"><span class="std std-doc">返照调用</span></a>。
+<code class="docutils literal notranslate"><span class="pre">rule.lilly1647.essential_dignities</span></code> 说明太阳等传统星体
 在哪些星座入庙、擢升、失势或落陷，出处是 Lilly 的著作。
 <code class="docutils literal notranslate"><span class="pre">rule.project.dispositor_chains</span></code> 定义沿传统星座守护关系遍历的路径，见<a class="reference internal" href="dignities.html#id6"><span class="std std-ref">定位星示例</span></a>。
 天王星只关联定位星链规则，因为它可以作为路径起点，但不作四种状态判断。
@@ -98,7 +99,7 @@
 <span class="go">('rule.project.cross_house_overlays', 'rule.project.cusp_ownership')</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">citation</span><span class="p">,</span> <span class="n">source</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">citations</span><span class="p">(</span><span class="n">overlay</span><span class="o">.</span><span class="n">identifier</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">source</span><span class="o">.</span><span class="n">identifier</span>
-<span class="go">'source.astrology.house_overlays.f269d14'</span>
+<span class="go">'source.astrology'</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">overlay</span><span class="o">.</span><span class="n">prerequisite_status</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">overlay</span><span class="o">.</span><span class="n">output_eligibility</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">overlay</span><span class="o">.</span><span class="n">chart_applicability</span>
 <span class="go">('complete', 'reference_only', 'not_assessed')</span>
 </pre></div>
@@ -106,7 +107,7 @@
 <p>这里有两条规则：<code class="docutils literal notranslate"><span class="pre">rule.project.cross_house_overlays</span></code> 说明怎样分别选择两张盘的对象、
 区分对象所属盘与宫位所属盘，并保留各自的宫制；<code class="docutils literal notranslate"><span class="pre">rule.project.cusp_ownership</span></code> 定义宫头之间的区间，
 决定黄经落在哪一宫。双盘落宫沿用这套区间规则。</p>
-<p>来源记录指向一个固定提交中的实现代码，可以据此核对算法及其支持范围。
+<p>来源记录指向具名发行 tag 中的实现代码，可以据此核对算法及其支持范围。
 上面的查询只读取说明和出处，不计算落宫，也不判断某张命盘。
 要对两张盘计算落宫，见<a class="reference internal" href="cross_aspects.html#id3"><span class="std std-ref">双盘落宫示例</span></a>。</p>
 <section id="id3">
@@ -130,6 +131,8 @@
 <li><p>Ashmand 1822 年版中的四组星座分类，以及相关书目、摘录和中文译文。</p></li>
 <li><p><a class="reference internal" href="dignities.html"><span class="std std-doc">传统星座守护与四种状态</span></a>：依据 William Lilly（威廉·利利）的
 《Christian Astrology》（1647），含原扫描本短引文及生成的星座表。</p></li>
+<li><p><a class="reference internal" href="returns.html"><span class="std std-doc">日月返照定义</span></a>：<code class="docutils literal notranslate"><span class="pre">entry.solar_lunar_returns</span></code> 保留原文短引、分开的译文、
+不同地点实践及显式的项目约定。</p></li>
 </ul>
 <p>配置项链接到程序实际使用的枚举成员；规则说明链接到对应的实现。
 宫制、月交点定义和相位角各有说明，写明采用哪种定义及其限制。
@@ -166,9 +169,10 @@
 </div>
 <p>来源记录给出版本、扫描文件哈希、转录时的文字处理和转载条件。包内只收录有限的定义摘录，
 不附扫描图、水印或现代网站说明。同一本书的镜像和书目可以帮助确认版本，但不能当作多份独立依据。
-代码引用给出包版本及固定提交中的符号；程序中的定义用了某位作者的名字，不表示已经核对过其原书公式。</p>
-<p>项目实现来源记录保留已查核的提交，不跟随包版本改写。
-<a class="reference internal" href="catalog.html#catalog-zh-cn-source-astrology-chart-fc845fa"><span class="std std-ref">排盘来源记录</span></a>定位其交点对拍测试，
+代码引用给出发行 tag、模块与符号；程序中的定义用了某位作者的名字，不表示已经核对过其原书公式。</p>
+<p><a class="reference internal" href="catalog.html#catalog-zh-cn-source-astrology"><span class="std std-ref">项目来源记录</span></a>标明实现引用所用的发行树，其版本可能与源码工作树不同；
+源码变更另见<a class="reference internal" href="releases.html"><span class="std std-doc">变更说明</span></a>。历史来源 ID 与完整修订保留在 lineage 中，这些历史核查不覆盖后续扩展。
+交点测试引用给出模块与符号，
 <a class="reference internal" href="catalog.html#catalog-zh-cn-rule-node-definition-meeus-five-term-true"><span class="std std-ref">交点规则</span></a>记录对拍范围及待核的来源问题。</p>
 <p>下面用手工构造的数据表示“只知道部分条件”的情况：第一个条件为真，第二个仍未知。
 目录不会读取这个字典，也不会因此改变条目的命盘适用状态：</p>
@@ -185,7 +189,7 @@
 <h2>四轴的独立词汇<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">axis.ascendant</span></code>、<code class="docutils literal notranslate"><span class="pre">axis.midheaven</span></code>、<code class="docutils literal notranslate"><span class="pre">axis.descendant</span></code> 和 <code class="docutils literal notranslate"><span class="pre">axis.imum_coeli</span></code> 是绑定到 <code class="docutils literal notranslate"><span class="pre">Axis</span></code>
 的不同概念，不是天体、交点或宫头的别名。仅供参考的 <code class="docutils literal notranslate"><span class="pre">entry.axis_aspects</span></code> 说明项目的显式选择、
-配对及缺速率政策，并引用固定修订的实现。原天体和交点来源仍保留原修订，不倒记为四轴扩展的证据。</p>
+配对及缺速率政策，其项目来源引用给出发行 tag 中对应的四轴实现单元。</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">astrology</span><span class="w"> </span><span class="kn">import</span> <span class="n">Axis</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">catalog</span><span class="o">.</span><span class="n">concept</span><span class="p">(</span><span class="s2">"axis.ascendant"</span><span class="p">)</span><span class="o">.</span><span class="n">configuration</span> <span class="ow">is</span> <span class="n">Axis</span><span class="o">.</span><span class="n">ASCENDANT</span>
 <span class="go">True</span>
@@ -236,9 +240,7 @@
 现代模式分类 <code class="docutils literal notranslate"><span class="pre">Modality</span></code> 与历史分组 <code class="docutils literal notranslate"><span class="pre">AshmandSignGroup</span></code> 是两套不同的分类，
 虽然其中一些组包含相同的星座：两者的固定组相同，现代变动组与 Ashmand 双体组相同，
 Ashmand 的至点、分点两组合起来则对应现代基本模式。成员相同不表示名称和历史定义也相同。</p>
-<p>两个 <code class="docutils literal notranslate"><span class="pre">FIXED</span></code> 成员的字符串值都是 <code class="docutils literal notranslate"><span class="pre">&quot;fixed&quot;</span></code>；按 <code class="docutils literal notranslate"><span class="pre">StrEnum</span></code> 的字符串语义，它们比较相等，
-hash 也相同。要在同一映射中保留二者，请用 <code class="docutils literal notranslate"><span class="pre">(type(member),</span> <span class="pre">member.value)</span></code> 作键，
-或使用各自带类别前缀的目录 ID。</p>
+<p>若在 Python 映射中混用这两种枚举，见 <a class="reference internal" href="reference.html#id5"><span class="std std-ref">API 的枚举键说明</span></a>。</p>
 <p>月相分类采用 Rudhyar 的 <em>Your Lunation Birthday</em> 第四部分中的八种类型。
 版本和研究状态见<a class="reference internal" href="catalog.html#catalog-zh-cn-source-rudhyar-lunation-birthday"><span class="std std-ref">来源记录</span></a>，
 区间见<a class="reference internal" href="catalog.html#catalog-zh-cn-rule-lunation-rudhyar1950"><span class="std std-ref">规则表</span></a>；区间端点如何归类、盈亏方向如何判断，见
@@ -263,22 +265,7 @@ hash 也相同。要在同一映射中保留二者，请用 <code class="docutil
 </section>
 <section id="id8">
 <h2>增加有来源的变体<a class="headerlink" href="#id8" title="Link to this heading">¶</a></h2>
-<ol class="arabic simple">
-<li><p>查可取得的版本及转载条件，记录作品、作者或译者、版本、语言、定位、谱系、所支持的陈述及限度。
-未核材料如实标注，两个镜像不算两份来源。</p></li>
-<li><p>在 <code class="docutils literal notranslate"><span class="pre">src/astrology/knowledge/catalog.json</span></code> 添加稳定记录。引用所属枚举类与成员，
-不抄其值，也不虚构算法。只有承载规则时才另加显式变体，写明其定义与限制；配置链接本身
-不会生成变体。月交点的定义关联从 <code class="docutils literal notranslate"><span class="pre">LunarNode.definition</span></code> 派生，加载器还检查内置语料中
-十二个 Sign 与概念的身份对应。
-纯来源变体没有配置引用；条目关联变体标识及引用。</p></li>
-<li><p>区分引文、译文及原作陈述。<code class="docutils literal notranslate"><span class="pre">text_defaults</span></code> 提供初始修订 1 及项目译者署名，各文本可覆盖它们。
-文本改动时递增 <code class="docutils literal notranslate"><span class="pre">revision</span></code>；译文未经复核前保留原 <code class="docutils literal notranslate"><span class="pre">zh_revision</span></code>，复核后再更新修订及署名。</p></li>
-<li><p>写清前提、例外及限度；独立选择来源查核、前提完整性与输出资格。
-即使一个条件可算，检索仍须将命盘适用性留为 <code class="docutils literal notranslate"><span class="pre">not_assessed</span></code>。
-缺乏依据的解释不进入默认语料。</p></li>
-<li><p>补充边界与来源测试，运行<a class="reference internal" href="contributing.html"><span class="std std-doc">完整检查</span></a>，核双语生成页。
-检查覆盖当前译文、完整配置／目录／API 及安装资源；语义审阅仍须核译意与来源保真。</p></li>
-</ol>
+<p>贡献定义或变体时，请按<a class="reference internal" href="contributing.html#id7"><span class="std std-ref">来源与译文维护步骤</span></a>操作。</p>
 </section>
 <section id="id9">
 <h2>记录与归属<a class="headerlink" href="#id9" title="Link to this heading">¶</a></h2>
@@ -395,9 +382,11 @@ hash 也相同。要在同一映射中保留二者，请用 <code class="docutil
 <li class="toctree-l2"><a class="reference internal" href="birth.html">出生记录与现代时刻解析</a></li>
 <li class="toctree-l2"><a class="reference internal" href="configuration.html">排盘请求配置</a></li>
 <li class="toctree-l2"><a class="reference internal" href="chart.html">本命盘</a></li>
+<li class="toctree-l2"><a class="reference internal" href="moments.html">时刻盘与固定时刻行运相位</a></li>
 <li class="toctree-l2"><a class="reference internal" href="aspects.html">相位</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cross_aspects.html">双盘相位与落宫</a></li>
 <li class="toctree-l2"><a class="reference internal" href="transits.html">精确行运命中</a></li>
+<li class="toctree-l2"><a class="reference internal" href="returns.html">日返照与月返照</a></li>
 <li class="toctree-l2"><a class="reference internal" href="summaries.html">星座分布与出生月相</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dignities.html">传统守护、尊贵状态与定位星链</a></li>
 <li class="toctree-l2"><a class="reference internal" href="records.html">命盘结果与文本显示</a></li>

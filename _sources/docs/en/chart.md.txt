@@ -10,6 +10,8 @@ request asks for are in `chart.aspects`; the [aspect guide](aspects.md) explains
 
 ## Calculate one chart
 
+For an explicit instant/location without a birth record, use [moment_chart](moments.md).
+
 <!-- usage: chart.calculation -->
 
 Prepare the input first. A chart needs a known clock, an explicit timezone and
@@ -199,16 +201,24 @@ as such.
 |---|---|
 | No location on the record | `MissingBirthDataError` |
 | Latitude at a pole | `ChartDomainError`, no upstream detail |
-| Civil year 2100 or later | `ChartDomainError`, no upstream detail |
+| Civil year at or beyond the upstream capability's exclusive end year | `ChartDomainError`, no upstream detail |
 | Instant outside the supported ephemeris range | `ChartDomainError` with the upstream message |
 | Requested geometry undefined at this latitude | `ChartDomainError` with the upstream message |
 
-`house_system` identifies the requested geometry. `upstream_message` is None for
-pre-call rejections and contains the upstream exception text for failures reported
-by the astronomy library, even if that text is empty. When supplied by the upstream
-exception, `operation` names the upstream operation and `recorded` indicates whether
-native code reported a recognized error kind. Domain rejections leave both as None.
-The error type is not determined by parsing the message text.
+`house_system` identifies the requested geometry. The other fields distinguish
+where a failure occurred:
+
+- Location, pole and civil-year rejections leave `upstream_message`, `operation`
+  and `recorded` as `None`.
+- An upstream `ValueError`, such as undefined Placidus geometry, supplies
+  `upstream_message` but leaves `operation` and `recorded` as `None`.
+- An upstream `CelestialError` from the capability query or chart calculation
+  supplies all three fields. `operation` names the failed upstream operation;
+  `recorded=True` means native code supplied a recognized error kind, while
+  `False` means it did not. Neither value means the calculation succeeded.
+
+Upstream exception text is retained even when empty. The adapter uses exception
+types and fields, not message parsing, to classify failures.
 
 ```{doctest}
 >>> high = prepare_natal_input(BirthRecord(
@@ -249,10 +259,22 @@ instants and do not guarantee accuracy over the full supported range. See the
 
 ## Limits
 
+The adapter reads the civil-year ceiling from upstream `house_capability` with
+its fixed Algo5 ΔT model. For example, celestial-calendar 1.1.1 reports:
+
+```{doctest}
+>>> from celestial_calendar import DeltaTModel, house_capability
+>>> capability = house_capability(delta_t_model=DeltaTModel.ALGO5)
+>>> capability.civil_start_year, capability.civil_end_year_exclusive, capability.utc_start_date
+(1885, 2100, (1972, 1, 1))
+```
+
+The end year is exclusive. Birth preparation separately requires modern UTC;
+the natal adapter adds no lower-year policy. The native snapshot still enforces
+its narrower TT and geometry domains, so civil-year admission does not guarantee
+a calculable chart.
+
 - Requested aspects are judged among the participating objects; the
   [aspect guide](aspects.md) explains the rules and their limits.
-- The astronomy library supports civil years 1885 to 2099 and, for UTC input,
-  instants from 1972-01-01; the ephemeris range is narrower than the civil
-  range, and an instant outside it fails explicitly.
 - Installs need a platform with a celestial-calendar wheel; see
   [installation](../../README.md#install-a-release).

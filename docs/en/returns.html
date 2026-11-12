@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Solar and lunar returns &#8212; celestial-astrology 0.5.0 documentation / 文档</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
+    <script src="../../_static/documentation_options.js?v=1dd76d02"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/en/returns.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Sign distributions and natal lunar phase" href="summaries.html" />
+    <link rel="prev" title="Exact transit hits" href="transits.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="solar-and-lunar-returns">
+<h1>Solar and lunar returns<a class="headerlink" href="#solar-and-lunar-returns" title="Link to this heading">¶</a></h1>
+<p><a class="reference internal" href="../zh-CN/returns.html"><span class="std std-doc">简体中文</span></a> · <a class="reference internal" href="moments.html"><span class="std std-doc">Moment charts</span></a> · <a class="reference internal" href="reference.html"><span class="std std-doc">API</span></a></p>
+<p>Use <code class="docutils literal notranslate"><span class="pre">return_hits</span></code> to find the Sun or Moon at its stored natal longitude within an
+explicit UTC interval. It returns <code class="docutils literal notranslate"><span class="pre">TransitHits</span></code>, the same result as an exact
+same-body conjunction search. Build a chart at a chosen event with <code class="docutils literal notranslate"><span class="pre">moment_chart</span></code>.
+The examples on this page continue in order.</p>
+<section id="find-every-return-in-an-interval">
+<h2>Find every return in an interval<a class="headerlink" href="#find-every-return-in-an-interval" title="Link to this heading">¶</a></h2>
+<!-- usage: returns.search -->
+<p>The natal chart must contain the selected luminary. This synthetic example stores
+both, then finds three lunar returns in January through March 2024:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">UTC</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">astrology</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+<span class="gp">... </span>    <span class="n">BirthRecord</span><span class="p">,</span> <span class="n">Body</span><span class="p">,</span> <span class="n">ChartConfig</span><span class="p">,</span> <span class="n">FixedOffset</span><span class="p">,</span> <span class="n">HouseSystem</span><span class="p">,</span> <span class="n">Location</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">moment_chart</span><span class="p">,</span> <span class="n">natal_chart</span><span class="p">,</span> <span class="n">prepare_natal_input</span><span class="p">,</span> <span class="n">return_hits</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">birthplace</span> <span class="o">=</span> <span class="n">Location</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config</span> <span class="o">=</span> <span class="n">ChartConfig</span><span class="p">(</span><span class="n">HouseSystem</span><span class="o">.</span><span class="n">WHOLE_SIGN</span><span class="p">,</span> <span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">SUN</span><span class="p">,</span> <span class="n">Body</span><span class="o">.</span><span class="n">MOON</span><span class="p">),</span> <span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span> <span class="o">=</span> <span class="n">BirthRecord</span><span class="p">(</span><span class="n">date</span><span class="p">(</span><span class="mi">2000</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">29</span><span class="p">),</span> <span class="n">time</span><span class="p">(</span><span class="mi">12</span><span class="p">),</span> <span class="n">FixedOffset</span><span class="p">(</span><span class="n">timedelta</span><span class="p">(</span><span class="mi">0</span><span class="p">)),</span> <span class="n">birthplace</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">natal</span> <span class="o">=</span> <span class="n">natal_chart</span><span class="p">(</span><span class="n">prepare_natal_input</span><span class="p">(</span><span class="n">record</span><span class="p">),</span> <span class="n">config</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">start</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">(</span><span class="mi">2024</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">tzinfo</span><span class="o">=</span><span class="n">UTC</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">end</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">(</span><span class="mi">2024</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">tzinfo</span><span class="o">=</span><span class="n">UTC</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">events</span> <span class="o">=</span> <span class="n">return_hits</span><span class="p">(</span><span class="n">natal</span><span class="p">,</span> <span class="n">Body</span><span class="o">.</span><span class="n">MOON</span><span class="p">,</span> <span class="n">start_utc</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end_utc</span><span class="o">=</span><span class="n">end</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">events</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">events</span><span class="o">.</span><span class="n">hits</span><span class="p">)</span>
+<span class="go">('TransitHits', 3)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">events</span><span class="o">.</span><span class="n">chart</span> <span class="ow">is</span> <span class="n">natal</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">events</span><span class="o">.</span><span class="n">moving_objects</span> <span class="o">==</span> <span class="n">events</span><span class="o">.</span><span class="n">natal_objects</span> <span class="o">==</span> <span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">MOON</span><span class="p">,)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">solar</span> <span class="o">=</span> <span class="n">return_hits</span><span class="p">(</span><span class="n">natal</span><span class="p">,</span> <span class="n">Body</span><span class="o">.</span><span class="n">SUN</span><span class="p">,</span> <span class="n">start_utc</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end_utc</span><span class="o">=</span><span class="n">end</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">solar</span><span class="o">.</span><span class="n">hits</span><span class="p">)</span>
+<span class="go">1</span>
+</pre></div>
+</div>
+<!-- /usage: returns.search -->
+<p>The interval is <code class="docutils literal notranslate"><span class="pre">[start_utc,</span> <span class="pre">end_utc)</span></code>: a hit at the start is included, one at the
+end is excluded. All hits are returned in time order. An interval with no return
+has <code class="docutils literal notranslate"><span class="pre">hits</span> <span class="pre">==</span> <span class="pre">()</span></code>. Choose the interval yourself; no birthday, calendar month or
+nearest-return window is inferred. In the interval above, the leap-day example has
+one solar return.
+For a birth near the turn of a year, a calendar-year search can find one solar
+return near each end of the year; both are retained. A leap-day birth needs no
+substitute anniversary date.</p>
+<p>The reference is the selected body’s <strong>stored natal apparent geocentric tropical
+longitude</strong>. It is compared with the moving longitude at its own date, following
+the <a class="reference internal" href="transits.html#select-targets-and-aspects"><span class="std std-ref">exact-transit convention</span></a>. <code class="docutils literal notranslate"><span class="pre">return_hits</span></code> makes
+one same-body conjunction query and returns its complete result unchanged:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">astrology</span><span class="w"> </span><span class="kn">import</span> <span class="n">MajorAspect</span><span class="p">,</span> <span class="n">transit_hits</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">explicit</span> <span class="o">=</span> <span class="n">transit_hits</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">natal</span><span class="p">,</span> <span class="n">start_utc</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end_utc</span><span class="o">=</span><span class="n">end</span><span class="p">,</span> <span class="n">moving_objects</span><span class="o">=</span><span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">MOON</span><span class="p">,),</span>
+<span class="gp">... </span>    <span class="n">natal_objects</span><span class="o">=</span><span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">MOON</span><span class="p">,),</span> <span class="n">aspects</span><span class="o">=</span><span class="p">(</span><span class="n">MajorAspect</span><span class="o">.</span><span class="n">CONJUNCTION</span><span class="p">,),</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">events</span> <span class="o">==</span> <span class="n">explicit</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</section>
+<section id="choose-an-event-and-an-explicit-location">
+<h2>Choose an event and an explicit location<a class="headerlink" href="#choose-an-event-and-an-explicit-location" title="Link to this heading">¶</a></h2>
+<!-- usage: returns.chart -->
+<p><code class="docutils literal notranslate"><span class="pre">events.hits</span></code> contains event times as JDE(TT), not UTC clock readings. Pass a hit
+directly to <code class="docutils literal notranslate"><span class="pre">moment_chart</span></code>; it converts the time at the chart boundary and retains
+the original in <code class="docutils literal notranslate"><span class="pre">moment.source_jde_tt</span></code>.</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">hit</span> <span class="o">=</span> <span class="n">events</span><span class="o">.</span><span class="n">hits</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">site</span> <span class="o">=</span> <span class="n">Location</span><span class="p">(</span><span class="mi">40</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">returned</span> <span class="o">=</span> <span class="n">moment_chart</span><span class="p">(</span><span class="n">hit</span><span class="p">,</span> <span class="n">site</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">returned</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span>
+<span class="go">'MomentChart'</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">returned</span><span class="o">.</span><span class="n">moment</span><span class="o">.</span><span class="n">source_jde_tt</span> <span class="o">==</span> <span class="n">hit</span><span class="o">.</span><span class="n">jde_tt</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">returned</span><span class="o">.</span><span class="n">moment</span><span class="o">.</span><span class="n">location</span> <span class="o">==</span> <span class="n">site</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">at_birthplace</span> <span class="o">=</span> <span class="n">moment_chart</span><span class="p">(</span><span class="n">hit</span><span class="p">,</span> <span class="n">birthplace</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">returned</span><span class="o">.</span><span class="n">positions</span> <span class="o">==</span> <span class="n">at_birthplace</span><span class="o">.</span><span class="n">positions</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">returned</span><span class="o">.</span><span class="n">times</span> <span class="o">==</span> <span class="n">at_birthplace</span><span class="o">.</span><span class="n">times</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">returned</span><span class="o">.</span><span class="n">houses</span> <span class="o">==</span> <span class="n">at_birthplace</span><span class="o">.</span><span class="n">houses</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+<!-- /usage: returns.chart -->
+<p>Changing location leaves the geocentric event and positions unchanged but changes
+local axes and houses. To use the birthplace, pass it explicitly as above; no
+current location is inferred. Supply the chart configuration too. It may differ
+from the natal configuration and need not contain the returning body; the search
+still retains the selected body and its stored natal longitude. No objects are
+added and the house system is not replaced.</p>
+<p>Keep <strong>both <code class="docutils literal notranslate"><span class="pre">events</span></code> and <code class="docutils literal notranslate"><span class="pre">returned</span></code></strong> for the complete calculation. <code class="docutils literal notranslate"><span class="pre">events</span></code>
+retains the natal chart, selected body, interval, event models, versions and every
+hit. <code class="docutils literal notranslate"><span class="pre">returned</span></code> retains its location, requested/effective chart configuration,
+provenance and source event TT separately from normalized UTC and derived
+<code class="docutils literal notranslate"><span class="pre">ChartTimes</span></code>. Source TT need not equal the chart calculation’s derived TT; see
+<a class="reference internal" href="moments.html#build-from-a-retained-exact-hit"><span class="std std-ref">time conversion</span></a>.</p>
+</section>
+<section id="read-or-compare-the-return-chart">
+<h2>Read or compare the return chart<a class="headerlink" href="#read-or-compare-the-return-chart" title="Link to this heading">¶</a></h2>
+<p>The result is an ordinary <code class="docutils literal notranslate"><span class="pre">MomentChart</span></code>, with no fabricated birth record. Existing
+chart consumers work directly with it:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">astrology</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+<span class="gp">... </span>    <span class="n">AspectRule</span><span class="p">,</span> <span class="n">HouseRulers</span><span class="p">,</span> <span class="n">chart_dispositors</span><span class="p">,</span> <span class="n">chart_sign_distribution</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">cross_chart_aspects</span><span class="p">,</span> <span class="n">cross_chart_house_overlays</span><span class="p">,</span> <span class="n">format_chart</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">load_catalog</span><span class="p">,</span> <span class="n">transit_aspects</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rules</span> <span class="o">=</span> <span class="p">(</span><span class="n">AspectRule</span><span class="p">(</span><span class="n">MajorAspect</span><span class="o">.</span><span class="n">CONJUNCTION</span><span class="p">,</span> <span class="mi">1</span><span class="p">),)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">comparison</span> <span class="o">=</span> <span class="n">cross_chart_aspects</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">returned</span><span class="p">,</span> <span class="n">natal</span><span class="p">,</span> <span class="n">rules</span><span class="p">,</span> <span class="n">left_objects</span><span class="o">=</span><span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">MOON</span><span class="p">,),</span> <span class="n">right_objects</span><span class="o">=</span><span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">MOON</span><span class="p">,),</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">comparison</span><span class="o">.</span><span class="n">hits</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">overlays</span> <span class="o">=</span> <span class="n">cross_chart_house_overlays</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">returned</span><span class="p">,</span> <span class="n">natal</span><span class="p">,</span> <span class="n">left_objects</span><span class="o">=</span><span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">MOON</span><span class="p">,),</span> <span class="n">right_objects</span><span class="o">=</span><span class="p">(),</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">overlays</span><span class="o">.</span><span class="n">placements</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">transit_aspects</span><span class="p">(</span><span class="n">returned</span><span class="p">,</span> <span class="n">natal</span><span class="p">,</span> <span class="n">rules</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">moving_objects</span><span class="o">=</span><span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">MOON</span><span class="p">,),</span> <span class="n">natal_objects</span><span class="o">=</span><span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">MOON</span><span class="p">,))</span><span class="o">.</span><span class="n">hits</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">HouseRulers</span><span class="p">(</span><span class="n">returned</span><span class="p">)</span><span class="o">.</span><span class="n">houses</span><span class="p">)</span>
+<span class="go">12</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">chart_dispositors</span><span class="p">(</span><span class="n">returned</span><span class="p">,</span> <span class="n">objects</span><span class="o">=</span><span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">MOON</span><span class="p">,))</span><span class="o">.</span><span class="n">chart</span> <span class="ow">is</span> <span class="n">returned</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">chart_sign_distribution</span><span class="p">(</span><span class="n">returned</span><span class="p">,</span> <span class="n">objects</span><span class="o">=</span><span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">MOON</span><span class="p">,))</span><span class="o">.</span><span class="n">total</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">catalog</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">format_chart</span><span class="p">(</span><span class="n">returned</span><span class="p">,</span> <span class="n">catalog</span><span class="p">)</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">'Tropical geocentric moment chart'</span>
+</pre></div>
+</div>
+<p>Static cross-chart aspects and fixed-instant transits have different motion
+semantics; see <a class="reference internal" href="moments.html#compare-moving-objects-with-a-natal-chart"><span class="std std-ref">moment comparisons</span></a>.
+These calls describe geometry and text, not a return interpretation.</p>
+</section>
+<section id="errors-and-sources">
+<h2>Errors and sources<a class="headerlink" href="#errors-and-sources" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">natal</span></code> must be a <code class="docutils literal notranslate"><span class="pre">NatalChart</span></code>, not a <code class="docutils literal notranslate"><span class="pre">MomentChart</span></code>; <code class="docutils literal notranslate"><span class="pre">body</span></code> must be a <code class="docutils literal notranslate"><span class="pre">Body</span></code>.
+Wrong types raise <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>; bodies other than <code class="docutils literal notranslate"><span class="pre">SUN</span></code> or <code class="docutils literal notranslate"><span class="pre">MOON</span></code> raise <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>.
+A missing natal luminary also raises <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>.</p></li>
+<li><p>Aware endpoints, modern UTC, maximum span, model domains and computation
+failures follow <a class="reference internal" href="transits.html#limits-and-failures"><span class="std std-ref">transit search</span></a>. In particular,
+<code class="docutils literal notranslate"><span class="pre">TransitDomainError</span></code> retains an upstream rejection; it is not an empty result.</p></li>
+<li><p>Finding an event does not ensure its chart can be calculated. Missing location
+raises <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>; unavailable house geometry raises <code class="docutils literal notranslate"><span class="pre">ChartDomainError</span></code>, without
+a fallback. Event conversion and the chart’s calculation domain follow
+<a class="reference internal" href="moments.html#calculate-at-an-instant"><span class="std std-ref">moment-chart input contracts</span></a>.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">entry.solar_lunar_returns</span></code> in the <a class="reference internal" href="catalog.html"><span class="std std-doc">catalog</span></a> records the definitions,
+short quotations with separate Chinese translations, location practices and
+project conventions. It is available without a chart or native astronomy:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">entry</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">entry</span><span class="p">(</span><span class="s2">"entry.solar_lunar_returns"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">entry</span><span class="o">.</span><span class="n">prerequisite_status</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">entry</span><span class="o">.</span><span class="n">output_eligibility</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">entry</span><span class="o">.</span><span class="n">chart_applicability</span>
+<span class="go">('complete', 'reference_only', 'not_assessed')</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">catalog</span><span class="o">.</span><span class="n">citations</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">identifier</span><span class="p">))</span>
+<span class="go">5</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">complete</span></code> means the entry states its prerequisites; <code class="docutils literal notranslate"><span class="pre">reference_only</span></code> makes it
+reference material, and <code class="docutils literal notranslate"><span class="pre">not_assessed</span></code> means retrieving the entry does not assess
+a chart against those prerequisites. These are
+<a class="reference internal" href="knowledge.html#status-has-several-dimensions"><span class="std std-ref">separate editorial states</span></a>.</p>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">celestial-astrology</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../README.html">celestial-astrology</a></li>
+<li class="toctree-l2"><a class="reference internal" href="birth.html">Birth records and modern time resolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html">Requested chart configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chart.html">Natal charts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="moments.html">Moment charts and fixed-instant transits</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aspects.html">Aspects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cross_aspects.html">Cross-chart aspects and house overlays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="transits.html">Exact transit hits</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Solar and lunar returns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="summaries.html">Sign distributions and natal lunar phase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dignities.html">Traditional rulership, dignities and dispositor chains</a></li>
+<li class="toctree-l2"><a class="reference internal" href="records.html">Chart results and text</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference.html">Public API reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html">Repository structure and calculation boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="knowledge.html">Knowledge organization and bilingual documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="catalog.html">Knowledge catalog reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="releases.html">Release notes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="releasing.html">Release procedure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html">Contributing</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../zh-CN/index.html">文档入口</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Documentation</a><ul>
+      <li>Previous: <a href="transits.html" title="previous chapter">Exact transit hits</a></li>
+      <li>Next: <a href="summaries.html" title="next chapter">Sign distributions and natal lunar phase</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 9.1.0</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../../_sources/docs/en/returns.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

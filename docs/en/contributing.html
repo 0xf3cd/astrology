@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Contributing &#8212; celestial-astrology 0.4.0 documentation / 文档</title>
+    <title>Contributing &#8212; celestial-astrology 0.5.0 documentation / 文档</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
-    <script src="../../_static/documentation_options.js?v=6c02275b"></script>
+    <script src="../../_static/documentation_options.js?v=1dd76d02"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/en/contributing.html" />
@@ -136,12 +136,12 @@ inputs, while sibling directories are not. Warnings in these document sources st
 fail the strict build.</p>
 <!-- usage: contributing.checks -->
 <p>Install this development package from the checkout using <code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">sync</span></code> above. Its
-distribution name/version is <code class="docutils literal notranslate"><span class="pre">celestial-astrology</span></code> / <code class="docutils literal notranslate"><span class="pre">0.4.0</span></code>; the Python import
+distribution name/version is <code class="docutils literal notranslate"><span class="pre">celestial-astrology</span></code> / <code class="docutils literal notranslate"><span class="pre">0.5.0</span></code>; the Python import
 remains <code class="docutils literal notranslate"><span class="pre">astrology</span></code>. The unrelated
 PyPI project <code class="docutils literal notranslate"><span class="pre">astrology</span></code> is not this library. Confirm the installed package and version:</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">importlib.metadata</span><span class="w"> </span><span class="kn">import</span> <span class="n">version</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">version</span><span class="p">(</span><span class="s2">"celestial-astrology"</span><span class="p">)</span>
-<span class="go">'0.4.0'</span>
+<span class="go">'0.5.0'</span>
 </pre></div>
 </div>
 <!-- /usage: contributing.checks -->
@@ -181,6 +181,23 @@ silent substitutions, and factories whose return type depends on hidden state.</
 </section>
 <section id="correctness">
 <h2>Correctness<a class="headerlink" href="#correctness" title="Link to this heading">¶</a></h2>
+<p>Return fixtures in <code class="docutils literal notranslate"><span class="pre">tests/reference/return_reference.json</span></code> use independently
+calculated natal degrees and TT crossings from pyswisseph 2.10.3.2 / Swiss 2.10.03,
+explicit Moshier plus speed flags 260. Regenerate them without project/native
+imports or a dependency change:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>--no-project<span class="w"> </span>--python<span class="w"> </span><span class="m">3</span>.11<span class="w"> </span>--with<span class="w"> </span><span class="nv">pyswisseph</span><span class="o">==</span><span class="m">2</span>.10.3.2<span class="w"> </span>python<span class="w"> </span>tools/fetch_return_reference.py<span class="w"> </span>--output<span class="w"> </span>&lt;path&gt;
+</pre></div>
+</div>
+<p>The recipe pins birth/search TT−UTC offsets to 64.184/69.184 seconds for its 2000
+natal instants and 2023–2024 intervals. The Sun 5-second and Moon 30-second fixture
+tolerances cover measured cross-model differences (maxima 1.344672/11.771331 seconds)
+for these synthetic cases only, not global error bounds. Tests separately recompute
+native wrapped residuals within 1e-6 degree, compare all event counts and exercise
+exact endpoint collisions. Cases include near-zero degrees, leap-day birth and
+two solar returns within calendar 2024. Some overlapping windows repeat events;
+they are not independent observations. The recipe hash binds the fixture to its
+generator. This optional reference environment adds no runtime or locked dependency;
+Swiss code and ephemeris files are not distributed here.</p>
 <p>Transit fixtures in <code class="docutils literal notranslate"><span class="pre">tests/reference/transit_reference.json</span></code> use explicitly selected
 Moshier ephemeris calculations through <code class="docutils literal notranslate"><span class="pre">pyswisseph==2.10.3.2</span></code>, not Swiss/JPL data
 files. The optional generator <code class="docutils literal notranslate"><span class="pre">tools/fetch_transit_reference.py</span> <span class="pre">--output</span> <span class="pre">&lt;path&gt;</span></code>
@@ -328,6 +345,8 @@ This does not change the project’s MIT license or constitute a general license
 </section>
 <section id="knowledge-and-documentation">
 <h2>Knowledge and documentation<a class="headerlink" href="#knowledge-and-documentation" title="Link to this heading">¶</a></h2>
+<p>Each technique needs a named definition, sources and reference cases before
+implementation.</p>
 <p>Follow the <a class="reference internal" href="knowledge.html"><span class="std std-doc">knowledge design</span></a>. Link explanations to stable concepts,
 rules and sources. Preserve original quotations and label translations; a checked
 source is not evidence that a particular chart meets its prerequisites.</p>
@@ -338,6 +357,33 @@ detect a missing translation file, but cannot establish semantic equivalence.
 The catalog checks also reject stale text revisions, missing record descriptions,
 unknown references and duplicate IDs. Both language views have executable examples;
 source and translation review checks that conditions and limits retain their meaning.</p>
+<section id="add-a-sourced-variant">
+<h3>Add a sourced variant<a class="headerlink" href="#add-a-sourced-variant" title="Link to this heading">¶</a></h3>
+<ol class="arabic simple">
+<li><p>Inspect a retrievable edition and reproduction terms. Record work, author or
+translator, edition, language, locator, lineage, supported claim and limits.
+Mark unverified material honestly; two mirrors are not two sources.</p></li>
+<li><p>Add stable records to <code class="docutils literal notranslate"><span class="pre">src/astrology/knowledge/catalog.json</span></code>. Reference an
+owning enum class/member instead of copying its value or inventing an algorithm.
+Add a separate explicit variant only when it carries a rule, with its own
+definition and limits; configuration links alone do not generate variants.
+Lunar-node definition links are derived from <code class="docutils literal notranslate"><span class="pre">LunarNode.definition</span></code>, and the
+loader checks all twelve Sign-to-concept identities in the built-in corpus.
+Source-only variants have no config reference; entries link variant IDs and citations.</p></li>
+<li><p>Keep excerpts, translations and authored statements distinct. <code class="docutils literal notranslate"><span class="pre">text_defaults</span></code>
+supplies initial revision 1 and project translation credit; each text can
+override them. Increment a changed text’s <code class="docutils literal notranslate"><span class="pre">revision</span></code>; retain its old <code class="docutils literal notranslate"><span class="pre">zh_revision</span></code>
+until translation review, then update revision and credit together.</p></li>
+<li><p>State prerequisites, exceptions and limits. Select source verification,
+prerequisite completeness and output eligibility independently. Retrieval must
+leave chart applicability <code class="docutils literal notranslate"><span class="pre">not_assessed</span></code> even when one condition is computable.
+Leave unsupported interpretations out of the default corpus.</p></li>
+<li><p>Add boundary/source tests, run the <a class="reference internal" href="#run-the-checks">complete checks</a> and inspect
+both generated language pages. Checks cover current translations, complete
+config/catalog/API references and installed resources. Semantic review still
+verifies translation meaning and source fidelity.</p></li>
+</ol>
+</section>
 </section>
 <section id="review-evidence">
 <h2>Review evidence<a class="headerlink" href="#review-evidence" title="Link to this heading">¶</a></h2>
@@ -415,9 +461,11 @@ incomplete evidence; verification of this repository’s merge policy is tracked
 <li class="toctree-l2"><a class="reference internal" href="birth.html">Birth records and modern time resolution</a></li>
 <li class="toctree-l2"><a class="reference internal" href="configuration.html">Requested chart configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="chart.html">Natal charts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="moments.html">Moment charts and fixed-instant transits</a></li>
 <li class="toctree-l2"><a class="reference internal" href="aspects.html">Aspects</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cross_aspects.html">Cross-chart aspects and house overlays</a></li>
 <li class="toctree-l2"><a class="reference internal" href="transits.html">Exact transit hits</a></li>
+<li class="toctree-l2"><a class="reference internal" href="returns.html">Solar and lunar returns</a></li>
 <li class="toctree-l2"><a class="reference internal" href="summaries.html">Sign distributions and natal lunar phase</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dignities.html">Traditional rulership, dignities and dispositor chains</a></li>
 <li class="toctree-l2"><a class="reference internal" href="records.html">Chart results and text</a></li>

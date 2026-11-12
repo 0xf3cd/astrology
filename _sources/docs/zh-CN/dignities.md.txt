@@ -32,7 +32,7 @@ True
 ```
 
 全部命中按入庙、擢升、失势、落陷的顺序返回。入庙指行星位于自己的某一守护星座；
-原文在此所说的 houses 不是命盘编号宫位。擢升覆盖所定的整个星座。
+Lilly 将这些守护星座称为行星的 houses，区别于命盘中的编号宫位。擢升覆盖所定的整个星座。
 失势与某一入庙星座相对，落陷与擢升星座相对。具体归属见
 {ref}`生成的十二星座表 <catalog-zh-cn-rule-lilly1647-essential-dignities>`。
 
@@ -50,7 +50,7 @@ True
 
 ```{doctest}
 >>> from datetime import date, time, timedelta
->>> from astrology import (BirthRecord, FixedOffset, Location, ChartConfig, HouseSystem,
+>>> from astrology import (BirthRecord, Body, FixedOffset, Location, ChartConfig, HouseSystem,
 ...     natal_chart, prepare_natal_input, HouseRulers, format_house_rulers, load_catalog)
 >>> chart = natal_chart(prepare_natal_input(BirthRecord(date(2000, 1, 1), time(12),
 ...     FixedOffset(timedelta(0)), Location(0, 0))),
@@ -76,7 +76,7 @@ True
 3 | 双子座 | 水星 | 摩羯座 1.889...° / 宫位 10 | 这四项均未命中
 ```
 
-`HouseRulers` 只保存给定的 `NatalChart`。每次读取 `houses`，按宫号顺序生成十二条新记录；
+`HouseRulers` 只保存给定的命盘（`NatalChart` 或 `MomentChart`）。每次读取 `houses`，按宫号顺序生成十二条新记录；
 两次读取所得的元组相等。使用**实际宫头黄经**，不借 ASC 或 MC 代替一宫头或十宫头。重复宫头星座仍保留为不同宫的记录。
 请求的宫制和原始天文值不变；不重算或补入宫主星，可用落点保留源盘中的原对象。
 
@@ -87,7 +87,7 @@ True
 ### 单独构造一条记录
 
 ```{doctest}
->>> from astrology import HouseRuler, Placement
+>>> from astrology import Body, Sign, HouseRuler, Placement, essential_dignities
 >>> placement = Placement(Body.MERCURY, Sign.VIRGO, 0, 6)
 >>> record = HouseRuler(house=3, cusp_sign=Sign.GEMINI, placement=placement)
 >>> record.ruler is Body.MERCURY, record.statuses == essential_dignities(Body.MERCURY, Sign.VIRGO)
@@ -148,11 +148,12 @@ True
 
 - `final_dispositors` 列出已到达且位于自身守护星座的星体。`edges` 保留其自环边；
   对于到达该星体的根，`chains[root]` 只列一次这颗星体。
-- `cycles` 中的两星循环表示本规则下基于入庙守护的互容。示例这样的较长循环不称为互容。
+- `cycles` 中的两星循环表示基于入庙守护的互容（mutual reception）：两颗行星各自位于
+  另一颗的守护星座。示例这样的较长循环不称为互容。
 - `missing_rulers[root]` 给出该根缺失的下一颗守护星。路径止于最后一个已有对象，
   指向缺失守护星的边仍保留。
 
-例如，只含这颗太阳的命盘无法继续到土星：
+接着上一个例子，沿用同一份 `birth`，只含这颗太阳的命盘无法继续到土星：
 
 ```{doctest}
 >>> sparse = natal_chart(birth, ChartConfig(HouseSystem.WHOLE_SIGN, (Body.SUN,), ()))
@@ -176,8 +177,9 @@ True
 
 `paths.rule_id` 为 `rule.project.dispositor_chains`。
 {ref}`项目规则 <catalog-zh-cn-rule-project-dispositor-chains>`在不变的 Lilly 星座守护表之上
-定义遍历及结果顺序；{ref}`知识条目 <catalog-zh-cn-entry-dispositor-chains>`记录来源边界及
-入庙互容的限度。不提供评分、解读、现代共同守护星或专用格式化函数。
+定义遍历及结果顺序，并限定这里基于入庙守护的互容含义。
+{ref}`知识条目 <catalog-zh-cn-entry-dispositor-chains>`引用来源，并链接该规则的限度。
+本操作不提供评分、解读、现代共同守护星或专用格式化函数。
 
 ## 来源与限制
 
@@ -190,4 +192,4 @@ True
 
 目录状态概念使用 `dignity_status.<value>`，不链接请求配置。
 `entry.essential_dignities` 的查询前提完整，但仍为 `reference_only` 和 `not_assessed`。
-目录检索不执行命盘判断。
+目录检索不执行命盘判断；各状态的区别见[状态说明](knowledge.md#状态需要分开表达)。

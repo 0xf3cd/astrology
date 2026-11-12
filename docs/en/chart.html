@@ -5,17 +5,17 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Natal charts &#8212; celestial-astrology 0.4.0 documentation / 文档</title>
+    <title>Natal charts &#8212; celestial-astrology 0.5.0 documentation / 文档</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
-    <script src="../../_static/documentation_options.js?v=6c02275b"></script>
+    <script src="../../_static/documentation_options.js?v=1dd76d02"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/en/chart.html" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Aspects" href="aspects.html" />
+    <link rel="next" title="Moment charts and fixed-instant transits" href="moments.html" />
     <link rel="prev" title="Requested chart configuration" href="configuration.html" />
    
   <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
@@ -44,6 +44,7 @@ choices, the astronomical values and their provenance apart. The aspects a
 request asks for are in <code class="docutils literal notranslate"><span class="pre">chart.aspects</span></code>; the <a class="reference internal" href="aspects.html"><span class="std std-doc">aspect guide</span></a> explains them.</p>
 <section id="calculate-one-chart">
 <h2>Calculate one chart<a class="headerlink" href="#calculate-one-chart" title="Link to this heading">¶</a></h2>
+<p>For an explicit instant/location without a birth record, use <a class="reference internal" href="moments.html"><span class="std std-doc">moment_chart</span></a>.</p>
 <!-- usage: chart.calculation -->
 <p>Prepare the input first. A chart needs a known clock, an explicit timezone and
 a location; the <a class="reference internal" href="birth.html"><span class="std std-doc">birth guide</span></a> explains that preparation.</p>
@@ -223,7 +224,7 @@ as such.</p>
 <tr class="row-odd"><td><p>Latitude at a pole</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">ChartDomainError</span></code>, no upstream detail</p></td>
 </tr>
-<tr class="row-even"><td><p>Civil year 2100 or later</p></td>
+<tr class="row-even"><td><p>Civil year at or beyond the upstream capability’s exclusive end year</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">ChartDomainError</span></code>, no upstream detail</p></td>
 </tr>
 <tr class="row-odd"><td><p>Instant outside the supported ephemeris range</p></td>
@@ -234,12 +235,20 @@ as such.</p>
 </tr>
 </tbody>
 </table>
-<p><code class="docutils literal notranslate"><span class="pre">house_system</span></code> identifies the requested geometry. <code class="docutils literal notranslate"><span class="pre">upstream_message</span></code> is None for
-pre-call rejections and contains the upstream exception text for failures reported
-by the astronomy library, even if that text is empty. When supplied by the upstream
-exception, <code class="docutils literal notranslate"><span class="pre">operation</span></code> names the upstream operation and <code class="docutils literal notranslate"><span class="pre">recorded</span></code> indicates whether
-native code reported a recognized error kind. Domain rejections leave both as None.
-The error type is not determined by parsing the message text.</p>
+<p><code class="docutils literal notranslate"><span class="pre">house_system</span></code> identifies the requested geometry. The other fields distinguish
+where a failure occurred:</p>
+<ul class="simple">
+<li><p>Location, pole and civil-year rejections leave <code class="docutils literal notranslate"><span class="pre">upstream_message</span></code>, <code class="docutils literal notranslate"><span class="pre">operation</span></code>
+and <code class="docutils literal notranslate"><span class="pre">recorded</span></code> as <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p>An upstream <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>, such as undefined Placidus geometry, supplies
+<code class="docutils literal notranslate"><span class="pre">upstream_message</span></code> but leaves <code class="docutils literal notranslate"><span class="pre">operation</span></code> and <code class="docutils literal notranslate"><span class="pre">recorded</span></code> as <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p>An upstream <code class="docutils literal notranslate"><span class="pre">CelestialError</span></code> from the capability query or chart calculation
+supplies all three fields. <code class="docutils literal notranslate"><span class="pre">operation</span></code> names the failed upstream operation;
+<code class="docutils literal notranslate"><span class="pre">recorded=True</span></code> means native code supplied a recognized error kind, while
+<code class="docutils literal notranslate"><span class="pre">False</span></code> means it did not. Neither value means the calculation succeeded.</p></li>
+</ul>
+<p>Upstream exception text is retained even when empty. The adapter uses exception
+types and fields, not message parsing, to classify failures.</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">high</span> <span class="o">=</span> <span class="n">prepare_natal_input</span><span class="p">(</span><span class="n">BirthRecord</span><span class="p">(</span>
 <span class="gp">... </span>  <span class="n">date</span><span class="p">(</span><span class="mi">1990</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">21</span><span class="p">),</span> <span class="n">time</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">FixedOffset</span><span class="p">(</span><span class="n">timedelta</span><span class="p">(</span><span class="mi">0</span><span class="p">)),</span>
 <span class="gp">... </span>  <span class="n">Location</span><span class="p">(</span><span class="mf">69.65</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span> <span class="n">TimePrecision</span><span class="o">.</span><span class="n">SECOND</span><span class="p">,</span> <span class="p">{</span><span class="s2">"record"</span><span class="p">:</span> <span class="s2">"synthetic"</span><span class="p">},</span>
@@ -278,12 +287,21 @@ instants and do not guarantee accuracy over the full supported range. See the
 </section>
 <section id="limits">
 <h2>Limits<a class="headerlink" href="#limits" title="Link to this heading">¶</a></h2>
+<p>The adapter reads the civil-year ceiling from upstream <code class="docutils literal notranslate"><span class="pre">house_capability</span></code> with
+its fixed Algo5 ΔT model. For example, celestial-calendar 1.1.1 reports:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">celestial_calendar</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeltaTModel</span><span class="p">,</span> <span class="n">house_capability</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">capability</span> <span class="o">=</span> <span class="n">house_capability</span><span class="p">(</span><span class="n">delta_t_model</span><span class="o">=</span><span class="n">DeltaTModel</span><span class="o">.</span><span class="n">ALGO5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">capability</span><span class="o">.</span><span class="n">civil_start_year</span><span class="p">,</span> <span class="n">capability</span><span class="o">.</span><span class="n">civil_end_year_exclusive</span><span class="p">,</span> <span class="n">capability</span><span class="o">.</span><span class="n">utc_start_date</span>
+<span class="go">(1885, 2100, (1972, 1, 1))</span>
+</pre></div>
+</div>
+<p>The end year is exclusive. Birth preparation separately requires modern UTC;
+the natal adapter adds no lower-year policy. The native snapshot still enforces
+its narrower TT and geometry domains, so civil-year admission does not guarantee
+a calculable chart.</p>
 <ul class="simple">
 <li><p>Requested aspects are judged among the participating objects; the
 <a class="reference internal" href="aspects.html"><span class="std std-doc">aspect guide</span></a> explains the rules and their limits.</p></li>
-<li><p>The astronomy library supports civil years 1885 to 2099 and, for UTC input,
-instants from 1972-01-01; the ephemeris range is narrower than the civil
-range, and an instant outside it fails explicitly.</p></li>
 <li><p>Installs need a platform with a celestial-calendar wheel; see
 <a class="reference internal" href="../../README.html#install-a-release"><span class="std std-ref">installation</span></a>.</p></li>
 </ul>
@@ -322,9 +340,11 @@ range, and an instant outside it fails explicitly.</p></li>
 <li class="toctree-l2"><a class="reference internal" href="birth.html">Birth records and modern time resolution</a></li>
 <li class="toctree-l2"><a class="reference internal" href="configuration.html">Requested chart configuration</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Natal charts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="moments.html">Moment charts and fixed-instant transits</a></li>
 <li class="toctree-l2"><a class="reference internal" href="aspects.html">Aspects</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cross_aspects.html">Cross-chart aspects and house overlays</a></li>
 <li class="toctree-l2"><a class="reference internal" href="transits.html">Exact transit hits</a></li>
+<li class="toctree-l2"><a class="reference internal" href="returns.html">Solar and lunar returns</a></li>
 <li class="toctree-l2"><a class="reference internal" href="summaries.html">Sign distributions and natal lunar phase</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dignities.html">Traditional rulership, dignities and dispositor chains</a></li>
 <li class="toctree-l2"><a class="reference internal" href="records.html">Chart results and text</a></li>
@@ -346,7 +366,7 @@ range, and an instant outside it fails explicitly.</p></li>
   <li><a href="../index.html">Documentation overview</a><ul>
   <li><a href="index.html">Documentation</a><ul>
       <li>Previous: <a href="configuration.html" title="previous chapter">Requested chart configuration</a></li>
-      <li>Next: <a href="aspects.html" title="next chapter">Aspects</a></li>
+      <li>Next: <a href="moments.html" title="next chapter">Moment charts and fixed-instant transits</a></li>
   </ul></li>
   </ul></li>
 </ul>

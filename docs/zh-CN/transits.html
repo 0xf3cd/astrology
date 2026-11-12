@@ -5,17 +5,17 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>精确行运命中 &#8212; celestial-astrology 0.4.0 documentation / 文档</title>
+    <title>精确行运命中 &#8212; celestial-astrology 0.5.0 documentation / 文档</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
-    <script src="../../_static/documentation_options.js?v=6c02275b"></script>
+    <script src="../../_static/documentation_options.js?v=1dd76d02"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/zh-CN/transits.html" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="星座分布与出生月相" href="summaries.html" />
+    <link rel="next" title="日返照与月返照" href="returns.html" />
     <link rel="prev" title="双盘相位与落宫" href="cross_aspects.html" />
    
   <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
@@ -40,8 +40,13 @@
 <p><code class="docutils literal notranslate"><span class="pre">transit_hits</span></code> 在 UTC 区间内搜索所选对象与已有本命盘的全部精确相位，返回 <code class="docutils literal notranslate"><span class="pre">TransitHits</span></code>。
 结果保留原盘、搜索输入、模型溯源及每次穿越或接触。命中时刻为 JDE(TT)，即 TT 时标的儒略日，
 不是 UTC 钟点。</p>
+<p>只接纳本命盘及日月的便捷入口 <code class="docutils literal notranslate"><span class="pre">return_hits</span></code>，以及选择命中和地点后建盘的用法，见<a class="reference internal" href="returns.html"><span class="std std-doc">日月返照</span></a>。</p>
 <section id="id2">
 <h2>搜索一个区间<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<p>固定源盘也可以是 <code class="docutils literal notranslate"><span class="pre">MomentChart</span></code>；<code class="docutils literal notranslate"><span class="pre">natal_objects</span></code> 命名固定参考侧的角色，不是出生输入类型。
+两种来源的黄经约定相同，因此 <code class="docutils literal notranslate"><span class="pre">TransitHits.epoch_policy</span></code> 均保留
+<code class="docutils literal notranslate"><span class="pre">fixed_natal_degree_against_moving_of_date_longitude</span></code>。真实来源类型及输入仍保存在 <code class="docutils literal notranslate"><span class="pre">result.chart</span></code>。
+时刻盘的构造与读取见<a class="reference internal" href="moments.html"><span class="std std-doc">时刻盘</span></a>。</p>
 <!-- usage: transits.hits -->
 <p>下面用合成出生资料计算一颗已存本命太阳。移动侧只需对象选择和区间，不需要出生地点或宫位。
 两端点须为有时区的内建 <code class="docutils literal notranslate"><span class="pre">datetime</span></code>，归一为 UTC 后不早于 1972-01-01。
@@ -61,20 +66,28 @@
 <span class="gp">... </span>  <span class="n">moving_objects</span><span class="o">=</span><span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">MERCURY</span><span class="p">,),</span> <span class="n">natal_objects</span><span class="o">=</span><span class="p">(</span><span class="n">Body</span><span class="o">.</span><span class="n">SUN</span><span class="p">,),</span>
 <span class="gp">... </span>  <span class="n">aspects</span><span class="o">=</span><span class="p">(</span><span class="n">MajorAspect</span><span class="o">.</span><span class="n">CONJUNCTION</span><span class="p">,))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">hit</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">hits</span><span class="p">:</span>
-<span class="gp">... </span>  <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">hit</span><span class="o">.</span><span class="n">jde_tt</span><span class="si">:</span><span class="s2">.5f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">hit</span><span class="o">.</span><span class="n">direction</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">hit</span><span class="o">.</span><span class="n">longitude_rate_deg_per_tt_day</span><span class="si">:</span><span class="s2">+.3f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-<span class="go">2460392.23731 increasing +1.208</span>
-<span class="go">2460414.61236 decreasing -0.744</span>
-<span class="go">2460437.45999 increasing +0.812</span>
+<span class="gp">... </span>  <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">hit</span><span class="o">.</span><span class="n">moving_object</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">hit</span><span class="o">.</span><span class="n">aspect</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">hit</span><span class="o">.</span><span class="n">natal_object</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2"> "</span>
+<span class="gp">... </span>        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">hit</span><span class="o">.</span><span class="n">jde_tt</span><span class="si">:</span><span class="s2">.5f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">hit</span><span class="o">.</span><span class="n">direction</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">hit</span><span class="o">.</span><span class="n">longitude_rate_deg_per_tt_day</span><span class="si">:</span><span class="s2">+.3f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="go">mercury conjunction sun 2460392.23731 increasing +1.208</span>
+<span class="go">mercury conjunction sun 2460414.61236 decreasing -0.744</span>
+<span class="go">mercury conjunction sun 2460437.45999 increasing +0.812</span>
 </pre></div>
 </div>
 <p>水星三次到达固定的本命太阳度数：黄经递增时一次，逆行时一次，恢复递增后又一次。
 速率单位为度/TT 日，直接保留上游事件值。<code class="docutils literal notranslate"><span class="pre">tangent</span></code> 表示到达查询黄经后相切而未穿越，
 报告的速率不必恰为零。</p>
-<p>如需显示 UTC 日期，从 <code class="docutils literal notranslate"><span class="pre">celestial_calendar</span></code> 导入 <code class="docutils literal notranslate"><span class="pre">jde_to_utc</span></code>，调用 <code class="docutils literal notranslate"><span class="pre">jde_to_utc(hit.jde_tt)</span></code>，
-取得 UTC 民用字段 <code class="docutils literal notranslate"><span class="pre">year</span></code>、<code class="docutils literal notranslate"><span class="pre">month</span></code>、<code class="docutils literal notranslate"><span class="pre">day</span></code>、<code class="docutils literal notranslate"><span class="pre">fraction</span></code>；<code class="docutils literal notranslate"><span class="pre">fraction</span></code> 是当天已过时间占 UTC 日的比例。
-仍应保留原始 <code class="docutils literal notranslate"><span class="pre">jde_tt</span></code> 作为事件时刻：从 UTC 转为 TT 再转回时，上游不保证在闰秒及
-1972 年模型交界处还原原始民用字段。最后一条闰秒记录之后，转换仍只保留最后已知偏移。</p>
 <!-- /usage: transits.hits -->
+<p>显示普通 UTC 钟点时，可将 <code class="docutils literal notranslate"><span class="pre">jde_to_utc</span></code> 返回的民用字段转为有时区的 <code class="docutils literal notranslate"><span class="pre">datetime</span></code>。
+<code class="docutils literal notranslate"><span class="pre">fraction</span></code> 是当天已过时间占 UTC 日的比例：</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">celestial_calendar</span><span class="w"> </span><span class="kn">import</span> <span class="n">jde_to_utc</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">civil</span> <span class="o">=</span> <span class="n">jde_to_utc</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">hits</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">jde_tt</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">displayed</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">(</span><span class="n">civil</span><span class="o">.</span><span class="n">year</span><span class="p">,</span> <span class="n">civil</span><span class="o">.</span><span class="n">month</span><span class="p">,</span> <span class="n">civil</span><span class="o">.</span><span class="n">day</span><span class="p">,</span> <span class="n">tzinfo</span><span class="o">=</span><span class="n">UTC</span><span class="p">)</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="n">civil</span><span class="o">.</span><span class="n">fraction</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">displayed</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(</span><span class="n">timespec</span><span class="o">=</span><span class="s2">"seconds"</span><span class="p">)</span>
+<span class="go">'2024-03-22T17:40:34+00:00'</span>
+</pre></div>
+</div>
+<p>仍应保留原始 <code class="docutils literal notranslate"><span class="pre">jde_tt</span></code> 作为事件时刻；这里只显示到秒，会损失精度。从 UTC 转为 TT 再转回时，
+上游不保证在闰秒及 1972 年模型交界处还原原始民用字段，Python <code class="docutils literal notranslate"><span class="pre">datetime</span></code> 也不能表示闰秒。</p>
 </section>
 <section id="id3">
 <h2>选择目标与相位<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
@@ -94,11 +107,24 @@
 [0°, 360°) 的结果，即搜索要达到的移动黄经。<code class="docutils literal notranslate"><span class="pre">hit.longitude_deg</span></code> 保留事件黄经原值，可能有微小数值残差，
 或位于 0°/360° 的另一侧。
 自身日期黄经约定见<a class="reference internal" href="catalog.html#catalog-zh-cn-rule-project-exact-transit-hits"><span class="std std-ref">规则及坐标限度</span></a>。</p>
-<p>每组移动对象、本命目标和有向相位分支都要单独调用上游扫描区间。
-先选择实际需要的对象和相位；同时扩大三项选择会使工作量相乘。</p>
 </section>
 <section id="id4">
-<h2>读取和保留结果<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h2>
+<h2>搜索耗时<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h2>
+<p>上游区间扫描次数为：</p>
+<p><code class="docutils literal notranslate"><span class="pre">移动对象数</span> <span class="pre">×</span> <span class="pre">本命目标数</span> <span class="pre">×</span> <span class="pre">所选相位的有向分支总数</span></code></p>
+<p>五种主要相位合计八个分支，不是五个。各项只选实际需要的对象和相位，先从短区间开始。
+调用没有进度回调，所有所选扫描成功后才返回，不返回部分结果。</p>
+<p>2026-11-07 在一台 16 核 Linux 机器上，以 celestial-calendar 1.1.1、Python 3.14.9
+实测得到以下近似耗时，不作为保证。对木星、天王星、金星、土星、火星、水星，单条黄经扫描
+365 TT 日约需 2–11 秒，水星最慢；太阳和月亮各不到 0.1 秒。另一次一年区间搜索，
+移动侧选土星和木星，本命侧选太阳、月亮、上升点，相位选合相、四分相、对分相，约需 74 秒，
+共 <code class="docutils literal notranslate"><span class="pre">2</span> <span class="pre">×</span> <span class="pre">3</span> <span class="pre">×</span> <span class="pre">(1</span> <span class="pre">+</span> <span class="pre">2</span> <span class="pre">+</span> <span class="pre">1)</span> <span class="pre">=</span> <span class="pre">24</span></code> 次扫描。</p>
+<p>十颗移动天体对十颗本命天体及四轴，选五种主要相位，共需 <code class="docutils literal notranslate"><span class="pre">10</span> <span class="pre">×</span> <span class="pre">14</span> <span class="pre">×</span> <span class="pre">8</span> <span class="pre">=</span> <span class="pre">1120</span></code> 次扫描。
+将每颗移动天体的单次实测耗时等量外推到所有本命目标和分支，这样的一年请求约需一小时；
+没有对完整请求计时。耗时取决于目标、区间、机器和负载，不应由这些样本假定耗时随区间长度线性增长。</p>
+</section>
+<section id="id5">
+<h2>读取和保留结果<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h2>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">result</span><span class="o">.</span><span class="n">chart</span> <span class="ow">is</span> <span class="n">chart</span>
 <span class="go">True</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">result</span><span class="o">.</span><span class="n">start_utc</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
@@ -112,7 +138,7 @@
 <p><code class="docutils literal notranslate"><span class="pre">('position_source',</span> <span class="pre">3)</span></code> 是本次水星搜索实际使用的上游模型键；
 <code class="docutils literal notranslate"><span class="pre">result.sources[0].model_description</span></code> 提供其名称及说明。</p>
 <p><code class="docutils literal notranslate"><span class="pre">start_jde_tt</span></code> 与 <code class="docutils literal notranslate"><span class="pre">end_jde_tt</span></code> 保留转换后的搜索区间。每个 <code class="docutils literal notranslate"><span class="pre">TransitSource</span></code> 保存实际移动模型、
-事件域端点、最长区间及上游说明。结果还保留 astrology 版本及明确的时间、位置坐标和历元政策。
+事件域端点、最长区间及上游说明。结果还保留 astrology 版本及明确的时间、位置参考系和历元政策。
 这里的版本描述本次行运计算；<code class="docutils literal notranslate"><span class="pre">result.chart.provenance</span></code> 描述原本命计算，两处版本可以不同。</p>
 <p>命中按 TT 时刻、移动对象选择顺序、本命源盘顺序、相位角升序及负分支在前排序。
 同一时刻的不同身份分别保留，不按容差合并相近穿越。报告时刻为 2^-30 日的整数倍；
@@ -120,8 +146,8 @@
 <p>序列复制为不可变元组。构造或读取给定结果不加载原生天文库。
 调用方所给结果会经过哪些检查，见<a class="reference internal" href="architecture.html#id7"><span class="std std-ref">构造校验合同</span></a>。</p>
 </section>
-<section id="id5">
-<h2>限制与失败<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h2>
+<section id="id6">
+<h2>限制与失败<a class="headerlink" href="#id6" title="Link to this heading">¶</a></h2>
 <p>搜索区间为<strong>半开区间</strong>：包含 TT 起点，排除 TT 终点；最长 <strong>3660 TT 日</strong>。
 这个上限在 UTC 转为 TT 后检查；闰秒变化可能使民用时间的 3660 日区间超过 TT 上限。
 每个所选移动来源都必须接纳整个区间。这与本命快照的联合有效域分开：只选太阳时，
@@ -159,8 +185,11 @@
 成功但命中元组为空，表示完整的所选搜索没有找到事件。</p>
 <p>端点使用 <code class="docutils literal notranslate"><span class="pre">datetime.utcoffset()</span></code> 返回的偏移，包括其 <code class="docutils literal notranslate"><span class="pre">fold</span></code> 设置。此函数不检测或拒绝不存在或有歧义的本地钟点。
 传入端点前，先处理夏令时空缺或重叠；相关说明见<a class="reference internal" href="birth.html"><span class="std std-doc">出生时间准备</span></a>。</p>
-<p>本操作搜索精确的移动对固定命中，不计算固定时刻行运盘、容许度进出窗口、返照、
-两颗移动对象间的事件或解读。</p>
+<p>本操作搜索精确的移动对固定命中，不计算固定时刻行运盘、容许度进出窗口、
+两颗移动对象间的事件或解读。
+若要查一个指定时刻的相位及局部运动，用 <a class="reference internal" href="moments.html"><span class="std std-doc">moment_chart 与 transit_aspects</span></a>。
+不需要运动标签时，仍可用<a class="reference internal" href="cross_aspects.html#id2"><span class="std std-ref">静态双盘相位</span></a>。两者都按
+<a class="reference internal" href="cross_aspects.html#id8"><span class="std std-ref">源盘兼容约定</span></a>比较各自日期的已存黄经。</p>
 </section>
 </section>
 
@@ -197,9 +226,11 @@
 <li class="toctree-l2"><a class="reference internal" href="birth.html">出生记录与现代时刻解析</a></li>
 <li class="toctree-l2"><a class="reference internal" href="configuration.html">排盘请求配置</a></li>
 <li class="toctree-l2"><a class="reference internal" href="chart.html">本命盘</a></li>
+<li class="toctree-l2"><a class="reference internal" href="moments.html">时刻盘与固定时刻行运相位</a></li>
 <li class="toctree-l2"><a class="reference internal" href="aspects.html">相位</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cross_aspects.html">双盘相位与落宫</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">精确行运命中</a></li>
+<li class="toctree-l2"><a class="reference internal" href="returns.html">日返照与月返照</a></li>
 <li class="toctree-l2"><a class="reference internal" href="summaries.html">星座分布与出生月相</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dignities.html">传统守护、尊贵状态与定位星链</a></li>
 <li class="toctree-l2"><a class="reference internal" href="records.html">命盘结果与文本显示</a></li>
@@ -220,7 +251,7 @@
   <li><a href="../index.html">Documentation overview</a><ul>
   <li><a href="index.html">文档入口</a><ul>
       <li>Previous: <a href="cross_aspects.html" title="previous chapter">双盘相位与落宫</a></li>
-      <li>Next: <a href="summaries.html" title="next chapter">星座分布与出生月相</a></li>
+      <li>Next: <a href="returns.html" title="next chapter">日返照与月返照</a></li>
   </ul></li>
   </ul></li>
 </ul>

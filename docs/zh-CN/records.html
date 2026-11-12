@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>命盘结果与文本显示 &#8212; celestial-astrology 0.4.0 documentation / 文档</title>
+    <title>命盘结果与文本显示 &#8212; celestial-astrology 0.5.0 documentation / 文档</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
-    <script src="../../_static/documentation_options.js?v=6c02275b"></script>
+    <script src="../../_static/documentation_options.js?v=1dd76d02"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/zh-CN/records.html" />
@@ -39,6 +39,10 @@
 <p><a class="reference internal" href="../en/records.html"><span class="std std-doc">English</span></a> · <a class="reference internal" href="chart.html"><span class="std std-doc">排盘</span></a> · <a class="reference internal" href="reference.html"><span class="std std-doc">API</span></a></p>
 <p><code class="docutils literal notranslate"><span class="pre">natal_chart</span></code> 返回内存中的不可变 <code class="docutils literal notranslate"><span class="pre">NatalChart</span></code>。可以直接查看结构化结果，或显式提供知识目录，
 交给 <code class="docutils literal notranslate"><span class="pre">format_chart</span></code> 显示。包不提供命盘存取接口或保存格式；接口撤回说明见<a class="reference internal" href="releases.html"><span class="std std-doc">发行说明</span></a>。</p>
+<p><code class="docutils literal notranslate"><span class="pre">moment_chart</span></code> 返回不可变 <code class="docutils literal notranslate"><span class="pre">MomentChart</span></code>，以 <code class="docutils literal notranslate"><span class="pre">moment</span></code> 代替已解析出生输入。
+<code class="docutils literal notranslate"><span class="pre">moment.utc</span></code> 与 <code class="docutils literal notranslate"><span class="pre">moment.location</span></code> 标明给定时刻及地点；可选的 <code class="docutils literal notranslate"><span class="pre">moment.source_jde_tt</span></code>
+保留来源事件的原始 TT，与 <code class="docutils literal notranslate"><span class="pre">times.jde_tt</span></code> 分开。其他结果字段沿用下文的命盘合同。
+<code class="docutils literal notranslate"><span class="pre">format_chart</span></code> 将其标为时刻盘，不显示出生或时区来源资料。见<a class="reference internal" href="moments.html"><span class="std std-doc">时刻盘示例</span></a>。</p>
 <section id="id2">
 <h2>一个完整例子<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
 <!-- usage: records.output -->
@@ -85,13 +89,15 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">positions</span></code> 保留未舍入的黄经、黄纬（度）、物理距离（AU）和黄经速率（度/TT 日）。
 月交点没有距离（<code class="docutils literal notranslate"><span class="pre">None</span></code>）。<code class="docutils literal notranslate"><span class="pre">times</span></code> 保留 JD(UT1) 和 JDE(TT)。<code class="docutils literal notranslate"><span class="pre">houses</span></code> 保留四轴黄经与十二宫头，
 单位为度；<code class="docutils literal notranslate"><span class="pre">placements</span></code> 给出星座与落宫。每条相位都保留分支、带符号偏差、上限和运动状态。</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">provenance</span></code> 保留 astrology、celestial-calendar 版本、位置坐标约定及 UT1 推导方式；
+<li><p><code class="docutils literal notranslate"><span class="pre">provenance</span></code> 保留 astrology、celestial-calendar 版本、位置参考系及 UT1 推导方式；
 <code class="docutils literal notranslate"><span class="pre">effective</span></code> 保留已确定的 ΔT 模型及求值方式。</p></li>
 </ul>
+<p>中文表格中的 <code class="docutils literal notranslate"><span class="pre">位置坐标约定</span></code> 标签指这里的同一个位置参考系值。</p>
 <p>直接构造 <code class="docutils literal notranslate"><span class="pre">NatalChart</span></code> 时，会检查字段类型、范围，以及星座、落宫和相位是否与传入的位置、四轴、宫头及规则一致。
 这些检查能确认什么，见<a class="reference internal" href="architecture.html#id7"><span class="std std-ref">校验边界</span></a>。从已解析输入计算天文值，请使用 <code class="docutils literal notranslate"><span class="pre">natal_chart</span></code>。</p>
 <p>参与对象、容许度覆盖及命中中用到的轴名与天体名一样，取自传入目录。
-原有只含天体或交点的请求不要求目录提供轴概念；四轴几何行仍使用已有的固定双语标签。</p>
+原有只含天体或交点的请求不要求目录提供轴概念；“四轴与宫头”中的上升点、中天、下降点、天底
+四行按所选语言使用固定标签，不从传入目录取名。</p>
 <p>调用 <code class="docutils literal notranslate"><span class="pre">natal_chart(chart.resolved,</span> <span class="pre">chart.requested)</span></code> 按当前实现计算新结果，并记录本次来源。
 它保留已解析出生输入，不再查时区。新结果可能与用不同代码算得的旧结果不同。
 分发包必须已安装：缺少 <code class="docutils literal notranslate"><span class="pre">celestial-astrology</span></code> 元数据时抛出
@@ -151,9 +157,11 @@
 <li class="toctree-l2"><a class="reference internal" href="birth.html">出生记录与现代时刻解析</a></li>
 <li class="toctree-l2"><a class="reference internal" href="configuration.html">排盘请求配置</a></li>
 <li class="toctree-l2"><a class="reference internal" href="chart.html">本命盘</a></li>
+<li class="toctree-l2"><a class="reference internal" href="moments.html">时刻盘与固定时刻行运相位</a></li>
 <li class="toctree-l2"><a class="reference internal" href="aspects.html">相位</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cross_aspects.html">双盘相位与落宫</a></li>
 <li class="toctree-l2"><a class="reference internal" href="transits.html">精确行运命中</a></li>
+<li class="toctree-l2"><a class="reference internal" href="returns.html">日返照与月返照</a></li>
 <li class="toctree-l2"><a class="reference internal" href="summaries.html">星座分布与出生月相</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dignities.html">传统守护、尊贵状态与定位星链</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">命盘结果与文本显示</a></li>

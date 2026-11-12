@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>双盘相位与落宫 &#8212; celestial-astrology 0.4.0 documentation / 文档</title>
+    <title>双盘相位与落宫 &#8212; celestial-astrology 0.5.0 documentation / 文档</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
-    <script src="../../_static/documentation_options.js?v=6c02275b"></script>
+    <script src="../../_static/documentation_options.js?v=1dd76d02"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="canonical" href="https://0xf3cd.github.io/astrology/docs/zh-CN/cross_aspects.html" />
@@ -43,8 +43,15 @@
 比较直接使用两张盘中已存的黄经；使用前请确认它们满足<a class="reference internal" href="#id8">坐标要求</a>。</p>
 <section id="id2">
 <h2>比较两张示例盘<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<p>两种比较函数的任一侧也可以是 <code class="docutils literal notranslate"><span class="pre">MomentChart</span></code>，比较仍为静态。
+给定时刻建盘及移动对本命的运动标签，使用 <a class="reference internal" href="moments.html"><span class="std std-doc">moment_chart 与 transit_aspects</span></a>。</p>
 <p>下面用两份虚构的出生资料排盘，再查两颗太阳是否在 3 度容许度内合相。
 双盘比较使用单独传入的相位规则，因此排本命盘时可以不计算相位。</p>
+<p>查固定时刻的行运相位时，把该时刻已算好的盘作为 <code class="docutils literal notranslate"><span class="pre">chart_left</span></code>，本命盘作为 <code class="docutils literal notranslate"><span class="pre">chart_right</span></code>，
+两侧都只选 <code class="docutils literal notranslate"><span class="pre">Body.SUN</span></code>，即可只比较行运太阳与本命太阳。这按<a class="reference internal" href="#id8">源盘兼容约定</a>
+比较各自日期的已存黄经。<code class="docutils literal notranslate"><span class="pre">find_aspects</span></code> 用于单盘，
+要求身份不同，还会配对输入内的其他对象，不能用来表示这两颗太阳。
+这种静态比较不搜索精确命中时刻；区间搜索用<a class="reference internal" href="transits.html"><span class="std std-doc">行运命中</span></a>。</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">date</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">timedelta</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">astrology</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">AspectRule</span><span class="p">,</span> <span class="n">BirthRecord</span><span class="p">,</span> <span class="n">Body</span><span class="p">,</span> <span class="n">ChartConfig</span><span class="p">,</span> <span class="n">FixedOffset</span><span class="p">,</span>
 <span class="gp">... </span>  <span class="n">HouseSystem</span><span class="p">,</span> <span class="n">Location</span><span class="p">,</span> <span class="n">MajorAspect</span><span class="p">,</span> <span class="n">ObjectOrb</span><span class="p">,</span> <span class="n">OrbCombination</span><span class="p">,</span>
@@ -102,10 +109,8 @@
 跨过 360 度后从 0 度继续。黄经恰好等于宫头时，归入从该宫头开始的宫。
 两张盘各用自己的宫制，原盘保持不变。交换参数中的左右盘后，结果中的所属盘也随之交换；
 也可以把同一张盘传给两边。</p>
-<p>同一侧重复选择对象，或选择该盘没有的对象，会抛出 <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>；传入非对象值或非序列选择，
-会抛出 <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>。即使另一侧选择为空，这些检查仍然执行。
-直接构造 <code class="docutils literal notranslate"><span class="pre">CrossChartHouseOverlays</span></code> 时，会按两张盘和所选对象重新计算完整落宫序列；
-缺少记录、宫号不同或顺序不同都会被拒绝。</p>
+<p>两种比较都在同一侧重复选择对象或选择该盘没有的对象时抛出 <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>；传入非对象值或非序列选择，
+会抛出 <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>。即使另一侧选择为空，这些检查仍然执行。</p>
 </section>
 <section id="id4">
 <h2>选择配对与容许度<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h2>
@@ -140,7 +145,6 @@
 </div>
 <p>以下请求会抛出 <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>，即使没有对象可配对也一样：</p>
 <ul class="simple">
-<li><p>同一侧重复选择对象，或选择该盘没有的对象。</p></li>
 <li><p>规则中重复指定同一种相位，或为两边都未选中的对象设置容许度。</p></li>
 <li><p>为对象单独设置了容许度却未选合成方式，或没有单独设置容许度却给了合成方式。</p></li>
 </ul>
@@ -192,7 +196,7 @@
 <p>表格开头列出两张盘各自的宫制、坐标约定、时标值、模型和版本标签，以及本次所选对象。
 落宫表随后逐条列出所属盘和宫号。相位表列出所有匹配分支，同一配对有多条命中时全部保留，
 不添加入相／离相等运动标签；表中还会列出基础容许度、对象单独设置、合成方式和每条命中的实际容许度上限。
-偏差的绝对值等于上限时也算命中。结果为空时，仍能从表中看到对象选择和相位规则。</p>
+结果为空时，仍能从表中看到对象选择和相位规则。</p>
 <p>分支、偏差和容许度以度、分、秒显示，沿用<a class="reference internal" href="records.html#id4"><span class="std std-ref">整角秒截断规则</span></a>。
 截断只影响显示，不重新判断相位，也不删掉记录。
 目录中所需的名称和译文必须齐备且为当前版本；缺失、过期或对应关系不唯一时会抛出 <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>，
@@ -212,13 +216,13 @@
 </section>
 <section id="id8">
 <h2>源盘兼容与计算边界<a class="headerlink" href="#id8" title="Link to this heading">¶</a></h2>
-<p>两种比较都要求两张盘使用相同的黄道、中心和位置坐标约定，不一致时会抛出 <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>。
+<p>两种比较都要求两张盘使用相同的黄道、中心和位置参考系约定，不一致时会抛出 <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>。
 当前公开构造器只接受热带地心位置，以各盘自身日期的真黄道和真春分点为基准。
 日期不同，春分点基准也就不同。双盘相位直接比较存储的黄经值，不把位置转换到共同历元，
 因此算出的不是两个位置在同一时刻的夹角。</p>
 <p>两张盘可以有不同的日期、地点、宫制、模型和软件标签，这些信息会原样保留，不会仅因不同就拒绝比较。
 构造双盘相位结果时，会按两张盘、所选对象和规则重算全部命中；构造双盘落宫结果时，
-会按两张盘和所选对象重算全部落宫。传入记录只要与重算结果不同，就会被拒绝。
+会按两张盘和所选对象重算全部落宫。记录缺失、值不同或顺序不同都会被拒绝。
 这些检查能确认什么，见<a class="reference internal" href="architecture.html#id7"><span class="std std-ref">校验边界</span></a>。</p>
 <p>双盘落宫同样直接比较对象在自身日期的已存黄经与另一张盘的宫头，不转换到共同历元，
 也不考虑对象纬度来计算三维落宫。
@@ -260,9 +264,11 @@
 <li class="toctree-l2"><a class="reference internal" href="birth.html">出生记录与现代时刻解析</a></li>
 <li class="toctree-l2"><a class="reference internal" href="configuration.html">排盘请求配置</a></li>
 <li class="toctree-l2"><a class="reference internal" href="chart.html">本命盘</a></li>
+<li class="toctree-l2"><a class="reference internal" href="moments.html">时刻盘与固定时刻行运相位</a></li>
 <li class="toctree-l2"><a class="reference internal" href="aspects.html">相位</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">双盘相位与落宫</a></li>
 <li class="toctree-l2"><a class="reference internal" href="transits.html">精确行运命中</a></li>
+<li class="toctree-l2"><a class="reference internal" href="returns.html">日返照与月返照</a></li>
 <li class="toctree-l2"><a class="reference internal" href="summaries.html">星座分布与出生月相</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dignities.html">传统守护、尊贵状态与定位星链</a></li>
 <li class="toctree-l2"><a class="reference internal" href="records.html">命盘结果与文本显示</a></li>
