@@ -86,6 +86,7 @@ SDIST_FILES = (
   ".gitattributes",
   ".github/workflows/checks.yml",
   ".github/workflows/release.yml",
+  "AGENTS.md",
   "pyproject.toml",
   "uv.lock",
   "MANIFEST.in",
@@ -96,15 +97,15 @@ SDIST_FILES = (
 )
 
 _TEST_INPUT_PATTERNS = (
-  "tests/*.py",
-  "tools/*.py",
+  "tests/**/*.py",
+  "tools/**/*.py",
   "tests/reference/**/*.json",
   "tests/reference/**/*.txt",
   "tests/consumer_cases/**/*.py",
 )
 
 
-def test_input_files(root: Path) -> tuple[str, ...]:
+def distributed_test_inputs(root: Path) -> tuple[str, ...]:
   """Return maintained test/tool inputs present in the working tree.
 
   The patterns match MANIFEST.in, so untracked matching files are inputs too; Git metadata
@@ -127,7 +128,7 @@ def sdist_input_files(root: Path) -> tuple[str, ...]:
 
   返回静态分发输入及 checkout 中的测试和工具输入。
   """
-  return tuple(sorted({*SDIST_FILES, *test_input_files(root)}))
+  return tuple(sorted({*SDIST_FILES, *distributed_test_inputs(root)}))
 
 
 def run(command: Sequence[str], *, cwd: Path = ROOT, env: Mapping[str, str] | None = None) -> None:
@@ -394,7 +395,7 @@ def check_sdist(sdist: Path, *, source_root: Path = ROOT) -> None:
     expected = {"src/" + name for name in PACKAGE_FILES} | set(sdist_input_files(source_root))
     if missing := expected - names:
       raise ValueError(f"Sdist is missing package resources: {sorted(missing)}")
-    for name in test_input_files(source_root):
+    for name in distributed_test_inputs(source_root):
       content = archive.extractfile(members[name])
       if content is None or content.read() != (source_root / name).read_bytes():
         raise ValueError(f"Sdist test input differs from the source: {name}")

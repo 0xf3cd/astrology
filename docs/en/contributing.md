@@ -112,8 +112,8 @@ calculation; it does not import development checks. Feature PRs keep domain
 assertions in tests, not the installed-package check; packaging agreement uses
 source-to-wheel bytes and observation files.
 
-The sdist check enumerates test and tool inputs from the working tree: `tests/*.py`,
-`tools/*.py`, JSON/TXT files under `tests/reference/`, and Python files under
+The sdist check enumerates test and tool inputs from the working tree: `tests/**/*.py`,
+`tools/**/*.py`, JSON/TXT files under `tests/reference/`, and Python files under
 `tests/consumer_cases/`. Their patterns match
 `MANIFEST.in`, so untracked matching files are included without reading Git metadata.
 Every input must be present in the archive with the same bytes as the checkout.

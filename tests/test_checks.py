@@ -23,6 +23,7 @@ from tools.check import (
   check_package_files,
   check_sdist,
   check_wheel,
+  distributed_test_inputs,
   document_errors,
   run,
   sdist_input_files,
@@ -638,6 +639,34 @@ def test_sdist_import_guard_resolves_both_paths_and_rejects_outside_imports(
     assert result.returncode == 0, result.stdout + result.stderr
 
 
+def test_input_discovery_matches_an_independently_listed_tree(tmp_path: Path) -> None:
+  inputs = (
+    "tests/test_top.py",
+    "tests/nested/test_extra.py",
+    "tests/reference/recipe.py",
+    "tests/reference/direct.json",
+    "tests/reference/direct.txt",
+    "tests/reference/nested/ref.json",
+    "tests/reference/nested/ref.txt",
+    "tests/consumer_cases/direct.py",
+    "tests/consumer_cases/nested/consumer.py",
+    "tools/check.py",
+    "tools/nested/extra.py",
+  )
+  decoys = (
+    "tests/nested/ignored.yaml",
+    "tests/reference/ignored.yaml",
+    "tools/nested/ignored.txt",
+    "tests/__pycache__/cached.pyc",
+    "tools/__pycache__/cached.pyc",
+  )
+  for name in (*inputs, *decoys):
+    path = tmp_path / name
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(name.encode())
+  assert distributed_test_inputs(tmp_path) == tuple(sorted(inputs))
+
+
 def _add_sdist_member(archive: tarfile.TarFile, name: str, content: bytes) -> None:
   member = tarfile.TarInfo("astrology/" + name)
   member.size = len(content)
@@ -669,10 +698,13 @@ def test_sdist_test_input_bytes_match_the_checkout(tmp_path: Path) -> None:
     check_sdist(sdist)
 
 
-def test_new_working_tree_input_is_required_and_compared(tmp_path: Path) -> None:
+@pytest.mark.parametrize(
+  "name",
+  ["tests/reference/new_input.json", "tests/nested/test_extra.py", "tools/nested/extra.py"],
+)
+def test_new_working_tree_input_is_required_and_compared(tmp_path: Path, name: str) -> None:
   source_root = tmp_path / "checkout"
-  name = "tests/reference/new_input.json"
-  payload = b'{"new": true}\n'
+  payload = b"new maintained input\n"
   source = source_root / name
   source.parent.mkdir(parents=True)
   source.write_bytes(payload)
@@ -690,11 +722,13 @@ def test_new_working_tree_input_is_required_and_compared(tmp_path: Path) -> None
   write_sdist()
   check_sdist(sdist, source_root=source_root)
   write_sdist(include=False)
-  with pytest.raises(ValueError, match=r"Sdist is missing.*new_input\.json"):
+  with pytest.raises(ValueError) as missing:
     check_sdist(sdist, source_root=source_root)
+  assert "Sdist is missing" in str(missing.value) and name in str(missing.value)
   write_sdist(content=b"changed")
-  with pytest.raises(ValueError, match=r"Sdist test input differs.*new_input\.json"):
+  with pytest.raises(ValueError) as changed:
     check_sdist(sdist, source_root=source_root)
+  assert "Sdist test input differs" in str(changed.value) and name in str(changed.value)
 
 
 @pytest.mark.parametrize(

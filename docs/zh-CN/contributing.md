@@ -83,7 +83,7 @@ Python 分词单测不能证明浏览器行为。
 天文适配层留到计算时才加载，不导入开发检查模块。
 功能 PR 将领域断言留在测试中，不加入安装包验证程序；打包一致性由源码与 wheel 的字节核对及检查值文件验证。
 
-sdist 检查从工作树枚举测试和工具输入：`tests/*.py`、`tools/*.py`、`tests/reference/` 中的 JSON／TXT 文件，
+sdist 检查从工作树枚举测试和工具输入：`tests/**/*.py`、`tools/**/*.py`、`tests/reference/` 中的 JSON／TXT 文件，
 以及 `tests/consumer_cases/` 中的 Python 文件。
 这些模式与 `MANIFEST.in` 一致，未跟踪的匹配文件也包含在内，不读取 Git 元数据。
 每个输入都必须出现在归档中，并与 checkout 中的字节一致。
