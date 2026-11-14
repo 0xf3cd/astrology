@@ -69,9 +69,22 @@ def _search(chart: NatalChart, body: Body = Body.MOON) -> TransitHits:
 
 
 @pytest.mark.parametrize("mode", [(), ("-O",)])
-def test_import_knowledge_and_rejections_do_not_initialize_native(mode: tuple[str, ...]) -> None:
-  program = Path("tests/consumer_cases/returns_isolation.py").read_text(encoding="utf-8")
-  subprocess.run((sys.executable, *mode, "-c", program), check=True, capture_output=True, text=True)
+@pytest.mark.parametrize("external_cwd", [False, True])
+def test_import_knowledge_and_rejections_do_not_initialize_native(
+  mode: tuple[str, ...], external_cwd: bool, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+  if external_cwd:
+    monkeypatch.chdir(tmp_path)
+  program = (Path(__file__).parent / "consumer_cases/returns_isolation.py").read_text(
+    encoding="utf-8"
+  )
+  subprocess.run(
+    (sys.executable, *mode, "-c", program),
+    check=True,
+    capture_output=True,
+    text=True,
+    cwd=Path(__file__).parents[1],
+  )
 
 
 @pytest.mark.parametrize("body", [Body.SUN, Body.MOON])
@@ -283,7 +296,7 @@ def test_reference_provenance_counts_and_recipe_are_pinned() -> None:
   assert reference["source"]["library_version"] == "2.10.03"
   assert reference["source"]["time_scale"].startswith("TT")
   assert reference["calibration"]["fixture_time_tolerance_seconds"] == {"sun": 5, "moon": 30}
-  recipe = Path("tools/fetch_return_reference.py")
+  recipe = Path(__file__).parents[1] / "tools" / "fetch_return_reference.py"
   assert hashlib.sha256(recipe.read_bytes()).hexdigest() == reference["source"]["recipe_sha256"]
   counts = {case["name"]: len(case["hits"]) for case in CASES}
   assert len(counts) == 9 and counts["year_end_sun_2024-01-01"] == 2

@@ -144,7 +144,7 @@ True
 太阳 [sun] | 白羊座 2°36'04" | 7 | D
 ```
 
-时刻盘文本显示给定 UTC 和地点，有来源事件时另列 TT，不添加出生钟点、时区身份或 tzdata/fold
+时刻盘文本显示 UTC 和地点，有来源事件时另列 TT，不添加出生钟点、时区身份或 tzdata/fold
 来源。`natal_lunar_phase` 仍只接纳本命盘；对时刻盘使用 `lunar_phase`，传入已存日月黄经。
 区间 `transit_hits` 的 `natal_objects` 命名固定参考侧的角色，即使源盘是时刻盘；保留的原
 epoch-policy 值在[行运指南](transits.md)中说明。

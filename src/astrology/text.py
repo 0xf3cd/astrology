@@ -35,7 +35,7 @@ _HEADINGS = {
   "en": {
     "title": "Tropical geocentric natal chart",
     "moment_title": "Tropical geocentric moment chart",
-    "moment_utc": "Supplied UTC",
+    "moment_utc": "Moment UTC",
     "source_tt": "Source event JDE(TT)",
     "input": "Recorded clock / timezone",
     "utc": "Resolved UTC",
@@ -47,6 +47,8 @@ _HEADINGS = {
     "cusp": "House cusp",
     "aspects": "Aspects",
     "aspect_columns": "First | Second | Aspect | Branch | Deviation | Orb limit | Motion",
+    "no_aspect_rules": "No aspect rules were requested",
+    "no_aspect_hits": "No aspects matched the requested rules",
     "none": "None",
     "configuration": "Configuration",
     "houses": "Requested / effective house system",
@@ -67,7 +69,7 @@ _HEADINGS = {
   "zh-CN": {
     "title": "热带地心本命盘",
     "moment_title": "热带地心时刻盘",
-    "moment_utc": "给定的 UTC",
+    "moment_utc": "时刻 UTC",
     "source_tt": "来源事件 JDE(TT)",
     "input": "原始钟点 / 时区",
     "utc": "已解析的 UTC",
@@ -79,6 +81,8 @@ _HEADINGS = {
     "cusp": "宫头",
     "aspects": "相位",
     "aspect_columns": "第一对象 | 第二对象 | 相位 | 分支 | 偏差 | 容许度上限 | 运动",
+    "no_aspect_rules": "未请求相位规则",
+    "no_aspect_hits": "没有符合请求规则的相位",
     "none": "无",
     "configuration": "配置",
     "houses": "请求 / 实际宫制",
@@ -281,7 +285,7 @@ def format_chart(chart: Chart, catalog: Catalog, *, language: Language = "en") -
   provenance are escaped for display; the chart values are unchanged.
 
   Natal output retains recorded birth/timezone provenance. A moment chart shows
-  supplied UTC/location and optional source-event TT without birth/timezone metadata.
+  its UTC/location and optional source-event TT without birth/timezone metadata.
 
   返回命盘位置、宫位、相位、配置及来源的文本表格。调用方须提供已加载的 Catalog；
   en 或 zh-CN 的名称及译文必须齐备且为当前版本，
@@ -289,7 +293,7 @@ def format_chart(chart: Chart, catalog: Catalog, *, language: Language = "en") -
   不改分类、宫位或运动状态；偏差显示为零时也保留原运动标签。
   chart/catalog 类型错误时抛出 TypeError。
   传入名称及来源中的非打印字符、反斜线和表格分隔符会转义显示，不改命盘中的值。
-  本命盘保留出生钟点及时区来源；时刻盘显示给定 UTC、地点及可选的来源事件 TT，
+  本命盘保留出生钟点及时区来源；时刻盘显示 UTC、地点及可选的来源事件 TT，
   不显示出生或时区资料。
   """
   _require_chart(chart)
@@ -354,7 +358,9 @@ def format_chart(chart: Chart, catalog: Catalog, *, language: Language = "en") -
       )
     )
   if not chart.aspects:
-    lines.append(labels["none"])
+    lines.append(
+      labels["no_aspect_rules"] if not chart.requested.aspects else labels["no_aspect_hits"]
+    )
   requested = chart.requested
   participants = (
     labels["all"]

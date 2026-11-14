@@ -127,6 +127,9 @@ def test_a_polar_latitude_is_outside_the_geometry_domain(latitude: float) -> Non
   with pytest.raises(ChartDomainError) as caught:
     natal_chart(resolved, config_for())
   assert caught.value.house_system is HouseSystem.WHOLE_SIGN
+  assert str(caught.value) == (
+    "Chart latitude must be strictly inside ±90 degrees for house geometry"
+  )
   # Rejected before any native call, so no upstream detail is claimed.
   assert caught.value.operation is None
   assert caught.value.recorded is None

@@ -163,8 +163,8 @@ Tropical geocentric moment chart
 Sun [sun] | Aries 2°36'04" | 7 | D
 ```
 
-Moment text shows supplied UTC/location and, when present, source-event TT; it
-does not add a recorded birth clock, timezone identity or tzdata/fold provenance.
+Moment-chart text shows the chart's UTC and location, plus source-event TT when present.
+It does not add a recorded birth clock, timezone identity or tzdata/fold provenance.
 `natal_lunar_phase` remains natal-specific; use `lunar_phase` with a moment chart's
 stored Sun/Moon longitudes. For interval `transit_hits`, `natal_objects` names the
 fixed-reference role even when the supplied source is a moment chart; the existing

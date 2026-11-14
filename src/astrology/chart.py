@@ -401,6 +401,32 @@ def _placements(
   )
 
 
+def _selected_placements(
+  chart: Chart, objects: Sequence[AstronomicalObject]
+) -> tuple[Placement, ...]:
+  """Return a nonempty Body/LunarNode selection in stored placement order.
+
+  The selection is validated and copied, while its Placement values remain the chart's immutable
+  objects. See `chart_sign_distribution` and `Dispositors`.
+
+  按已存落点顺序返回非空的天体和交点选择。选择经过校验并复制，返回的 Placement 仍是盘中不可变对象。
+  公开合同见 `chart_sign_distribution` 和 `Dispositors`。
+  """
+  _require_chart(chart)
+  if not isinstance(objects, Sequence) or isinstance(objects, (str, bytes)):
+    raise TypeError("objects must be a sequence")
+  selected = tuple(objects)
+  if any(not _is_astronomical_object(identity) for identity in selected):
+    raise TypeError("objects must contain Body or LunarNode values")
+  if not selected or len(set(selected)) != len(selected):
+    raise ValueError("objects must be nonempty and contain no duplicate identities")
+  available = {placement.identity for placement in chart.placements}
+  missing = [identity.value for identity in selected if identity not in available]
+  if missing:
+    raise ValueError(f"Objects unavailable in chart: {', '.join(missing)}")
+  return tuple(placement for placement in chart.placements if placement.identity in selected)
+
+
 def _selected_longitudes(
   positions: Sequence[EclipticPosition], houses: ChartHouses, participants: Sequence[ChartObject]
 ) -> tuple[tuple[ChartObject, float], ...]:

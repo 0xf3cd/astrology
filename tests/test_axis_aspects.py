@@ -10,6 +10,7 @@ from collections.abc import Callable
 from dataclasses import replace
 from datetime import date, time, timedelta
 from enum import StrEnum
+from pathlib import Path
 from typing import Any, cast, get_args
 
 import pytest
@@ -502,7 +503,12 @@ if len(result.hits) != 1 or load_catalog().concept('axis.ascendant').configurati
 if 'celestial_calendar' in sys.modules or 'astrology.celestial' in sys.modules:
   raise RuntimeError('native astronomy initialized')
 """
-  result = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True)
+  result = subprocess.run(
+    [sys.executable, "-c", code],
+    capture_output=True,
+    text=True,
+    cwd=Path(__file__).parents[1],
+  )
   assert result.returncode == 0, result.stdout + result.stderr
 
 

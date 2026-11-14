@@ -80,12 +80,13 @@ PACKAGE_FILES = (
   "astrology/knowledge/catalog.json",
 )
 
-# Build, documentation and test inputs outside the package itself.
-# 不在包内的构建、文档和测试输入。
+# Build and documentation inputs outside the package itself.
+# 不在包内的构建和文档输入。
 SDIST_FILES = (
   ".gitattributes",
   ".github/workflows/checks.yml",
   ".github/workflows/release.yml",
+  "AGENTS.md",
   "pyproject.toml",
   "uv.lock",
   "MANIFEST.in",
@@ -93,26 +94,41 @@ SDIST_FILES = (
   "README.zh-CN.md",
   "docs/conf.py",
   "docs/_templates/site_index.html",
-  "tools/check.py",
-  "tools/installed_check.py",
-  "tools/release.py",
-  "tools/fetch_reference.py",
-  "tools/catalog_docs.py",
-  "tools/docs_search.py",
-  "tools/guide_checks.py",
-  "tools/release_documents.py",
-  "tests/reference/natal_reference.json",
-  "tests/reference/complete_chart_reference.json",
-  "tests/reference/chart_regression.json",
-  "tests/reference/constructed_chart.en.txt",
-  "tests/reference/constructed_chart.zh-CN.txt",
-  "tests/consumer_cases/import_isolation.py",
-  "tests/consumer_cases/chart_validation.py",
-  "tests/consumer_cases/comparison_text_isolation.py",
-  "tests/consumer_cases/cross_aspects_isolation.py",
-  "tests/consumer_cases/dignities_isolation.py",
-  "tests/consumer_cases/knowledge_isolation.py",
 )
+
+_TEST_INPUT_PATTERNS = (
+  "tests/**/*.py",
+  "tools/**/*.py",
+  "tests/reference/**/*.json",
+  "tests/reference/**/*.txt",
+  "tests/consumer_cases/**/*.py",
+)
+
+
+def distributed_test_inputs(root: Path) -> tuple[str, ...]:
+  """Return maintained test/tool inputs present in the working tree.
+
+  The patterns match MANIFEST.in, so untracked matching files are inputs too; Git metadata
+  is not consulted. Cache files are excluded.
+
+  返回工作树中维护的测试和工具输入。匹配模式与 MANIFEST.in 一致，未跟踪的匹配文件也算输入，
+  不读取 Git 元数据。缓存文件不计入。
+  """
+  files = {
+    path
+    for pattern in _TEST_INPUT_PATTERNS
+    for path in root.glob(pattern)
+    if path.is_file() and "__pycache__" not in path.parts and path.suffix != ".pyc"
+  }
+  return tuple(sorted(path.relative_to(root).as_posix() for path in files))
+
+
+def sdist_input_files(root: Path) -> tuple[str, ...]:
+  """Return static distribution inputs plus the checkout's test/tool inputs.
+
+  返回静态分发输入及 checkout 中的测试和工具输入。
+  """
+  return tuple(sorted({*SDIST_FILES, *distributed_test_inputs(root)}))
 
 
 def run(command: Sequence[str], *, cwd: Path = ROOT, env: Mapping[str, str] | None = None) -> None:
@@ -347,31 +363,42 @@ def check_wheel(wheel: Path, expected_version: str, *, source_root: Path) -> Non
         raise ValueError(f"Wheel package member differs from the source: {name}")
 
 
-def check_sdist(sdist: Path) -> None:
+def check_sdist(sdist: Path, *, source_root: Path = ROOT) -> None:
   """Require package resources and the inputs for source builds, docs and tests.
 
-  要求源码分发包包含包资源及构建、文档和测试所需的输入。
+  `source_root` supplies the expected test/tool inputs and their bytes. Those expectations
+  come from the checkout, not from MANIFEST.in.
+
+  要求源码分发包包含包资源及构建、文档和测试所需的输入。`source_root` 提供预期的测试和工具输入
+  及其字节；预期来自 checkout，而不是 MANIFEST.in。
   """
   with tarfile.open(sdist) as archive:
-    names = {name.partition("/")[2] for name in archive.getnames()}
-  if any(
-    name == "src/astrology/serialization.py"
-    or name.startswith("src/astrology/serialization/")
-    or name == "tests/test_serialization.py"
-    or name.startswith("tests/reference/chart_record_")
-    for name in names
-  ):
-    raise ValueError("Sdist contains withdrawn chart persistence")
-  if any(
-    name in ("src/astrology/svg.py", "tests/test_svg.py", "docs/en/svg.md", "docs/zh-CN/svg.md")
-    or name.startswith("src/astrology/svg/")
-    or name.startswith("docs/_static/svg-")
-    for name in names
-  ):
-    raise ValueError("Sdist contains withdrawn SVG rendering")
-  expected = {"src/" + name for name in PACKAGE_FILES} | set(SDIST_FILES)
-  if missing := expected - names:
-    raise ValueError(f"Sdist is missing package resources: {sorted(missing)}")
+    members = {
+      member.name.partition("/")[2]: member for member in archive.getmembers() if member.isfile()
+    }
+    names = set(members)
+    if any(
+      name == "src/astrology/serialization.py"
+      or name.startswith("src/astrology/serialization/")
+      or name == "tests/test_serialization.py"
+      or name.startswith("tests/reference/chart_record_")
+      for name in names
+    ):
+      raise ValueError("Sdist contains withdrawn chart persistence")
+    if any(
+      name in ("src/astrology/svg.py", "tests/test_svg.py", "docs/en/svg.md", "docs/zh-CN/svg.md")
+      or name.startswith("src/astrology/svg/")
+      or name.startswith("docs/_static/svg-")
+      for name in names
+    ):
+      raise ValueError("Sdist contains withdrawn SVG rendering")
+    expected = {"src/" + name for name in PACKAGE_FILES} | set(sdist_input_files(source_root))
+    if missing := expected - names:
+      raise ValueError(f"Sdist is missing package resources: {sorted(missing)}")
+    for name in distributed_test_inputs(source_root):
+      content = archive.extractfile(members[name])
+      if content is None or content.read() != (source_root / name).read_bytes():
+        raise ValueError(f"Sdist test input differs from the source: {name}")
 
 
 class _CatalogHtml(_ApiHtml):
@@ -785,7 +812,7 @@ def check_distribution(directory: Path) -> None:
   sdists = tuple(artifacts.glob("*.tar.gz"))
   if len(sdists) != 1:
     raise ValueError("Expected one sdist")
-  check_sdist(sdists[0])
+  check_sdist(sdists[0], source_root=ROOT)
   source_directory = directory / "source"
   with tarfile.open(sdists[0]) as archive:
     archive.extractall(source_directory, filter="data")
