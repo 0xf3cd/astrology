@@ -64,10 +64,12 @@ both directions.
 `objects.py` defines body, node and axis identities. It distinguishes body/node-only
 types from the types that also include axes, used by aspects and house overlays.
 The astronomy adapter maps these identities to calculation targets; the text
-module looks up names in the supplied catalog. `chart.py` extracts the selected
-stored longitudes for natal aspects, static cross-chart aspects and house
-overlays. `_comparison.py` checks coordinate compatibility and object selections
-for both cross-chart consumers and validates natal target selections for transits.
+module looks up names in the supplied catalog. `chart.py` defines stored chart
+results and owns the Body/LunarNode placement selection shared by chart-domain
+consumers. `_comparison.py` owns source compatibility checks and axis-capable
+selections for comparison-style queries. `transit_aspects.py` is one consumer of
+those source checks; each module still defines its own admitted population and
+composition policy.
 
 `transits.py` composes the adapter's independent longitude-event queries with
 selected natal degrees and the aspect branches in `aspects.py`. It retains the

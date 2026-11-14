@@ -363,7 +363,12 @@ def test_dignities_and_composition_without_native_imports(mode: list[str]) -> No
   code = (Path(__file__).parent / "consumer_cases/dignities_isolation.py").read_text(
     encoding="utf-8"
   )
-  run = subprocess.run([sys.executable, *mode, "-c", code], capture_output=True, text=True)
+  run = subprocess.run(
+    [sys.executable, *mode, "-c", code],
+    capture_output=True,
+    text=True,
+    cwd=Path(__file__).parents[1],
+  )
   assert run.returncode == 0, run.stdout + run.stderr
 
 

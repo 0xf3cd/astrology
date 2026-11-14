@@ -101,7 +101,7 @@ def _precheck(utc: datetime, location: Location | None, config: ChartConfig) -> 
     raise MissingBirthDataError("Chart calculation requires a birth location")
   if not -90.0 < location.latitude < 90.0:
     raise ChartDomainError(
-      "Birth latitude must be strictly inside ±90 degrees for house geometry",
+      "Chart latitude must be strictly inside ±90 degrees for house geometry",
       house_system=config.house_system,
     )
   try:

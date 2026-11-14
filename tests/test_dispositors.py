@@ -18,6 +18,7 @@ from astrology import (
   NatalChart,
   Sign,
   chart_dispositors,
+  chart_sign_distribution,
   load_catalog,
 )
 from astrology.objects import AstronomicalObject
@@ -256,6 +257,39 @@ def test_unavailable_root_is_rejected_not_returned_as_a_missing_ruler(
 ) -> None:
   with pytest.raises(ValueError, match=missing.value):
     Dispositors(_chart((Body.SUN, Sign.LEO)), (Body.SUN, missing))
+
+
+@pytest.mark.parametrize(
+  ("selection", "error", "match"),
+  [
+    (None, TypeError, "sequence"),
+    ("sun", TypeError, "sequence"),
+    (b"sun", TypeError, "sequence"),
+    (iter(()), TypeError, "sequence"),
+    ((Axis.ASCENDANT,), TypeError, "Body or LunarNode"),
+    ((), ValueError, "nonempty"),
+    ((Body.SUN, Body.SUN), ValueError, "duplicate"),
+    ((Body.PLUTO, Body.URANUS), ValueError, "pluto, uranus"),
+  ],
+)
+def test_shared_placement_selection_rejections(
+  selection: Any, error: type[Exception], match: str
+) -> None:
+  chart = _chart((Body.SUN, Sign.LEO))
+  for caller in (chart_sign_distribution, chart_dispositors):
+    with pytest.raises(error, match=match):
+      caller(chart, objects=selection)
+
+
+def test_shared_placement_selection_order_and_alias_isolation() -> None:
+  chart = _chart((Body.MOON, Sign.CANCER), (Body.SUN, Sign.LEO))
+  selection = [Body.SUN, Body.MOON]
+  distribution = chart_sign_distribution(chart, objects=selection)
+  dispositors = chart_dispositors(chart, objects=selection)
+  selection.clear()
+  assert distribution.objects == dispositors.objects == (Body.MOON, Body.SUN)
+  assert distribution.placements == chart.placements
+  assert dispositors.chart is chart
 
 
 def test_root_exports_follow_the_defining_domain() -> None:

@@ -88,11 +88,13 @@ def display_case(
   combination: OrbCombination | None = None,
   aspect: MajorAspect = MajorAspect.CONJUNCTION,
   cusps: tuple[float, ...] = _CUSPS,
+  rules: tuple[AspectRule, ...] | None = None,
 ) -> NatalChart:
+  requested_rules = (AspectRule(aspect, orb, object_orbs),) if rules is None else rules
   config = ChartConfig(
     HouseSystem.WHOLE_SIGN,
     (Body.SUN, Body.MARS),
-    (AspectRule(aspect, orb, object_orbs),),
+    requested_rules,
     orb_combination=combination,
   )
   positions = (
@@ -141,6 +143,7 @@ def test_complete_table_and_no_mutation(recorded_chart: NatalChart, language: st
   assert recorded_chart.provenance.celestial_version in output
   assert "2021-11-07T06:30:00+00:00" in output
   assert ("House cusp" if language == "en" else "宫头") in output
+  assert ("Resolved UTC" if language == "en" else "已解析的 UTC") in output
   assert "°" in output
   assert repr(recorded_chart) == before
 
@@ -250,20 +253,43 @@ def test_all_aspect_motion_labels(
 
 
 @pytest.mark.parametrize("language", ["en", "zh-CN"])
-def test_no_aspects_and_no_overrides_are_rendered(
+def test_aspect_output_distinguishes_no_rules_no_hits_and_populated(
   recorded_chart: NatalChart,
   language: Language,
 ) -> None:
-  chart = display_case(recorded_chart, 0, second=120, orb=6)
-  output = format_chart(chart, load_catalog(), language=language)
+  no_hits = format_chart(
+    display_case(recorded_chart, 0, second=120, orb=6), load_catalog(), language=language
+  )
+  no_rules = format_chart(
+    display_case(recorded_chart, 0, second=120, orb=6, rules=()),
+    load_catalog(),
+    language=language,
+  )
+  populated = format_chart(
+    display_case(recorded_chart, 0, second=0, orb=6), load_catalog(), language=language
+  )
   if language == "en":
-    assert "Motion\nNone\n\nConfiguration" in output
-    assert "Orb combination (identifier): None" in output
-    assert "Aspect rule / base orb / object overrides: Conjunction / 6°00'00\" / None" in output
+    empty = "Motion\nNo aspects matched the requested rules\n\nConfiguration"
+    omitted = "Motion\nNo aspect rules were requested\n\nConfiguration"
+    assert empty in no_hits
+    assert omitted in no_rules
+    assert "Requested aspect objects: All requested objects (selection omitted)" in no_rules
+    assert "Effective aspect objects (requested object order): None" in no_rules
+    assert "Orb combination (identifier): None" in no_hits
+    assert "Aspect rule / base orb / object overrides: Conjunction / 6°00'00\" / None" in no_hits
+    assert "Motion\nSun | Mars | Conjunction" in populated
+    assert empty not in populated and omitted not in populated
   else:
-    assert "运动\n无\n\n配置" in output
-    assert "容许度合成规则（标识）: 无" in output
-    assert "相位规则 / 基础容许度 / 对象单独设置: 合相 / 6°00'00\" / 无" in output
+    empty = "运动\n没有符合请求规则的相位\n\n配置"
+    omitted = "运动\n未请求相位规则\n\n配置"
+    assert empty in no_hits
+    assert omitted in no_rules
+    assert "请求参与相位的对象: 全部请求对象（未单独指定）" in no_rules
+    assert "实际参与相位的对象（按请求对象顺序）: 无" in no_rules
+    assert "容许度合成规则（标识）: 无" in no_hits
+    assert "相位规则 / 基础容许度 / 对象单独设置: 合相 / 6°00'00\" / 无" in no_hits
+    assert "运动\n太阳 | 火星 | 合相" in populated
+    assert empty not in populated and omitted not in populated
 
 
 @pytest.mark.parametrize(
