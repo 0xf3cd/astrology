@@ -1,0 +1,385 @@
+{
+  "generated_utc": "2026-11-15T06:22:16.806975+00:00",
+  "source": {
+    "pyswisseph_version": "2.10.3.2",
+    "library_version": "2.10.03",
+    "ephemeris": "Moshier analytical, explicitly selected; no Swiss/JPL data-file fallback",
+    "requested_flags": 260,
+    "verified_calculation_flags": 260,
+    "coordinates": "apparent geocentric tropical longitude, true equinox/ecliptic of date",
+    "time_scale": "TT; fixed TT minus UTC offset of 69.184 seconds applies to every civil input in these 2022-2026 cases",
+    "algorithm": "signed-longitude sign changes on 0.0625 TT-day partitions, refined by 60 bisection iterations; these positive cases do not seek stationary tangencies or adjacent double crossings inside one partition and are not a complete event oracle",
+    "manual": "https://www.astro.com/swisseph/swephprg.htm",
+    "recipe_sha256": "713edaee9ff41fb69ae1e8d79a9c533263249d6642c86c313c943e336daf7905"
+  },
+  "cases": [
+    {
+      "name": "post_natal_sun",
+      "body": "sun",
+      "birth_utc": "2024-12-01T00:00:00+00:00",
+      "birth_jde_tt": 2460645.500800741,
+      "natal_longitude_deg": 249.27993861893094,
+      "start_utc": "2024-12-02T00:00:00+00:00",
+      "start_jde_tt": 2460646.500800741,
+      "end_utc": "2025-12-02T05:41:24.744573+00:00",
+      "end_jde_tt": 2461011.737892692,
+      "hits": [
+        {
+          "jde_tt": 2461010.737892692,
+          "longitude_deg": 249.27993861921126,
+          "rate_deg_per_tt_day": 1.0131720326334395,
+          "direction": "increasing",
+          "residual_deg": 2.803233201120747e-10,
+          "bracket_jde_tt": [
+            2461010.688312315,
+            2461010.750812315
+          ],
+          "time_tolerance_seconds": 34.11069284075238
+        }
+      ]
+    },
+    {
+      "name": "post_natal_moon",
+      "body": "moon",
+      "birth_utc": "2024-12-01T00:00:00+00:00",
+      "birth_jde_tt": 2460645.500800741,
+      "natal_longitude_deg": 246.24903495266238,
+      "start_utc": "2024-12-02T00:00:00+00:00",
+      "start_jde_tt": 2460646.500800741,
+      "end_utc": "2024-12-29T07:51:47.675949+00:00",
+      "end_jde_tt": 2460673.828435879,
+      "hits": [
+        {
+          "jde_tt": 2460672.828435879,
+          "longitude_deg": 246.24903495390632,
+          "rate_deg_per_tt_day": 12.473673263057238,
+          "direction": "increasing",
+          "residual_deg": 1.2439329566404922e-09,
+          "bracket_jde_tt": [
+            2460672.813312315,
+            2460672.875812315
+          ],
+          "time_tolerance_seconds": 66.4675418792229
+        }
+      ]
+    },
+    {
+      "name": "post_natal_mercury",
+      "body": "mercury",
+      "birth_utc": "2024-12-01T00:00:00+00:00",
+      "birth_jde_tt": 2460645.500800741,
+      "natal_longitude_deg": 260.5766273813069,
+      "start_utc": "2024-12-02T00:00:00+00:00",
+      "start_jde_tt": 2460646.500800741,
+      "end_utc": "2025-01-02T13:06:44.567617+00:00",
+      "end_jde_tt": 2460678.047149903,
+      "hits": [
+        {
+          "jde_tt": 2460677.047149903,
+          "longitude_deg": 260.57662738090244,
+          "rate_deg_per_tt_day": 1.3001920578318538,
+          "direction": "increasing",
+          "residual_deg": -4.04440925194649e-10,
+          "bracket_jde_tt": [
+            2460677.000812315,
+            2460677.063312315
+          ],
+          "time_tolerance_seconds": 26.580688438930185
+        }
+      ]
+    },
+    {
+      "name": "post_natal_venus",
+      "body": "venus",
+      "birth_utc": "2024-12-01T00:00:00+00:00",
+      "birth_jde_tt": 2460645.500800741,
+      "natal_longitude_deg": 292.72351978435887,
+      "start_utc": "2024-12-02T00:00:00+00:00",
+      "start_jde_tt": 2460646.500800741,
+      "end_utc": "2026-01-12T17:51:59.660139+00:00",
+      "end_jde_tt": 2461053.245241252,
+      "hits": [
+        {
+          "jde_tt": 2461052.245241252,
+          "longitude_deg": 292.7235197839452,
+          "rate_deg_per_tt_day": 1.2578226210161918,
+          "direction": "increasing",
+          "residual_deg": -4.136495590500999e-10,
+          "bracket_jde_tt": [
+            2461052.188312315,
+            2461052.250812315
+          ],
+          "time_tolerance_seconds": 29.811516642708956
+        }
+      ]
+    },
+    {
+      "name": "post_natal_mars",
+      "body": "mars",
+      "birth_utc": "2024-12-01T00:00:00+00:00",
+      "birth_jde_tt": 2460645.500800741,
+      "natal_longitude_deg": 125.93601899570366,
+      "start_utc": "2024-12-02T00:00:00+00:00",
+      "start_jde_tt": 2460646.500800741,
+      "end_utc": "2025-05-02T17:53:38.252161+00:00",
+      "end_jde_tt": 2460798.246382363,
+      "hits": [
+        {
+          "jde_tt": 2460657.3687198823,
+          "longitude_deg": 125.93601899567825,
+          "rate_deg_per_tt_day": -0.08025540241085759,
+          "direction": "decreasing",
+          "residual_deg": -2.5409008230781183e-11,
+          "bracket_jde_tt": [
+            2460657.313312315,
+            2460657.375812315
+          ],
+          "time_tolerance_seconds": 307.89702945476705
+        },
+        {
+          "jde_tt": 2460797.246382363,
+          "longitude_deg": 125.93601899596781,
+          "rate_deg_per_tt_day": 0.4610256128270997,
+          "direction": "increasing",
+          "residual_deg": 2.6415136744617485e-10,
+          "bracket_jde_tt": [
+            2460797.188312315,
+            2460797.250812315
+          ],
+          "time_tolerance_seconds": 53.598757449658756
+        }
+      ]
+    },
+    {
+      "name": "post_natal_jupiter",
+      "body": "jupiter",
+      "birth_utc": "2024-12-01T00:00:00+00:00",
+      "birth_jde_tt": 2460645.500800741,
+      "natal_longitude_deg": 77.1887018970215,
+      "start_utc": "2024-12-02T00:00:00+00:00",
+      "start_jde_tt": 2460646.500800741,
+      "end_utc": "2025-04-09T11:25:44.149473+00:00",
+      "end_jde_tt": 2460774.9770061746,
+      "hits": [
+        {
+          "jde_tt": 2460773.9770061746,
+          "longitude_deg": 77.18870189711218,
+          "rate_deg_per_tt_day": 0.16860851664355792,
+          "direction": "increasing",
+          "residual_deg": 9.066525308298878e-11,
+          "bracket_jde_tt": [
+            2460773.938312315,
+            2460774.000812315
+          ],
+          "time_tolerance_seconds": 197.79783764128283
+        }
+      ]
+    },
+    {
+      "name": "post_natal_saturn",
+      "body": "saturn",
+      "birth_utc": "2025-06-01T00:00:00+00:00",
+      "birth_jde_tt": 2460827.500800741,
+      "natal_longitude_deg": 0.4859252185546007,
+      "start_utc": "2025-06-02T00:00:00+00:00",
+      "start_jde_tt": 2460828.500800741,
+      "end_utc": "2026-02-19T08:39:35.415695+00:00",
+      "end_jde_tt": 2461090.8616273114,
+      "hits": [
+        {
+          "jde_tt": 2460912.52334519,
+          "longitude_deg": 0.4859252185287191,
+          "rate_deg_per_tt_day": -0.06298804160597196,
+          "direction": "decreasing",
+          "residual_deg": -2.589217729109805e-11,
+          "bracket_jde_tt": [
+            2460912.500812315,
+            2460912.563312315
+          ],
+          "time_tolerance_seconds": 877.8809213645616
+        },
+        {
+          "jde_tt": 2461089.8616273114,
+          "longitude_deg": 0.48592521864242266,
+          "rate_deg_per_tt_day": 0.11314937341751485,
+          "direction": "increasing",
+          "residual_deg": 8.782308213994838e-11,
+          "bracket_jde_tt": [
+            2461089.813312315,
+            2461089.875812315
+          ],
+          "time_tolerance_seconds": 488.69912691394995
+        }
+      ]
+    },
+    {
+      "name": "post_natal_uranus",
+      "body": "uranus",
+      "birth_utc": "2024-12-01T00:00:00+00:00",
+      "birth_jde_tt": 2460645.500800741,
+      "natal_longitude_deg": 54.67011477960965,
+      "start_utc": "2024-12-02T00:00:00+00:00",
+      "start_jde_tt": 2460646.500800741,
+      "end_utc": "2025-03-31T02:11:08.049940+00:00",
+      "end_jde_tt": 2460765.5918661337,
+      "hits": [
+        {
+          "jde_tt": 2460764.5918661337,
+          "longitude_deg": 54.67011477959848,
+          "rate_deg_per_tt_day": 0.044763737401525304,
+          "direction": "increasing",
+          "residual_deg": -1.1169731806148775e-11,
+          "bracket_jde_tt": [
+            2460764.563312315,
+            2460764.625812315
+          ],
+          "time_tolerance_seconds": 2841.1568689898168
+        }
+      ]
+    },
+    {
+      "name": "post_natal_neptune",
+      "body": "neptune",
+      "birth_utc": "2024-12-01T00:00:00+00:00",
+      "birth_jde_tt": 2460645.500800741,
+      "natal_longitude_deg": 357.1447534208417,
+      "start_utc": "2024-12-02T00:00:00+00:00",
+      "start_jde_tt": 2460646.500800741,
+      "end_utc": "2024-12-15T20:55:18.314785+00:00",
+      "end_jde_tt": 2460660.3725404954,
+      "hits": [
+        {
+          "jde_tt": 2460659.3725404954,
+          "longitude_deg": 357.14475342068533,
+          "rate_deg_per_tt_day": 0.004046759472313847,
+          "direction": "increasing",
+          "residual_deg": -1.5637624528608285e-10,
+          "bracket_jde_tt": [
+            2460659.313312315,
+            2460659.375812315
+          ],
+          "time_tolerance_seconds": 39028.56126749087
+        }
+      ]
+    },
+    {
+      "name": "post_natal_pluto",
+      "body": "pluto",
+      "birth_utc": "2025-04-01T00:00:00+00:00",
+      "birth_jde_tt": 2460766.500800741,
+      "natal_longitude_deg": 303.5534918075719,
+      "start_utc": "2025-04-02T00:00:00+00:00",
+      "start_jde_tt": 2460767.500800741,
+      "end_utc": "2026-01-28T12:11:27.538978+00:00",
+      "end_jde_tt": 2461069.008758368,
+      "hits": [
+        {
+          "jde_tt": 2460834.755667788,
+          "longitude_deg": 303.55349180815733,
+          "rate_deg_per_tt_day": -0.014657317249416437,
+          "direction": "decreasing",
+          "residual_deg": 5.854303708474617e-10,
+          "bracket_jde_tt": [
+            2460834.750812315,
+            2460834.813312315
+          ],
+          "time_tolerance_seconds": 4479.946697108868
+        },
+        {
+          "jde_tt": 2461068.008758368,
+          "longitude_deg": 303.5534918069911,
+          "rate_deg_per_tt_day": 0.03200333697486699,
+          "direction": "increasing",
+          "residual_deg": -5.808260539197363e-10,
+          "bracket_jde_tt": [
+            2461068.000812315,
+            2461068.063312315
+          ],
+          "time_tolerance_seconds": 2051.786038798628
+        }
+      ]
+    },
+    {
+      "name": "mercury_retrograde_triple",
+      "body": "mercury",
+      "birth_utc": "2023-03-29T04:37:15.409185+00:00",
+      "birth_jde_tt": 2460032.693340199,
+      "natal_longitude_deg": 20,
+      "start_utc": "2024-03-01T00:00:00+00:00",
+      "start_jde_tt": 2460370.500800741,
+      "end_utc": "2024-06-01T00:00:00+00:00",
+      "end_jde_tt": 2460462.500800741,
+      "hits": [
+        {
+          "jde_tt": 2460391.498340857,
+          "longitude_deg": 20.00000000048692,
+          "rate_deg_per_tt_day": 1.28184162724512,
+          "direction": "increasing",
+          "residual_deg": 4.869207259616815e-10,
+          "bracket_jde_tt": [
+            2460391.443351773,
+            2460391.505851773
+          ],
+          "time_tolerance_seconds": 26.96120898669432
+        },
+        {
+          "jde_tt": 2460415.8748225225,
+          "longitude_deg": 19.999999999828876,
+          "rate_deg_per_tt_day": -0.710489257491949,
+          "direction": "decreasing",
+          "residual_deg": -1.7112711248046253e-10,
+          "bracket_jde_tt": [
+            2460415.818351773,
+            2460415.880851773
+          ],
+          "time_tolerance_seconds": 48.64253700611599
+        },
+        {
+          "jde_tt": 2460436.277470788,
+          "longitude_deg": 19.999999999821224,
+          "rate_deg_per_tt_day": 0.7431786451925928,
+          "direction": "increasing",
+          "residual_deg": -1.787725523172412e-10,
+          "bracket_jde_tt": [
+            2460436.255851773,
+            2460436.318351773
+          ],
+          "time_tolerance_seconds": 46.50295083632801
+        }
+      ]
+    }
+  ],
+  "calibrated_utc": "2026-11-15T06:22:40.635542+00:00",
+  "calibration": {
+    "native_version": "1.1.1",
+    "transit_reference_sha256": "65db61687b8b41c327f22add3ed47f9c9a0c8d19cab0a48c8dc02e91cb66c4dc",
+    "calibration_recipe_sha256": "abacf0c6fd75805ad563aed083d5860b4f2d8ea1c21b7037c2cf6402db32705b",
+    "angular_tolerance_deg": {
+      "sun": 0.0002,
+      "moon": 0.004798,
+      "mercury": 0.0002,
+      "venus": 0.000217,
+      "mars": 0.000143,
+      "jupiter": 0.000193,
+      "saturn": 0.00032,
+      "uranus": 0.000736,
+      "neptune": 0.000914,
+      "pluto": 0.00038
+    },
+    "time_tolerance": "max(2 seconds, 2 * angular_tolerance_deg / abs(reference_rate) * 86400), stored independently for each hit",
+    "maximum_observed_absolute_time_difference_seconds": {
+      "sun": 1.622280478477478,
+      "moon": 0.3097951412200928,
+      "mercury": 1.2198686599731445,
+      "venus": 2.269229292869568,
+      "mars": 8.96233320236206,
+      "jupiter": 25.728607177734375,
+      "saturn": 43.91213357448578,
+      "uranus": 72.23280072212219,
+      "neptune": 34.36698317527771,
+      "pluto": 104.27430868148804
+    },
+    "scope": "The angular bounds reuse the 1,830-point 2021-2022 Moshier/native calibration. Native observations here are same-backend composition checks for the selected 2023-2026 return cases, not independent numerical references or general accuracy bounds.",
+    "native_observations_sha256": "8d9f4f322e3eabc880865d03186f9d8cb99c44cbaa4770a09da1a0b84f323564"
+  }
+}

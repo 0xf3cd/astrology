@@ -5,7 +5,7 @@
 Use `moment_chart` for a supplied instant and location. It returns a `MomentChart`,
 with no birth record or inferred location. Use `transit_aspects` to compare that
 moment's moving objects with an existing natal chart's frozen degrees.
-For solar or lunar return searches followed by chart construction, see [returns](returns.md).
+For ten-body return searches followed by chart construction, see [returns](returns.md).
 The examples on this page continue in order.
 
 ## Calculate at an instant
@@ -134,6 +134,13 @@ event-search domain does not guarantee a valid full chart. Conversion/domain
 failures raise `ChartDomainError` with the requested house system and available
 upstream diagnostics. See the [transit time limits](transits.md#limits-and-failures)
 for the fixed leap table's future-offset behavior.
+
+To display a retained hit without a location or snapshot, use `transit_hit_utc`
+instead. Its `EventDisplayError` reports display-conversion failures separately
+from chart errors, including a pre-1972 UT1 substitute. See
+[event UTC and tables](transits.md#read-utc-and-format-event-tables) for the actual
+leap-interior display behavior; neither display UTC nor derived chart TT replaces
+the source event TT.
 
 ## Use existing consumers
 

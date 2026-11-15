@@ -20,9 +20,10 @@ from astrology.knowledge.catalog import _configuration_name
 from astrology.knowledge.catalog import _current_name as _raw_current_name
 from astrology.knowledge.records import _LANGUAGES, Language
 from astrology.lunar_phase import LunarPhaseResult
-from astrology.objects import Axis, ChartObject
+from astrology.objects import Axis, Body, ChartObject
 from astrology.summaries import SignDistribution
 from astrology.transit_aspects import TransitAspects
+from astrology.transits import TransitHits, transit_hit_utc
 from astrology.zodiac import (
   _ELEMENT_RULE_ID,
   _MODALITY_RULE_ID,
@@ -207,6 +208,44 @@ _COMPARISON_LABELS = {
     "aspect_columns": "左盘对象 | 右盘对象 | 相位 | 分支 | 偏差 | 容许度上限",
     "placement": "将已存黄经归入接收盘的宫头区间，不计算三维落宫。",
     "static": "静态黄经比较，不使用速率。",
+  },
+}
+_EVENT_LABELS = {
+  "en": {
+    "transit_title": "Exact transit hits",
+    "return_title": "Planetary returns",
+    "utc_interval": "Supplied UTC interval [start, end)",
+    "tt_interval": "Converted TT interval [start, end)",
+    "models": "Event models",
+    "versions": "astrology / celestial-calendar versions",
+    "transit_columns": "UTC | Moving object | Fixed source | Aspect | Branch | Direction | JDE(TT)",
+    "return_columns": "UTC | Returning body | Direction | JDE(TT)",
+    "empty_transit": "No exact transit hits in the supplied interval",
+    "empty_return": "No returns in the supplied interval",
+  },
+  "zh-CN": {
+    "transit_title": "精确行运命中",
+    "return_title": "行星返照",
+    "utc_interval": "给定 UTC 区间 [start, end)",
+    "tt_interval": "转换后 TT 区间 [start, end)",
+    "models": "事件模型",
+    "versions": "astrology / celestial-calendar 版本",
+    "transit_columns": "UTC | 移动对象 | 固定源对象 | 相位 | 分支 | 方向 | JDE(TT)",
+    "return_columns": "UTC | 返照星体 | 方向 | JDE(TT)",
+    "empty_transit": "给定区间内没有精确行运命中",
+    "empty_return": "给定区间内没有返照",
+  },
+}
+_EVENT_DIRECTIONS = {
+  "en": {
+    "increasing": "increasing",
+    "decreasing": "decreasing",
+    "tangent": "tangent",
+  },
+  "zh-CN": {
+    "increasing": "黄经增大",
+    "decreasing": "黄经减小",
+    "tangent": "相切",
   },
 }
 
@@ -628,6 +667,105 @@ def format_cross_aspects(
     or [f"{headings['rule']}: {headings['none']}"]
   )
   lines.append(headings["display"])
+  return "\n".join(lines)
+
+
+def _event_inputs(result: TransitHits, catalog: Catalog, language: Language) -> None:
+  if type(result) is not TransitHits or type(catalog) is not Catalog:
+    raise TypeError("result and catalog must be TransitHits and Catalog values")
+  if type(language) is not str or language not in _LANGUAGES:
+    raise ValueError("language must be en or zh-CN")
+
+
+def _event_context(result: TransitHits, catalog: Catalog, language: Language) -> list[str]:
+  labels = _EVENT_LABELS[language]
+  models = "; ".join(
+    f"{_name(source.moving_object, catalog, language)} [{source.moving_object.value}]: "
+    f"{source.model_kind}/{source.model_identity}"
+    for source in result.sources
+  )
+  return [
+    f"{labels['utc_interval']}: [{result.start_utc.isoformat()}, {result.end_utc.isoformat()})",
+    f"{labels['tt_interval']}: [{result.start_jde_tt!r}, {result.end_jde_tt!r})",
+    f"{labels['models']}: {models}",
+    f"{labels['versions']}: {result.astrology_version} / {result.celestial_version}",
+  ]
+
+
+def format_transit_hits(result: TransitHits, catalog: Catalog, *, language: Language = "en") -> str:
+  """Format retained exact hits with UTC and raw TT, roles, models and directions.
+
+  The table includes supplied UTC and converted TT bounds. Empty results do not
+  initialize native astronomy. Populated rows call transit_hit_utc and therefore
+  initialize only TT-to-civil conversion, never another search, houses or a chart.
+  Display seconds truncate the rounded datetime; raw TT remains authoritative.
+
+  以 UTC 和原始 TT 显示保留的精确命中，列出对象角色、模型和方向。表中包含给定 UTC
+  与转换后 TT 区间。空结果不初始化原生天文；非空行调用 transit_hit_utc，仅初始化
+  TT 到民用时刻的转换，不重新搜索、计算宫位或建盘。秒显示截断舍入后的 datetime，
+  原始 TT 仍是事件依据。
+  """
+  _event_inputs(result, catalog, language)
+  labels = _EVENT_LABELS[language]
+  lines = [labels["transit_title"], *_event_context(result, catalog, language), ""]
+  lines.append(labels["transit_columns"])
+  for hit in result.hits:
+    lines.append(
+      " | ".join(
+        (
+          transit_hit_utc(hit).isoformat(timespec="seconds"),
+          f"{_name(hit.moving_object, catalog, language)} [{hit.moving_object.value}]",
+          f"{_name(hit.natal_object, catalog, language)} [{hit.natal_object.value}]",
+          _name(hit.aspect, catalog, language),
+          _angle(hit.branch_deg, signed=True),
+          _EVENT_DIRECTIONS[language][hit.direction.value],
+          repr(hit.jde_tt),
+        )
+      )
+    )
+  if not result.hits:
+    lines.append(labels["empty_transit"])
+  return "\n".join(lines)
+
+
+def format_return_hits(result: TransitHits, catalog: Catalog, *, language: Language = "en") -> str:
+  """Format a validated post-natal same-body return result in English or Chinese.
+
+  result must use a NatalChart, one repeated same-body selection, conjunction only,
+  and hits strictly later than the natal TT. Other TransitHits shapes raise
+  ValueError. Empty and populated conversion effects match format_transit_hits.
+
+  以英文或中文显示已校验的本命后同星体返照结果。result 必须使用 NatalChart、
+  同一星体的单项重复选择及仅合相搜索，且全部命中严格晚于本命 TT；其他
+  TransitHits 形状抛 ValueError。空结果与非空结果的转换副作用同 format_transit_hits。
+  """
+  _event_inputs(result, catalog, language)
+  if (
+    type(result.chart) is not NatalChart
+    or len(result.moving_objects) != 1
+    or type(result.moving_objects[0]) is not Body
+    or result.moving_objects != result.natal_objects
+    or result.aspects != (MajorAspect.CONJUNCTION,)
+    or any(hit.jde_tt <= result.chart.times.jde_tt for hit in result.hits)
+  ):
+    raise ValueError("result must be a post-natal same-body conjunction return on a NatalChart")
+  labels = _EVENT_LABELS[language]
+  lines = [labels["return_title"], *_event_context(result, catalog, language), ""]
+  lines.append(labels["return_columns"])
+  body = result.moving_objects[0]
+  for hit in result.hits:
+    lines.append(
+      " | ".join(
+        (
+          transit_hit_utc(hit).isoformat(timespec="seconds"),
+          f"{_name(body, catalog, language)} [{body.value}]",
+          _EVENT_DIRECTIONS[language][hit.direction.value],
+          repr(hit.jde_tt),
+        )
+      )
+    )
+  if not result.hits:
+    lines.append(labels["empty_return"])
   return "\n".join(lines)
 
 

@@ -201,14 +201,18 @@ def snapshot(
   return times, positions, houses
 
 
+def _datetime_from_civil(civil: celestial.CivilDateTime) -> datetime:
+  """Build a Python UTC instant from upstream civil fields. 由上游民用字段建立 Python UTC 时刻。"""
+  return datetime(civil.year, civil.month, civil.day, tzinfo=UTC) + timedelta(days=civil.fraction)
+
+
 def moment_utc(jde_tt: float, house_system: HouseSystem) -> datetime:
   """Convert a source event's TT to a Python UTC instant for snapshot calculation.
 
   把来源事件的 TT 转为 Python UTC 时刻，供快照计算使用。
   """
   try:
-    civil = celestial.jde_to_utc(jde_tt)
-    return datetime(civil.year, civil.month, civil.day, tzinfo=UTC) + timedelta(days=civil.fraction)
+    return _datetime_from_civil(celestial.jde_to_utc(jde_tt))
   except (ValueError, OverflowError) as exc:
     raise ChartDomainError(
       f"Source event cannot be converted to a chart UTC instant: {exc}",

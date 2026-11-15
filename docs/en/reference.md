@@ -57,7 +57,7 @@ See the [complete natal result and text example](records.md) for natal output, o
 
 ```{eval-rst}
 .. automodule:: astrology.text
-   :members: format_chart, format_sign_distribution, format_lunar_phase, format_house_rulers, format_house_overlays, format_cross_aspects, format_transit_aspects
+   :members: format_chart, format_sign_distribution, format_lunar_phase, format_house_rulers, format_house_overlays, format_cross_aspects, format_transit_aspects, format_transit_hits, format_return_hits
 ```
 
 ## Zodiac classification
@@ -120,12 +120,12 @@ See [exact transit hits](transits.md) for a UTC-interval search and result field
 
 ```{eval-rst}
 .. automodule:: astrology.transits
-   :members: TransitDirection, TransitDomainError, TransitSource, TransitHit, TransitHits, transit_hits
+   :members: TransitDirection, TransitDomainError, EventDisplayError, TransitSource, TransitHit, TransitHits, transit_hit_utc, transit_hits
    :undoc-members:
    :member-order: bysource
 ```
 
-## Solar and lunar returns
+## Planetary returns
 
 See [returns](returns.md) for event searches, explicit locations and chart consumers.
 

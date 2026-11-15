@@ -202,6 +202,36 @@ they are not independent observations. The recipe hash binds the fixture to its
 generator. This optional reference environment adds no runtime or locked dependency;
 Swiss code and ephemeris files are not distributed here.
 
+The separate `tests/reference/planetary_return_reference.json` adds 11 post-natal
+cases and 16 hits covering all ten bodies, including three Mercury crossings.
+Its independent generator uses the same pinned Swiss/Moshier versions and flags,
+without importing astrology or celestial-calendar:
+
+```sh
+uv run --no-project --python 3.11 --with pyswisseph==2.10.3.2 python tools/fetch_planetary_return_reference.py --output <candidates-path>
+uv run --locked python tools/calibrate_planetary_return_reference.py --candidates <candidates-path> --output <fixture-path> --observations <observations-path>
+```
+
+The second command performs same-backend composition and calibration, not
+independent reference generation. The fixture pins both recipe hashes and the
+native-observation hash and records generation and calibration times separately.
+Its 69.184-second TT−UTC offset applies only to the 2022–2026 civil inputs.
+The independent recipe brackets signed-longitude crossings at 0.0625-TT-day
+intervals and refines them by bisection; it does not find stationary tangencies
+or adjacent double crossings within one partition and is not a complete event
+oracle.
+
+Each hit's time tolerance is
+`max(2 seconds, 2 * angular_tolerance_deg / abs(reference_rate) * 86400)`,
+using the existing 1,830-point transit calibration below. The angular bounds are
+not uniformly twice the observed maxima: Mercury's 0.0002° bound is about 1.953
+times its observed maximum. Slow-body time tolerances can be hours. Tests
+therefore separately check the product's same-backend angular residual within
+1e-6 degree; that residual is not independent astronomical evidence. Ten-body
+chart/comparison assertions belong in domain tests. Installed consumers exercise
+actual bilingual transit and return tables and compare same-revision observations
+for packaging agreement.
+
 Transit fixtures in `tests/reference/transit_reference.json` use explicitly selected
 Moshier ephemeris calculations through `pyswisseph==2.10.3.2`, not Swiss/JPL data
 files. The optional generator `tools/fetch_transit_reference.py --output <path>`

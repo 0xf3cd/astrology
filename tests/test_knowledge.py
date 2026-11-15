@@ -645,11 +645,7 @@ def test_retired_identity_variants_keep_their_concepts(catalog: Catalog, identif
     else ()
   )
   assert tuple(v.identifier for v in catalog.list_variants(concept_id=concept_id)) == (
-    *(
-      ("rule.project.solar_lunar_returns",)
-      if concept.configuration in (Body.SUN, Body.MOON)
-      else ()
-    ),
+    *(("rule.project.solar_lunar_returns",) if concept.configuration in tuple(Body) else ()),
     *expected,
     "rule.project.dispositor_chains",
   )
