@@ -1,6 +1,6 @@
-"""Exact moving-to-fixed-source aspects over a modern UTC interval.
+"""Exact moving-to-fixed-source aspects in converted TT intervals.
 
-在现代 UTC 区间内搜索移动对象与固定源盘黄经的精确相位。
+在转换后的 TT 区间内搜索移动对象与固定源盘黄经的精确相位。
 """
 
 from __future__ import annotations
@@ -85,6 +85,32 @@ class TransitDomainError(ValueError):
     self.moving_object = moving_object
     self.start_jde_tt = start_jde_tt
     self.end_jde_tt = end_jde_tt
+    self.upstream_message = upstream_message
+
+
+class EventDisplayError(ValueError):
+  """A retained event TT cannot be represented as ordinary display UTC.
+
+  The source TT and conversion operation are retained. Conversion failures also
+  retain the exact upstream message and chained cause.
+  Native computation failures propagate unchanged instead of becoming this error.
+
+  保留事件的 TT 无法表示为普通显示 UTC。保留来源 TT 和转换操作；
+  转换失败时还保留上游原始错误文本及异常因果链。
+  原生计算失败直接向外抛出，不改写为本错误。
+  """
+
+  def __init__(
+    self,
+    message: str,
+    *,
+    jde_tt: float,
+    operation: str = "jde_to_utc",
+    upstream_message: str | None = None,
+  ) -> None:
+    super().__init__(message)
+    self.jde_tt = jde_tt
+    self.operation = operation
     self.upstream_message = upstream_message
 
 
@@ -192,6 +218,48 @@ class TransitHit:
       raise ValueError("branch_deg does not belong to the selected aspect")
     if not 0 <= self.query_longitude_deg < 360:
       raise ValueError("query_longitude_deg must be within [0, 360)")
+
+
+def transit_hit_utc(hit: TransitHit) -> datetime:
+  """Convert a retained hit's TT to an aware display datetime, without a chart or location.
+
+  This lazily initializes only upstream TT-to-civil conversion. It performs no event
+  search, house calculation or chart-specific moment_utc conversion. A converted
+  civil date before 1972-01-01 is the upstream UT1 substitute and raises
+  EventDisplayError. Other conversion/range failures retain their cause; native
+  CelestialError propagates unchanged. The hit and its raw TT are unchanged.
+
+  Display is not a new event authority. At leap boundaries it can repeat a second,
+  enter the next day/year or reverse order; Python datetime cannot represent a leap
+  second. Membership, ordering and classification continue to use hit.jde_tt.
+
+  将保留命中的 TT 转为带时区的显示 datetime，无需建盘或地点。仅延迟初始化上游 TT
+  到民用时刻的转换，不重新搜索事件、计算宫位或调用建盘专用的 moment_utc。转换所得
+  民用日期早于 1972-01-01 时属于上游 UT1 替代值，抛 EventDisplayError；其他转换或
+  范围失败保留异常因果链，原生 CelestialError 直接向外抛出。命中及其原始 TT 不变。
+  显示值不是新的事件依据：闰秒边界可能重复一秒、进入次日或次年，或逆转顺序，Python
+  datetime 无法表示闰秒。区间归属、排序和分类仍使用 hit.jde_tt。
+  """
+  if type(hit) is not TransitHit:
+    raise TypeError("hit must be a TransitHit")
+  from astrology.celestial import _civil_from_tt, _datetime_from_civil
+
+  try:
+    civil = _civil_from_tt(hit.jde_tt)
+    if (civil.year, civil.month, civil.day) < (1972, 1, 1):
+      raise EventDisplayError(
+        "Event TT resolves to the upstream pre-1972 UT1 substitute, not ordinary UTC",
+        jde_tt=hit.jde_tt,
+      )
+    return _datetime_from_civil(civil)
+  except EventDisplayError:
+    raise
+  except (ValueError, OverflowError) as exc:
+    raise EventDisplayError(
+      f"Event TT cannot be converted to display UTC: {exc}",
+      jde_tt=hit.jde_tt,
+      upstream_message=str(exc),
+    ) from exc
 
 
 @dataclass(frozen=True, slots=True)
@@ -321,7 +389,7 @@ def transit_hits(
   natal_objects: Sequence[ChartObject],
   aspects: Sequence[MajorAspect],
 ) -> TransitHits:
-  """Find every exact selected moving-to-fixed-source branch in [start_utc, end_utc).
+  """Find exact moving-to-fixed branches in the TT interval converted from UTC bounds.
 
   Endpoints must be aware built-in datetimes at or after 1972-01-01 UTC. Selections
   and aspects are explicit, nonempty and unique; moving bodies/nodes need not be
@@ -329,7 +397,7 @@ def transit_hits(
   UTC is converted upstream; the half-open search is capped at 3660 TT days and
   each selected provider's event domain. A failed query aborts the whole result.
   Domain/span rejections raise TransitDomainError; native computation failures
-  propagate unchanged. Native astronomy is loaded only by this calculation call.
+  propagate unchanged. The search lazily initializes native astronomy.
   Hits are ordered by TT time, moving order, natal source order, aspect angle,
   then negative before positive branch. Raw event values, including tangent rates,
   are preserved, with times reported as multiples of 2^-30 day. Coordinate/source
@@ -340,12 +408,12 @@ def transit_hits(
   role. Its stored degrees remain fixed regardless of the source input kind.
   TransitHits.epoch_policy retains its existing value for both source kinds.
 
-  搜索 [start_utc, end_utc) 内所选移动对象与固定源盘黄经的全部精确分支。
+  在给定 UTC 端点转换后的 TT 区间内，搜索移动对象与固定源盘黄经的全部精确分支。
   端点须为有时区的内建 datetime，归一为 UTC 后不早于 1972-01-01。对象及相位须显式、非空且
   不重复；移动天体或交点不必出现在本命盘中，本命四轴须显式选择。不使用容许度。
   上游将 UTC 转为 TT；半开搜索区间最长 3660 TT 日，并受每个所选事件来源的域限制。
   任一查询失败即整次失败。域或区间拒绝抛 TransitDomainError；原生计算失败保持原异常。
-  只有此计算调用才加载原生天文。按 TT 时刻、移动对象顺序、本命源盘顺序、相位角升序及
+  此搜索调用延迟加载原生天文。按 TT 时刻、移动对象顺序、本命源盘顺序、相位角升序及
   负分支在前排序。保留原值，包括相切速率；报告时刻为 2^-30 日的整数倍。
   坐标及来源详情分别见 rule.project.exact_transit_hits 和 entry.transit_hits；
   已安装分发包元数据缺失时抛出 importlib.metadata.PackageNotFoundError。

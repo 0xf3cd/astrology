@@ -155,8 +155,8 @@ def acceptance_returns(
     events = astrology.return_hits(
       chart,
       body,
-      start_utc=datetime(2024, 1, 1, tzinfo=UTC),
-      end_utc=datetime(2024, 5, 1, tzinfo=UTC),
+      start_utc=datetime(2027, 1, 1, tzinfo=UTC),
+      end_utc=datetime(2027, 5, 1, tzinfo=UTC),
     )
     moving = astrology.moment_chart(events.hits[0], astrology.Location(40, 100), chart.requested)
     results.append((events, moving))
@@ -182,11 +182,19 @@ def calculation_observations(
     {
       "chart": json.loads(chart_observations(chart)),
       "transits": repr(transits),
+      "transit_table": {
+        language: astrology.format_transit_hits(transits, catalog, language=language)
+        for language in languages
+      },
       "moments": [json.loads(chart_observations(moment)) for moment in moments],
       "fixed_aspects": repr(fixed),
       "returns": [
         {
           "search": repr(events),
+          "event_table": {
+            language: astrology.format_return_hits(events, catalog, language=language)
+            for language in languages
+          },
           "chart": json.loads(chart_observations(moving)),
           "comparison": repr(
             astrology.cross_chart_aspects(

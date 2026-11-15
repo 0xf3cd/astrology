@@ -152,6 +152,27 @@ uv run --no-project --python 3.11 --with pyswisseph==2.10.3.2 python tools/fetch
 事件，不算独立观测。配方散列将夹具绑定到生成器。可选参考环境不增加运行时或锁定依赖；
 仓内不分发 Swiss 代码或星历文件。
 
+另设 `tests/reference/planetary_return_reference.json`，含覆盖十体的 11 个本命后案例、
+16 次命中，包括水星三次穿越。独立生成器使用相同的钉版 Swiss/Moshier 版本及标志，
+不导入 astrology 或 celestial-calendar：
+
+```sh
+uv run --no-project --python 3.11 --with pyswisseph==2.10.3.2 python tools/fetch_planetary_return_reference.py --output <candidates-path>
+uv run --locked python tools/calibrate_planetary_return_reference.py --candidates <candidates-path> --output <fixture-path> --observations <observations-path>
+```
+
+第二条命令执行同后端组合与校准，不生成独立参考。夹具钉住两份配方及原生观察文件的散列，
+分别记录生成与校准时间。69.184 秒的 TT−UTC 偏移仅适用于其中 2022–2026 年的民用输入。
+独立配方以 0.0625 TT 日分段，括住带符号黄经的穿越并二分细化；它不查找驻点相切或
+单个分段内相邻的两次穿越，不是完整事件判定器。
+
+逐命中时间容差为 `max(2 seconds, 2 * angular_tolerance_deg / abs(reference_rate) * 86400)`，
+角度界来自下述已有的 1,830 点行运校准。各角度界并不统一为观测最大差异的两倍：
+水星的 0.0002° 约为其观测最大值的 1.953 倍。慢星体的时间容差可达数小时，
+因此测试另要求产品的同后端角度残差在 1e-6 度内；这项残差不是独立天文证据。
+十体建盘及比较内容断言放在领域测试中。安装消费者实际生成中英文行运及返照表，
+并对照同一修订的观察值，检查打包一致性。
+
 `tests/reference/transit_reference.json` 的行运夹具通过 `pyswisseph==2.10.3.2` 显式选择
 Moshier 星历，不使用 Swiss/JPL 数据文件。可选生成器
 `tools/fetch_transit_reference.py --output <path>` 在单独参考环境中运行，需安装该包及项目的

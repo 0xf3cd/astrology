@@ -56,7 +56,7 @@
 
 ```{eval-rst}
 .. automodule:: astrology.text
-   :members: format_chart, format_sign_distribution, format_lunar_phase, format_house_rulers, format_house_overlays, format_cross_aspects, format_transit_aspects
+   :members: format_chart, format_sign_distribution, format_lunar_phase, format_house_rulers, format_house_overlays, format_cross_aspects, format_transit_aspects, format_transit_hits, format_return_hits
    :no-index:
 ```
 
@@ -124,13 +124,13 @@ UTC 区间搜索及结果字段见[精确行运命中](transits.md)。
 
 ```{eval-rst}
 .. automodule:: astrology.transits
-   :members: TransitDirection, TransitDomainError, TransitSource, TransitHit, TransitHits, transit_hits
+   :members: TransitDirection, TransitDomainError, EventDisplayError, TransitSource, TransitHit, TransitHits, transit_hit_utc, transit_hits
    :undoc-members:
    :member-order: bysource
    :no-index:
 ```
 
-## 日返照与月返照
+## 行星返照
 
 事件搜索、显式地点及命盘消费见[返照指南](returns.md)。
 

@@ -335,7 +335,9 @@ def test_installed_consumer_compares_each_moment_field(
     installed_check.main(version("celestial-astrology"), expected_observations=expected)
 
 
-@pytest.mark.parametrize("field", ["fixed_aspects", "fixed_text", "moment_text", "returns"])
+@pytest.mark.parametrize(
+  "field", ["fixed_aspects", "fixed_text", "moment_text", "returns", "transit_table"]
+)
 def test_installed_consumer_compares_new_operation_outputs(
   consumer: Path, monkeypatch: pytest.MonkeyPatch, field: str
 ) -> None:

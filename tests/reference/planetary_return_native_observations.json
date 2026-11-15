@@ -1,0 +1,277 @@
+{
+  "native_version": "1.1.1",
+  "purpose": "same-backend composition and tolerance calibration only",
+  "cases": [
+    {
+      "name": "post_natal_sun",
+      "chart_jde_tt": 2460645.500800741,
+      "reference_birth_jde_tt": 2460645.500800741,
+      "natal_hits_excluded_for_post_natal_comparison": [],
+      "retained_hits": [
+        {
+          "reference_jde_tt": 2461010.737892692,
+          "native_jde_tt": 2461010.7378739156,
+          "signed_difference_seconds": -1.622280478477478,
+          "time_tolerance_seconds": 34.11069284075238,
+          "native_direction": "increasing",
+          "same_model_residual_deg": -5.958895599178504e-10
+        }
+      ],
+      "source": {
+        "model_identity": 1,
+        "domain_start_jde_tt": -1200954.625,
+        "domain_end_jde_tt": 6104044.625
+      }
+    },
+    {
+      "name": "post_natal_moon",
+      "chart_jde_tt": 2460645.500800741,
+      "reference_birth_jde_tt": 2460645.500800741,
+      "natal_hits_excluded_for_post_natal_comparison": [],
+      "retained_hits": [
+        {
+          "reference_jde_tt": 2460672.828435879,
+          "native_jde_tt": 2460672.828439465,
+          "signed_difference_seconds": 0.3097951412200928,
+          "time_tolerance_seconds": 66.4675418792229,
+          "native_direction": "increasing",
+          "same_model_residual_deg": -2.077626959362533e-08
+        }
+      ],
+      "source": {
+        "model_identity": 2,
+        "domain_start_jde_tt": -1200954.625,
+        "domain_end_jde_tt": 6104044.625
+      }
+    },
+    {
+      "name": "post_natal_mercury",
+      "chart_jde_tt": 2460645.500800741,
+      "reference_birth_jde_tt": 2460645.500800741,
+      "natal_hits_excluded_for_post_natal_comparison": [],
+      "retained_hits": [
+        {
+          "reference_jde_tt": 2460677.047149903,
+          "native_jde_tt": 2460677.0471363813,
+          "signed_difference_seconds": -1.1682897806167603,
+          "time_tolerance_seconds": 26.580688438930185,
+          "native_direction": "increasing",
+          "same_model_residual_deg": -2.925617081928067e-09
+        }
+      ],
+      "source": {
+        "model_identity": 3,
+        "domain_start_jde_tt": -1200954.625,
+        "domain_end_jde_tt": 6104044.625
+      }
+    },
+    {
+      "name": "post_natal_venus",
+      "chart_jde_tt": 2460645.500800741,
+      "reference_birth_jde_tt": 2460645.500800741,
+      "natal_hits_excluded_for_post_natal_comparison": [],
+      "retained_hits": [
+        {
+          "reference_jde_tt": 2461052.245241252,
+          "native_jde_tt": 2461052.245267516,
+          "signed_difference_seconds": 2.269229292869568,
+          "time_tolerance_seconds": 29.811516642708956,
+          "native_direction": "increasing",
+          "same_model_residual_deg": -8.955680641520303e-10
+        }
+      ],
+      "source": {
+        "model_identity": 3,
+        "domain_start_jde_tt": -1200954.625,
+        "domain_end_jde_tt": 6104044.625
+      }
+    },
+    {
+      "name": "post_natal_mars",
+      "chart_jde_tt": 2460645.500800741,
+      "reference_birth_jde_tt": 2460645.500800741,
+      "natal_hits_excluded_for_post_natal_comparison": [],
+      "retained_hits": [
+        {
+          "reference_jde_tt": 2460657.3687198823,
+          "native_jde_tt": 2460657.368823613,
+          "signed_difference_seconds": 8.96233320236206,
+          "time_tolerance_seconds": 307.89702945476705,
+          "native_direction": "decreasing",
+          "same_model_residual_deg": 1.2076100119884359e-09
+        },
+        {
+          "reference_jde_tt": 2460797.246382363,
+          "native_jde_tt": 2460797.2464565523,
+          "signed_difference_seconds": 6.409943103790283,
+          "time_tolerance_seconds": 53.598757449658756,
+          "native_direction": "increasing",
+          "same_model_residual_deg": -7.153744263632689e-10
+        }
+      ],
+      "source": {
+        "model_identity": 3,
+        "domain_start_jde_tt": -1200954.625,
+        "domain_end_jde_tt": 6104044.625
+      }
+    },
+    {
+      "name": "post_natal_jupiter",
+      "chart_jde_tt": 2460645.500800741,
+      "reference_birth_jde_tt": 2460645.500800741,
+      "natal_hits_excluded_for_post_natal_comparison": [],
+      "retained_hits": [
+        {
+          "reference_jde_tt": 2460773.9770061746,
+          "native_jde_tt": 2460773.97670839,
+          "signed_difference_seconds": -25.728607177734375,
+          "time_tolerance_seconds": 197.79783764128283,
+          "native_direction": "increasing",
+          "same_model_residual_deg": -1.4193801689543761e-10
+        }
+      ],
+      "source": {
+        "model_identity": 3,
+        "domain_start_jde_tt": -1200954.625,
+        "domain_end_jde_tt": 6104044.625
+      }
+    },
+    {
+      "name": "post_natal_saturn",
+      "chart_jde_tt": 2460827.500800741,
+      "reference_birth_jde_tt": 2460827.500800741,
+      "natal_hits_excluded_for_post_natal_comparison": [],
+      "retained_hits": [
+        {
+          "reference_jde_tt": 2460912.52334519,
+          "native_jde_tt": 2460912.5238534324,
+          "signed_difference_seconds": 43.91213357448578,
+          "time_tolerance_seconds": 877.8809213645616,
+          "native_direction": "decreasing",
+          "same_model_residual_deg": 1.3494627637555823e-10
+        },
+        {
+          "reference_jde_tt": 2461089.8616273114,
+          "native_jde_tt": 2461089.861392025,
+          "signed_difference_seconds": -20.328757166862488,
+          "time_tolerance_seconds": 488.69912691394995,
+          "native_direction": "increasing",
+          "same_model_residual_deg": 1.1880274541908875e-11
+        }
+      ],
+      "source": {
+        "model_identity": 3,
+        "domain_start_jde_tt": -1200954.625,
+        "domain_end_jde_tt": 6104044.625
+      }
+    },
+    {
+      "name": "post_natal_uranus",
+      "chart_jde_tt": 2460645.500800741,
+      "reference_birth_jde_tt": 2460645.500800741,
+      "natal_hits_excluded_for_post_natal_comparison": [],
+      "retained_hits": [
+        {
+          "reference_jde_tt": 2460764.5918661337,
+          "native_jde_tt": 2460764.591030106,
+          "signed_difference_seconds": -72.23280072212219,
+          "time_tolerance_seconds": 2841.1568689898168,
+          "native_direction": "increasing",
+          "same_model_residual_deg": -6.417621989385225e-11
+        }
+      ],
+      "source": {
+        "model_identity": 3,
+        "domain_start_jde_tt": -1200954.625,
+        "domain_end_jde_tt": 6104044.625
+      }
+    },
+    {
+      "name": "post_natal_neptune",
+      "chart_jde_tt": 2460645.500800741,
+      "reference_birth_jde_tt": 2460645.500800741,
+      "natal_hits_excluded_for_post_natal_comparison": [],
+      "retained_hits": [
+        {
+          "reference_jde_tt": 2460659.3725404954,
+          "native_jde_tt": 2460659.3729382614,
+          "signed_difference_seconds": 34.36698317527771,
+          "time_tolerance_seconds": 39028.56126749087,
+          "native_direction": "increasing",
+          "same_model_residual_deg": -2.773958840407431e-11
+        }
+      ],
+      "source": {
+        "model_identity": 3,
+        "domain_start_jde_tt": -1200954.625,
+        "domain_end_jde_tt": 6104044.625
+      }
+    },
+    {
+      "name": "post_natal_pluto",
+      "chart_jde_tt": 2460766.500800741,
+      "reference_birth_jde_tt": 2460766.500800741,
+      "natal_hits_excluded_for_post_natal_comparison": [],
+      "retained_hits": [
+        {
+          "reference_jde_tt": 2460834.755667788,
+          "native_jde_tt": 2460834.75655522,
+          "signed_difference_seconds": 76.67413651943207,
+          "time_tolerance_seconds": 4479.946697108868,
+          "native_direction": "decreasing",
+          "same_model_residual_deg": 3.4503955248510465e-11
+        },
+        {
+          "reference_jde_tt": 2461068.008758368,
+          "native_jde_tt": 2461068.0075514894,
+          "signed_difference_seconds": -104.27430868148804,
+          "time_tolerance_seconds": 2051.786038798628,
+          "native_direction": "increasing",
+          "same_model_residual_deg": 2.8421709430404007e-13
+        }
+      ],
+      "source": {
+        "model_identity": 4,
+        "domain_start_jde_tt": 2409543.875,
+        "domain_end_jde_tt": 2488069.125
+      }
+    },
+    {
+      "name": "mercury_retrograde_triple",
+      "chart_jde_tt": 2460032.693340199,
+      "reference_birth_jde_tt": 2460032.693340199,
+      "natal_hits_excluded_for_post_natal_comparison": [],
+      "retained_hits": [
+        {
+          "reference_jde_tt": 2460391.498340857,
+          "native_jde_tt": 2460391.498339908,
+          "signed_difference_seconds": -0.08199512958526611,
+          "time_tolerance_seconds": 26.96120898669432,
+          "native_direction": "increasing",
+          "same_model_residual_deg": 9.610573670215672e-09
+        },
+        {
+          "reference_jde_tt": 2460415.8748225225,
+          "native_jde_tt": 2460415.8748366414,
+          "signed_difference_seconds": 1.2198686599731445,
+          "time_tolerance_seconds": 48.64253700611599,
+          "native_direction": "decreasing",
+          "same_model_residual_deg": -1.9500419057294494e-09
+        },
+        {
+          "reference_jde_tt": 2460436.277470788,
+          "native_jde_tt": 2460436.2774751615,
+          "signed_difference_seconds": 0.3778696060180664,
+          "time_tolerance_seconds": 46.50295083632801,
+          "native_direction": "increasing",
+          "same_model_residual_deg": -3.492289124551462e-09
+        }
+      ],
+      "source": {
+        "model_identity": 3,
+        "domain_start_jde_tt": -1200954.625,
+        "domain_end_jde_tt": 6104044.625
+      }
+    }
+  ]
+}

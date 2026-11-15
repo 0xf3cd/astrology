@@ -2,13 +2,18 @@
 
 [简体中文](../zh-CN/transits.md) · [Documentation](index.md) · [API](reference.md)
 
-`transit_hits` finds every selected exact aspect to an existing natal chart within
-a UTC interval. It returns a `TransitHits` result with the original chart, the
-search inputs and model provenance, and each crossing or contact. Hit times are
-JDE(TT): Julian Dates on the TT time scale, not UTC clock readings.
+`transit_hits` finds every selected exact aspect to an existing chart within a
+supplied UTC interval, converted to TT for membership. It returns a `TransitHits`
+result with the original chart, search inputs, model provenance, and each crossing
+or contact. Hit times are JDE(TT): Julian Dates on the TT time scale, not UTC clock
+readings.
 
-For the natal-only Sun/Moon convenience `return_hits` and a chart at a chosen
-hit/location, see [solar and lunar returns](returns.md).
+(event-provider-en)=
+The event provider is the selected celestial-calendar longitude-event search
+implementation.
+
+For the natal-only ten-body convenience `return_hits` and a chart at a chosen
+hit/location, see [planetary returns](returns.md).
 
 ## Search an interval
 
@@ -56,20 +61,67 @@ be exactly zero.
 
 <!-- /usage: transits.hits -->
 
-For ordinary UTC clock display, convert the civil fields returned by `jde_to_utc`
-to a timezone-aware `datetime`. `fraction` is the elapsed fraction of that UTC day:
+## Read UTC and format event tables
+
+Use `transit_hit_utc` for a location-free UTC readout, and `format_transit_hits`
+for an English or Chinese table. The table keeps the moving and fixed-source roles,
+aspect and oriented branch, direction, raw TT, and the model/version context:
 
 ```{doctest}
->>> from celestial_calendar import jde_to_utc
->>> civil = jde_to_utc(result.hits[0].jde_tt)
->>> displayed = datetime(civil.year, civil.month, civil.day, tzinfo=UTC) + timedelta(days=civil.fraction)
+>>> from astrology import format_transit_hits, load_catalog, transit_hit_utc
+>>> displayed = transit_hit_utc(result.hits[0])
+>>> displayed.isoformat(timespec="microseconds")
+'2024-03-22T17:40:34.047537+00:00'
 >>> displayed.isoformat(timespec="seconds")
 '2024-03-22T17:40:34+00:00'
+>>> catalog = load_catalog()
+>>> print(format_transit_hits(result, catalog))
+Exact transit hits
+Supplied UTC interval [start, end): [2024-03-01T00:00:00+00:00, 2024-06-01T00:00:00+00:00)
+Converted TT interval [start, end): [2460370.500800741, 2460462.500800741)
+Event models: Mercury [mercury]: position_source/3
+astrology / celestial-calendar versions: 0.5.0 / 1.1.1
+<BLANKLINE>
+UTC | Moving object | Fixed source | Aspect | Branch | Direction | JDE(TT)
+2024-03-22T17:40:34+00:00 | Mercury [mercury] | Sun [sun] | Conjunction | 0°00'00" | increasing | 2460392.2373059206
+2024-04-14T02:40:38+00:00 | Mercury [mercury] | Sun [sun] | Conjunction | 0°00'00" | decreasing | 2460414.612359507
+2024-05-06T23:01:13+00:00 | Mercury [mercury] | Sun [sun] | Conjunction | 0°00'00" | increasing | 2460437.459988502
 ```
 
-Retain `jde_tt` as the event time; this seconds-only display loses precision.
-A UTC-to-TT-to-UTC round trip need not recover the original civil fields at leap
-seconds or the 1972 model boundary, and Python `datetime` cannot represent a leap second.
+The three times have different jobs: `start_utc` and `end_utc` are the supplied
+civil endpoints, `start_jde_tt` and `end_jde_tt` determine search membership, and
+each derived event UTC is only a display. Keep raw `jde_tt` as the event authority.
+Conversion to `datetime` rounds the day fraction to microseconds; the table then
+truncates rather than rounds to whole seconds. This display loses precision and
+does not change the hit or its order.
+
+The upstream uses a frozen leap-offset table and retains its final offset after
+the last entry. It does not predict future leap seconds. Python `datetime` cannot
+represent a leap second, and a UTC-to-TT-to-UTC round trip need not recover the
+original civil fields. At the 2016 leap boundary, direct TT offsets of +68.400,
++69.100 and +69.200 seconds from JDE(TT) `2457754.5` display respectively as
+`2017-01-01T00:00:00.215991+00:00`, `00:00:00.916007+00:00` and
+`00:00:00.015987+00:00`. Display can therefore enter the next year, repeat a
+second, reverse order, or appear outside the supplied UTC interval. Raw TT still
+determines membership, ordering and classification. The adjacent representable
+floating-point JDE(TT) values immediately below and above the leap start can also
+display on different civil dates.
+
+The upstream converter accepts JDE(TT) in `[1867522.5, 13689325.5)`. Display is
+further limited to converted civil dates at or after 1972-01-01 and values Python
+`datetime` can represent (through year 9999, including any rounding carry).
+If conversion yields the upstream pre-1972 UT1 substitute, `transit_hit_utc` raises
+`EventDisplayError` rather than labeling it ordinary UTC. Range and Python datetime
+construction failures use the same display-specific error and retain the source TT,
+operation, upstream message and original cause. Native `CelestialError` propagates
+unchanged. The 1972 model seam and leap steps are not exact inverses.
+
+Calling either formatter with no hits returns a meaningful empty table without
+initializing native astronomy. Populated tables lazily call only `jde_to_utc` for
+each row: they do not search again, call `utc_to_jde`, calculate houses, construct
+a chart, or use chart-specific `moment_utc`. Package import and field reads remain
+native-free. `format_return_hits` additionally validates a post-natal same-body
+`NatalChart` result; see [planetary returns](returns.md#read-utc-and-format-event-tables).
 
 ## Select targets and aspects
 
@@ -140,6 +192,7 @@ True
 
 `('position_source', 3)` is the effective upstream model key for this Mercury
 search; `result.sources[0].model_description` gives its name and description.
+Tables write this key as `model_kind/model_identity`, here `position_source/3`.
 
 `start_jde_tt` and `end_jde_tt` retain the converted search interval. Each
 `TransitSource` identifies the effective moving model, its event-domain bounds,

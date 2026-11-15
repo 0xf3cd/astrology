@@ -82,16 +82,20 @@ from astrology.text import (
   format_house_overlays,
   format_house_rulers,
   format_lunar_phase,
+  format_return_hits,
   format_sign_distribution,
   format_transit_aspects,
+  format_transit_hits,
 )
 from astrology.transit_aspects import TransitAspectHit, TransitAspects, transit_aspects
 from astrology.transits import (
+  EventDisplayError,
   TransitDirection,
   TransitDomainError,
   TransitHit,
   TransitHits,
   TransitSource,
+  transit_hit_utc,
   transit_hits,
 )
 from astrology.zodiac import (
@@ -132,6 +136,7 @@ __all__ = [
   "EclipticPosition",
   "EffectiveConfiguration",
   "Element",
+  "EventDisplayError",
   "FixedOffset",
   "HistoricalTimeError",
   "HouseOverlay",
@@ -179,8 +184,10 @@ __all__ = [
   "format_house_overlays",
   "format_house_rulers",
   "format_lunar_phase",
+  "format_return_hits",
   "format_sign_distribution",
   "format_transit_aspects",
+  "format_transit_hits",
   "house_of",
   "load_catalog",
   "lunar_phase",
@@ -196,6 +203,7 @@ __all__ = [
   "sign_of",
   "sign_ruler",
   "transit_aspects",
+  "transit_hit_utc",
   "transit_hits",
   "truncate_display",
 ]
