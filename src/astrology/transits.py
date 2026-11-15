@@ -240,12 +240,10 @@ def transit_hit_utc(hit: TransitHit) -> datetime:
   """
   if type(hit) is not TransitHit:
     raise TypeError("hit must be a TransitHit")
-  import celestial_calendar as native
-
-  from astrology.celestial import _datetime_from_civil
+  from astrology.celestial import _civil_from_tt, _datetime_from_civil
 
   try:
-    civil = native.jde_to_utc(hit.jde_tt)
+    civil = _civil_from_tt(hit.jde_tt)
     if (civil.year, civil.month, civil.day) < (1972, 1, 1):
       raise EventDisplayError(
         "Event TT resolves to the upstream pre-1972 UT1 substitute, not ordinary UTC",
@@ -253,8 +251,6 @@ def transit_hit_utc(hit: TransitHit) -> datetime:
       )
     return _datetime_from_civil(civil)
   except EventDisplayError:
-    raise
-  except native.CelestialError:
     raise
   except (ValueError, OverflowError) as exc:
     raise EventDisplayError(

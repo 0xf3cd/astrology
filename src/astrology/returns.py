@@ -6,7 +6,25 @@ from datetime import datetime
 from astrology.chart import NatalChart
 from astrology.config import MajorAspect
 from astrology.objects import Body
-from astrology.transits import TransitHits, transit_hits
+from astrology.transits import TransitHit, TransitHits, transit_hits
+
+
+def _post_natal_hits(natal: NatalChart, hits: tuple[TransitHit, ...]) -> tuple[TransitHit, ...]:
+  """Keep hits strictly after natal TT. 仅保留严格晚于本命 TT 的命中。"""
+  return tuple(hit for hit in hits if hit.jde_tt > natal.times.jde_tt)
+
+
+def _require_return_result(result: TransitHits) -> None:
+  """Require a post-natal single-body conjunction result. 要求本命后的单星体合相结果。"""
+  if (
+    type(result.chart) is not NatalChart
+    or len(result.moving_objects) != 1
+    or type(result.moving_objects[0]) is not Body
+    or result.moving_objects != result.natal_objects
+    or result.aspects != (MajorAspect.CONJUNCTION,)
+    or result.hits != _post_natal_hits(result.chart, result.hits)
+  ):
+    raise ValueError("result must be a post-natal same-body conjunction return on a NatalChart")
 
 
 def return_hits(
@@ -56,4 +74,4 @@ def return_hits(
     natal_objects=(body,),
     aspects=(MajorAspect.CONJUNCTION,),
   )
-  return replace(result, hits=tuple(hit for hit in result.hits if hit.jde_tt > natal.times.jde_tt))
+  return replace(result, hits=_post_natal_hits(natal, result.hits))

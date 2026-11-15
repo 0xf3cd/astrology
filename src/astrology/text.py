@@ -20,10 +20,11 @@ from astrology.knowledge.catalog import _configuration_name
 from astrology.knowledge.catalog import _current_name as _raw_current_name
 from astrology.knowledge.records import _LANGUAGES, Language
 from astrology.lunar_phase import LunarPhaseResult
-from astrology.objects import Axis, Body, ChartObject
+from astrology.objects import Axis, ChartObject
+from astrology.returns import _require_return_result
 from astrology.summaries import SignDistribution
 from astrology.transit_aspects import TransitAspects
-from astrology.transits import TransitHits, transit_hit_utc
+from astrology.transits import TransitDirection, TransitHits, transit_hit_utc
 from astrology.zodiac import (
   _ELEMENT_RULE_ID,
   _MODALITY_RULE_ID,
@@ -237,15 +238,11 @@ _EVENT_LABELS = {
   },
 }
 _EVENT_DIRECTIONS = {
-  "en": {
-    "increasing": "increasing",
-    "decreasing": "decreasing",
-    "tangent": "tangent",
-  },
+  "en": {direction: direction.value for direction in TransitDirection},
   "zh-CN": {
-    "increasing": "黄经增大",
-    "decreasing": "黄经减小",
-    "tangent": "相切",
+    TransitDirection.INCREASING: "黄经增大",
+    TransitDirection.DECREASING: "黄经减小",
+    TransitDirection.TANGENT: "相切",
   },
 }
 
@@ -698,12 +695,13 @@ def format_transit_hits(result: TransitHits, catalog: Catalog, *, language: Lang
   The table includes supplied UTC and converted TT bounds. Empty results do not
   initialize native astronomy. Populated rows call transit_hit_utc and therefore
   initialize only TT-to-civil conversion, never another search, houses or a chart.
-  Display seconds truncate the rounded datetime; raw TT remains authoritative.
+  Conversion rounds the day fraction to microseconds; the table then truncates
+  to whole seconds. Raw TT remains authoritative.
 
   以 UTC 和原始 TT 显示保留的精确命中，列出对象角色、模型和方向。表中包含给定 UTC
   与转换后 TT 区间。空结果不初始化原生天文；非空行调用 transit_hit_utc，仅初始化
-  TT 到民用时刻的转换，不重新搜索、计算宫位或建盘。秒显示截断舍入后的 datetime，
-  原始 TT 仍是事件依据。
+  TT 到民用时刻的转换，不重新搜索、计算宫位或建盘。转换先把日小数舍入到微秒，
+  表格再截断到整秒；原始 TT 仍是事件依据。
   """
   _event_inputs(result, catalog, language)
   labels = _EVENT_LABELS[language]
@@ -718,7 +716,7 @@ def format_transit_hits(result: TransitHits, catalog: Catalog, *, language: Lang
           f"{_name(hit.natal_object, catalog, language)} [{hit.natal_object.value}]",
           _name(hit.aspect, catalog, language),
           _angle(hit.branch_deg, signed=True),
-          _EVENT_DIRECTIONS[language][hit.direction.value],
+          _EVENT_DIRECTIONS[language][hit.direction],
           repr(hit.jde_tt),
         )
       )
@@ -731,24 +729,18 @@ def format_transit_hits(result: TransitHits, catalog: Catalog, *, language: Lang
 def format_return_hits(result: TransitHits, catalog: Catalog, *, language: Language = "en") -> str:
   """Format a validated post-natal same-body return result in English or Chinese.
 
-  result must use a NatalChart, one repeated same-body selection, conjunction only,
-  and hits strictly later than the natal TT. Other TransitHits shapes raise
-  ValueError. Empty and populated conversion effects match format_transit_hits.
+  result must use a NatalChart. Its moving_objects and natal_objects must select
+  the same single Body, with conjunction as the only aspect and every hit strictly
+  later than natal TT. Other TransitHits shapes raise ValueError. Empty and
+  populated conversion effects match format_transit_hits.
 
-  以英文或中文显示已校验的本命后同星体返照结果。result 必须使用 NatalChart、
-  同一星体的单项重复选择及仅合相搜索，且全部命中严格晚于本命 TT；其他
-  TransitHits 形状抛 ValueError。空结果与非空结果的转换副作用同 format_transit_hits。
+  以英文或中文显示已校验的本命后同星体返照结果。result 必须使用 NatalChart。
+  moving_objects 与 natal_objects 须选择同一个 Body，只搜索合相，且每个命中严格晚于
+  本命 TT。其他 TransitHits 形状抛 ValueError。空结果与非空结果的转换副作用同
+  format_transit_hits。
   """
   _event_inputs(result, catalog, language)
-  if (
-    type(result.chart) is not NatalChart
-    or len(result.moving_objects) != 1
-    or type(result.moving_objects[0]) is not Body
-    or result.moving_objects != result.natal_objects
-    or result.aspects != (MajorAspect.CONJUNCTION,)
-    or any(hit.jde_tt <= result.chart.times.jde_tt for hit in result.hits)
-  ):
-    raise ValueError("result must be a post-natal same-body conjunction return on a NatalChart")
+  _require_return_result(result)
   labels = _EVENT_LABELS[language]
   lines = [labels["return_title"], *_event_context(result, catalog, language), ""]
   lines.append(labels["return_columns"])
@@ -759,7 +751,7 @@ def format_return_hits(result: TransitHits, catalog: Catalog, *, language: Langu
         (
           transit_hit_utc(hit).isoformat(timespec="seconds"),
           f"{_name(body, catalog, language)} [{body.value}]",
-          _EVENT_DIRECTIONS[language][hit.direction.value],
+          _EVENT_DIRECTIONS[language][hit.direction],
           repr(hit.jde_tt),
         )
       )

@@ -181,6 +181,22 @@ def test_native_conversion_failure_propagates_unchanged(monkeypatch: pytest.Monk
   assert raised.value is failure
 
 
+def test_hit_conversion_uses_the_celestial_adapter(monkeypatch: pytest.MonkeyPatch) -> None:
+  import astrology.celestial as adapter
+
+  calls: list[float] = []
+  original = adapter._civil_from_tt
+
+  def observed(jde_tt: float) -> native.CivilDateTime:
+    calls.append(jde_tt)
+    return original(jde_tt)
+
+  monkeypatch.setattr(adapter, "_civil_from_tt", observed)
+  hit = _hit()
+  assert transit_hit_utc(hit) == datetime(2024, 3, 22, 17, 40, 34, 47537, tzinfo=UTC)
+  assert calls == [hit.jde_tt]
+
+
 def test_leap_interior_display_can_enter_next_year_and_reverse() -> None:
   first = _hit(2457754.5007916666)
   second = _hit(2457754.5007997686)
