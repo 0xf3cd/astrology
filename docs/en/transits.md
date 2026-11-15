@@ -8,6 +8,7 @@ result with the original chart, search inputs, model provenance, and each crossi
 or contact. Hit times are JDE(TT): Julian Dates on the TT time scale, not UTC clock
 readings.
 
+(event-provider-en)=
 The event provider is the selected celestial-calendar longitude-event search
 implementation.
 
@@ -191,6 +192,7 @@ True
 
 `('position_source', 3)` is the effective upstream model key for this Mercury
 search; `result.sources[0].model_description` gives its name and description.
+Tables write this key as `model_kind/model_identity`, here `position_source/3`.
 
 `start_jde_tt` and `end_jde_tt` retain the converted search interval. Each
 `TransitSource` identifies the effective moving model, its event-domain bounds,

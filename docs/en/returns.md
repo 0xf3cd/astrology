@@ -49,8 +49,9 @@ True
 
 The supplied interval is `[start_utc, end_utc)` and is converted to TT for event
 membership. All retained hits are returned in raw-TT order. Direct, retrograde and
-tangent events admitted by the provider are preserved; a short retrograde
-recrossing is a return and does not require a complete orbital cycle. An interval
+tangent events admitted by the {ref}`event provider <event-provider-en>` are
+preserved; a short retrograde recrossing is a return and does not require a
+complete orbital cycle. An interval
 with no post-natal return has `hits == ()`. No birthday, calendar month,
 nearest-return window or complete-cycle assumption is inferred. A calendar-year
 search can find one solar return near each end of the year, and a leap-day birth
@@ -231,7 +232,7 @@ These calls describe geometry and text, not a return interpretation.
 `entry.solar_lunar_returns` in the [catalog](catalog.md) keeps its stable identity
 while covering the ten-body project convention. It records the general return
 definitions, short quotations with separate Chinese translations, location
-practices, post-natal filtering and the limit on root-adjacent events. It does not
+practices and post-natal filtering. It does not
 define node returns or supply ten separate interpretive traditions. The entry is
 available without a chart or native astronomy:
 
