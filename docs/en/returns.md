@@ -74,19 +74,20 @@ is strictly later than `natal.times.jde_tt`:
 True
 ```
 
-Pre-natal hits and a hit exactly at natal TT do not count. Distinct provider events
-are not merged by a time tolerance, so a birth-inclusive interval can retain a
-root-adjacent provider event just after natal TT. Choose an interval around the
-later return of interest to omit that numerical residual. The rest of the result retains the
-original chart, supplied UTC and converted TT bounds, selected body, effective
-models, domains and versions.
+Pre-natal hits and a hit exactly at natal TT do not count. Distinct events are
+not merged by a time tolerance. The numerical search can report a separate hit
+just after natal TT, which a birth-inclusive interval can retain. To omit this
+near-natal hit, choose an interval around the later return of interest. The rest
+of the result retains the original chart, supplied UTC and converted TT bounds,
+selected body, effective models, domains and versions.
 
 ## Read UTC and format event tables
 
 Use `transit_hit_utc` to read a retained hit as an aware UTC `datetime`; no
 location or chart construction is needed. `format_return_hits` renders the
 validated return result in English or Chinese and includes the supplied UTC and
-converted TT intervals, model identity and versions:
+converted TT intervals, model identity and versions. For the model identifier
+format, see [retained model provenance](transits.md#read-and-retain-the-result):
 
 ```{doctest}
 >>> from astrology import format_return_hits, load_catalog, transit_hit_utc
@@ -114,8 +115,9 @@ UTC | 返照星体 | 方向 | JDE(TT)
 ```
 
 Seconds are truncated after conversion to a microsecond-precision `datetime`.
-The raw TT remains authoritative for membership, ordering and classification;
-displayed UTC can behave unexpectedly inside a leap second. Display errors,
+The raw TT remains authoritative for membership, ordering and classification.
+Displayed UTC inside a leap second can repeat a second, cross a civil-date
+boundary or reverse order. Display errors,
 conversion effects and empty-table behavior are described under
 [event UTC and tables](transits.md#read-utc-and-format-event-tables).
 
@@ -215,7 +217,7 @@ These calls describe geometry and text, not a return interpretation.
 
 - `natal` must be a `NatalChart`, not a `MomentChart`; `body` must be a `Body`.
   Wrong types raise `TypeError`. A selected body missing from the natal chart
-  raises `ValueError` in the return API's terms.
+  raises `ValueError`; its message lists the bodies available on that chart.
 - Aware endpoints, modern UTC, maximum span, model domains and computation
   failures follow [transit search](transits.md#limits-and-failures). In particular,
   `TransitDomainError` retains an upstream rejection; it is not an empty result.

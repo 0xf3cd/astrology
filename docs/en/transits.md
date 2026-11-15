@@ -8,6 +8,9 @@ result with the original chart, search inputs, model provenance, and each crossi
 or contact. Hit times are JDE(TT): Julian Dates on the TT time scale, not UTC clock
 readings.
 
+The event provider is the selected celestial-calendar longitude-event search
+implementation.
+
 For the natal-only ten-body convenience `return_hits` and a chart at a chosen
 hit/location, see [planetary returns](returns.md).
 
@@ -99,8 +102,9 @@ original civil fields. At the 2016 leap boundary, direct TT offsets of +68.400,
 `2017-01-01T00:00:00.215991+00:00`, `00:00:00.916007+00:00` and
 `00:00:00.015987+00:00`. Display can therefore enter the next year, repeat a
 second, reverse order, or appear outside the supplied UTC interval. Raw TT still
-determines membership, ordering and classification. The two binary64 sides of the
-leap start can also display on different civil dates.
+determines membership, ordering and classification. The adjacent representable
+floating-point JDE(TT) values immediately below and above the leap start can also
+display on different civil dates.
 
 The upstream converter accepts JDE(TT) in `[1867522.5, 13689325.5)`. Display is
 further limited to converted civil dates at or after 1972-01-01 and values Python
