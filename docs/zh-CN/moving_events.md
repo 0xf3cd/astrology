@@ -91,7 +91,8 @@ UTC 端点须为有时区的内建 datetime，且归一后不早于 1972-01-01 U
 ```
 
 平升交点和平降交点持续成立的对分相会被拒绝，不会表示为无限事件列表。类型无效抛 `TypeError`；
-选择、自身配对或端点顺序无效抛 `ValueError`，早于 1972 年的 UTC 抛 `HistoricalTimeError`。
+选择、自身配对或端点顺序无效、缺少 UTC 偏移时抛 `ValueError`，
+早于 1972 年的 UTC 抛 `HistoricalTimeError`。
 域或区间拒绝抛出 `MovingEventDomainError`，它是 `ValueError` 的子类；
 可用时保留操作、两侧身份及 TT 端点，还保留上游原始文本与异常因果链。
 原生 `CelestialError` 直接向外抛出。任一对象对或分支失败即整次失败，包括已有其他成功结果的情况；

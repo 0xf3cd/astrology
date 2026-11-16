@@ -44,7 +44,7 @@ including its frozen leap offsets, 1972 restriction, microsecond rounding and
 whole-second table display. Display precision never changes event membership.
 
 The USNO definition identifies exact new/full moons with Moon-minus-Sun apparent
-ecliptic longitude 0°/180°. Reversal leaves these targets unchanged: 0° stays 0°,
+ecliptic longitude 0°/180°. Swapping the pair order leaves these targets unchanged: 0° stays 0°,
 and -180° is represented as 180°. The example's `(Moon, Sun)` pair uses the
 reversed Sun-minus-Moon separation.
 The [knowledge entry](catalog.md), `entry.moving_aspect_events`, records that source
@@ -55,8 +55,8 @@ separately from the project's model and search conventions.
 `pairs` is a nonempty sequence of ordered `(first, second)` identities; `aspects`
 is an explicit nonempty selection of `MajorAspect` values. Repeated ordered pairs,
 repeated aspects and self-pairs are rejected. A reversed pair is a separate request.
-All ten `Body` members and the four named `LunarNode` members are available where
-their providers admit the query; axes are not moving event providers.
+All ten `Body` members and the four named `LunarNode` members are available within
+their supported event windows; axes are not moving event sources.
 For the other major aspects, select `MajorAspect.SEXTILE`, `MajorAspect.SQUARE`
 or `MajorAspect.TRINE`. Each identity uses a calculation model with its own
 supported TT window and maximum search span. Read these limits and the model name
@@ -86,7 +86,7 @@ wraps, not the absolute value of the canonical separation.
 The UTC endpoints must be aware built-in datetimes whose instants, converted to
 UTC, are at or after 1972-01-01 UTC.
 The search uses their converted **half-open TT interval**, at most 3660 TT days,
-within both providers' event domains.
+within both identities' supported event windows.
 
 Constant mismatch (the relation never holds) is a valid empty result. For example, mean ascending and descending
 nodes cannot be conjunct:
@@ -105,8 +105,8 @@ No exact moving-pair events in the supplied interval
 
 The mean ascending and descending nodes' continuously satisfied opposition is
 rejected rather than represented by an infinite event list. Invalid types raise
-`TypeError`; invalid selections,
-self-pairs or endpoint order raise `ValueError`. Pre-1972 UTC raises
+`TypeError`; invalid selections, self-pairs, endpoint order or missing UTC offsets
+raise `ValueError`. Pre-1972 UTC raises
 `HistoricalTimeError`. Domain/span rejections raise `MovingEventDomainError`,
 a `ValueError` subclass,
 retaining the operation, both pair identities and TT bounds when available, the
