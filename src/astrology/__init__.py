@@ -60,6 +60,7 @@ from astrology.dignities import (
   essential_dignities,
   sign_ruler,
 )
+from astrology.event_records import EventDisplayError, TransitSource
 from astrology.house_overlays import (
   CrossChartHouseOverlays,
   HouseOverlay,
@@ -98,12 +99,10 @@ from astrology.text import (
 )
 from astrology.transit_aspects import TransitAspectHit, TransitAspects, transit_aspects
 from astrology.transits import (
-  EventDisplayError,
   TransitDirection,
   TransitDomainError,
   TransitHit,
   TransitHits,
-  TransitSource,
   transit_hit_utc,
   transit_hits,
 )

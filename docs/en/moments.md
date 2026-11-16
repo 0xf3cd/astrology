@@ -137,7 +137,8 @@ upstream diagnostics. See the [transit time limits](transits.md#limits-and-failu
 for the fixed leap table's future-offset behavior.
 
 To display a retained hit without a location or snapshot, use `transit_hit_utc`
-instead. Its `EventDisplayError` reports display-conversion failures separately
+for a transit/return hit, or `moving_hit_utc` for a moving-pair hit.
+Their `EventDisplayError` reports display-conversion failures separately
 from chart errors, including a pre-1972 UT1 substitute. See
 [event UTC and tables](transits.md#read-utc-and-format-event-tables) for the actual
 leap-interior display behavior; neither display UTC nor derived chart TT replaces

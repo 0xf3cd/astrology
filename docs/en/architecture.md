@@ -8,7 +8,7 @@ usage and constraints are in the [birth](birth.md), [configuration](configuratio
 [chart](chart.md), [aspect](aspects.md), [cross-chart](cross_aspects.md), [result](records.md)
 and [knowledge](knowledge.md) guides. [Exact transit hits](transits.md) search
 moving objects against fixed source-chart degrees over a UTC interval.
-[Moving-pair events](moving_events.md) instead vary both longitudes at the same TT,
+[Moving-pair events](moving_events.md) evaluate both moving longitudes at the same TT,
 without a natal chart; the concrete adapter retains both provider records.
 Charts use modern tropical, geocentric coordinates; the underlying knowledge can
 also be queried without a chart.
@@ -37,7 +37,9 @@ src/astrology/
   chart.py          Composition and immutable chart results
   _comparison.py    Source compatibility and stored-chart object selection
   cross_aspects.py  Static comparison of supplied charts, retaining both sources
+  event_records.py  Shared event-provider records and display errors
   transits.py       Exact moving-to-fixed-source interval events
+  moving_events.py  Exact aspects between ordered moving pairs
   returns.py        Post-natal planetary return selection over exact transit hits
   transit_aspects.py Fixed-instant moving-to-natal geometry and local motion
   house_overlays.py Directional house placement between supplied charts
@@ -77,6 +79,11 @@ composition policy.
 selected natal degrees and the aspect branches in `aspects.py`. It retains the
 source chart without creating a moving-side birth record or house geometry.
 
+`moving_events.py` owns ordered moving-pair selection, relative-direction results
+and major-aspect query composition. `event_records.py` owns the `TransitSource`
+provider record and `EventDisplayError` shared by both event families.
+Their existing imports through `transits` remain available.
+
 `returns.py` owns natal-only, ten-body return selection. It delegates to
 `transit_hits`, filters hits strictly after natal TT and retains the search
 provenance in `TransitHits`; chart construction stays with `moment_chart`.
@@ -94,9 +101,10 @@ the result later without moving calculation into a frontend.
 ## Effects boundary
 
 Package imports, knowledge queries, classifications, summaries and supplied-chart
-comparisons do not initialize native astronomy. `natal_chart`, `moment_chart` and `transit_hits`
+comparisons do not initialize native astronomy. `natal_chart`, `moment_chart`,
+`transit_hits` and `moving_aspect_events`
 load the astronomy adapter only when called. `return_hits` delegates to `transit_hits`
-after validating its source/body. `transit_hit_utc` and populated event tables
+after validating its source/body. `transit_hit_utc`, `moving_hit_utc` and populated event tables
 lazily use TT-to-civil conversion without event search or chart construction.
 Empty event tables and ordinary field reads remain native-free.
 `resolve_birth_time` reads timezone data, and `load_catalog` reads packaged

@@ -118,8 +118,9 @@ Python 不能表示插入的闰秒。在 1972 年首次闰秒阶跃附近，转�
 转换或求值域失败抛出带有所请求宫制及可用上游诊断的 `ChartDomainError`。
 固定闰秒表在未来如何沿用偏移，见[行运时标限制](transits.md#限制与失败)。
 
-只显示保留命中的时刻而不提供地点或计算快照时，使用 `transit_hit_utc`。
-它以 `EventDisplayError` 单独报告显示转换失败，包括上游 1972 年前的 UT1 替代值，
+只显示保留命中的时刻而不提供地点或计算快照时，行运／返照命中使用 `transit_hit_utc`，
+移动对象对命中使用 `moving_hit_utc`。
+它们以 `EventDisplayError` 单独报告显示转换失败，包括上游 1972 年前的 UT1 替代值，
 与建盘错误分开。闰秒内部的实际显示行为见{ref}`事件 UTC 与表格 <event-display-zh-cn>`；
 显示 UTC 与导出的排盘 TT 都不替代来源事件 TT。
 

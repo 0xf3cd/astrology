@@ -28,8 +28,9 @@ relative angle and rate are **Sun minus Moon**:
 >>> print(table.splitlines()[0])
 Exact moving-pair events
 >>> for row in table.splitlines():
-...     if row.startswith("2024-"):
+...     if row.startswith(("UTC |", "2024-")):
 ...         print(" | ".join(row.split(" | ")[:6]))
+UTC | First moving object | Second moving object | Aspect | Branch | Relative direction
 2024-01-11T11:57:27+00:00 | Moon [moon] | Sun [sun] | Conjunction | 0°00'00" | separation decreasing
 2024-01-25T17:54:00+00:00 | Moon [moon] | Sun [sun] | Opposition | +180°00'00" | separation decreasing
 ```
@@ -43,7 +44,8 @@ including its frozen leap offsets, 1972 restriction, microsecond rounding and
 whole-second table display. Display precision never changes event membership.
 
 The USNO definition identifies exact new/full moons with Moon-minus-Sun apparent
-ecliptic longitude 0°/180°. These two targets are unchanged by reversal.
+ecliptic longitude 0°/180°. Reversal leaves these targets unchanged: 0° stays 0°,
+and -180° is represented as 180°.
 The [knowledge entry](catalog.md), `entry.moving_aspect_events`, records that source
 separately from the project's model and search conventions.
 
@@ -54,6 +56,10 @@ is an explicit nonempty selection of `MajorAspect` values. Repeated ordered pair
 repeated aspects and self-pairs are rejected. A reversed pair is a separate request.
 All ten `Body` members and the four named `LunarNode` members are available where
 their providers admit the query; axes are not moving event providers.
+For the other major aspects, select `MajorAspect.SEXTILE`, `MajorAspect.SQUARE`
+or `MajorAspect.TRINE`. Each identity uses a calculation model with its own
+supported TT window and maximum search span. Read these limits and the model name
+from `events.sources`; see [event source records](transits.md#read-and-retain-the-result).
 
 | Result | Meaning |
 |---|---|
@@ -66,10 +72,11 @@ their providers admit the query; axes are not moving event providers.
 | `hit.direction` | `RelativeDirection`: separation increasing, decreasing or tangent, not either body's direct/retrograde motion |
 | `events.sources` | One `TransitSource` per distinct requested identity, in first-appearance order |
 
-Opposition remains 180° after reversal. Tangent retains the provider's two-sided
-contact classification; it does not require identical rates. Hits sort by raw TT,
-requested pair order, aspect angle and branch. Coincident roles and distinct
-provider times are not merged by a tolerance.
+Opposition remains 180° after reversal. At a tangent, the separation reaches the
+requested branch without crossing it; the reported relative rate need not be
+exactly zero. Hits sort by raw TT, requested pair order, aspect angle and branch.
+Two requested pairs that hit at the same TT give two hits. Nearby times returned
+by the provider are not combined by a tolerance.
 Direction follows the continuous (unwrapped) second-minus-first longitude across
 wraps, not the absolute value of the canonical separation.
 
@@ -79,7 +86,7 @@ The UTC endpoints must be aware built-in datetimes at or after 1972-01-01 UTC.
 The search uses their converted **half-open TT interval**, at most 3660 TT days,
 within both providers' event domains.
 
-Constant mismatch is a valid empty result. For example, mean ascending and descending
+Constant mismatch (the relation never holds) is a valid empty result. For example, mean ascending and descending
 nodes cannot be conjunct:
 
 ```{doctest}
@@ -95,17 +102,19 @@ No exact moving-pair events in the supplied interval
 ```
 
 Their continuously satisfied opposition is rejected rather than represented by
-an infinite event list. Domain/span rejections raise `MovingEventDomainError`,
+an infinite event list. Invalid types raise `TypeError`; invalid selections,
+self-pairs or endpoint order raise `ValueError`. Pre-1972 UTC raises
+`HistoricalTimeError`. Domain/span rejections raise `MovingEventDomainError`,
+a `ValueError` subclass,
 retaining the operation, both pair identities and TT bounds when available, the
 verbatim upstream message and the cause. Native `CelestialError` propagates
 unchanged. Any failed pair/branch aborts the entire query, including after earlier
 success; failure never becomes an empty or partial result.
 
-Importing the package, querying knowledge, constructing supplied results and formatting
-empty results are native-free. Search initializes native astronomy lazily; reading
-or formatting populated hits initializes only time conversion. Constructors copy
-nested pairs and validate consistency and provider windows, not astronomical origin
-or completeness of caller-supplied hits.
+Importing the package, querying knowledge, constructing supplied results and
+formatting empty results do not start the native astronomy library. Search
+initializes it lazily; reading or formatting populated hits initializes only
+time conversion.
 
 ## Build a chart at an event
 
@@ -126,19 +135,11 @@ The [moment-chart domain](moments.md#build-from-a-retained-exact-hit) is separat
 from the event domain. A chart failure does not invalidate the retained event.
 Source-event TT and the chart's derived calculation TT remain separate.
 
-Independent numerical fixtures and regeneration are described in
-[contributing](contributing.md#correctness).
-
 ## Search cost
 
-On one Linux environment with Python 3.14.9 and celestial-calendar 1.1.1, complete
-queries had the following median wall times over three runs after an initial query:
+A one-year Mercury/Sun conjunction query took about 13 seconds in a measured
+environment, despite returning only six hits. Cost is not proportional to hit
+count, and the measurement is not a response-time guarantee.
 
-| Pair / aspects | UTC interval | Hits | Median |
-|---|---|---:|---:|
-| Moon/Sun, all five aspects | 2024-01-01 to 2024-02-01 | 9 | 0.66 s |
-| Moon/Sun, conjunction/opposition | 2024-01-01 to 2025-01-01 | 25 | 1.89 s |
-| Mercury/Sun, conjunction | 2024-01-01 to 2025-01-01 | 6 | 12.80 s |
-
-These are selected-query measurements, not latency guarantees. Relative extrema
-can make a small event list expensive; query cost is not proportional to hit count.
+For independent numerical fixtures and regeneration, see
+[contributing](contributing.md#correctness).

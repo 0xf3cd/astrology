@@ -337,7 +337,9 @@ def test_real_reversal_and_half_open_ownership(aspect: MajorAspect) -> None:
 
 def test_real_adapter_canonical_tangent_and_raw_subtraction_regression() -> None:
   # celestial-calendar v1.1.1, ACanonicalRelativeStationConstructsARepeatablePairTangent.
-  instant, level = 2460742.5711974148, 18.156417570420462
+  instant = 2460742.5711974148
+  first, second = native.positions((native.Target.MERCURY, native.Target.SUN), instant)
+  level = _signed(_signed(first.longitude_deg) - _signed(second.longitude_deg))
   (event,) = adapter.moving_events(Body.MERCURY, Body.SUN, level, instant - 0.5, instant + 0.5)
   assert event.jde_tt == instant and event.direction is RelativeDirection.TANGENT
   assert event.first_rate_deg_per_tt_day != event.second_rate_deg_per_tt_day
@@ -361,7 +363,7 @@ def test_real_adapter_canonical_tangent_and_raw_subtraction_regression() -> None
 
 
 def _cases() -> list[dict[str, Any]]:
-  return list(json.loads(REFERENCE.read_text())["cases"])
+  return list(json.loads(REFERENCE.read_text(encoding="utf-8"))["cases"])
 
 
 @pytest.mark.parametrize("case", _cases(), ids=lambda case: case["name"])
@@ -374,7 +376,7 @@ def test_independent_moving_pair_reference(case: dict[str, Any]) -> None:
     end_utc=datetime.fromisoformat(case["end_utc"]),
   )
   assert len(result.hits) == len(case["hits"])
-  fixture = json.loads(REFERENCE.read_text())
+  fixture = json.loads(REFERENCE.read_text(encoding="utf-8"))
   bounds = fixture["calibration"]["angular_tolerance_deg"]
   for actual, expected in zip(result.hits, case["hits"], strict=True):
     assert abs(actual.jde_tt - expected["jde_tt"]) * 86400 <= expected["time_tolerance_seconds"]
@@ -397,7 +399,7 @@ def test_independent_moving_pair_reference(case: dict[str, Any]) -> None:
 
 
 def test_reference_recipes_and_bilateral_calibration_are_pinned() -> None:
-  fixture = json.loads(REFERENCE.read_text())
+  fixture = json.loads(REFERENCE.read_text(encoding="utf-8"))
   assert fixture["source"]["requested_flags"] == fixture["source"]["verified_returned_flags"] == 260
   assert fixture["source"]["library_version"] == "2.10.03"
   assert fixture["calibration"]["sample_count"] == 696
@@ -423,6 +425,38 @@ def test_bilateral_time_budget_uses_both_bounds_and_enforces_reference_limits() 
     time_tolerance_seconds(0.1, 0.2, 1)
 
 
+def test_stored_reference_time_budgets_match_both_body_bounds() -> None:
+  fixture = json.loads(REFERENCE.read_text(encoding="utf-8"))
+  bounds = fixture["calibration"]["angular_tolerance_deg"]
+  for case in fixture["cases"]:
+    for hit in case["hits"]:
+      assert hit["time_tolerance_seconds"] == time_tolerance_seconds(
+        bounds[case["first"]], bounds[case["second"]], hit["relative_rate_deg_per_tt_day"]
+      )
+
+
+def test_stored_reference_extrema_stay_outside_the_angular_budget() -> None:
+  fixture = json.loads(REFERENCE.read_text(encoding="utf-8"))
+  bounds = fixture["calibration"]["angular_tolerance_deg"]
+  checked = 0
+  for case in fixture["cases"]:
+    for extremum in case["relative_extrema"]:
+      assert extremum["distance_from_requested_branch_deg"] > (
+        bounds[case["first"]] + bounds[case["second"]]
+      )
+      checked += 1
+  assert checked > 0
+
+
+def test_shared_event_records_preserve_legacy_import_identity() -> None:
+  import astrology
+  import astrology.event_records as owner
+  import astrology.transits as legacy
+
+  assert astrology.TransitSource is legacy.TransitSource is owner.TransitSource
+  assert astrology.EventDisplayError is legacy.EventDisplayError is owner.EventDisplayError
+
+
 def test_retained_moving_event_builds_real_moment_chart_and_keeps_source_time() -> None:
   hit = _search().hits[0]
   config = ChartConfig(HouseSystem.WHOLE_SIGN, (Body.SUN, Body.MOON), ())
@@ -438,6 +472,8 @@ def test_retained_moving_event_builds_real_moment_chart_and_keeps_source_time() 
 
 @pytest.mark.parametrize("mode", ((), ("-O",)))
 def test_native_free_construction_and_validation(mode: tuple[str, ...]) -> None:
-  program = (Path(__file__).parent / "consumer_cases/moving_events_isolation.py").read_text()
+  program = (Path(__file__).parent / "consumer_cases/moving_events_isolation.py").read_text(
+    encoding="utf-8"
+  )
   completed = subprocess.run([sys.executable, *mode, "-c", program], capture_output=True, text=True)
   assert completed.returncode == 0, completed.stdout + completed.stderr

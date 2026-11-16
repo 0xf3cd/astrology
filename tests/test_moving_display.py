@@ -16,6 +16,8 @@ from astrology import (
   RelativeDirection,
   TransitSource,
   format_moving_events,
+  format_return_hits,
+  format_transit_hits,
   load_catalog,
   moving_hit_utc,
 )
@@ -173,6 +175,29 @@ def test_conversion_failure_keeps_native_exception_identity(
   with pytest.raises(native.CelestialError) as raised:
     moving_hit_utc(_hit())
   assert raised.value is error
+
+
+def test_populated_formatter_propagates_display_failure_without_losing_tt() -> None:
+  floor = native.utc_to_jde(native.CivilDateTime(1972, 1, 1, 0))
+  hit = _hit(floor)
+  result = replace(
+    _result(),
+    start_utc=datetime(1972, 1, 1, tzinfo=UTC),
+    end_utc=datetime(1972, 1, 2, tzinfo=UTC),
+    start_jde_tt=floor,
+    end_jde_tt=floor + 1,
+    hits=(hit,),
+  )
+  with pytest.raises(EventDisplayError) as raised:
+    format_moving_events(result, load_catalog())
+  assert raised.value.jde_tt == hit.jde_tt == floor
+  assert raised.value.operation == "jde_to_utc"
+
+
+def test_transit_formatters_still_reject_a_moving_result() -> None:
+  for formatter in (format_transit_hits, format_return_hits):
+    with pytest.raises(TypeError, match="TransitHits"):
+      formatter(_result(), load_catalog())  # type: ignore[arg-type]
 
 
 @pytest.mark.parametrize("value", (None, True, "event", 2460392))

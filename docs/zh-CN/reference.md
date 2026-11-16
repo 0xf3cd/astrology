@@ -118,13 +118,22 @@
    :no-index:
 ```
 
+## 事件来源记录及显示错误
+
+```{eval-rst}
+.. automodule:: astrology.event_records
+   :members: TransitSource, EventDisplayError
+   :member-order: bysource
+   :no-index:
+```
+
 ## 精确行运命中
 
 UTC 区间搜索及结果字段见[精确行运命中](transits.md)。
 
 ```{eval-rst}
 .. automodule:: astrology.transits
-   :members: TransitDirection, TransitDomainError, EventDisplayError, TransitSource, TransitHit, TransitHits, transit_hit_utc, transit_hits
+   :members: TransitDirection, TransitDomainError, TransitHit, TransitHits, transit_hit_utc, transit_hits
    :undoc-members:
    :member-order: bysource
    :no-index:

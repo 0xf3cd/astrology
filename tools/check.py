@@ -64,6 +64,7 @@ PACKAGE_FILES = (
   "astrology/config.py",
   "astrology/cross_aspects.py",
   "astrology/dignities.py",
+  "astrology/event_records.py",
   "astrology/house_overlays.py",
   "astrology/houses.py",
   "astrology/lunar_phase.py",

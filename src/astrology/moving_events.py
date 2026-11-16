@@ -8,12 +8,12 @@ from datetime import datetime
 from enum import StrEnum
 
 from astrology._distribution import installed_version
-from astrology._validation import finite_number
+from astrology._validation import finite_number, nonempty_text
 from astrology.aspects import _branches, _deviation, _selected_aspects, _signed, aspect_angle
 from astrology.birth import _normalize_utc
 from astrology.config import MajorAspect
+from astrology.event_records import TransitSource
 from astrology.objects import AstronomicalObject, Body, LunarNode, _is_astronomical_object
-from astrology.transits import TransitSource
 
 
 class RelativeDirection(StrEnum):
@@ -95,12 +95,13 @@ class MovingAspectHit:
   Time is JDE(TT), longitudes are degrees and rates are degrees per TT day.
   signed_difference_deg retains native first-minus-second; separation_deg and
   deviation_deg use second-minus-first in (-180, 180]. direction describes that
-  relative separation, not either object's motion. A tangent can have unequal rates.
+  relative separation, not either object's motion. At a tangent, the reported
+  relative rate need not be exactly zero.
 
   一个主要相位分支，保留两侧移动角色及原生数值。时刻为 JDE(TT)，黄经以度计，速率为
   度/TT 日。signed_difference_deg 保留上游第一侧减第二侧；separation_deg 与
   deviation_deg 使用第二侧减第一侧，归入 (-180, 180]。direction 是相对角距方向，
-  不是任一对象自身的运动；相切时两侧速率仍可能不相等。
+  不是任一对象自身的运动；相切时报告的相对速率不一定恰为零。
   """
 
   first_object: AstronomicalObject
@@ -232,9 +233,7 @@ class MovingAspectEvents:
       if self.end_jde_tt - self.start_jde_tt > source.maximum_span_tt_days:
         raise ValueError("TT interval exceeds a retained event-source span")
     for name in ("celestial_version", "astrology_version"):
-      value = getattr(self, name)
-      if type(value) is not str or not value.strip():
-        raise ValueError(f"{name} must be a nonempty plain string")
+      nonempty_text(getattr(self, name), name)
     for hit in self.hits:
       if (hit.first_object, hit.second_object) not in self.pairs or hit.aspect not in self.aspects:
         raise ValueError("Hit pair and aspect must belong to the retained selections")
@@ -274,14 +273,21 @@ def moving_aspect_events(
   while constant mismatch is empty success. Both provider domains and their
   maximum spans apply. A rejected query raises MovingEventDomainError; native
   computation failures propagate unchanged, with no partial result.
-  Search lazily initializes native astronomy. Hits are sorted by raw TT, pair
-  request order, aspect angle and branch; coincident roles are not merged.
+  UTC endpoints must be aware built-in datetimes at or after 1972-01-01 UTC.
+  Invalid types raise TypeError; invalid selections/order raise ValueError, and
+  pre-1972 endpoints raise HistoricalTimeError. MovingEventDomainError is a
+  ValueError subclass. Search lazily initializes native astronomy.
+  Hits sort by raw TT, pair request order, aspect angle and branch. Events for
+  different requested pairs remain separate even at the same TT.
   See entry.moving_aspect_events for coordinate and source conventions.
 
   在转换后的左闭右开 TT 区间内搜索移动对象主要相位。对象对及相位须显式、非空且不重复。
   逆序是不同请求；自身配对及持续成立的关系无效，恒定不等则为空成功。两侧来源的域与最长
   区间均适用。查询拒绝抛 MovingEventDomainError；原生计算失败保持原异常，不返回部分结果。
-  搜索延迟初始化原生天文；按原始 TT、请求对象对顺序、相位角与分支排序，不合并重合角色。
+  UTC 端点须为有时区的内建 datetime，且不早于 1972-01-01 UTC。类型无效抛 TypeError；
+  选择或顺序无效抛 ValueError，早于 1972 年的端点抛 HistoricalTimeError。
+  MovingEventDomainError 是 ValueError 的子类。搜索延迟初始化原生天文；
+  按原始 TT、请求对象对顺序、相位角与分支排序，不同请求对象对的同时事件分别保留。
   坐标及来源约定见 entry.moving_aspect_events。
   """
   selected_pairs, selected_aspects = _pairs(pairs), _selected_aspects(aspects)

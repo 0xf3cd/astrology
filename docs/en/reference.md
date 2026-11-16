@@ -114,13 +114,21 @@ See [moment charts](moments.md) for fixed-instant comparisons and bilingual outp
    :member-order: bysource
 ```
 
+## Event source records and display errors
+
+```{eval-rst}
+.. automodule:: astrology.event_records
+   :members: TransitSource, EventDisplayError
+   :member-order: bysource
+```
+
 ## Exact transit hits
 
 See [exact transit hits](transits.md) for a UTC-interval search and result fields.
 
 ```{eval-rst}
 .. automodule:: astrology.transits
-   :members: TransitDirection, TransitDomainError, EventDisplayError, TransitSource, TransitHit, TransitHits, transit_hit_utc, transit_hits
+   :members: TransitDirection, TransitDomainError, TransitHit, TransitHits, transit_hit_utc, transit_hits
    :undoc-members:
    :member-order: bysource
 ```

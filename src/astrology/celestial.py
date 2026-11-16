@@ -17,13 +17,12 @@ from celestial_calendar import BodyState, Target
 from astrology.birth import Location, MissingBirthDataError
 from astrology.chart import ChartDomainError, ChartHouses, ChartTimes, EclipticPosition
 from astrology.config import ChartConfig, HouseSystem
+from astrology.event_records import EventDisplayError, TransitSource
 from astrology.moving_events import MovingEventDomainError, RelativeDirection, _MovingEvent
 from astrology.objects import AstronomicalObject, Body, LunarNode, _is_astronomical_object
 from astrology.transits import (
-  EventDisplayError,
   TransitDirection,
   TransitDomainError,
-  TransitSource,
   _TransitEvent,
 )
 
@@ -60,6 +59,11 @@ _EVENT_DIRECTIONS: dict[celestial.EventDirection, TransitDirection] = {
   celestial.EventDirection.INCREASING: TransitDirection.INCREASING,
   celestial.EventDirection.DECREASING: TransitDirection.DECREASING,
   celestial.EventDirection.TANGENT: TransitDirection.TANGENT,
+}
+_RELATIVE_DIRECTIONS: dict[celestial.EventDirection, RelativeDirection] = {
+  celestial.EventDirection.INCREASING: RelativeDirection.DECREASING,
+  celestial.EventDirection.DECREASING: RelativeDirection.INCREASING,
+  celestial.EventDirection.TANGENT: RelativeDirection.TANGENT,
 }
 
 # The ΔT model is fixed here, not requested by the caller, and is passed
@@ -289,6 +293,36 @@ def transit_source(identity: AstronomicalObject) -> TransitSource:
   )
 
 
+def transit_events(
+  identity: AstronomicalObject, longitude_deg: float, start_jde_tt: float, end_jde_tt: float
+) -> tuple[_TransitEvent, ...]:
+  """Search one level; preserve computation failures and wrap domain rejections.
+
+  搜索一个黄经；保留计算失败的原异常，为域拒绝附上行运查询信息。
+  """
+  target = _target(identity)
+  try:
+    events = celestial.longitude_events(target, longitude_deg, start_jde_tt, end_jde_tt)
+  except ValueError as exc:
+    raise TransitDomainError(
+      str(exc),
+      operation="longitude_events",
+      moving_object=identity,
+      start_jde_tt=start_jde_tt,
+      end_jde_tt=end_jde_tt,
+      upstream_message=str(exc),
+    ) from exc
+  return tuple(
+    _TransitEvent(
+      event.jde_tt,
+      event.longitude_deg,
+      event.longitude_rate_deg_per_tt_day,
+      _EVENT_DIRECTIONS[event.direction],
+    )
+    for event in events
+  )
+
+
 def moving_interval(start: datetime, end: datetime) -> tuple[float, float]:
   """Convert moving-query UTC endpoints to TT. 将移动查询的 UTC 端点转为 TT。"""
   try:
@@ -330,11 +364,6 @@ def moving_events(
       end_jde_tt=end_jde_tt,
       upstream_message=str(exc),
     ) from exc
-  directions = {
-    celestial.EventDirection.INCREASING: RelativeDirection.DECREASING,
-    celestial.EventDirection.DECREASING: RelativeDirection.INCREASING,
-    celestial.EventDirection.TANGENT: RelativeDirection.TANGENT,
-  }
   return tuple(
     _MovingEvent(
       event.jde_tt,
@@ -343,37 +372,7 @@ def moving_events(
       event.longitude_rate_a_deg_per_tt_day,
       event.longitude_rate_b_deg_per_tt_day,
       event.signed_difference_deg,
-      directions[event.direction],
-    )
-    for event in events
-  )
-
-
-def transit_events(
-  identity: AstronomicalObject, longitude_deg: float, start_jde_tt: float, end_jde_tt: float
-) -> tuple[_TransitEvent, ...]:
-  """Search one level; preserve computation failures and wrap domain rejections.
-
-  搜索一个黄经；保留计算失败的原异常，为域拒绝附上行运查询信息。
-  """
-  target = _target(identity)
-  try:
-    events = celestial.longitude_events(target, longitude_deg, start_jde_tt, end_jde_tt)
-  except ValueError as exc:
-    raise TransitDomainError(
-      str(exc),
-      operation="longitude_events",
-      moving_object=identity,
-      start_jde_tt=start_jde_tt,
-      end_jde_tt=end_jde_tt,
-      upstream_message=str(exc),
-    ) from exc
-  return tuple(
-    _TransitEvent(
-      event.jde_tt,
-      event.longitude_deg,
-      event.longitude_rate_deg_per_tt_day,
-      _EVENT_DIRECTIONS[event.direction],
+      _RELATIVE_DIRECTIONS[event.direction],
     )
     for event in events
   )

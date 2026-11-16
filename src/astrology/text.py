@@ -692,9 +692,14 @@ def format_cross_aspects(
   return "\n".join(lines)
 
 
-def _event_inputs(result: TransitHits, catalog: Catalog, language: Language) -> None:
-  if type(result) is not TransitHits or type(catalog) is not Catalog:
-    raise TypeError("result and catalog must be TransitHits and Catalog values")
+def _event_inputs(
+  result: TransitHits | MovingAspectEvents,
+  catalog: Catalog,
+  language: Language,
+  result_type: type[TransitHits] | type[MovingAspectEvents],
+) -> None:
+  if type(result) is not result_type or type(catalog) is not Catalog:
+    raise TypeError(f"result and catalog must be {result_type.__name__} and Catalog values")
   if type(language) is not str or language not in _LANGUAGES:
     raise ValueError("language must be en or zh-CN")
 
@@ -730,7 +735,7 @@ def format_transit_hits(result: TransitHits, catalog: Catalog, *, language: Lang
   TT 到民用时刻的转换，不重新搜索、计算宫位或建盘。转换先把日小数舍入到微秒，
   表格再截断到整秒；原始 TT 仍是事件依据。
   """
-  _event_inputs(result, catalog, language)
+  _event_inputs(result, catalog, language, TransitHits)
   labels = _EVENT_LABELS[language]
   lines = [labels["transit_title"], *_event_context(result, catalog, language), ""]
   lines.append(labels["transit_columns"])
@@ -763,14 +768,13 @@ def format_moving_events(
 
   Empty results are native-free. Populated rows use moving_hit_utc's conversion-only
   path. UTC is displayed to whole seconds without changing raw-TT ordering.
+  Invalid result/catalog types raise TypeError; an unknown language raises ValueError.
 
   用给定词汇显示两侧移动角色、相对运动、UTC 及原始 TT。空结果不调用原生库；
   非空行仅用 moving_hit_utc 转换时刻。UTC 显示到整秒，不改变原始 TT 排序。
+  结果或目录类型无效抛 TypeError；语言无效抛 ValueError。
   """
-  if type(result) is not MovingAspectEvents or type(catalog) is not Catalog:
-    raise TypeError("result and catalog must be MovingAspectEvents and Catalog values")
-  if type(language) is not str or language not in _LANGUAGES:
-    raise ValueError("language must be en or zh-CN")
+  _event_inputs(result, catalog, language, MovingAspectEvents)
   labels = _EVENT_LABELS[language]
   pairs = "; ".join(
     f"({_name(first, catalog, language)} [{first.value}], "
@@ -820,7 +824,7 @@ def format_return_hits(result: TransitHits, catalog: Catalog, *, language: Langu
   本命 TT。其他 TransitHits 形状抛 ValueError。空结果与非空结果的转换副作用同
   format_transit_hits。
   """
-  _event_inputs(result, catalog, language)
+  _event_inputs(result, catalog, language, TransitHits)
   _require_return_result(result)
   labels = _EVENT_LABELS[language]
   lines = [labels["return_title"], *_event_context(result, catalog, language), ""]
