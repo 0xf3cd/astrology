@@ -45,7 +45,8 @@ whole-second table display. Display precision never changes event membership.
 
 The USNO definition identifies exact new/full moons with Moon-minus-Sun apparent
 ecliptic longitude 0°/180°. Reversal leaves these targets unchanged: 0° stays 0°,
-and -180° is represented as 180°.
+and -180° is represented as 180°. The example's `(Moon, Sun)` pair uses the
+reversed Sun-minus-Moon separation.
 The [knowledge entry](catalog.md), `entry.moving_aspect_events`, records that source
 separately from the project's model and search conventions.
 
@@ -76,13 +77,14 @@ Opposition remains 180° after reversal. At a tangent, the separation reaches th
 requested branch without crossing it; the reported relative rate need not be
 exactly zero. Hits sort by raw TT, requested pair order, aspect angle and branch.
 Two requested pairs that hit at the same TT give two hits. Nearby times returned
-by the provider are not combined by a tolerance.
+by the upstream search are not combined by a tolerance.
 Direction follows the continuous (unwrapped) second-minus-first longitude across
 wraps, not the absolute value of the canonical separation.
 
 ## Empty results and failures
 
-The UTC endpoints must be aware built-in datetimes at or after 1972-01-01 UTC.
+The UTC endpoints must be aware built-in datetimes whose instants, converted to
+UTC, are at or after 1972-01-01 UTC.
 The search uses their converted **half-open TT interval**, at most 3660 TT days,
 within both providers' event domains.
 
@@ -101,8 +103,9 @@ nodes cannot be conjunct:
 No exact moving-pair events in the supplied interval
 ```
 
-Their continuously satisfied opposition is rejected rather than represented by
-an infinite event list. Invalid types raise `TypeError`; invalid selections,
+The mean ascending and descending nodes' continuously satisfied opposition is
+rejected rather than represented by an infinite event list. Invalid types raise
+`TypeError`; invalid selections,
 self-pairs or endpoint order raise `ValueError`. Pre-1972 UTC raises
 `HistoricalTimeError`. Domain/span rejections raise `MovingEventDomainError`,
 a `ValueError` subclass,
