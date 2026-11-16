@@ -13,6 +13,7 @@ the [guides](https://0xf3cd.github.io/astrology/docs/en/index.html) and
 
 The library provides:
 
+- [Moving-pair events](https://0xf3cd.github.io/astrology/docs/en/moving_events.html): find new/full moons and planetary aspects without a natal chart.
 - [Ten-body planetary returns](https://0xf3cd.github.io/astrology/docs/en/returns.html): find every post-natal event in an explicit interval, then build its chart at a supplied location.
 - [Event UTC and English/Chinese tables](https://0xf3cd.github.io/astrology/docs/en/transits.html#read-utc-and-format-event-tables), without choosing a display location or building a chart.
 - [Moment charts and fixed-instant transit-to-natal aspects](https://0xf3cd.github.io/astrology/docs/en/moments.html), including direct construction from a retained exact hit and bilingual text.

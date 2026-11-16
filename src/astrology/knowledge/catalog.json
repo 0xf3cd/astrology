@@ -173,9 +173,29 @@
       "definition": {"en": "Hold the selected natal longitude fixed with zero derivative. For each major-aspect angle from astrology.aspects.aspect_angle, search the moving apparent longitude at the natal degree plus each oriented branch, modulo one turn. Coincident conjunction/opposition branches are searched once. astrology.transits.transit_hits composes the native events and retains their moving rate and contact direction.", "zh": "将所选本命黄经固定，导数为零。对 astrology.aspects.aspect_angle 定义的主要相位角，将本命度数加各有向分支角并归入一周，搜索移动视黄经达到该度数的时刻。合相与对分相的重合分支各只搜索一次。astrology.transits.transit_hits 组合原生事件，保留其移动速率及接触方向。"},
       "tradition": {"en": "Project-defined composition of exact longitude aspects; no interpretive tradition is selected.", "zh": "项目对精确黄经相位的组合定义，不选择解读传统。"},
       "limits": {"en": "Natal and moving tropical degrees retain their own dates, without a common-epoch transformation or a simultaneous spatial-angle claim. A natal axis is a stored house-geometry point, not an apparent geocentric body position. Named mean and Meeus five-term nodes retain their definitions, not an osculating-node substitute. Exact means the native numerical root/contact contract, not an astronomical accuracy guarantee or a bitwise-zero tangent rate. No orb window, applying/separating label or interpretation follows from an exact hit.", "zh": "本命与移动热带度数保留各自日期，不转换共同历元，也不声称是同时刻的空间角。本命轴是已存宫位几何点，不是地心视天体位置。具名平交点及 Meeus 五项交点保留其定义，不替换为密切轨道交点。精确指原生数值求根或接触合同，不是天文精度保证，也不要求相切速率的位模式为零。精确命中本身不推出容许度窗口、入相出相标签或解读。"}
+    },
+    {
+      "identifier": "rule.project.moving_aspect_events",
+      "name": {"en": "Exact moving-pair aspects", "zh": "精确移动对象对相位"},
+      "concept_ids": ["aspect.conjunction", "aspect.sextile", "aspect.square", "aspect.trine", "aspect.opposition"],
+      "definition": {"en": "Both apparent geocentric tropical longitudes vary at the same TT. Search each oriented second-minus-first branch from astrology.aspects.aspect_angle by negating its target for the native first-minus-second query. Conjunction and opposition each have one branch. Retain both raw longitudes and rates; relative rate is second minus first. Keep native contact classification, reversing increasing/decreasing to express the project orientation. Coincident events for distinct ordered pairs remain separate.", "zh": "两侧地心视热带黄经在同一 TT 随时间变化。按第二侧减第一侧的有向分支搜索 astrology.aspects.aspect_angle 给出的相位角，将目标取反交给上游第一侧减第二侧的查询。合相与对分相各有一个分支。保留两侧原始黄经及速率；相对速率为第二侧减第一侧。保留原生接触分类，将增减方向反转为项目方向。不同有序对象对的同时事件分别保留。"},
+      "tradition": {"en": "Project composition of existing major-aspect geometry and the released native pair-event contract.", "zh": "项目对既有主要相位几何与已发行原生对象对事件合同的组合。"},
+      "limits": {"en": "Both provider domains and span limits apply. Exact means the native numerical crossing/contact contract, not a global astronomical accuracy bound or a bitwise-zero relative rate. Named mean and Meeus five-term nodes keep their definitions. Longitude separation is not three-dimensional angular distance. No orb, interpretation or fixed natal role is implied.", "zh": "两侧来源的求值域及长度上限均适用。精确指上游数值穿越或接触合同，不是全域天文精度界，也不要求相对速率的位模式为零。具名平交点及 Meeus 五项交点保留自身定义。黄经角距不等于三维空间夹角。不隐含容许度、解读或固定本命角色。"}
     }
   ],
   "sources": [
+    {
+      "identifier": "source.usno.moon-phases",
+      "title": "Phases of the Moon",
+      "author": "U.S. Naval Observatory, Astronomical Applications Department",
+      "edition": "Webpage inspected 2026-11-15; publication date not stated",
+      "language": "en",
+      "lineage": {"en": "Retained HTML SHA-256 0fb38b03590a917d9461b617bdcab9f5aff653c694ba8fb299c38a348c511bd4. Linked third-party images and animations were not acquired. The exact primary-phase definition is independent of this project's phase-band and event implementations.", "zh": "保留 HTML 的 SHA-256 为 0fb38b03590a917d9461b617bdcab9f5aff653c694ba8fb299c38a348c511bd4。未取得外链第三方图片及动画。精确主要月相定义独立于本项目的月相分型及事件实现。"},
+      "rights": {"en": "Project paraphrase and citation only; no HTML, images or animations are redistributed.", "zh": "仅收项目释义及引用，不再分发 HTML、图片或动画。"},
+      "scope": {"en": "Defines primary phases by Moon-minus-Sun apparent ecliptic longitude, including 0 degrees for new moon and 180 for full moon. Does not specify the project's geocentric model, equinox-of-date convention, time scale, search policy or accuracy tolerances.", "zh": "按月亮减太阳的视黄经定义主要月相，包括新月的 0 度及满月的 180 度。不规定项目的地心模型、当日春分点约定、时标、搜索政策或精度容差。"},
+      "verification": "verified",
+      "url": "https://aa.usno.navy.mil/faq/moon_phases"
+    },
     {
       "identifier": "source.astrowiki.solar_return.10448",
       "title": "Solar Return Chart",
@@ -240,7 +260,7 @@
       "identifier": "source.celestial-calendar.events.1.1.1",
       "title": "celestial-calendar longitude events and UTC conversion",
       "author": "celestial-calendar contributors",
-      "edition": "Released Python package 1.1.1: events.py, utc_to_jde, longitude_events and model/capability interfaces",
+      "edition": "Released Python package 1.1.1: events.py, utc_to_jde, longitude_events, longitude_difference_events and model/capability interfaces",
       "language": "en",
       "lineage": {"en": "Released Python binding definitions and native model/capability descriptions, inspected with the published 1.1.1 package. The event search and UTC conversion are upstream operations; composing them with fixed natal targets is this project's rule.", "zh": "已核公开发行的 1.1.1 Python 绑定定义及原生模型、能力说明。事件搜索及 UTC 转换是上游操作；与固定本命目标组合是本项目规则。"},
       "rights": {"en": "Upstream code is MIT licensed. This record contains project-authored summaries, not a redistributed implementation.", "zh": "上游代码采用 MIT 许可证。此记录为项目自写摘要，不再分发上游实现。"},
@@ -369,11 +389,11 @@
     },
     {
       "identifier": "entry.moment_charts",
-      "statement": {"en": "A moment chart retains an explicit instant and location without birth metadata; a retained transit hit can supply its source time through the public chart entry.", "zh": "时刻盘保留显式时刻与地点，不含出生资料；保留的行运命中可通过公开建盘入口提供来源时刻。"},
+      "statement": {"en": "A moment chart retains an explicit instant and location without birth metadata; a retained transit or moving-pair hit can supply its source time through the public chart entry.", "zh": "时刻盘保留显式时刻与地点，不含出生资料；保留的行运或移动对象对命中可通过公开建盘入口提供来源时刻。", "revision": 2, "zh_revision": 2},
       "concept_ids": ["house.whole_sign", "house.equal", "house.placidus"],
       "rule_ids": ["rule.project.moment_charts"],
       "citations": [{"source_id": "source.celestial-calendar.events.1.1.1", "locator": "jde_to_utc and utc_to_jde Python contracts and retained fixed leap offsets; the moment input/result composition is project-defined"}],
-      "prerequisites": [{"en": "An explicit location and ChartConfig, and an aware modern datetime or a retained TransitHit whose converted UTC and joint snapshot are admitted.", "zh": "显式地点及 ChartConfig，以及有时区的现代 datetime，或转换后 UTC 及联合快照均被接纳的保留 TransitHit。"}],
+      "prerequisites": [{"en": "An explicit location and ChartConfig, and an aware modern datetime or a retained TransitHit or MovingAspectHit whose converted UTC and joint snapshot are admitted.", "zh": "显式地点及 ChartConfig，以及有时区的现代 datetime，或转换后 UTC 及联合快照均被接纳的保留 TransitHit、MovingAspectHit。", "revision": 2, "zh_revision": 2}],
       "exceptions": {"en": "A valid event-source TT is not sufficient to admit a complete chart; converted UTC can leave the modern domain or cross the house-year ceiling.", "zh": "事件来源 TT 合法不等于能计算完整命盘；转换后的 UTC 可能越出现代范围或跨过宫位年上限。"},
       "limits": {"en": "Project-defined input/result policy. The upstream citation covers time conversion, not an independent numerical reference or the project's chart composition. Retrieval performs no chart calculation or chart matching.", "zh": "项目自定输入与结果政策。上游引用支持时刻转换，不是独立数值参考，也不定义项目排盘组合。检索不进行排盘或命盘匹配。"},
       "prerequisite_status": "complete", "output_eligibility": "reference_only"
@@ -399,6 +419,22 @@
       "exceptions": {"en": "Retrograde loops can produce repeated hits. Tangent is an exact numerical contact, not a promise of a zero rate. Simultaneous different endpoint identities remain separate.", "zh": "逆行回环可产生多次命中。tangent 是精确数值接触，不承诺速率为零。同一时刻的不同端点身份仍分别保留。"},
       "limits": {"en": "The composition and own-date fixed-target convention are project definitions, not attributed to Lilly. The upstream contract is not an independent accuracy reference. Scope and coordinate limits are in rule.project.exact_transit_hits; catalog retrieval performs no event search or chart-applicability judgment. This is reference information, not an eligible default interpretation.", "zh": "组合及自身日期固定目标约定由项目定义，不归于 Lilly。上游合同不是独立精度参考。范围及坐标限度见 rule.project.exact_transit_hits；目录检索不搜索事件，也不判断命盘适用性。此为参考信息，不用于默认解读输出。"},
       "prerequisite_status": "complete", "output_eligibility": "reference_only"
+    },
+    {
+      "identifier": "entry.moving_aspect_events",
+      "statement": {"en": "Moving-pair events find exact major-aspect branches between two moving longitudes without a natal chart. Moon/Sun conjunctions and oppositions supply exact new/full-moon events.", "zh": "移动对象对事件无需本命盘，搜索两个移动黄经之间的精确主要相位分支。月亮与太阳的合相、对分相给出精确新月与满月事件。"},
+      "concept_ids": ["body.sun", "body.moon", "aspect.conjunction", "aspect.sextile", "aspect.square", "aspect.trine", "aspect.opposition"],
+      "rule_ids": ["rule.project.moving_aspect_events", "rule.project.aspect_deviation"],
+      "citations": [
+        {"source_id": "source.usno.moon-phases", "locator": "Primary phases: excess of apparent lunar ecliptic longitude over solar longitude; new moon 0 degrees and full moon 180 degrees; project paraphrase."},
+        {"source_id": "source.celestial-calendar.events.1.1.1", "locator": "longitude_difference_events, LongitudeDifferenceEvent and EVENTS capabilities: directed first-minus-second angle, both rates, half-open TT interval and failure behavior"},
+        {"source_id": "source.astrology", "locator": "src/astrology/moving_events.py and src/astrology/aspects.py: composition and oriented major-aspect geometry"}
+      ],
+      "prerequisites": [{"en": "Explicit distinct ordered body/node pairs, major-aspect identities and modern UTC bounds admitted by both event providers.", "zh": "显式且两侧身份不同的有序天体或交点对、主要相位身份，以及两侧事件来源均接纳的现代 UTC 端点。"}],
+      "exceptions": {"en": "Reversed pairs are separate roles. Constant mismatch is empty success; self-pairs and continuously satisfied relations are rejected. A failure aborts the whole result. A valid event remains available if chart construction fails.", "zh": "逆序对象对是不同角色。恒定不等为空成功；自身配对及持续成立的关系被拒绝。任一失败均中止整个结果。建盘失败时，有效事件仍可保留。"},
+      "limits": {"en": "The USNO citation establishes the exact phase-angle definition; the model, frame, time scale and query policy are project conventions. Numerical contacts follow the upstream contract, not an independent accuracy guarantee. No phase-band classification, orb window or interpretation follows from an event. Catalog retrieval does not search events or assess chart applicability.", "zh": "USNO 引用确立精确月相角定义；模型、坐标、时标及查询政策为项目约定。数值接触沿用上游合同，不是独立精度保证。事件本身不推出月相分型、容许度窗口或解读。目录检索不搜索事件或判断命盘适用性。"},
+      "prerequisite_status": "complete",
+      "output_eligibility": "reference_only"
     },
     {
       "identifier": "entry.sign_elements",

@@ -14,7 +14,7 @@ from typing import Final, Literal, get_args
 from astrology._comparison import _selection_for_chart
 from astrology._distribution import installed_version
 from astrology._validation import finite_number
-from astrology.aspects import _branches, aspect_angle
+from astrology.aspects import _branches, _selected_aspects, aspect_angle
 from astrology.birth import _normalize_utc
 from astrology.chart import (
   _POSITION_FRAME,
@@ -125,17 +125,6 @@ def _moving(values: Sequence[AstronomicalObject]) -> tuple[AstronomicalObject, .
   return result
 
 
-def _aspects(values: Sequence[MajorAspect]) -> tuple[MajorAspect, ...]:
-  if not isinstance(values, Sequence) or isinstance(values, (str, bytes)):
-    raise TypeError("aspects must be a sequence of MajorAspect values")
-  result = tuple(values)
-  if any(type(value) is not MajorAspect for value in result):
-    raise TypeError("aspects must contain only MajorAspect values")
-  if not result or len(set(result)) != len(result):
-    raise ValueError("aspects must be nonempty and must not repeat identities")
-  return tuple(sorted(result, key=aspect_angle))
-
-
 def _text(value: str, name: str) -> None:
   if type(value) is not str or not value.strip():
     raise ValueError(f"{name} must be a nonempty plain string")
@@ -242,24 +231,9 @@ def transit_hit_utc(hit: TransitHit) -> datetime:
   """
   if type(hit) is not TransitHit:
     raise TypeError("hit must be a TransitHit")
-  from astrology.celestial import _civil_from_tt, _datetime_from_civil
+  from astrology.celestial import event_utc
 
-  try:
-    civil = _civil_from_tt(hit.jde_tt)
-    if (civil.year, civil.month, civil.day) < (1972, 1, 1):
-      raise EventDisplayError(
-        "Event TT resolves to the upstream pre-1972 UT1 substitute, not ordinary UTC",
-        jde_tt=hit.jde_tt,
-      )
-    return _datetime_from_civil(civil)
-  except EventDisplayError:
-    raise
-  except (ValueError, OverflowError) as exc:
-    raise EventDisplayError(
-      f"Event TT cannot be converted to display UTC: {exc}",
-      jde_tt=hit.jde_tt,
-      upstream_message=str(exc),
-    ) from exc
+  return event_utc(hit.jde_tt)
 
 
 @dataclass(frozen=True, slots=True)
@@ -315,7 +289,7 @@ class TransitHits:
     natal = _selection_for_chart(self.chart, self.natal_objects, "natal_objects")
     if not natal:
       raise ValueError("natal_objects must not be empty")
-    aspects = _aspects(self.aspects)
+    aspects = _selected_aspects(self.aspects)
     for name, value in (("moving_objects", moving), ("natal_objects", natal), ("aspects", aspects)):
       object.__setattr__(self, name, value)
     for name, member_type in (("sources", TransitSource), ("hits", TransitHit)):
@@ -428,7 +402,7 @@ def transit_hits(
   natal = _selection_for_chart(chart, natal_objects, "natal_objects")
   if not natal:
     raise ValueError("natal_objects must not be empty")
-  selected_aspects = _aspects(aspects)
+  selected_aspects = _selected_aspects(aspects)
 
   from astrology.celestial import (
     celestial_version,

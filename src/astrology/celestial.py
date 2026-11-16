@@ -1,10 +1,10 @@
-"""Concrete celestial-calendar calls for chart snapshots and transit event searches.
+"""Concrete celestial-calendar calls for chart snapshots and exact-event searches.
 
-Copy native records into chart/transit domain values. Calculation entries import
+Copy native records into chart/event domain values. Calculation entries import
 this adapter lazily; importing the public value types does not load it.
 
-为命盘快照与行运事件搜索提供 celestial-calendar 的具体调用。
-将原生记录复制为命盘或行运领域值；计算入口延迟导入本层，导入公开值类型不会加载它。
+为命盘快照与精确事件搜索提供 celestial-calendar 的具体调用。
+将原生记录复制为命盘或事件领域值；计算入口延迟导入本层，导入公开值类型不会加载它。
 """
 
 from __future__ import annotations
@@ -17,8 +17,15 @@ from celestial_calendar import BodyState, Target
 from astrology.birth import Location, MissingBirthDataError
 from astrology.chart import ChartDomainError, ChartHouses, ChartTimes, EclipticPosition
 from astrology.config import ChartConfig, HouseSystem
+from astrology.moving_events import MovingEventDomainError, RelativeDirection, _MovingEvent
 from astrology.objects import AstronomicalObject, Body, LunarNode, _is_astronomical_object
-from astrology.transits import TransitDirection, TransitDomainError, TransitSource, _TransitEvent
+from astrology.transits import (
+  EventDisplayError,
+  TransitDirection,
+  TransitDomainError,
+  TransitSource,
+  _TransitEvent,
+)
 
 _BODY_TARGETS: dict[Body, Target] = {
   Body.SUN: Target.SUN,
@@ -211,6 +218,26 @@ def _datetime_from_civil(civil: celestial.CivilDateTime) -> datetime:
   return datetime(civil.year, civil.month, civil.day, tzinfo=UTC) + timedelta(days=civil.fraction)
 
 
+def event_utc(jde_tt: float) -> datetime:
+  """Convert retained TT to ordinary display UTC. 将保留的 TT 转为普通显示 UTC。"""
+  try:
+    civil = _civil_from_tt(jde_tt)
+    if (civil.year, civil.month, civil.day) < (1972, 1, 1):
+      raise EventDisplayError(
+        "Event TT resolves to the upstream pre-1972 UT1 substitute, not ordinary UTC",
+        jde_tt=jde_tt,
+      )
+    return _datetime_from_civil(civil)
+  except EventDisplayError:
+    raise
+  except (ValueError, OverflowError) as exc:
+    raise EventDisplayError(
+      f"Event TT cannot be converted to display UTC: {exc}",
+      jde_tt=jde_tt,
+      upstream_message=str(exc),
+    ) from exc
+
+
 def moment_utc(jde_tt: float, house_system: HouseSystem) -> datetime:
   """Convert a source event's TT to a Python UTC instant for snapshot calculation.
 
@@ -259,6 +286,66 @@ def transit_source(identity: AstronomicalObject) -> TransitSource:
     capability.domain_end_jde_tt,
     capability.maximum_span_tt_days,
     celestial.capability_text(celestial.CapabilityOperation.EVENTS, target),
+  )
+
+
+def moving_interval(start: datetime, end: datetime) -> tuple[float, float]:
+  """Convert moving-query UTC endpoints to TT. 将移动查询的 UTC 端点转为 TT。"""
+  try:
+    return celestial.utc_to_jde(_civil(start)), celestial.utc_to_jde(_civil(end))
+  except ValueError as exc:
+    raise MovingEventDomainError(
+      str(exc),
+      operation="utc_to_jde",
+      upstream_message=str(exc),
+    ) from exc
+
+
+def moving_events(
+  first: AstronomicalObject,
+  second: AstronomicalObject,
+  difference_deg: float,
+  start_jde_tt: float,
+  end_jde_tt: float,
+) -> tuple[_MovingEvent, ...]:
+  """Search one native first-minus-second level and copy both moving roles.
+
+  搜索一个上游第一侧减第二侧的角度，复制两侧移动角色。
+  """
+  try:
+    events = celestial.longitude_difference_events(
+      _target(first),
+      _target(second),
+      difference_deg,
+      start_jde_tt,
+      end_jde_tt,
+    )
+  except ValueError as exc:
+    raise MovingEventDomainError(
+      str(exc),
+      operation="longitude_difference_events",
+      first_object=first,
+      second_object=second,
+      start_jde_tt=start_jde_tt,
+      end_jde_tt=end_jde_tt,
+      upstream_message=str(exc),
+    ) from exc
+  directions = {
+    celestial.EventDirection.INCREASING: RelativeDirection.DECREASING,
+    celestial.EventDirection.DECREASING: RelativeDirection.INCREASING,
+    celestial.EventDirection.TANGENT: RelativeDirection.TANGENT,
+  }
+  return tuple(
+    _MovingEvent(
+      event.jde_tt,
+      event.longitude_a_deg,
+      event.longitude_b_deg,
+      event.longitude_rate_a_deg_per_tt_day,
+      event.longitude_rate_b_deg_per_tt_day,
+      event.signed_difference_deg,
+      directions[event.direction],
+    )
+    for event in events
   )
 
 

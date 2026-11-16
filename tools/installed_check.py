@@ -163,12 +163,34 @@ def acceptance_returns(
   return tuple(results)
 
 
+def acceptance_moving_events() -> tuple[astrology.MovingAspectEvents, astrology.MomentChart]:
+  """Search moving events and build a chart at the first retained time.
+
+  搜索移动事件，并为第一个保留时刻建盘。
+  """
+  events = astrology.moving_aspect_events(
+    pairs=((astrology.Body.MOON, astrology.Body.SUN),),
+    aspects=(astrology.MajorAspect.CONJUNCTION, astrology.MajorAspect.OPPOSITION),
+    start_utc=datetime(2024, 1, 1, tzinfo=UTC),
+    end_utc=datetime(2024, 2, 1, tzinfo=UTC),
+  )
+  chart = astrology.moment_chart(
+    events.hits[0],
+    astrology.Location(0, 0),
+    astrology.ChartConfig(
+      astrology.HouseSystem.WHOLE_SIGN, (astrology.Body.SUN, astrology.Body.MOON), ()
+    ),
+  )
+  return events, chart
+
+
 def calculation_observations(
   chart: astrology.NatalChart,
   transits: astrology.TransitHits,
   moments: tuple[astrology.MomentChart, astrology.MomentChart],
   returns: tuple[tuple[astrology.TransitHits, astrology.MomentChart], ...],
   catalog: Catalog,
+  moving: tuple[astrology.MovingAspectEvents, astrology.MomentChart],
 ) -> str:
   """Capture supplied astronomy values and their pure comparison/text outputs.
 
@@ -181,6 +203,15 @@ def calculation_observations(
   return json.dumps(
     {
       "chart": json.loads(chart_observations(chart)),
+      "moving_events": {
+        "search": repr(moving[0]),
+        "utc": [astrology.moving_hit_utc(hit).isoformat() for hit in moving[0].hits],
+        "text": {
+          language: astrology.format_moving_events(moving[0], catalog, language=language)
+          for language in languages
+        },
+        "chart": json.loads(chart_observations(moving[1])),
+      },
       "transits": repr(transits),
       "transit_table": {
         language: astrology.format_transit_hits(transits, catalog, language=language)
@@ -485,7 +516,12 @@ def _check_natal_chart(expected_observations: Path | None = None) -> None:
   transits = acceptance_transits(chart)
   returns = acceptance_returns(chart)
   observed = calculation_observations(
-    chart, transits, acceptance_moments(chart, transits), returns, astrology.load_catalog()
+    chart,
+    transits,
+    acceptance_moments(chart, transits),
+    returns,
+    astrology.load_catalog(),
+    acceptance_moving_events(),
   )
   if expected_observations is not None and observed != expected_observations.read_text(
     encoding="utf-8"

@@ -90,7 +90,8 @@ True
 
 <!-- usage: chart.hit_moment -->
 
-把保留的 `TransitHit` 直接传给 `moment_chart`，无需导入上游转换器。
+把保留的 `TransitHit` 或[移动对象对 `MovingAspectHit`](moving_events.md)
+直接传给 `moment_chart`，无需导入上游转换器。
 显式给出的地点用于新盘的宫位计算：
 
 ```{doctest}

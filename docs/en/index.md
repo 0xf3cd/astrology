@@ -13,6 +13,7 @@ task you need:
 | Build a moment chart or compare fixed-instant transits | [Moment charts](moments.md) |
 | Compare two charts | [Cross-chart aspects and house overlays](cross_aspects.md) |
 | Find exact transits in a UTC interval | [Exact transit hits](transits.md) |
+| Find new/full moons and planetary aspects without a natal chart | [Moving-pair events](moving_events.md) |
 | Find ten-body returns and choose a chart location | [Returns](returns.md) |
 | Read event UTC or print English/Chinese event tables | [Event display](transits.md#read-utc-and-format-event-tables) |
 | Count elements/modalities or classify lunar phase | [Sign distributions and natal lunar phase](summaries.md) |
@@ -34,6 +35,7 @@ moments
 aspects
 cross_aspects
 transits
+moving_events
 returns
 summaries
 dignities

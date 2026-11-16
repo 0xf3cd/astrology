@@ -137,6 +137,17 @@ doctrees、缓存及其他构建控制文件不进入站点成品。检查所有
 
 ## 正确性
 
+`tests/reference/moving_pair_reference.json` 的移动对象对参考不导入 astrology 或其原生后端：
+
+```sh
+uv run --no-project --python 3.11 --with pyswisseph==2.10.3.2 python tools/fetch_moving_reference.py --output <candidates-path>
+uv run --locked python tools/calibrate_moving_reference.py --candidates <candidates-path> --output <fixture-path> --observations <observations-path>
+```
+
+夹具记录 Moshier 标志位及版本、粗细网格穿越核对、相对速度极值、同历元校准数量与误差界及逐命中
+双侧时间容差。第二条命令是原生比较，不是独立参考生成。经验容差限制夹具能检出的时刻误差；
+扫描不认证全部事件或相切。真实 canonical 适配层接触与明确合成的公开主要相位接触分别测试。
+
 `tests/reference/return_reference.json` 的返照夹具使用 pyswisseph 2.10.3.2 / Swiss 2.10.03
 独立计算的本命黄经及 TT 穿越时刻，显式采用 Moshier 加速率标志 260。重生成时不导入项目或
 其原生天文后端，也不改项目依赖：

@@ -37,6 +37,7 @@ REQUIRED_TOPICS = frozenset(
     "dignities.lookup",
     "dignities.dispositors",
     "transits.hits",
+    "moving.events",
     "returns.search",
     "returns.chart",
     "contributing.checks",

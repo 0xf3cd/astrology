@@ -20,6 +20,7 @@ from astrology.knowledge.catalog import _configuration_name
 from astrology.knowledge.catalog import _current_name as _raw_current_name
 from astrology.knowledge.records import _LANGUAGES, Language
 from astrology.lunar_phase import LunarPhaseResult
+from astrology.moving_events import MovingAspectEvents, RelativeDirection, moving_hit_utc
 from astrology.objects import Axis, ChartObject
 from astrology.returns import _require_return_result
 from astrology.summaries import SignDistribution
@@ -215,6 +216,12 @@ _EVENT_LABELS = {
   "en": {
     "transit_title": "Exact transit hits",
     "return_title": "Planetary returns",
+    "moving_title": "Exact moving-pair events",
+    "pairs": "Requested moving pairs (first, second)",
+    "aspects": "Requested aspects",
+    "relative_legend": "Relative direction and rate describe second minus first longitude.",
+    "moving_columns": "UTC | First moving object | Second moving object | Aspect | Branch | Relative direction | Relative rate (degrees/TT day) | JDE(TT)",
+    "empty_moving": "No exact moving-pair events in the supplied interval",
     "utc_interval": "Supplied UTC interval [start, end)",
     "tt_interval": "Converted TT interval [start, end)",
     "models": "Event models",
@@ -227,6 +234,12 @@ _EVENT_LABELS = {
   "zh-CN": {
     "transit_title": "精确行运命中",
     "return_title": "行星返照",
+    "moving_title": "精确移动对象对事件",
+    "pairs": "请求移动对象对（第一侧，第二侧）",
+    "aspects": "请求相位",
+    "relative_legend": "相对方向与速率按第二侧黄经减第一侧黄经定义。",
+    "moving_columns": "UTC | 第一侧移动对象 | 第二侧移动对象 | 相位 | 分支 | 相对方向 | 相对速率（度/TT 日） | JDE(TT)",
+    "empty_moving": "给定区间内没有精确移动对象对事件",
     "utc_interval": "给定 UTC 区间 [start, end)",
     "tt_interval": "转换后 TT 区间 [start, end)",
     "models": "事件模型",
@@ -243,6 +256,18 @@ _EVENT_DIRECTIONS = {
     TransitDirection.INCREASING: "黄经增大",
     TransitDirection.DECREASING: "黄经减小",
     TransitDirection.TANGENT: "相切",
+  },
+}
+_RELATIVE_DIRECTIONS = {
+  "en": {
+    RelativeDirection.INCREASING: "separation increasing",
+    RelativeDirection.DECREASING: "separation decreasing",
+    RelativeDirection.TANGENT: "separation tangent",
+  },
+  "zh-CN": {
+    RelativeDirection.INCREASING: "角距增大",
+    RelativeDirection.DECREASING: "角距减小",
+    RelativeDirection.TANGENT: "相切",
   },
 }
 
@@ -674,7 +699,9 @@ def _event_inputs(result: TransitHits, catalog: Catalog, language: Language) -> 
     raise ValueError("language must be en or zh-CN")
 
 
-def _event_context(result: TransitHits, catalog: Catalog, language: Language) -> list[str]:
+def _event_context(
+  result: TransitHits | MovingAspectEvents, catalog: Catalog, language: Language
+) -> list[str]:
   labels = _EVENT_LABELS[language]
   models = "; ".join(
     f"{_name(source.moving_object, catalog, language)} [{source.moving_object.value}]: "
@@ -723,6 +750,60 @@ def format_transit_hits(result: TransitHits, catalog: Catalog, *, language: Lang
     )
   if not result.hits:
     lines.append(labels["empty_transit"])
+  return "\n".join(lines)
+
+
+def format_moving_events(
+  result: MovingAspectEvents,
+  catalog: Catalog,
+  *,
+  language: Language = "en",
+) -> str:
+  """Render both moving roles, relative motion, UTC and raw TT using supplied vocabulary.
+
+  Empty results are native-free. Populated rows use moving_hit_utc's conversion-only
+  path. UTC is displayed to whole seconds without changing raw-TT ordering.
+
+  用给定词汇显示两侧移动角色、相对运动、UTC 及原始 TT。空结果不调用原生库；
+  非空行仅用 moving_hit_utc 转换时刻。UTC 显示到整秒，不改变原始 TT 排序。
+  """
+  if type(result) is not MovingAspectEvents or type(catalog) is not Catalog:
+    raise TypeError("result and catalog must be MovingAspectEvents and Catalog values")
+  if type(language) is not str or language not in _LANGUAGES:
+    raise ValueError("language must be en or zh-CN")
+  labels = _EVENT_LABELS[language]
+  pairs = "; ".join(
+    f"({_name(first, catalog, language)} [{first.value}], "
+    f"{_name(second, catalog, language)} [{second.value}])"
+    for first, second in result.pairs
+  )
+  lines = [
+    labels["moving_title"],
+    *_event_context(result, catalog, language),
+    f"{labels['pairs']}: {pairs}",
+    f"{labels['aspects']}: "
+    + ", ".join(_name(aspect, catalog, language) for aspect in result.aspects),
+    labels["relative_legend"],
+    "",
+    labels["moving_columns"],
+  ]
+  for hit in result.hits:
+    lines.append(
+      " | ".join(
+        (
+          moving_hit_utc(hit).isoformat(timespec="seconds"),
+          f"{_name(hit.first_object, catalog, language)} [{hit.first_object.value}]",
+          f"{_name(hit.second_object, catalog, language)} [{hit.second_object.value}]",
+          _name(hit.aspect, catalog, language),
+          _angle(hit.branch_deg, signed=True),
+          _RELATIVE_DIRECTIONS[language][hit.direction],
+          repr(hit.relative_rate_deg_per_tt_day),
+          repr(hit.jde_tt),
+        )
+      )
+    )
+  if not result.hits:
+    lines.append(labels["empty_moving"])
   return "\n".join(lines)
 
 

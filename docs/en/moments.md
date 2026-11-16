@@ -102,7 +102,8 @@ common-epoch conversion or a simultaneous spatial-angle claim.
 
 <!-- usage: chart.hit_moment -->
 
-Pass a retained `TransitHit` directly to `moment_chart`; no upstream converter
+Pass a retained `TransitHit` or [moving-pair `MovingAspectHit`](moving_events.md)
+directly to `moment_chart`; no upstream converter
 import is needed. The explicit location determines the new chart's houses:
 
 ```{doctest}

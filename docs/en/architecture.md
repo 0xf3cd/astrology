@@ -8,6 +8,8 @@ usage and constraints are in the [birth](birth.md), [configuration](configuratio
 [chart](chart.md), [aspect](aspects.md), [cross-chart](cross_aspects.md), [result](records.md)
 and [knowledge](knowledge.md) guides. [Exact transit hits](transits.md) search
 moving objects against fixed source-chart degrees over a UTC interval.
+[Moving-pair events](moving_events.md) instead vary both longitudes at the same TT,
+without a natal chart; the concrete adapter retains both provider records.
 Charts use modern tropical, geocentric coordinates; the underlying knowledge can
 also be queried without a chart.
 
