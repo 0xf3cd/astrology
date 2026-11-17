@@ -585,6 +585,7 @@ def test_installed_return_observations_capture_supplied_results_without_calculat
   from tools.installed_check import (
     acceptance_chart,
     acceptance_moments,
+    acceptance_moving_events,
     acceptance_returns,
     acceptance_transits,
     calculation_observations,
@@ -594,13 +595,27 @@ def test_installed_return_observations_capture_supplied_results_without_calculat
   transits = acceptance_transits(chart)
   moments = acceptance_moments(chart, transits)
   returns = acceptance_returns(chart)
+  moving_case = acceptance_moving_events()
 
   def forbidden(*args: Any, **kwargs: Any) -> NoReturn:
     pytest.fail("Observation serialization performed a new native calculation")
 
-  for name in ("snapshot", "transit_events", "transit_source", "moment_utc", "transit_interval"):
+  for name in (
+    "snapshot",
+    "transit_events",
+    "transit_source",
+    "moment_utc",
+    "transit_interval",
+    "moving_events",
+    "moving_interval",
+  ):
     monkeypatch.setattr(adapter, name, forbidden)
-  values = json.loads(calculation_observations(chart, transits, moments, returns, load_catalog()))
+  values = json.loads(
+    calculation_observations(chart, transits, moments, returns, load_catalog(), moving_case)
+  )
+  assert values["moving_events"]["search"] == repr(moving_case[0])
+  assert values["moving_events"]["chart"]["moment"] == repr(moving_case[1].moment)
+  assert "Exact moving-pair events" in values["moving_events"]["text"]["en"]
   assert "Exact transit hits" in values["transit_table"]["en"]
   assert "精确行运命中" in values["transit_table"]["zh-CN"]
   assert len(values["returns"]) == 2

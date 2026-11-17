@@ -124,6 +124,7 @@ def test_query_contracts(catalog: Catalog) -> None:
     "entry.essential_dignities",
     "entry.dispositor_chains",
     "entry.transit_hits",
+    "entry.moving_aspect_events",
     "entry.moment_charts",
     "entry.transit_aspects",
     "entry.solar_lunar_returns",
@@ -700,6 +701,7 @@ def test_retained_rule_ids_and_order(catalog: Catalog) -> None:
     "rule.project.moment_charts",
     "rule.project.transit_aspects",
     "rule.project.exact_transit_hits",
+    "rule.project.moving_aspect_events",
   ]
   for identifier, configuration in expected:
     variant = catalog.variant(identifier)
@@ -821,6 +823,7 @@ def test_project_source_consolidation_preserves_lineage_and_citation_coverage(
     "cross_house_overlays": 1,
     "axis_aspects": 1,
     "transit_hits": 1,
+    "moving_aspect_events": 1,
     "transit_aspects": 1,
     "dispositor_chains": 1,
   }

@@ -24,6 +24,7 @@ from astrology import (
   TransitHit,
   TransitHits,
   TransitSource,
+  format_moving_events,
   format_return_hits,
   format_transit_hits,
   load_catalog,
@@ -84,6 +85,11 @@ def _result(
 
 def _empty(result: TransitHits) -> TransitHits:
   return replace(result, hits=())
+
+
+def test_moving_formatter_rejects_a_transit_result() -> None:
+  with pytest.raises(TypeError, match="MovingAspectEvents"):
+    format_moving_events(_empty(_result()), CATALOG)  # type: ignore[arg-type]
 
 
 @pytest.mark.parametrize("mode", [(), ("-O",)])

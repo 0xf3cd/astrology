@@ -33,7 +33,7 @@ True
 >>> catalog.filter_entries(concept_id="body.sun")[0].identifier
 'entry.solar_lunar_returns'
 >>> len(catalog.filter_sources(verification=SourceVerification.VERIFIED))
-14
+15
 >>> print(catalog.entry("entry.cross_aspect_evaluation").statement.text("en"))
 Static major cross aspects compare two supplied natal or moment results with distinct left/right endpoints and preserve both complete sources, without a motion field.
 >>> print(catalog.variant("rule.project.cusp_ownership").definition.text("en"))

@@ -182,6 +182,29 @@ silent substitutions, and factories whose return type depends on hidden state.
 
 ## Correctness
 
+Regenerate `tests/reference/moving_pair_reference.json` in two steps.
+First generate independent candidates with Swiss/Moshier, without importing
+astrology or its native backend:
+
+```sh
+uv run --no-project --python 3.11 --with pyswisseph==2.10.3.2 python tools/fetch_moving_reference.py --output <candidates-path>
+```
+
+Then compare those candidates and sampled longitudes with the native backend.
+This writes the fixture to `<fixture-path>` and the native event values and
+comparison controls to `<observations-path>`:
+
+```sh
+uv run --locked python tools/calibrate_moving_reference.py --candidates <candidates-path> --output <fixture-path> --observations <observations-path>
+```
+
+The comparison measures each body's longitude error at matching times. Each event's
+time tolerance uses both bodies' angular bounds and their relative rate.
+These empirical tolerances limit what timing errors the fixture can detect;
+the scans do not certify all events or tangencies. The real native contact
+construction and synthetic public major-aspect contacts are tested separately
+in `tests/test_moving_events.py` and `tests/test_moving_display.py`.
+
 Return fixtures in `tests/reference/return_reference.json` use independently
 calculated natal degrees and TT crossings from pyswisseph 2.10.3.2 / Swiss 2.10.03,
 explicit Moshier plus speed flags 260. Regenerate them without project/native

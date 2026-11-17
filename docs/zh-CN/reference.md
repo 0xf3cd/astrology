@@ -56,7 +56,7 @@
 
 ```{eval-rst}
 .. automodule:: astrology.text
-   :members: format_chart, format_sign_distribution, format_lunar_phase, format_house_rulers, format_house_overlays, format_cross_aspects, format_transit_aspects, format_transit_hits, format_return_hits
+   :members: format_chart, format_sign_distribution, format_lunar_phase, format_house_rulers, format_house_overlays, format_cross_aspects, format_transit_aspects, format_transit_hits, format_return_hits, format_moving_events
    :no-index:
 ```
 
@@ -118,13 +118,34 @@
    :no-index:
 ```
 
+## 事件来源记录及显示错误
+
+```{eval-rst}
+.. automodule:: astrology.event_records
+   :members: TransitSource, EventDisplayError
+   :member-order: bysource
+   :no-index:
+```
+
 ## 精确行运命中
 
 UTC 区间搜索及结果字段见[精确行运命中](transits.md)。
 
 ```{eval-rst}
 .. automodule:: astrology.transits
-   :members: TransitDirection, TransitDomainError, EventDisplayError, TransitSource, TransitHit, TransitHits, transit_hit_utc, transit_hits
+   :members: TransitDirection, TransitDomainError, TransitHit, TransitHits, transit_hit_utc, transit_hits
+   :undoc-members:
+   :member-order: bysource
+   :no-index:
+```
+
+## 移动对象对事件
+
+搜索、UTC 表及事件建盘见[移动对象对事件](moving_events.md)。
+
+```{eval-rst}
+.. automodule:: astrology.moving_events
+   :members: RelativeDirection, MovingEventDomainError, MovingAspectHit, MovingAspectEvents, moving_hit_utc, moving_aspect_events
    :undoc-members:
    :member-order: bysource
    :no-index:

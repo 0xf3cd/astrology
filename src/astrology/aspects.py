@@ -178,6 +178,17 @@ def _branches(angle: float) -> tuple[float, ...]:
   return (-angle, angle)
 
 
+def _selected_aspects(values: Sequence[MajorAspect]) -> tuple[MajorAspect, ...]:
+  if not isinstance(values, Sequence) or isinstance(values, (str, bytes)):
+    raise TypeError("aspects must be a sequence of MajorAspect values")
+  result = tuple(values)
+  if any(type(value) is not MajorAspect for value in result):
+    raise TypeError("aspects must contain only MajorAspect values")
+  if not result or len(set(result)) != len(result):
+    raise ValueError("aspects must be nonempty and must not repeat identities")
+  return tuple(sorted(result, key=aspect_angle))
+
+
 def _geometry_values(
   aspect: MajorAspect, branch_deg: float, deviation_deg: float, orb_limit_deg: float
 ) -> tuple[float, float, float]:

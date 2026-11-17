@@ -27,6 +27,7 @@ from astrology.objects import (
 from astrology.zodiac import Sign, _longitude, sign_degree, sign_of
 
 if TYPE_CHECKING:
+  from astrology.moving_events import MovingAspectHit
   from astrology.transits import TransitHit
 
 _Evaluation = Literal["fixed_fourteen_object_joint_snapshot"]
@@ -546,9 +547,9 @@ def _calculate(
 
 
 def moment_chart(
-  instant: datetime.datetime | TransitHit, location: Location, config: ChartConfig
+  instant: datetime.datetime | TransitHit | MovingAspectHit, location: Location, config: ChartConfig
 ) -> MomentChart:
-  """Calculate a moment chart from an aware instant or a retained TransitHit.
+  """Calculate a moment chart from an aware instant or a retained exact-event hit.
 
   Location and configuration are explicit. A datetime is normalized to modern UTC;
   a hit's JDE(TT) is converted upstream at this calculation boundary. Its original
@@ -560,7 +561,7 @@ def moment_chart(
   failures raise ChartDomainError; pre-1972 UTC raises HistoricalTimeError. See
   entry.moment_charts and entry.transit_aspects for the project conventions.
 
-  从有时区的时刻或保留的 TransitHit 计算时刻盘。地点与配置须显式给出。datetime 归一为
+  从有时区的时刻或保留的 TransitHit、MovingAspectHit 计算时刻盘。地点与配置须显式给出。datetime 归一为
   现代 UTC；命中的 JDE(TT) 在此计算入口由上游转换。原事件时刻保存在 moment.source_jde_tt，
   与归一后的 UTC 及导出的 ChartTimes 分开。转换使用上游固定闰秒表和 Python 微秒级 datetime，
   在闰秒阶跃或 1972 边界不保证精确往返；转换后的 UTC 本身也须不早于 1972-01-01。
@@ -576,10 +577,11 @@ def moment_chart(
   if type(instant) is datetime.datetime:
     utc = _normalize_utc(instant, "instant")
   else:
+    from astrology.moving_events import MovingAspectHit
     from astrology.transits import TransitHit
 
-    if type(instant) is not TransitHit:
-      raise TypeError("instant must be a built-in datetime or TransitHit")
+    if type(instant) is not TransitHit and type(instant) is not MovingAspectHit:
+      raise TypeError("instant must be a built-in datetime, TransitHit or MovingAspectHit")
     from astrology.celestial import moment_utc
 
     source_jde_tt = instant.jde_tt

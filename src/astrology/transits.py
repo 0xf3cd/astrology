@@ -13,8 +13,8 @@ from typing import Final, Literal, get_args
 
 from astrology._comparison import _selection_for_chart
 from astrology._distribution import installed_version
-from astrology._validation import finite_number
-from astrology.aspects import _branches, aspect_angle
+from astrology._validation import finite_number, nonempty_text
+from astrology.aspects import _branches, _selected_aspects, aspect_angle
 from astrology.birth import _normalize_utc
 from astrology.chart import (
   _POSITION_FRAME,
@@ -24,6 +24,8 @@ from astrology.chart import (
   _selected_longitudes,
 )
 from astrology.config import MajorAspect
+from astrology.event_records import EventDisplayError as EventDisplayError
+from astrology.event_records import TransitSource as TransitSource
 from astrology.objects import (
   AstronomicalObject,
   Body,
@@ -88,32 +90,6 @@ class TransitDomainError(ValueError):
     self.upstream_message = upstream_message
 
 
-class EventDisplayError(ValueError):
-  """A retained event TT cannot be represented as ordinary display UTC.
-
-  The source TT and conversion operation are retained. Conversion failures also
-  retain the exact upstream message and chained cause.
-  Native computation failures propagate unchanged instead of becoming this error.
-
-  保留事件的 TT 无法表示为普通显示 UTC。保留来源 TT 和转换操作；
-  转换失败时还保留上游原始错误文本及异常因果链。
-  原生计算失败直接向外抛出，不改写为本错误。
-  """
-
-  def __init__(
-    self,
-    message: str,
-    *,
-    jde_tt: float,
-    operation: str = "jde_to_utc",
-    upstream_message: str | None = None,
-  ) -> None:
-    super().__init__(message)
-    self.jde_tt = jde_tt
-    self.operation = operation
-    self.upstream_message = upstream_message
-
-
 def _moving(values: Sequence[AstronomicalObject]) -> tuple[AstronomicalObject, ...]:
   if not isinstance(values, Sequence) or isinstance(values, (str, bytes)):
     raise TypeError("moving_objects must be a sequence of Body or LunarNode values")
@@ -123,57 +99,6 @@ def _moving(values: Sequence[AstronomicalObject]) -> tuple[AstronomicalObject, .
   if not result or len(set(result)) != len(result):
     raise ValueError("moving_objects must be nonempty and must not repeat identities")
   return result
-
-
-def _aspects(values: Sequence[MajorAspect]) -> tuple[MajorAspect, ...]:
-  if not isinstance(values, Sequence) or isinstance(values, (str, bytes)):
-    raise TypeError("aspects must be a sequence of MajorAspect values")
-  result = tuple(values)
-  if any(type(value) is not MajorAspect for value in result):
-    raise TypeError("aspects must contain only MajorAspect values")
-  if not result or len(set(result)) != len(result):
-    raise ValueError("aspects must be nonempty and must not repeat identities")
-  return tuple(sorted(result, key=aspect_angle))
-
-
-def _text(value: str, name: str) -> None:
-  if type(value) is not str or not value.strip():
-    raise ValueError(f"{name} must be a nonempty plain string")
-
-
-@dataclass(frozen=True, slots=True)
-class TransitSource:
-  """One moving object's effective model and bounded event window.
-
-  Bounds and maximum span are in JDE(TT) and TT days. Descriptions are copied from
-  the upstream; these implementation windows are not astronomical accuracy bounds.
-
-  一个移动对象实际使用的模型及有界事件求值窗口。端点为 JDE(TT)，最长区间以 TT 日计。
-  说明文字复制自上游；实现求值窗口不是天文精度界。
-  """
-
-  moving_object: AstronomicalObject
-  model_kind: str
-  model_identity: int
-  model_description: str
-  domain_start_jde_tt: float
-  domain_end_jde_tt: float
-  maximum_span_tt_days: float
-  capability_description: str
-
-  def __post_init__(self) -> None:
-    if not _is_astronomical_object(self.moving_object):
-      raise TypeError("moving_object must be a Body or LunarNode")
-    if type(self.model_kind) is not str or self.model_kind != "position_source":
-      raise ValueError("model_kind must be position_source")
-    if type(self.model_identity) is not int or self.model_identity <= 0:
-      raise ValueError("model_identity must be a positive integer")
-    _text(self.model_description, "model_description")
-    _text(self.capability_description, "capability_description")
-    for name in ("domain_start_jde_tt", "domain_end_jde_tt", "maximum_span_tt_days"):
-      object.__setattr__(self, name, finite_number(getattr(self, name), name))
-    if self.domain_start_jde_tt >= self.domain_end_jde_tt or self.maximum_span_tt_days <= 0:
-      raise ValueError("Event domain and maximum span must be nonempty and positive")
 
 
 @dataclass(frozen=True, slots=True)
@@ -242,24 +167,9 @@ def transit_hit_utc(hit: TransitHit) -> datetime:
   """
   if type(hit) is not TransitHit:
     raise TypeError("hit must be a TransitHit")
-  from astrology.celestial import _civil_from_tt, _datetime_from_civil
+  from astrology.celestial import event_utc
 
-  try:
-    civil = _civil_from_tt(hit.jde_tt)
-    if (civil.year, civil.month, civil.day) < (1972, 1, 1):
-      raise EventDisplayError(
-        "Event TT resolves to the upstream pre-1972 UT1 substitute, not ordinary UTC",
-        jde_tt=hit.jde_tt,
-      )
-    return _datetime_from_civil(civil)
-  except EventDisplayError:
-    raise
-  except (ValueError, OverflowError) as exc:
-    raise EventDisplayError(
-      f"Event TT cannot be converted to display UTC: {exc}",
-      jde_tt=hit.jde_tt,
-      upstream_message=str(exc),
-    ) from exc
+  return event_utc(hit.jde_tt)
 
 
 @dataclass(frozen=True, slots=True)
@@ -315,7 +225,7 @@ class TransitHits:
     natal = _selection_for_chart(self.chart, self.natal_objects, "natal_objects")
     if not natal:
       raise ValueError("natal_objects must not be empty")
-    aspects = _aspects(self.aspects)
+    aspects = _selected_aspects(self.aspects)
     for name, value in (("moving_objects", moving), ("natal_objects", natal), ("aspects", aspects)):
       object.__setattr__(self, name, value)
     for name, member_type in (("sources", TransitSource), ("hits", TransitHit)):
@@ -339,7 +249,7 @@ class TransitHits:
       if self.end_jde_tt - self.start_jde_tt > source.maximum_span_tt_days:
         raise ValueError("TT interval exceeds a retained event-source span")
     for name in ("celestial_version", "astrology_version"):
-      _text(getattr(self, name), name)
+      nonempty_text(getattr(self, name), name)
     for name, expected in (
       ("position_frame", _POSITION_FRAME),
       ("time_policy", _TIME_POLICY),
@@ -428,7 +338,7 @@ def transit_hits(
   natal = _selection_for_chart(chart, natal_objects, "natal_objects")
   if not natal:
     raise ValueError("natal_objects must not be empty")
-  selected_aspects = _aspects(aspects)
+  selected_aspects = _selected_aspects(aspects)
 
   from astrology.celestial import (
     celestial_version,
