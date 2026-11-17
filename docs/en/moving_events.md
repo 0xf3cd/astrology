@@ -9,21 +9,21 @@ or named lunar nodes. Searching needs neither a natal chart nor a location.
 
 <!-- usage: moving.events -->
 
-Both longitudes vary. This example requests Moon first and Sun second, so its
-relative angle and rate are **Sun minus Moon**:
+Both longitudes vary. This example requests Sun first and Moon second, so its
+relative angle and rate are **Moon minus Sun**:
 
 ```{doctest}
 >>> from datetime import UTC, datetime
 >>> from astrology import (Body, MajorAspect, moving_aspect_events, moving_hit_utc,
 ...     format_moving_events, load_catalog)
 >>> events = moving_aspect_events(
-...     pairs=((Body.MOON, Body.SUN),),
+...     pairs=((Body.SUN, Body.MOON),),
 ...     aspects=(MajorAspect.CONJUNCTION, MajorAspect.OPPOSITION),
 ...     start_utc=datetime(2024, 1, 1, tzinfo=UTC),
 ...     end_utc=datetime(2024, 2, 1, tzinfo=UTC))
 >>> [(moving_hit_utc(hit).isoformat(timespec="seconds"), hit.aspect.value,
 ...   hit.direction.value) for hit in events.hits]
-[('2024-01-11T11:57:27+00:00', 'conjunction', 'decreasing'), ('2024-01-25T17:54:00+00:00', 'opposition', 'decreasing')]
+[('2024-01-11T11:57:27+00:00', 'conjunction', 'increasing'), ('2024-01-25T17:54:00+00:00', 'opposition', 'increasing')]
 >>> table = format_moving_events(events, load_catalog())
 >>> print(table.splitlines()[0])
 Exact moving-pair events
@@ -31,8 +31,8 @@ Exact moving-pair events
 ...     if row.startswith(("UTC |", "2024-")):
 ...         print(" | ".join(row.split(" | ")[:6]))
 UTC | First moving object | Second moving object | Aspect | Branch | Relative direction
-2024-01-11T11:57:27+00:00 | Moon [moon] | Sun [sun] | Conjunction | 0°00'00" | separation decreasing
-2024-01-25T17:54:00+00:00 | Moon [moon] | Sun [sun] | Opposition | +180°00'00" | separation decreasing
+2024-01-11T11:57:27+00:00 | Sun [sun] | Moon [moon] | Conjunction | 0°00'00" | separation increasing
+2024-01-25T17:54:00+00:00 | Sun [sun] | Moon [moon] | Opposition | +180°00'00" | separation increasing
 ```
 
 <!-- /usage: moving.events -->
@@ -44,9 +44,9 @@ including its frozen leap offsets, 1972 restriction, microsecond rounding and
 whole-second table display. Display precision never changes event membership.
 
 The USNO definition identifies exact new/full moons with Moon-minus-Sun apparent
-ecliptic longitude 0°/180°. Swapping the pair order leaves these targets unchanged: 0° stays 0°,
-and -180° is represented as 180°. The example's `(Moon, Sun)` pair uses the
-reversed Sun-minus-Moon separation.
+ecliptic longitude 0°/180°. The example's `(Sun, Moon)` pair uses this
+Moon-minus-Sun separation. Swapping the pair order leaves these targets unchanged:
+0° stays 0°, and -180° is represented as 180°.
 The [knowledge entry](catalog.md), `entry.moving_aspect_events`, records that source
 separately from the project's model and search conventions.
 

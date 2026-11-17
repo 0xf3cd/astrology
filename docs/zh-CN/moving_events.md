@@ -9,21 +9,21 @@
 
 <!-- usage: moving.events -->
 
-两侧黄经都在变化。下例将月亮放在第一侧、太阳放在第二侧，相对角度与速率因此为
-**太阳减月亮**：
+两侧黄经都在变化。下例将太阳放在第一侧、月亮放在第二侧，相对角度与速率因此为
+**月亮减太阳**：
 
 ```{doctest}
 >>> from datetime import UTC, datetime
 >>> from astrology import (Body, MajorAspect, moving_aspect_events, moving_hit_utc,
 ...     format_moving_events, load_catalog)
 >>> events = moving_aspect_events(
-...     pairs=((Body.MOON, Body.SUN),),
+...     pairs=((Body.SUN, Body.MOON),),
 ...     aspects=(MajorAspect.CONJUNCTION, MajorAspect.OPPOSITION),
 ...     start_utc=datetime(2024, 1, 1, tzinfo=UTC),
 ...     end_utc=datetime(2024, 2, 1, tzinfo=UTC))
 >>> [(moving_hit_utc(hit).isoformat(timespec="seconds"), hit.aspect.value,
 ...   hit.direction.value) for hit in events.hits]
-[('2024-01-11T11:57:27+00:00', 'conjunction', 'decreasing'), ('2024-01-25T17:54:00+00:00', 'opposition', 'decreasing')]
+[('2024-01-11T11:57:27+00:00', 'conjunction', 'increasing'), ('2024-01-25T17:54:00+00:00', 'opposition', 'increasing')]
 >>> table = format_moving_events(events, load_catalog(), language="zh-CN")
 >>> print(table.splitlines()[0])
 精确移动对象对事件
@@ -31,8 +31,8 @@
 ...     if row.startswith(("UTC |", "2024-")):
 ...         print(" | ".join(row.split(" | ")[:6]))
 UTC | 第一侧移动对象 | 第二侧移动对象 | 相位 | 分支 | 相对方向
-2024-01-11T11:57:27+00:00 | 月亮 [moon] | 太阳 [sun] | 合相 | 0°00'00" | 角距减小
-2024-01-25T17:54:00+00:00 | 月亮 [moon] | 太阳 [sun] | 对分相 | +180°00'00" | 角距减小
+2024-01-11T11:57:27+00:00 | 太阳 [sun] | 月亮 [moon] | 合相 | 0°00'00" | 角距增大
+2024-01-25T17:54:00+00:00 | 太阳 [sun] | 月亮 [moon] | 对分相 | +180°00'00" | 角距增大
 ```
 
 <!-- /usage: moving.events -->
@@ -41,9 +41,9 @@ UTC | 第一侧移动对象 | 第二侧移动对象 | 相位 | 分支 | 相对�
 可改为给定目录中的英文词汇。UTC 沿用既有{ref}`事件显示转换 <event-display-zh-cn>`，
 包括固定闰秒偏移、1972 限制、微秒舍入及表格整秒显示。显示精度不改变事件的区间归属。
 
-USNO 将精确新月与满月分别定义为月亮减太阳的视黄经差 0°、180°。交换顺序后，
-0° 仍为 0°，-180° 按约定记为 180°，因此这两个目标不变。示例中的 `(Moon, Sun)` 对象对
-使用反向的太阳减月亮角距。
+USNO 将精确新月与满月分别定义为月亮减太阳的视黄经差 0°、180°。示例中的 `(Sun, Moon)` 对象对
+使用的就是这个月亮减太阳的角距。交换顺序后，0° 仍为 0°，-180° 按约定记为 180°，
+因此这两个目标不变。
 [知识条目](catalog.md) `entry.moving_aspect_events` 将该来源与项目的模型及搜索约定分开记录。
 
 ## 读取几何
