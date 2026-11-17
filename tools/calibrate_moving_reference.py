@@ -30,9 +30,7 @@ def time_tolerance_seconds(first_bound: float, second_bound: float, relative_rat
   return tolerance
 
 
-def calibrate(
-  candidates: dict[str, Any], candidate_bytes: bytes
-) -> tuple[dict[str, Any], dict[str, Any]]:
+def calibrate(candidates: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
   maxima = {sample["body"]: 0.0 for sample in candidates["calibration_states"]}
   for sample in candidates["calibration_states"]:
     position = native.positions((native.Target(sample["body"]),), sample["jde_tt"])[0]
@@ -105,7 +103,6 @@ def calibrate(
       "relative_rate_floor_deg_per_tt_day": 0.1,
       "time_tolerance_ceiling_seconds": 300,
       "scope": "Weekly samples over 2024-01-01 to 2025-03-01 plus all hit times and +/-1 TT-day neighbors. Empirical acceptance bounds, not global accuracy bounds; timing errors within each recorded tolerance can pass. Shifted-time controls are comparator sanity checks, not mutation tests.",
-      "candidate_sha256": hashlib.sha256(candidate_bytes).hexdigest(),
       "recipe_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
     },
   }
@@ -119,9 +116,8 @@ def main() -> None:
   parser.add_argument("--observations", required=True, type=Path)
   args = parser.parse_args()
   content = args.candidates.read_bytes()
-  fixture, observations = calibrate(json.loads(content), content)
+  fixture, observations = calibrate(json.loads(content))
   observed_bytes = (json.dumps(observations, indent=2) + "\n").encode()
-  fixture["calibration"]["native_observations_sha256"] = hashlib.sha256(observed_bytes).hexdigest()
   args.observations.write_bytes(observed_bytes)
   args.output.write_text(json.dumps(fixture, indent=2) + "\n")
   print(args.output)

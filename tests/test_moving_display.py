@@ -63,6 +63,17 @@ def test_populated_and_empty_tables_keep_both_roles_relative_direction_and_tt(
 ) -> None:
   result = _result()
   text = format_moving_events(result, load_catalog(), language=language)
+  pair_line = (
+    "Requested moving pairs (first, second): (Moon [moon], Sun [sun])"
+    if language == "en"
+    else "请求移动对象对（第一侧，第二侧）: (月亮 [moon], 太阳 [sun])"
+  )
+  legend = (
+    "Relative direction and rate describe second minus first longitude."
+    if language == "en"
+    else "相对方向与速率按第二侧黄经减第一侧黄经定义。"
+  )
+  assert pair_line in text.splitlines() and legend in text.splitlines()
   assert "[moon]" in text and "[sun]" in text
   assert "position_source/2" in text and "position_source/1" in text
   assert "2460392.2373059206" in text and "2024-03-22T17:40:34+00:00" in text
@@ -78,6 +89,7 @@ def test_populated_and_empty_tables_keep_both_roles_relative_direction_and_tt(
   ) in text
   assert "黄经增大" not in text and "Fixed source" not in text
   empty = format_moving_events(replace(result, hits=()), load_catalog(), language=language)
+  assert pair_line in empty.splitlines() and legend in empty.splitlines()
   assert ("No exact moving-pair events" if language == "en" else "没有精确移动对象对事件") in empty
   assert "[moon]" in empty and "[sun]" in empty and "2460370.5" in empty
 

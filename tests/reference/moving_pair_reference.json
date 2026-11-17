@@ -400,8 +400,6 @@
     "relative_rate_floor_deg_per_tt_day": 0.1,
     "time_tolerance_ceiling_seconds": 300,
     "scope": "Weekly samples over 2024-01-01 to 2025-03-01 plus all hit times and +/-1 TT-day neighbors. Empirical acceptance bounds, not global accuracy bounds; timing errors within each recorded tolerance can pass. Shifted-time controls are comparator sanity checks, not mutation tests.",
-    "candidate_sha256": "d20b233d57b9e0705cdbf5b0ba6e8fa5e9eac1c4f638ce155051686abd8230f2",
-    "recipe_sha256": "5f79465bcb074fe947d260623e442ea3c1946952be72427f5417e418dc29ab9d",
-    "native_observations_sha256": "cf1936a2f89497bc186214a62c0850043cf9e27dc3f7473fd676b5ff78971205"
+    "recipe_sha256": "e7a18eb6dbfd56e23fa8be7733ba02de53a9ed5ba9dce35b1ca2aa91ee7010b6"
   }
 }

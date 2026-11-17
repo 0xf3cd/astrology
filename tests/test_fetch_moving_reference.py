@@ -174,10 +174,12 @@ def native_values(
 def test_calibration_uses_both_bounds_and_records_shift_controls(
   native_values: Callable[..., tuple[native.LongitudeDifferenceEvent, ...]],
 ) -> None:
-  fixture, observations = calibration.calibrate(_candidates(), b"synthetic")
+  fixture, observations = calibration.calibrate(_candidates())
   assert fixture["calibration"]["angular_tolerance_deg"] == {"sun": 0.0002, "moon": 0.0004}
   assert fixture["cases"][0]["hits"][0]["time_tolerance_seconds"] == pytest.approx(103.68)
   assert observations["controls"][0]["shifted_time_rejected"] is True
+  assert "candidate_sha256" not in fixture["calibration"]
+  assert "native_observations_sha256" not in fixture["calibration"]
 
 
 @pytest.mark.parametrize(
@@ -211,4 +213,4 @@ def test_calibration_rejects_inconsistent_reference_inputs(
   else:
     monkeypatch.setattr(calibration, "time_tolerance_seconds", lambda *args: 0)
   with pytest.raises(RuntimeError, match=expected):
-    calibration.calibrate(candidates, b"synthetic")
+    calibration.calibrate(candidates)

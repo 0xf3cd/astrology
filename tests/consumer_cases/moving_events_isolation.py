@@ -53,8 +53,20 @@ if result.pairs != ((a.Body.MOON, a.Body.SUN),):
   raise RuntimeError("Nested moving pair aliases caller data")
 for language in ("en", "zh-CN"):
   text = a.format_moving_events(result, a.load_catalog(), language=language)
-  if "[moon]" not in text or "[sun]" not in text:
-    raise RuntimeError("Empty result lost its requested roles")
+  pair_line = (
+    "Requested moving pairs (first, second): (Moon [moon], Sun [sun])"
+    if language == "en"
+    else "请求移动对象对（第一侧，第二侧）: (月亮 [moon], 太阳 [sun])"
+  )
+  legend = (
+    "Relative direction and rate describe second minus first longitude."
+    if language == "en"
+    else "相对方向与速率按第二侧黄经减第一侧黄经定义。"
+  )
+  if pair_line not in text.splitlines():
+    raise RuntimeError("Empty result lost its requested ordered-pair line")
+  if legend not in text.splitlines():
+    raise RuntimeError("Empty result lost its relative-motion legend")
 for changed in ({"pairs": ((a.Body.SUN, a.Body.SUN),)}, {"sources": ()}):
   try:
     replace(result, **changed)

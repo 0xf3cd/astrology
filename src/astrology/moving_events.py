@@ -271,12 +271,13 @@ def moving_aspect_events(
   Ordered pairs and aspects are explicit, nonempty and unique. Reversed pairs are
   distinct requests; self-pairs and continuously satisfied relations are invalid,
   while constant mismatch is empty success. Both provider domains and their
-  maximum spans apply. A rejected query raises MovingEventDomainError; native
-  computation failures propagate unchanged, with no partial result.
+  maximum spans apply. Domain/span or upstream UTC-conversion rejections and continuously
+  satisfied relations raise MovingEventDomainError. Native computation failures
+  propagate unchanged, with no partial result.
   UTC endpoints must be aware built-in datetimes at or after 1972-01-01 UTC.
-  Invalid types raise TypeError; invalid selections/order or missing UTC offsets
-  raise ValueError, and
-  pre-1972 endpoints raise HistoricalTimeError. MovingEventDomainError is a
+  Invalid types raise TypeError; invalid selections (including self-pairs), endpoint
+  order or missing UTC offsets raise ValueError. Pre-1972 endpoints raise
+  HistoricalTimeError. MovingEventDomainError is a
   ValueError subclass. Search lazily initializes native astronomy.
   Hits sort by raw TT, pair request order, aspect angle and branch. Events for
   different requested pairs remain separate even at the same TT.
@@ -284,9 +285,11 @@ def moving_aspect_events(
 
   在转换后的左闭右开 TT 区间内搜索移动对象主要相位。对象对及相位须显式、非空且不重复。
   逆序是不同请求；自身配对及持续成立的关系无效，恒定不等则为空成功。两侧来源的域与最长
-  区间均适用。查询拒绝抛 MovingEventDomainError；原生计算失败保持原异常，不返回部分结果。
+  区间均适用。求值域、区间、上游 UTC 转换被拒绝或关系持续成立时抛 MovingEventDomainError；
+  原生计算失败保持原异常，不返回部分结果。
   UTC 端点须为有时区的内建 datetime，且不早于 1972-01-01 UTC。类型无效抛 TypeError；
-  选择或顺序无效、缺少 UTC 偏移时抛 ValueError，早于 1972 年的端点抛 HistoricalTimeError。
+  选择（包括自身配对）或端点顺序无效、缺少 UTC 偏移时抛 ValueError；
+  早于 1972 年的端点抛 HistoricalTimeError。
   MovingEventDomainError 是 ValueError 的子类。搜索延迟初始化原生天文；
   按原始 TT、请求对象对顺序、相位角与分支排序，不同请求对象对的同时事件分别保留。
   坐标及来源约定见 entry.moving_aspect_events。

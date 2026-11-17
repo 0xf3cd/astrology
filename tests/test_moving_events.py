@@ -114,6 +114,17 @@ def test_all_branches_roles_coincidences_and_close_contacts_are_preserved(
   )
 
 
+def test_query_keeps_native_and_package_versions_in_their_own_fields(
+  controlled: list[tuple[native.Target, native.Target, float]],
+  monkeypatch: pytest.MonkeyPatch,
+) -> None:
+  monkeypatch.setattr(adapter, "celestial_version", lambda: "synthetic-celestial")
+  monkeypatch.setattr("astrology.moving_events.installed_version", lambda: "synthetic-astrology")
+  result = _search()
+  assert result.celestial_version == "synthetic-celestial"
+  assert result.astrology_version == "synthetic-astrology"
+
+
 @pytest.mark.parametrize(
   "overrides,exception",
   [
@@ -142,8 +153,9 @@ def test_invalid_inputs_never_reach_astronomy(
     pytest.fail("Invalid moving query reached astronomy")
 
   monkeypatch.setattr(adapter, "moving_interval", forbidden)
-  with pytest.raises(exception):
+  with pytest.raises(exception) as raised:
     _search(**overrides)
+  assert type(raised.value) is exception
 
 
 def test_nested_inputs_and_results_are_isolated(
@@ -380,6 +392,12 @@ def test_independent_moving_pair_reference(case: dict[str, Any]) -> None:
   bounds = fixture["calibration"]["angular_tolerance_deg"]
   for actual, expected in zip(result.hits, case["hits"], strict=True):
     assert abs(actual.jde_tt - expected["jde_tt"]) * 86400 <= expected["time_tolerance_seconds"]
+    assert actual.first_rate_deg_per_tt_day == pytest.approx(
+      expected["first_rate_deg_per_tt_day"], rel=0, abs=0.001
+    )
+    assert actual.second_rate_deg_per_tt_day == pytest.approx(
+      expected["second_rate_deg_per_tt_day"], rel=0, abs=0.001
+    )
     assert (
       actual.branch_deg == expected["branch_deg"]
       and actual.direction.value == expected["direction"]
@@ -413,6 +431,8 @@ def test_reference_recipes_and_bilateral_calibration_are_pinned() -> None:
       == fixture[block]["recipe_sha256"]
     )
   assert fixture["calibration"]["native_version"] == "1.1.1"
+  assert "candidate_sha256" not in fixture["calibration"]
+  assert "native_observations_sha256" not in fixture["calibration"]
 
 
 def test_bilateral_time_budget_uses_both_bounds_and_enforces_reference_limits() -> None:

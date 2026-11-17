@@ -103,8 +103,8 @@ nodes cannot be conjunct:
 No exact moving-pair events in the supplied interval
 ```
 
-The mean ascending and descending nodes' continuously satisfied opposition is
-rejected rather than represented by an infinite event list. Invalid types raise
+The mean ascending and descending nodes' continuously satisfied opposition raises
+`MovingEventDomainError` rather than producing an infinite event list. Invalid types raise
 `TypeError`; invalid selections, self-pairs, endpoint order or missing UTC offsets
 raise `ValueError`. Pre-1972 UTC raises
 `HistoricalTimeError`. Domain/span rejections raise `MovingEventDomainError`,
