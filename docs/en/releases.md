@@ -25,8 +25,9 @@ New `transit_hit_utc` and `moving_hit_utc` functions convert a retained
 transit/return or moving-pair hit's TT to a timezone-aware UTC `datetime`.
 The [event tables](https://github.com/0xf3cd/astrology/blob/v0.6.0/docs/en/transits.md)
 format retained transit/return and moving-pair results with supplied vocabulary,
-without another search, location or house calculation. Pre-1972 UT1 substitutes
-and conversion/range failures raise `EventDisplayError`. Python `datetime` cannot
+without another search, location or house calculation. Pre-1972 UT1 substitutes,
+range failures and Python `datetime` construction failures raise `EventDisplayError`;
+native `CelestialError` propagates unchanged. Python `datetime` cannot
 represent leap seconds; leap-boundary display can repeat or reverse civil time
 without changing the authoritative TT ordering.
 

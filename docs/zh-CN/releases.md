@@ -22,7 +22,8 @@
 转为带时区的 UTC `datetime`。
 [事件表格](https://github.com/0xf3cd/astrology/blob/v0.6.0/docs/zh-CN/transits.md)
 用传入的词汇显示保留的行运／返照及移动配对结果，不再次搜索，也不要求地点或宫位计算。
-1972 年之前的 UT1 替代结果及转换／范围失败抛出 `EventDisplayError`。
+1972 年之前的 UT1 替代结果、范围失败及 Python `datetime` 构造失败抛出 `EventDisplayError`；
+原生 `CelestialError` 原样传播。
 Python `datetime` 不能表示闰秒；闰秒边界的民用时间显示可能重复或倒序，但不改变作为依据的 TT 顺序。
 
 ### 发行镜像与来源记录
