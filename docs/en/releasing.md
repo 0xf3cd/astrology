@@ -164,9 +164,10 @@ select a public Gitee namespace/repository and verify its permissions, two-facto
 authentication, recovery readiness, fresh sign-in and Git/API clients. Repository
 creation, account settings and publication each require authorization.
 
-Use a clean checkout at the accepted full SHA with the matching package version.
-Retain the original files from its GitHub Release or formal workflow artifact in
-this layout; do not rebuild packages or regenerate a published manifest:
+Use a clean checkout at the accepted commit with the matching package version.
+Retain the original files from its GitHub Release or formal workflow artifact
+outside the checkout, for example in the sibling directory below. Do not rebuild
+packages or regenerate a published manifest:
 
 ```text
 release-files/
@@ -176,46 +177,58 @@ release-files/
     celestial_astrology-0.6.0.tar.gz
 ```
 
-For a read-only preflight, replace the repository and SHA placeholders:
+For a read-only preflight, replace the repository and SHA placeholders.
+`ACCEPTED_FULL_SHA` must be 40 lowercase hexadecimal characters. Use the accepted
+version in `major.minor.patch` form (three numeric components), shown here as
+`0.6.0`, and select the landing branch with `--branch`:
 
 ```sh
 uv run --locked python tools/mirror.py check --version 0.6.0 --sha ACCEPTED_FULL_SHA --repository NAMESPACE/REPOSITORY --branch main --files ../release-files
 ```
 
-Keep the retained files outside the checkout. `check` is anonymous and makes no
-remote writes. It verifies the GitHub tag and stable Release's uploaded assets,
+`check` is anonymous and makes no remote writes. It verifies the GitHub tag and
+stable Release's uploaded assets,
 including each raw size and SHA-256, cross-checks the two distribution digests with
 PyPI, then checks the original manifest and archive/source agreement without
-installing or rebuilding. Unrelated digest environment variables are ignored.
+installing or rebuilding. It also reads Gitee's repository, refs, release and
+attachments, rejecting the conflicts described below. A pass ends with
+`Read-only check passed: N/3 attachments; publication not performed`.
+`N/3` counts matching attachments already on Gitee; `0/3` is normal before the
+first publication.
 An older accepted release need not be the current GitHub main tip.
 
 After separate publication authorization, run the same command with `publish`
 instead of `check`. The operator supplies `GITEE_ACCESS_TOKEN` through the process
-environment for API writes and establishes Git authentication separately. Do not
-put credentials in a URL, command argument or retained log. The tool installs no
-authentication files or helpers; prompting is disabled. Anonymous Git reads ignore
-operator credentials, URL rewrites and extra headers. API writes use the fixed
+environment for API writes. Configure your ordinary Git credentials for
+`https://gitee.com` separately before running it; Git prompting is disabled.
+Do not put credentials in a URL, command argument or retained log. Anonymous
+Git reads do not use those credentials. API writes use the fixed
 HTTPS Gitee origin, documented form/multipart token fields and no redirects.
 
-Only the selected `refs/heads/main` (or the explicitly named landing branch) and
-`refs/tags/v0.6.0` may be written, resolving to the accepted commit. Branch updates
-must be known fast-forwards; matching annotated tags are retained after peeling.
-An existing repository's default branch must match the landing branch. An empty
-repository may receive its first selected branch, but its default branch is read
-back before release creation. A mismatch requires separately authorized operator
-configuration. No force push, all-ref mirror, webhook or automatic setting change
-is performed. An ahead/divergent branch or unknown ancestry fails; completing an
-older partial mirror after a newer release advanced the branch needs operator
-intervention.
+Only the branch selected by `--branch` and the accepted version tag may be written
+(`refs/heads/main` and `refs/tags/v0.6.0` in this example). Both must point to the
+accepted commit. An existing annotated tag is retained if it points to that commit.
+To update an existing Gitee branch, the tool must establish that its current commit
+is an ancestor of the accepted commit, so the update is a fast-forward.
+A branch already beyond the accepted commit, a divergent branch or unknown
+ancestry stops the run. This also applies when a newer release has advanced the
+branch before an older partial mirror is completed. Inspect the refs and decide
+how to resolve that state before rerunning; the tool does not force a branch back.
 
-The release body is the exact Chinese version section from the accepted Git
-object's `docs/zh-CN/releases.md`, using absolute tagged guide links. Comparison
-normalizes CRLF only. Matching release metadata and attachments are retained.
-The tool requests the first attachment page at 100 records per page. Any inventory
-above the expected three files is a conflict; a successful inventory fits entirely
-on that page. JSON responses are bounded at 2 MiB and each original file at 64 MiB.
-Missing files are uploaded from the same immutable buffers that passed verification.
-Duplicate names, unexpected names or different downloaded bytes fail with attachment IDs.
+An existing repository's default branch must match the selected landing branch.
+An empty repository may receive its first selected branch, but the tool reads
+back its default branch before creating a release. If it does not match, stop
+and obtain authorization to configure the default branch separately.
+No force push, all-ref mirror, webhook or automatic setting change is performed.
+
+The release body is the Chinese version section from the accepted Git object's
+`docs/zh-CN/releases.md`, excluding its `##` version heading and using absolute
+tagged guide links. The existing body must match that text apart from CRLF
+line endings. Matching release metadata and attachments are retained.
+An extra attachment is a conflict; each original file must be no larger than
+64 MiB. Missing files are uploaded from the verified originals.
+Duplicate names, unexpected names or different downloaded bytes stop the run
+and identify the conflicting attachments by ID.
 
 After a failed or timed-out write, the tool reads anonymous state without
 automatically retrying that write. An observed matching result is retained;

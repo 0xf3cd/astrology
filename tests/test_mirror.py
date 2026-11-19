@@ -970,3 +970,56 @@ def test_only_fixed_retained_files_are_read_and_uploaded(
   monkeypatch.setattr(Path, "open", guarded)
   remote.run(publish=True)
   assert set(remote.downloads.values()) == set(remote.buffers.values())
+
+
+@pytest.mark.parametrize("phase", ["refs", "inventory", "release"])
+def test_final_state_losses_are_refused(
+  remote: Remote, monkeypatch: pytest.MonkeyPatch, phase: str
+) -> None:
+  remote.complete()
+  name = {"refs": "_refs", "inventory": "_inventory", "release": "_release"}[phase]
+  original = getattr(mirror, name)
+  calls = 0
+
+  def read(*args: Any, **kwargs: Any) -> Any:
+    nonlocal calls
+    result = original(*args, **kwargs)
+    if phase == "refs" and args[1] == mirror.GITHUB:
+      return result
+    calls += 1
+    if phase == "refs" and calls == 2:
+      return {key: value for key, value in result.items() if key != BRANCH}
+    if phase == "inventory" and calls == 3:
+      return set()
+    if phase == "release" and calls == 2:
+      return None
+    return result
+
+  monkeypatch.setattr(mirror, name, read)
+  with pytest.raises(mirror.MirrorError, match=r"readback|inventory"):
+    remote.run(publish=True)
+  assert remote.writes == []
+
+
+def test_anonymous_git_failure_is_named(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+  monkeypatch.setattr(
+    mirror, "_git", lambda *args, **kwargs: subprocess.CompletedProcess([], 128, "")
+  )
+  with pytest.raises(mirror.MirrorError, match="Anonymous Git read failed"):
+    mirror._refs(tmp_path, mirror.GITHUB, ("refs/tags/v0.1.0",))
+
+
+def test_json_default_is_the_documented_bound() -> None:
+  assert mirror.MAX_JSON == 2 * 1024 * 1024
+  assert mirror._http.__kwdefaults__["limit"] == mirror.MAX_JSON
+
+
+def test_original_symlink_is_refused(remote: Remote) -> None:
+  path = remote.files.directory / "packages" / next(iter(remote.buffers))
+  target = remote.files.root.parent / "retained-identical"
+  target.write_bytes(path.read_bytes())
+  path.unlink()
+  path.symlink_to(target)
+  with pytest.raises(mirror.MirrorError, match="Original file type"):
+    remote.run(publish=True)
+  assert remote.writes == []

@@ -497,12 +497,20 @@ def mirror(
 def main() -> None:
   """Run an explicit check or publication command. 执行显式检查或发布命令。"""
   parser = argparse.ArgumentParser(description=__doc__)
-  parser.add_argument("operation", choices=("check", "publish"))
-  parser.add_argument("--version", required=True)
-  parser.add_argument("--sha", required=True)
-  parser.add_argument("--repository", required=True)
-  parser.add_argument("--branch", required=True)
-  parser.add_argument("--files", type=Path, required=True)
+  parser.add_argument(
+    "operation", choices=("check", "publish"), help="anonymous check or explicit publication"
+  )
+  parser.add_argument(
+    "--version", required=True, help="accepted version with three numeric components"
+  )
+  parser.add_argument(
+    "--sha", required=True, help="accepted commit: 40 lowercase hexadecimal characters"
+  )
+  parser.add_argument("--repository", required=True, help="public Gitee namespace/repository")
+  parser.add_argument("--branch", required=True, help="explicit landing/default branch")
+  parser.add_argument(
+    "--files", type=Path, required=True, help="directory containing manifest.json and packages/"
+  )
   args = parser.parse_args()
   try:
     mirror(

@@ -21,23 +21,22 @@ searches ordered moving pairs without a natal chart, retaining both provider
 records, native TT and relative motion. New/full-moon queries use the same event
 composition. Pair order and the Moon-minus-Sun phase convention remain explicit.
 
-`transit_hit_utc` and `moving_hit_utc` keep their existing names, type checks,
-lazy TT-to-civil conversion and `EventDisplayError` behavior.
+New `transit_hit_utc` and `moving_hit_utc` functions convert a retained
+transit/return or moving-pair hit's TT to a timezone-aware UTC `datetime`.
 The [event tables](https://github.com/0xf3cd/astrology/blob/v0.6.0/docs/en/transits.md)
 format retained transit/return and moving-pair results with supplied vocabulary,
 without another search, location or house calculation. Pre-1972 UT1 substitutes
-and conversion/range failures raise display errors. Python `datetime` cannot
+and conversion/range failures raise `EventDisplayError`. Python `datetime` cannot
 represent leap seconds; leap-boundary display can repeat or reverse civil time
 without changing the authoritative TT ordering.
 
-### Composition, distribution and mirroring
+### Release mirroring and source records
 
-Moment-chart checks cover complete content; chart composition shares placement
-selection, and the sdist includes the maintained test/tool inputs.
 The [release procedure](https://github.com/0xf3cd/astrology/blob/v0.6.0/docs/en/releasing.md)
-adds an explicit Gitee mirror command that verifies the accepted source, original
-three files, Chinese notes and anonymous readback.
-Project implementation source locators now point to v0.6.0.
+adds an explicit Gitee mirror command. It verifies the accepted source and the
+original wheel, sdist and `manifest.json`, copies the Chinese release notes,
+and checks the published result anonymously.
+The `source.astrology` catalog record now cites the v0.6.0 release tree.
 
 Python 3.11–3.14, platform minimums and exact runtime pins remain unchanged:
 `celestial-calendar==1.1.1` and `tzdata==2026.5`.

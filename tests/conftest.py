@@ -1,4 +1,4 @@
-"""Shared complete charts for result and rendering tests. 结果与显示测试共用的完整命盘。"""
+"""Shared chart and project-version fixtures. 共用命盘及项目版本测试夹具。"""
 
 import tomllib
 from datetime import date, time
