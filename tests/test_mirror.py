@@ -1011,7 +1011,9 @@ def test_anonymous_git_failure_is_named(monkeypatch: pytest.MonkeyPatch, tmp_pat
 
 def test_json_default_is_the_documented_bound() -> None:
   assert mirror.MAX_JSON == 2 * 1024 * 1024
-  assert mirror._http.__kwdefaults__["limit"] == mirror.MAX_JSON
+  defaults = mirror._http.__kwdefaults__
+  assert defaults is not None
+  assert defaults["limit"] == mirror.MAX_JSON
 
 
 def test_original_symlink_is_refused(remote: Remote) -> None:
