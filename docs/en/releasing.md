@@ -225,10 +225,11 @@ The release body is the Chinese version section from the accepted Git object's
 `docs/zh-CN/releases.md`, excluding its `##` version heading and using absolute
 tagged guide links. The existing body must match that text apart from CRLF
 line endings. Matching release metadata and attachments are retained.
-An extra attachment is a conflict; each original file must be no larger than
-64 MiB. Missing files are uploaded from the verified originals.
-Duplicate names, unexpected names or different downloaded bytes stop the run
-and identify the conflicting attachments by ID.
+More than three attachment records stop the run on count alone, before downloads.
+Within that bound, duplicate names, unexpected names or different downloaded
+bytes stop the run and identify the conflicting attachments by ID.
+Each original file must be no larger than 64 MiB. Missing files are uploaded
+from the verified originals.
 
 After a failed or timed-out write, the tool reads anonymous state without
 automatically retrying that write. An observed matching result is retained;

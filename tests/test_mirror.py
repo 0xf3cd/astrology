@@ -506,16 +506,16 @@ def test_notes_use_accepted_object_and_only_canonicalize_crlf(remote: Remote, fi
 def test_attachment_conflicts_never_write_or_delete(remote: Remote, defect: str) -> None:
   remote.complete()
   if defect == "duplicate":
-    remote.attachments.append({**remote.attachments[0], "id": 4})
+    remote.attachments[-1] = {**remote.attachments[0], "id": 4}
   elif defect == "repeated-id":
-    remote.attachments.append(dict(remote.attachments[0]))
+    remote.attachments[-1] = dict(remote.attachments[0])
   elif defect == "bytes":
     remote.downloads[1] = b"x" * len(remote.downloads[1])
   elif defect == "size":
     remote.attachments[0]["size"] += 1
   else:
     remote.attachments[0]["name"] = "unexpected"
-  with pytest.raises(mirror.MirrorError):
+  with pytest.raises(mirror.MirrorError, match=r"\(ID "):
     remote.run(publish=True)
   assert remote.writes == []
 
