@@ -13,11 +13,14 @@ import tempfile
 import uuid
 from collections.abc import Mapping, Sequence
 from contextlib import suppress
+from http.client import HTTPException
 from pathlib import Path
+from tarfile import TarError
 from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlencode, urlsplit
 from urllib.request import HTTPRedirectHandler, ProxyHandler, Request, build_opener
+from zipfile import BadZipFile
 
 if __package__ in (None, ""):
   sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -30,7 +33,6 @@ DOWNLOAD_ORIGINS = frozenset({GITEE})
 READ_ORIGINS = DOWNLOAD_ORIGINS | {"https://api.github.com", "https://pypi.org"}
 MAX_FILE = 64 * 1024 * 1024
 MAX_JSON = 2 * 1024 * 1024
-MAX_PAGES = 20
 
 
 class MirrorError(ValueError):
@@ -95,7 +97,7 @@ def _http(
       return None
     error = UncertainWrite if data is not None else MirrorError
     raise error(f"HTTP operation failed (status {status}); no automatic retry") from None
-  except (OSError, URLError):
+  except (OSError, URLError, HTTPException):
     error = UncertainWrite if data is not None else MirrorError
     raise error("HTTP operation failed; no automatic retry") from None
 
@@ -261,7 +263,6 @@ def _files(
   for item in packages:
     if _object(item.get("digests")).get("sha256") != expected[item["filename"]][1]:
       raise MirrorError("PyPI and GitHub distribution digests differ")
-  release._packages(directory, identity)
   buffers: dict[str, bytes] = {}
   for name, (size, digest) in expected.items():
     path = directory / ("packages/" + name if name != "manifest.json" else name)
@@ -277,35 +278,36 @@ def _files(
     (snapshot / "packages").mkdir()
     for name, content in buffers.items():
       (snapshot / ("packages/" + name if name != "manifest.json" else name)).write_bytes(content)
-    release.verify(
-      root,
-      identity,
-      snapshot,
-      {
-        "WHEEL_SHA256": expected[identity.wheel_name][1],
-        "SDIST_SHA256": expected[identity.sdist_name][1],
-      },
-    )
+    try:
+      release.verify(
+        root,
+        identity,
+        snapshot,
+        {
+          "WHEEL_SHA256": expected[identity.wheel_name][1],
+          "SDIST_SHA256": expected[identity.sdist_name][1],
+        },
+      )
+    except (
+      ValueError,
+      TypeError,
+      KeyError,
+      OSError,
+      subprocess.SubprocessError,
+      TarError,
+      BadZipFile,
+    ):
+      raise MirrorError(
+        "Retained manifest/archive/source validation failed; "
+        "use the original files for the accepted checkout"
+      ) from None
   return buffers
 
 
 def _inventory(url: str, buffers: Mapping[str, bytes]) -> set[str]:
-  records: list[dict[str, Any]] = []
-  ids: set[int] = set()
-  for page in range(1, MAX_PAGES + 1):
-    batch = _items(_json(url + f"?page={page}&per_page=100&direction=asc"))
-    if len(batch) > 100:
-      raise MirrorError("Attachment page exceeds the bound")
-    for item in batch:
-      record_id = _id(item.get("id"))
-      if record_id in ids:
-        raise MirrorError("Repeated attachment ID in pagination")
-      ids.add(record_id)
-    records.extend(batch)
-    if len(batch) < 100:
-      break
-  else:
-    raise MirrorError("Attachment pagination exceeds the bound")
+  records = _items(_json(url + "?page=1&per_page=100&direction=asc"))
+  if len(records) > len(buffers):
+    raise MirrorError("Attachment inventory exceeds the expected file count")
   present: set[str] = set()
   for item in records:
     record_id, name = _id(item.get("id")), item.get("name")
@@ -383,11 +385,17 @@ def mirror(
   核验保留字节及远端状态；仅在显式请求时发布。
   """
   url = _target(repository, branch)
-  release.release_identity(
-    root,
-    {"RELEASE_VERSION": identity.version, "RELEASE_SHA": identity.source_sha},
-  )
-  release.check_checkout(root, identity)
+  try:
+    release.release_identity(
+      root,
+      {"RELEASE_VERSION": identity.version, "RELEASE_SHA": identity.source_sha},
+    )
+    release.check_checkout(root, identity)
+  except (ValueError, TypeError, KeyError, OSError, subprocess.SubprocessError):
+    raise MirrorError(
+      "Accepted checkout/version validation failed; "
+      "use a clean checkout at the accepted SHA with the matching project version"
+    ) from None
   buffers, body = _files(root, identity, directory), _notes(root, identity)
   branch_ref, tag_ref = "refs/heads/" + branch, "refs/tags/v" + identity.version
   git_url, tag = GITEE + "/" + repository + ".git", "v" + identity.version
@@ -474,12 +482,8 @@ def mirror(
   present = _inventory(attachments, buffers)
   for name, data in buffers.items():
     if name not in present:
-      try:
+      with suppress(UncertainWrite):
         _post(attachments, {}, (name, data))
-      except UncertainWrite:
-        observed_names = _inventory(attachments, buffers)
-        if name not in observed_names:
-          raise UncertainWrite("Upload is unconfirmed; inspect before an explicit rerun") from None
       present = _inventory(attachments, buffers)
       if name not in present:
         raise UncertainWrite("Upload is unconfirmed; inspect before an explicit rerun")
@@ -512,7 +516,11 @@ def main() -> None:
   except MirrorError as exc:
     parser.exit(1, str(exc) + "\n")
   except (ValueError, TypeError, KeyError, OSError):
-    parser.exit(1, "Mirror verification failed; no automatic retry or rollback\n")
+    parser.exit(
+      1,
+      "Mirror verification failed; inspect inputs, retained files and remote state "
+      "before an explicit rerun\n",
+    )
 
 
 if __name__ == "__main__":

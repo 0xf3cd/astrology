@@ -162,8 +162,7 @@ new reviewed release version.
 GitHub remains the source repository. Before the first mirror, the maintainer must
 select a public Gitee namespace/repository and verify its permissions, two-factor
 authentication, recovery readiness, fresh sign-in and Git/API clients. Repository
-creation, account settings and publication each require authorization. API
-documentation and local tests do not establish account eligibility.
+creation, account settings and publication each require authorization.
 
 Use a clean checkout at the accepted full SHA with the matching package version.
 Retain the original files from its GitHub Release or formal workflow artifact in
@@ -212,18 +211,17 @@ intervention.
 The release body is the exact Chinese version section from the accepted Git
 object's `docs/zh-CN/releases.md`, using absolute tagged guide links. Comparison
 normalizes CRLF only. Matching release metadata and attachments are retained.
-All attachment pages are checked, up to 20 pages of 100 records; JSON responses
-are bounded at 2 MiB and each original file at 64 MiB. Missing files are uploaded
-from the same immutable buffers that passed verification. Duplicate names,
+The tool requests the first attachment page at 100 records per page. Any inventory
+above the expected three files is a conflict; a successful inventory fits entirely
+on that page. JSON responses are bounded at 2 MiB and each original file at 64 MiB.
+Missing files are uploaded from the same immutable buffers that passed verification. Duplicate names,
 unexpected names or different downloaded bytes fail with attachment IDs.
-Git's built-in source archives are not uploaded attachments.
 
 After a failed or timed-out write, the tool reads anonymous state without
 automatically retrying that write. An observed matching result is retained;
 unconfirmed state stops the run. Inspect the partial delivery before an explicit
 rerun, which inventories fresh state and adds only missing content from the
 original files. The tool never deletes conflicts or rolls back completed work.
-HTTP/Git error bodies are not printed.
 
 Anonymous attachment downloads allow only HTTPS `gitee.com` on the standard
 port, including redirects. An unknown download origin fails; investigate actual
@@ -232,8 +230,6 @@ automatically. No API credential is sent during readback.
 
 Record the accepted version/SHA, ref targets, notes, attachment IDs and anonymous
 download digests. Inspect the actual Gitee landing page and Chinese README
-selection, Chinese release rendering and source links. Gitee's documented README
-language-suffix behavior is not a rendering test. Verify all three anonymous
-downloads against the retained files. Successful Git transfer alone does not
-complete mirror acceptance, and preparation does not close the release tracker
-or mirror issue.
+selection, Chinese release rendering and source links. Verify all three anonymous
+downloads against the retained files. Record these results with the other
+publication checks before closing the release tracker or mirror issue.

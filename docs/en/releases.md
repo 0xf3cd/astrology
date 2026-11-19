@@ -36,8 +36,7 @@ Moment-chart checks cover complete content; chart composition shares placement
 selection, and the sdist includes the maintained test/tool inputs.
 The [release procedure](https://github.com/0xf3cd/astrology/blob/v0.6.0/docs/en/releasing.md)
 adds an explicit Gitee mirror command that verifies the accepted source, original
-three files, Chinese notes and anonymous readback. Account readiness and actual
-publication are separate acceptance steps; local checks do not establish a live mirror.
+three files, Chinese notes and anonymous readback.
 Project implementation source locators now point to v0.6.0.
 
 Python 3.11–3.14, platform minimums and exact runtime pins remain unchanged:

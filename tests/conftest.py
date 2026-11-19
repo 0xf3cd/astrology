@@ -1,6 +1,8 @@
 """Shared complete charts for result and rendering tests. 结果与显示测试共用的完整命盘。"""
 
+import tomllib
 from datetime import date, time
+from pathlib import Path
 
 import pytest
 
@@ -21,6 +23,15 @@ from astrology import (
   natal_chart,
   prepare_natal_input,
 )
+
+
+@pytest.fixture
+def project_version() -> str:
+  """Package version declared by this checkout. 当前 checkout 声明的包版本。"""
+  value: str = tomllib.loads(
+    (Path(__file__).resolve().parents[1] / "pyproject.toml").read_text(encoding="utf-8")
+  )["project"]["version"]
+  return value
 
 
 @pytest.fixture
