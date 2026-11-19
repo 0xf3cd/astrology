@@ -139,7 +139,7 @@ release-files/
 只读预检命令如下，替换仓库及 SHA 占位符：
 
 ```sh
-uv run --locked python tools/mirror.py check --version 0.6.0 --sha ACCEPTED_FULL_SHA --repository NAMESPACE/REPOSITORY --branch main --files release-files
+uv run --locked python tools/mirror.py check --version 0.6.0 --sha ACCEPTED_FULL_SHA --repository NAMESPACE/REPOSITORY --branch main --files ../release-files
 ```
 
 保留文件应放在 checkout 外。`check` 使用匿名读取，不写远端。它核验 GitHub tag 及稳定 Release 的

@@ -179,7 +179,7 @@ release-files/
 For a read-only preflight, replace the repository and SHA placeholders:
 
 ```sh
-uv run --locked python tools/mirror.py check --version 0.6.0 --sha ACCEPTED_FULL_SHA --repository NAMESPACE/REPOSITORY --branch main --files release-files
+uv run --locked python tools/mirror.py check --version 0.6.0 --sha ACCEPTED_FULL_SHA --repository NAMESPACE/REPOSITORY --branch main --files ../release-files
 ```
 
 Keep the retained files outside the checkout. `check` is anonymous and makes no
@@ -214,8 +214,8 @@ normalizes CRLF only. Matching release metadata and attachments are retained.
 The tool requests the first attachment page at 100 records per page. Any inventory
 above the expected three files is a conflict; a successful inventory fits entirely
 on that page. JSON responses are bounded at 2 MiB and each original file at 64 MiB.
-Missing files are uploaded from the same immutable buffers that passed verification. Duplicate names,
-unexpected names or different downloaded bytes fail with attachment IDs.
+Missing files are uploaded from the same immutable buffers that passed verification.
+Duplicate names, unexpected names or different downloaded bytes fail with attachment IDs.
 
 After a failed or timed-out write, the tool reads anonymous state without
 automatically retrying that write. An observed matching result is retained;
@@ -232,4 +232,5 @@ Record the accepted version/SHA, ref targets, notes, attachment IDs and anonymou
 download digests. Inspect the actual Gitee landing page and Chinese README
 selection, Chinese release rendering and source links. Verify all three anonymous
 downloads against the retained files. Record these results with the other
-publication checks before closing the release tracker or mirror issue.
+publication checks. Close the release tracker and mirror issue only after all
+acceptance checks pass.

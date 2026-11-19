@@ -837,7 +837,8 @@ def test_documented_commands_use_the_real_cli(
   assert len(calls) == 1
   args, kwargs = calls[0]
   assert args[1] == release.ReleaseIdentity(project_version, SHA)
-  assert args[2:] == ("NAMESPACE/REPOSITORY", "main", Path("release-files"))
+  assert args[2:] == ("NAMESPACE/REPOSITORY", "main", Path("../release-files"))
+  assert not (release.ROOT / args[4]).resolve().is_relative_to(release.ROOT)
   assert kwargs == {"publish": operation == "publish"}
 
 
