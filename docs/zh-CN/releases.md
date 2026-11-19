@@ -2,6 +2,42 @@
 
 [English](../en/releases.md) · [文档](index.md) · [发行流程](releasing.md)
 
+## 0.6.0
+
+本版增加已有十星体的返照、移动对象之间的精确相位事件，以及 UTC 读取和中英文事件表格。
+包索引：[PyPI](https://pypi.org/project/celestial-astrology/0.6.0/)。
+
+### 返照、移动对象配对及事件显示
+
+[`return_hits`](https://github.com/0xf3cd/astrology/blob/v0.6.0/docs/zh-CN/returns.md)
+将已有日月流程扩至水星到冥王星，保留请求区间内本命时刻之后的全部同星体合相，包括重复穿越。
+选定命中后，将其与显式地点和配置传给 `moment_chart`。
+这项计算约定不表示每个星体都有已确立的返照解读传统。
+
+[`moving_aspect_events`](https://github.com/0xf3cd/astrology/blob/v0.6.0/docs/zh-CN/moving_events.md)
+不依赖本命盘，搜索有序的移动对象配对，保留双侧提供方记录、原生 TT 和相对运动。
+新月／满月查询使用相同的事件组合。配对顺序及月亮减太阳的月相约定仍明确保留。
+
+`transit_hit_utc` 和 `moving_hit_utc` 保留已有名称、类型检查、延迟 TT 转民用时间及
+`EventDisplayError` 行为。
+[事件表格](https://github.com/0xf3cd/astrology/blob/v0.6.0/docs/zh-CN/transits.md)
+用传入的词汇显示保留的行运／返照及移动配对结果，不再次搜索，也不要求地点或宫位计算。
+1972 年之前的 UT1 替代结果及转换／范围失败作为显示错误处理。
+Python `datetime` 不能表示闰秒；闰秒边界的民用时间显示可能重复或倒序，但不改变作为依据的 TT 顺序。
+
+### 组合、分发与镜像
+
+时刻盘检查覆盖完整内容，排盘组合共用对象位置选择，sdist 收入维护中的测试和工具输入。
+[发行流程](https://github.com/0xf3cd/astrology/blob/v0.6.0/docs/zh-CN/releasing.md)
+增加显式 Gitee 镜像命令，核验接受的源码、原三份文件、中文说明及匿名回读。
+账户准备和实际发布另行验收，本地检查不能证明线上镜像已可用。
+项目实现来源定位更新至 v0.6.0。
+
+Python 3.11–3.14、平台下限及运行依赖钉版不变：
+`celestial-calendar==1.1.1` 和 `tzdata==2026.5`。
+容许度窗口、窗口边界 UTC 及窗口表格延后至
+[#94](https://github.com/0xf3cd/astrology/issues/94)，不阻塞本次发行。
+
 ## 0.5.0
 
 本版增加时刻盘、固定时刻的行运对本命相位及中英文文本，以及日月返照工作流。

@@ -2,6 +2,49 @@
 
 [简体中文](../zh-CN/releases.md) · [Documentation](index.md) · [Release procedure](releasing.md)
 
+## 0.6.0
+
+This version adds returns for all ten existing bodies, exact moving-pair events,
+and UTC readout with English/Chinese event tables.
+Package index: [PyPI](https://pypi.org/project/celestial-astrology/0.6.0/).
+
+### Returns, moving pairs and event display
+
+[`return_hits`](https://github.com/0xf3cd/astrology/blob/v0.6.0/docs/en/returns.md)
+extends the existing Sun/Moon workflow to Mercury through Pluto. It retains every
+post-natal same-body conjunction in the requested interval, including recrossings.
+Pass a chosen hit to `moment_chart` with an explicit location and configuration.
+This calculation convention does not establish interpretive traditions for every body.
+
+[`moving_aspect_events`](https://github.com/0xf3cd/astrology/blob/v0.6.0/docs/en/moving_events.md)
+searches ordered moving pairs without a natal chart, retaining both provider
+records, native TT and relative motion. New/full-moon queries use the same event
+composition. Pair order and the Moon-minus-Sun phase convention remain explicit.
+
+`transit_hit_utc` and `moving_hit_utc` keep their existing names, type checks,
+lazy TT-to-civil conversion and `EventDisplayError` behavior.
+The [event tables](https://github.com/0xf3cd/astrology/blob/v0.6.0/docs/en/transits.md)
+format retained transit/return and moving-pair results with supplied vocabulary,
+without another search, location or house calculation. Pre-1972 UT1 substitutes
+and conversion/range failures raise display errors. Python `datetime` cannot
+represent leap seconds; leap-boundary display can repeat or reverse civil time
+without changing the authoritative TT ordering.
+
+### Composition, distribution and mirroring
+
+Moment-chart checks cover complete content; chart composition shares placement
+selection, and the sdist includes the maintained test/tool inputs.
+The [release procedure](https://github.com/0xf3cd/astrology/blob/v0.6.0/docs/en/releasing.md)
+adds an explicit Gitee mirror command that verifies the accepted source, original
+three files, Chinese notes and anonymous readback. Account readiness and actual
+publication are separate acceptance steps; local checks do not establish a live mirror.
+Project implementation source locators now point to v0.6.0.
+
+Python 3.11–3.14, platform minimums and exact runtime pins remain unchanged:
+`celestial-calendar==1.1.1` and `tzdata==2026.5`.
+Orb windows, window-boundary UTC and window tables are deferred to
+[#94](https://github.com/0xf3cd/astrology/issues/94); they do not block this release.
+
 ## 0.5.0
 
 This version adds moment charts, fixed-instant transit-to-natal aspects with

@@ -130,14 +130,14 @@ fail the strict build.
 <!-- usage: contributing.checks -->
 
 Install this development package from the checkout using `uv sync` above. Its
-distribution name/version is `celestial-astrology` / `0.5.0`; the Python import
+distribution name/version is `celestial-astrology` / `0.6.0`; the Python import
 remains `astrology`. The unrelated
 PyPI project `astrology` is not this library. Confirm the installed package and version:
 
 ```{doctest}
 >>> from importlib.metadata import version
 >>> version("celestial-astrology")
-'0.5.0'
+'0.6.0'
 ```
 
 <!-- /usage: contributing.checks -->

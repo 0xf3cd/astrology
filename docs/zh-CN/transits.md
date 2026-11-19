@@ -73,7 +73,7 @@ mercury conjunction sun 2460437.45999 increasing +0.812
 给定 UTC 区间 [start, end): [2024-03-01T00:00:00+00:00, 2024-06-01T00:00:00+00:00)
 转换后 TT 区间 [start, end): [2460370.500800741, 2460462.500800741)
 事件模型: 水星 [mercury]: position_source/3
-astrology / celestial-calendar 版本: 0.5.0 / 1.1.1
+astrology / celestial-calendar 版本: 0.6.0 / 1.1.1
 <BLANKLINE>
 UTC | 移动对象 | 固定源对象 | 相位 | 分支 | 方向 | JDE(TT)
 2024-03-22T17:40:34+00:00 | 水星 [mercury] | 太阳 [sun] | 合相 | 0°00'00" | 黄经增大 | 2460392.2373059206
