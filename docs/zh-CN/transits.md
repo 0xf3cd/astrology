@@ -6,13 +6,13 @@
 判断事件归属，返回 `TransitHits`。结果保留原盘、搜索输入、模型溯源及每次穿越或接触。
 命中时刻为 JDE(TT)，即 TT 时标的儒略日，不是 UTC 钟点。
 
-(event-provider-zh-cn)=
-本文的「事件来源」指所选 celestial-calendar 黄经事件搜索实现。
-
 只接纳本命盘及十个天体身份的便捷入口 `return_hits`，以及选择命中和地点后建盘的用法，
 见[行星返照](returns.md)。
 
 ## 搜索一个区间
+
+(event-provider-zh-cn)=
+本文的「事件来源」指所选 celestial-calendar 黄经事件搜索实现。
 
 固定源盘也可以是 `MomentChart`；`natal_objects` 命名固定参考侧的角色，不是出生输入类型。
 两种来源的黄经约定相同，因此 `TransitHits.epoch_policy` 均保留

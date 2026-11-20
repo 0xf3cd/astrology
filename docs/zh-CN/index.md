@@ -12,7 +12,7 @@
 | 按给定时刻建盘或比较固定时刻行运 | [时刻盘](moments.md) |
 | 比较两张命盘 | [双盘相位与落宫](cross_aspects.md) |
 | 搜索 UTC 区间内的精确行运 | [精确行运命中](transits.md) |
-| 不用本命盘，查新满月或行星相位事件 | [移动对象对事件](moving_events.md) |
+| 不用本命盘，查新月与满月或行星相位事件 | [移动对象对事件](moving_events.md) |
 | 查找十体返照并选择排盘地点 | [返照](returns.md) |
 | 读取事件 UTC 或输出中英文事件表 | {ref}`事件显示 <event-display-zh-cn>` |
 | 统计元素、模式分布或判断月相类型 | [星座分布与出生月相](summaries.md) |

@@ -118,7 +118,7 @@
    :no-index:
 ```
 
-## 事件来源记录及显示错误
+## 事件模型记录及显示错误
 
 ```{eval-rst}
 .. automodule:: astrology.event_records

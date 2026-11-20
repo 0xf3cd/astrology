@@ -342,7 +342,7 @@ def moving_events(
   start_jde_tt: float,
   end_jde_tt: float,
 ) -> tuple[_MovingEvent, ...]:
-  """Search one native first-minus-second level and copy both moving roles.
+  """Search one upstream first-minus-second level and copy both moving roles.
 
   搜索一个上游第一侧减第二侧的角度，复制两侧移动角色。
   """

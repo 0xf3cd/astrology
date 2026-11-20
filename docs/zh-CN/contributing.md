@@ -152,7 +152,7 @@ uv run --locked python tools/calibrate_moving_reference.py --candidates <candida
 ```
 
 比较时测量各天体在相同时刻的黄经误差；每次命中的时间容差使用两侧角误差界及相对速率。
-经验容差限制夹具能检出的时刻误差；扫描不认证全部事件或相切。
+夹具的 `source.algorithm` 说明采样限度。
 真实原生接触的构造与合成的公开主要相位接触，分别在
 `tests/test_moving_events.py` 及 `tests/test_moving_display.py` 中测试。
 
@@ -182,12 +182,10 @@ uv run --locked python tools/calibrate_planetary_return_reference.py --candidate
 
 第二条命令执行同后端组合与校准，不生成独立参考。夹具钉住两份配方及原生观察文件的散列，
 分别记录生成与校准时间。69.184 秒的 TT−UTC 偏移仅适用于其中 2022–2026 年的民用输入。
-独立配方以 0.0625 TT 日分段，括住带符号黄经的穿越并二分细化；它不查找驻点相切或
-单个分段内相邻的两次穿越，不是完整事件判定器。
+夹具的 `source.algorithm` 说明独立搜索及其限度。
 
 逐命中时间容差为 `max(2 seconds, 2 * angular_tolerance_deg / abs(reference_rate) * 86400)`，
-角度界来自下述已有的 1,830 点行运校准。各角度界并不统一为观测最大差异的两倍：
-水星的 0.0002° 约为其观测最大值的 1.953 倍。慢星体的时间容差可达数小时，
+角度界来自下述已有的 1,830 点行运校准。慢星体的时间容差可达数小时，
 因此测试另要求产品的同后端角度残差在 1e-6 度内；这项残差不是独立天文证据。
 十体建盘及比较内容断言放在领域测试中。安装消费者实际生成中英文行运及返照表，
 并对照同一修订的观察值，检查打包一致性。

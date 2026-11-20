@@ -8,14 +8,14 @@ result with the original chart, search inputs, model provenance, and each crossi
 or contact. Hit times are JDE(TT): Julian Dates on the TT time scale, not UTC clock
 readings.
 
-(event-provider-en)=
-The event provider is the selected celestial-calendar longitude-event search
-implementation.
-
 For the natal-only ten-body convenience `return_hits` and a chart at a chosen
 hit/location, see [planetary returns](returns.md).
 
 ## Search an interval
+
+(event-provider-en)=
+The event provider is the selected celestial-calendar longitude-event search
+implementation.
 
 The fixed source may also be a `MomentChart`; `natal_objects` names its
 fixed-reference role, not its birth-input kind. `TransitHits.epoch_policy` keeps

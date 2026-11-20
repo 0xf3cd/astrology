@@ -60,20 +60,22 @@ their supported event windows; axes are not moving event sources.
 For the other major aspects, select `MajorAspect.SEXTILE`, `MajorAspect.SQUARE`
 or `MajorAspect.TRINE`. Each identity uses a calculation model with its own
 supported TT window and maximum search span. Read these limits and the model name
-from `events.sources`; see [event source records](transits.md#read-and-retain-the-result).
+from `events.sources`; see [event-provider records](transits.md#read-and-retain-the-result).
 
 | Result | Meaning |
 |---|---|
 | `hit.first_object`, `hit.second_object` | Both are moving roles |
 | `hit.branch_deg` | Second-minus-first target: one branch for conjunction/opposition, two for the other major aspects |
-| `hit.signed_difference_deg` | Unchanged native first-minus-second angle |
+| `hit.signed_difference_deg` | Unchanged first-minus-second angle returned by the event provider |
 | `hit.separation_deg`, `hit.deviation_deg` | Canonical second-minus-first angle and its signed deviation from the branch, in (-180, 180] |
 | `hit.first_longitude_deg`, `hit.second_longitude_deg` | Raw apparent geocentric tropical longitudes at the same event TT, in degrees |
 | `hit.first_rate_deg_per_tt_day`, `hit.second_rate_deg_per_tt_day` | Raw rates; `relative_rate_deg_per_tt_day` is second minus first |
 | `hit.direction` | `RelativeDirection`: separation increasing, decreasing or tangent, not either body's direct/retrograde motion |
 | `events.sources` | One `TransitSource` per distinct requested identity, in first-appearance order |
 
-Opposition remains 180° after reversal. At a tangent, the separation reaches the
+The table's Branch column displays `branch_deg`, using second minus first;
+`signed_difference_deg` uses the opposite object order. For opposition,
+`branch_deg` stays +180° when the object order is reversed. At a tangent, the separation reaches the
 requested branch without crossing it; the reported relative rate need not be
 exactly zero. Hits sort by raw TT, requested pair order, aspect angle and branch.
 Two requested pairs that hit at the same TT give two hits. Nearby times returned
@@ -140,9 +142,12 @@ Source-event TT and the chart's derived calculation TT remain separate.
 
 ## Search cost
 
-A one-year Mercury/Sun conjunction query took about 13 seconds in a measured
-environment, despite returning only six hits. Cost is not proportional to hit
-count, and the measurement is not a response-time guarantee.
+The search runs one scan for each ordered pair and oriented aspect branch:
+one each for conjunction/opposition and two each for the other major aspects.
+Cost is not proportional to hit count. A one-year Mercury/Sun conjunction query
+with Python 3.14.9 and celestial-calendar 1.1.1 took about 13 seconds for six
+hits; this measurement is not a response-time guarantee. See
+[transit search cost](transits.md#search-cost) for other scan-count examples.
 
 For independent numerical fixtures and regeneration, see
 [contributing](contributing.md#correctness).

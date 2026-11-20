@@ -18,7 +18,7 @@ This calculation convention does not establish interpretive traditions for every
 
 [`moving_aspect_events`](https://github.com/0xf3cd/astrology/blob/v0.6.0/docs/en/moving_events.md)
 searches ordered moving pairs without a natal chart, retaining both provider
-records, native TT and relative motion. New/full-moon queries use the same event
+records, raw event TT and relative motion. New/full-moon queries use the same event
 composition. Pair order and the Moon-minus-Sun phase convention remain explicit.
 
 New `transit_hit_utc` and `moving_hit_utc` functions convert a retained

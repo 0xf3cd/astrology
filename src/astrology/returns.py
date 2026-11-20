@@ -39,9 +39,10 @@ def return_hits(
   body must be present on the NatalChart. The same-body conjunction search uses
   transit_hits, including its converted-TT interval, domain and failure contracts.
   Only hits strictly later than the natal TT are retained; an exact natal hit does
-  not count. Distinct events are never merged by a time tolerance. The numerical
-  search can report a separate hit just after natal TT, which a birth-inclusive
-  interval can retain. To omit this near-natal hit, choose an interval around the
+  not count. Distinct events are never merged by a time tolerance. When the
+  interval includes the birth instant, the provider's numerical search may return
+  a distinct hit just after natal TT, which passes the strictly-later filter.
+  To omit such near-natal hits, choose an interval around the
   later return of interest. An empty hits tuple is valid. Pass a retained hit to
   moment_chart with an explicit location and configuration to build its chart.
   See entry.solar_lunar_returns.
@@ -51,9 +52,9 @@ def return_hits(
   查找 [start_utc, end_utc) 内所选 Body 在本命时刻后的全部返照，返回 TransitHits。
   body 须已存在于 NatalChart。同星体合相搜索使用 transit_hits，沿用其转换后 TT 区间、
   有效域及失败合同。只保留严格晚于本命 TT 的命中，本命时刻的精确命中不计入。
-  不按时间容差合并不同的事件。数值搜索可能在本命 TT 之后紧邻的位置报告另一次命中，
-  而包含本命时刻的区间可能保留它。要排除这个紧邻本命的命中，请选择之后所关心的返照
-  附近区间。hits 可以为空。将保留的命中连同显式地点和配置交给 moment_chart，
+  不按时间容差合并不同的事件。区间包含出生时刻时，事件来源的数值搜索可能返回另一个
+  稍晚于本命 TT 的命中，它会通过严格晚于本命 TT 的过滤。要排除这种命中，
+  请选择之后所关心的返照附近区间。hits 可以为空。将保留的命中连同显式地点和配置交给 moment_chart，
   即可建立返照时刻的盘。
   定义见 entry.solar_lunar_returns。natal 或 body 类型不符时抛 TypeError；
   本命盘缺少所选星体时抛 ValueError。

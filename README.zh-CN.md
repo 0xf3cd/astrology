@@ -12,7 +12,7 @@
 
 功能包括：
 
-- [移动对象对事件](https://0xf3cd.github.io/astrology/docs/zh-CN/moving_events.html)：不用本命盘，查新满月及行星相位。
+- [移动对象对事件](https://0xf3cd.github.io/astrology/docs/zh-CN/moving_events.html)：不用本命盘，查新月与满月及行星相位。
 - [十体行星返照](https://0xf3cd.github.io/astrology/docs/zh-CN/returns.html)：查找显式区间内全部本命后事件，再按给定地点建盘。
 - [事件 UTC 与中英文表格](https://0xf3cd.github.io/astrology/docs/zh-CN/transits.html#event-display-zh-cn)，无需为显示选择地点或建盘。
 - [时刻盘与固定时刻行运对本命相位](https://0xf3cd.github.io/astrology/docs/zh-CN/moments.html)，支持从保留的精确命中直接建盘及双语文本。
@@ -146,6 +146,8 @@ moon: scorpio
 | 比较两张命盘 | [双盘相位与落宫](https://0xf3cd.github.io/astrology/docs/zh-CN/cross_aspects.html) |
 | 搜索区间内的精确行运 | [精确行运命中](https://0xf3cd.github.io/astrology/docs/zh-CN/transits.html) |
 | 查找十体返照并建盘 | [返照](https://0xf3cd.github.io/astrology/docs/zh-CN/returns.html) |
+| 不用本命盘，查新月与满月或行星相位 | [移动对象对事件](https://0xf3cd.github.io/astrology/docs/zh-CN/moving_events.html) |
+| 读取事件 UTC 并输出中英文表格 | [事件显示](https://0xf3cd.github.io/astrology/docs/zh-CN/transits.html#event-display-zh-cn) |
 
 ## 第一次查询知识
 
