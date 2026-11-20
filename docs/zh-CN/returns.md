@@ -155,7 +155,7 @@ False
 ## 阅读或比较返照盘
 
 结果是普通的 `MomentChart`，没有虚构的出生记录，已有命盘消费者可直接使用。
-本例中，返照月亮落入本命盘第八宫：
+本例中，返照月亮落入本命盘第八宫。
 
 `cross_chart_house_overlays` 的 `left_objects` 选择返照盘中要查落入本命盘宫位的对象；
 `right_objects=()` 跳过反向落宫。详见[双盘落宫](cross_aspects.md#查询对象落入另一张盘的哪一宫)。

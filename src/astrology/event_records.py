@@ -12,11 +12,11 @@ from astrology.objects import AstronomicalObject, _is_astronomical_object
 class EventDisplayError(ValueError):
   """A retained event TT cannot be represented as ordinary display UTC.
 
-  The source TT and conversion operation are retained. Conversion failures also
+  The source-event TT and conversion operation are retained. Conversion failures also
   retain the exact upstream message and chained cause.
   Native computation failures propagate unchanged instead of becoming this error.
 
-  保留事件的 TT 无法表示为普通显示 UTC。保留来源 TT 和转换操作；
+  保留事件的 TT 无法表示为普通显示 UTC。保留源事件 TT 和转换操作；
   转换失败时还保留上游原始错误文本及异常因果链。
   原生计算失败直接向外抛出，不改写为本错误。
   """

@@ -74,8 +74,8 @@ from `events.sources`; see [event-provider records](transits.md#read-and-retain-
 | `events.sources` | One `TransitSource` per distinct requested identity, in first-appearance order |
 
 The table's Branch column displays `branch_deg`, using second minus first;
-`signed_difference_deg` uses the opposite object order. Opposition remains 180°
-after reversal. At a tangent, the separation reaches the
+`signed_difference_deg` uses the opposite object order. For opposition,
+`branch_deg` stays +180° when the object order is reversed. At a tangent, the separation reaches the
 requested branch without crossing it; the reported relative rate need not be
 exactly zero. Hits sort by raw TT, requested pair order, aspect angle and branch.
 Two requested pairs that hit at the same TT give two hits. Nearby times returned

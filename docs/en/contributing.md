@@ -200,7 +200,7 @@ uv run --locked python tools/calibrate_moving_reference.py --candidates <candida
 
 The comparison measures each body's longitude error at matching times. Each event's
 time tolerance uses both bodies' angular bounds and their relative rate.
-The fixture's source record describes its sampling limits. Real native contact
+The fixture's `source.algorithm` describes its sampling limits. Real native contact
 construction and synthetic public major-aspect contacts are tested separately
 in `tests/test_moving_events.py` and `tests/test_moving_display.py`.
 

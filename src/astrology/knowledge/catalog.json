@@ -394,7 +394,7 @@
       "rule_ids": ["rule.project.moment_charts"],
       "citations": [{"source_id": "source.celestial-calendar.events.1.1.1", "locator": "jde_to_utc and utc_to_jde Python contracts and retained fixed leap offsets; the moment input/result composition is project-defined"}],
       "prerequisites": [{"en": "An explicit location and ChartConfig, and an aware modern datetime or a retained TransitHit or MovingAspectHit whose converted UTC and joint snapshot are admitted.", "zh": "显式地点及 ChartConfig，以及有时区的现代 datetime，或转换后 UTC 及联合快照均被接纳的保留 TransitHit、MovingAspectHit。", "revision": 2, "zh_revision": 2}],
-      "exceptions": {"en": "A valid event-source TT is not sufficient to admit a complete chart; converted UTC can leave the modern domain or cross the house-year ceiling.", "zh": "源事件 TT 合法不等于能计算完整命盘；转换后的 UTC 可能越出现代范围或跨过宫位年上限。"},
+      "exceptions": {"en": "A valid source-event TT is not sufficient to admit a complete chart; converted UTC can leave the modern domain or cross the house-year ceiling.", "zh": "源事件 TT 合法不等于能计算完整命盘；转换后的 UTC 可能越出现代范围或跨过宫位年上限。"},
       "limits": {"en": "Project-defined input/result policy. The upstream citation covers time conversion, not an independent numerical reference or the project's chart composition. Retrieval performs no chart calculation or chart matching.", "zh": "项目自定输入与结果政策。上游引用支持时刻转换，不是独立数值参考，也不定义项目排盘组合。检索不进行排盘或命盘匹配。"},
       "prerequisite_status": "complete", "output_eligibility": "reference_only"
     },

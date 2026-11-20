@@ -152,7 +152,7 @@ uv run --locked python tools/calibrate_moving_reference.py --candidates <candida
 ```
 
 比较时测量各天体在相同时刻的黄经误差；每次命中的时间容差使用两侧角误差界及相对速率。
-夹具的来源记录说明采样限度。
+夹具的 `source.algorithm` 说明采样限度。
 真实原生接触的构造与合成的公开主要相位接触，分别在
 `tests/test_moving_events.py` 及 `tests/test_moving_display.py` 中测试。
 

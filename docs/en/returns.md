@@ -177,7 +177,7 @@ see [time conversion](moments.md#build-from-a-retained-exact-hit).
 
 The result is an ordinary `MomentChart`, with no fabricated birth record. Existing
 chart consumers work directly with it. The returning Moon falls in the natal
-chart's eighth house in this example:
+chart's eighth house in this example.
 
 In `cross_chart_house_overlays`, `left_objects` selects returned-chart objects
 to place in the natal houses. `right_objects=()` skips placement in the reverse
