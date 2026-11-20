@@ -89,7 +89,7 @@ Planetary returns
 Supplied UTC interval [start, end): [2024-01-01T00:00:00+00:00, 2024-04-01T00:00:00+00:00)
 Converted TT interval [start, end): [2460310.500800741, 2460401.500800741)
 Event models: Mercury [mercury]: position_source/3
-astrology / celestial-calendar versions: 0.5.0 / 1.1.1
+astrology / celestial-calendar versions: 0.6.0 / 1.1.1
 <BLANKLINE>
 UTC | Returning body | Direction | JDE(TT)
 2024-03-01T02:18:31+00:00 | Mercury [mercury] | increasing | 2460370.5969953192
@@ -98,7 +98,7 @@ UTC | Returning body | Direction | JDE(TT)
 给定 UTC 区间 [start, end): [2024-01-01T00:00:00+00:00, 2024-04-01T00:00:00+00:00)
 转换后 TT 区间 [start, end): [2460310.500800741, 2460401.500800741)
 事件模型: 水星 [mercury]: position_source/3
-astrology / celestial-calendar 版本: 0.5.0 / 1.1.1
+astrology / celestial-calendar 版本: 0.6.0 / 1.1.1
 <BLANKLINE>
 UTC | 返照星体 | 方向 | JDE(TT)
 2024-03-01T02:18:31+00:00 | 水星 [mercury] | 黄经增大 | 2460370.5969953192

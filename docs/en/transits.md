@@ -80,7 +80,7 @@ Exact transit hits
 Supplied UTC interval [start, end): [2024-03-01T00:00:00+00:00, 2024-06-01T00:00:00+00:00)
 Converted TT interval [start, end): [2460370.500800741, 2460462.500800741)
 Event models: Mercury [mercury]: position_source/3
-astrology / celestial-calendar versions: 0.5.0 / 1.1.1
+astrology / celestial-calendar versions: 0.6.0 / 1.1.1
 <BLANKLINE>
 UTC | Moving object | Fixed source | Aspect | Branch | Direction | JDE(TT)
 2024-03-22T17:40:34+00:00 | Mercury [mercury] | Sun [sun] | Conjunction | 0°00'00" | increasing | 2460392.2373059206
