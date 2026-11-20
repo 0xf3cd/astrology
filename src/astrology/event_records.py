@@ -1,6 +1,6 @@
 """Provider records and display errors shared by exact-event queries.
 
-精确事件查询共用的来源记录及显示错误。
+精确事件查询共用的事件模型记录及显示错误。
 """
 
 from dataclasses import dataclass

@@ -133,8 +133,8 @@ The catalog currently includes:
   sign table.
 - [Planetary return definitions](returns.md), with short original quotations,
   separate translations, different location practices and the ten-body project
-  convention under the stable ID `entry.solar_lunar_returns`. General other-planet
-  calculation and Mercury recrossings do not establish ten interpretive traditions.
+  convention under the stable ID `entry.solar_lunar_returns`. The entry records
+  the convention's sources and limits.
 
 Configuration entries link to the enum members the program uses; rule descriptions
 link to their implementations. House systems, node definitions and aspect angles

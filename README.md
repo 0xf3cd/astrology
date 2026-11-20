@@ -159,6 +159,8 @@ To calculate aspects, supply orb rules in `aspects` and select participants with
 | Compare two charts | [Cross-chart aspects and house overlays](https://0xf3cd.github.io/astrology/docs/en/cross_aspects.html) |
 | Search an interval for exact transits | [Exact transit hits](https://0xf3cd.github.io/astrology/docs/en/transits.html) |
 | Find ten-body returns and build their charts | [Returns](https://0xf3cd.github.io/astrology/docs/en/returns.html) |
+| Find new/full moons or planetary aspects without a natal chart | [Moving-pair events](https://0xf3cd.github.io/astrology/docs/en/moving_events.html) |
+| Read event UTC and print English/Chinese tables | [Event display](https://0xf3cd.github.io/astrology/docs/en/transits.html#read-utc-and-format-event-tables) |
 
 ## First knowledge lookup
 

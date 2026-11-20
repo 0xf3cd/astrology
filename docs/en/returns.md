@@ -76,9 +76,10 @@ True
 ```
 
 Pre-natal hits and a hit exactly at natal TT do not count. Distinct events are
-not merged by a time tolerance. The numerical search can report a separate hit
-just after natal TT, which a birth-inclusive interval can retain. To omit this
-near-natal hit, choose an interval around the later return of interest. The rest
+not merged by a time tolerance. When the interval includes the birth instant,
+the event provider's numerical search may return a distinct hit just after natal
+TT. It passes the strictly-later filter. To exclude such near-natal hits, choose
+an interval around the later return of interest. The rest
 of the result retains the original chart, supplied UTC and converted TT bounds,
 selected body, effective models, domains and versions.
 
@@ -177,6 +178,10 @@ see [time conversion](moments.md#build-from-a-retained-exact-hit).
 The result is an ordinary `MomentChart`, with no fabricated birth record. Existing
 chart consumers work directly with it. The returning Moon falls in the natal
 chart's eighth house in this example:
+
+In `cross_chart_house_overlays`, `left_objects` selects returned-chart objects
+to place in the natal houses. `right_objects=()` skips placement in the reverse
+direction; see [house overlays](cross_aspects.md#find-houses-in-the-other-chart).
 
 ```{doctest}
 >>> from astrology import (

@@ -200,8 +200,7 @@ uv run --locked python tools/calibrate_moving_reference.py --candidates <candida
 
 The comparison measures each body's longitude error at matching times. Each event's
 time tolerance uses both bodies' angular bounds and their relative rate.
-These empirical tolerances limit what timing errors the fixture can detect;
-the scans do not certify all events or tangencies. The real native contact
+The fixture's source record describes its sampling limits. Real native contact
 construction and synthetic public major-aspect contacts are tested separately
 in `tests/test_moving_events.py` and `tests/test_moving_display.py`.
 
@@ -239,16 +238,12 @@ The second command performs same-backend composition and calibration, not
 independent reference generation. The fixture pins both recipe hashes and the
 native-observation hash and records generation and calibration times separately.
 Its 69.184-second TT−UTC offset applies only to the 2022–2026 civil inputs.
-The independent recipe brackets signed-longitude crossings at 0.0625-TT-day
-intervals and refines them by bisection; it does not find stationary tangencies
-or adjacent double crossings within one partition and is not a complete event
-oracle.
+The fixture's `source.algorithm` describes the independent search and its limits.
 
 Each hit's time tolerance is
 `max(2 seconds, 2 * angular_tolerance_deg / abs(reference_rate) * 86400)`,
-using the existing 1,830-point transit calibration below. The angular bounds are
-not uniformly twice the observed maxima: Mercury's 0.0002° bound is about 1.953
-times its observed maximum. Slow-body time tolerances can be hours. Tests
+using the existing 1,830-point transit calibration below. Slow-body time
+tolerances can be hours. Tests
 therefore separately check the product's same-backend angular residual within
 1e-6 degree; that residual is not independent astronomical evidence. Ten-body
 chart/comparison assertions belong in domain tests. Installed consumers exercise

@@ -90,15 +90,15 @@ def _pairs(
 
 @dataclass(frozen=True, slots=True)
 class MovingAspectHit:
-  """One major-aspect branch with both moving roles and retained native values.
+  """One major-aspect branch with both moving roles and retained event values.
 
   Time is JDE(TT), longitudes are degrees and rates are degrees per TT day.
-  signed_difference_deg retains native first-minus-second; separation_deg and
+  signed_difference_deg retains the provider's first-minus-second angle; separation_deg and
   deviation_deg use second-minus-first in (-180, 180]. direction describes that
   relative separation, not either object's motion. At a tangent, the reported
   relative rate need not be exactly zero.
 
-  一个主要相位分支，保留两侧移动角色及原生数值。时刻为 JDE(TT)，黄经以度计，速率为
+  一个主要相位分支，保留两侧移动角色及事件原值。时刻为 JDE(TT)，黄经以度计，速率为
   度/TT 日。signed_difference_deg 保留上游第一侧减第二侧；separation_deg 与
   deviation_deg 使用第二侧减第一侧，归入 (-180, 180]。direction 是相对角距方向，
   不是任一对象自身的运动；相切时报告的相对速率不一定恰为零。
@@ -180,7 +180,7 @@ class MovingAspectEvents:
   and both provider windows without native calls; it does not establish a supplied
   list's astronomical origin or completeness. See entry.moving_aspect_events.
 
-  不可变的有序对象对、转换后 TT 区间、来源记录及命中。复制各序列，包括嵌套对象对；
+  不可变的有序对象对、转换后 TT 区间、事件模型记录及命中。复制各序列，包括嵌套对象对；
   构造时不调用原生库，只检查一致性及两侧来源窗口，不认证给定列表的天文来源或完整性。
   见 entry.moving_aspect_events。
   """
@@ -269,8 +269,7 @@ def moving_aspect_events(
   """Find moving-pair major aspects in the converted half-open TT interval.
 
   Ordered pairs and aspects are explicit, nonempty and unique. Reversed pairs are
-  distinct requests; self-pairs and continuously satisfied relations are invalid,
-  while constant mismatch is empty success. Both provider domains and their
+  distinct requests; constant mismatch is empty success. Both provider domains and their
   maximum spans apply. Domain/span or upstream UTC-conversion rejections and continuously
   satisfied relations raise MovingEventDomainError. Native computation failures
   propagate unchanged, with no partial result.
@@ -284,7 +283,7 @@ def moving_aspect_events(
   See entry.moving_aspect_events for coordinate and source conventions.
 
   在转换后的左闭右开 TT 区间内搜索移动对象主要相位。对象对及相位须显式、非空且不重复。
-  逆序是不同请求；自身配对及持续成立的关系无效，恒定不等则为空成功。两侧来源的域与最长
+  逆序是不同请求；恒定不等为空成功。两侧事件模型的域与最长
   区间均适用。求值域、区间、上游 UTC 转换被拒绝或关系持续成立时抛 MovingEventDomainError；
   原生计算失败保持原异常，不返回部分结果。
   UTC 端点须为有时区的内建 datetime，且不早于 1972-01-01 UTC。类型无效抛 TypeError；

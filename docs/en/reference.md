@@ -114,7 +114,7 @@ See [moment charts](moments.md) for fixed-instant comparisons and bilingual outp
    :member-order: bysource
 ```
 
-## Event source records and display errors
+## Event-provider records and display errors
 
 ```{eval-rst}
 .. automodule:: astrology.event_records
