@@ -51,6 +51,8 @@ def bisect(function: Callable[[float], float], left: float, right: float) -> flo
     if middle in (left, right):
       break
     value = function(middle)
+    if value == 0:
+      return middle
     if value * before < 0:
       right = middle
     else:

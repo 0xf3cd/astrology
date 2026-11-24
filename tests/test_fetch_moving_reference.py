@@ -75,6 +75,35 @@ def test_scan_finds_a_crossing_but_not_a_wrap_discontinuity(
     reference.bisect(lambda instant: instant + 1, 0, 1)
 
 
+@pytest.mark.parametrize("root", (0.25, 0.5, 0.75))
+@pytest.mark.parametrize("direction", (-1.0, 1.0))
+def test_bisection_retains_an_exact_midpoint_root(
+  reference: ModuleType, root: float, direction: float
+) -> None:
+  assert reference.bisect(lambda instant: direction * (instant - root), 0, 1) == root
+
+
+def test_scans_retain_exact_midpoint_crossings_and_extrema(
+  reference: ModuleType, monkeypatch: pytest.MonkeyPatch
+) -> None:
+  def crossing(body: str, instant: float) -> tuple[float, float]:
+    return (0, 0) if body == "sun" else (instant - 0.5, 1)
+
+  monkeypatch.setattr(reference, "state", crossing)
+  hits, extrema = reference.crossings(_case(), 1)
+  assert not extrema and len(hits) == 1
+  assert hits[0]["jde_tt"] == 0.5 and hits[0]["residual_deg"] == 0
+
+  def extremum(body: str, instant: float) -> tuple[float, float]:
+    return (0, 0) if body == "sun" else ((instant - 0.5) ** 2 + 5, 2 * (instant - 0.5))
+
+  monkeypatch.setattr(reference, "state", extremum)
+  hits, extrema = reference.crossings(_case(), 1)
+  assert not hits and len(extrema) == 1
+  assert extrema[0]["jde_tt"] == 0.5
+  assert extrema[0]["distance_from_requested_branch_deg"] == 5
+
+
 def test_scan_records_a_relative_extremum(
   reference: ModuleType,
   monkeypatch: pytest.MonkeyPatch,

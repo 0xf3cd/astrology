@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-11-15T23:14:14.062305+00:00",
+  "generated_utc": "2026-11-24T20:25:16.811820+00:00",
   "source": {
     "pyswisseph_version": "2.10.3.2",
     "library_version": "2.10.03",
@@ -12,7 +12,7 @@
     "algorithm": "1/16- and 1/256-TT-day sign-change scans, bisection and relative-rate sign-change extrema. Numerical selected-window audit, not a complete event or tangency oracle; adjacent double sign changes inside a partition are not certified.",
     "selection": "Eight fixed ordinary-crossing cases selected before native comparison; all retained",
     "manual": "https://www.astro.com/swisseph/swephprg.htm",
-    "recipe_sha256": "4fb9b2d31c9f78d578a8066d308af22d9cd4c8ff929821763aa06c94c6871a55"
+    "recipe_sha256": "e49e8622cbd60bc8af82c2ae37e4c18aaed25b139e227aeb5156370b08a071f3"
   },
   "cases": [
     {
@@ -375,7 +375,7 @@
     }
   ],
   "calibration": {
-    "calibrated_utc": "2026-11-15T23:14:52.844037+00:00",
+    "calibrated_utc": "2026-11-24T20:26:05.187614+00:00",
     "native_version": "1.1.1",
     "sample_count": 696,
     "time_count": 116,
