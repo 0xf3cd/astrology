@@ -354,7 +354,7 @@ def format_chart(chart: Chart, catalog: Catalog, *, language: Language = "en") -
   不改分类、宫位或运动状态；偏差显示为零时也保留原运动标签。
   chart/catalog 类型错误时抛出 TypeError。
   传入名称及来源中的非打印字符、反斜线和表格分隔符会转义显示，不改命盘中的值。
-  本命盘保留出生钟点及时区来源；时刻盘显示 UTC、地点及可选的来源事件 TT，
+  本命盘保留出生钟点及时区来源；时刻盘显示 UTC、地点及可选的源事件 TT，
   不显示出生或时区资料。
   """
   _require_chart(chart)

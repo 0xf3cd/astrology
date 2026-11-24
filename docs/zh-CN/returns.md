@@ -67,9 +67,9 @@ True
 True
 ```
 
-本命前及恰好位于本命 TT 的命中不计入。不同的事件不按时间容差合并。数值搜索可能在
-本命 TT 之后紧邻的位置报告另一次命中，而包含本命时刻的区间可能保留它。要排除这个
-紧邻本命的命中，请选择之后所关心的返照附近区间。结果其余部分仍保存原盘、给定 UTC
+本命前及恰好位于本命 TT 的命中不计入。不同的事件不按时间容差合并。区间包含出生时刻时，
+事件来源的数值搜索可能返回另一个稍晚于本命 TT 的命中，它会通过严格晚于本命 TT 的过滤。
+要排除这种紧邻本命的命中，请选择之后所关心的返照附近区间。结果其余部分仍保存原盘、给定 UTC
 与转换后 TT 区间、所选星体、实际模型、有效域及版本。
 
 (return-tables-zh-cn)=
@@ -77,7 +77,7 @@ True
 
 用 `transit_hit_utc` 把保留命中读成带时区的 UTC `datetime`，无需地点或建盘。
 `format_return_hits` 可输出英文或中文返照表，包含给定 UTC 与转换后 TT 区间、
-模型身份及版本。模型标识的格式见{ref}`保留的模型来源记录 <event-provenance-zh-cn>`：
+模型身份及版本。模型标识的格式见{ref}`保留的事件模型记录 <event-provenance-zh-cn>`：
 
 ```{doctest}
 >>> from astrology import format_return_hits, load_catalog, transit_hit_utc
@@ -149,13 +149,16 @@ False
 
 要保存完整计算，须**同时保留 `events` 与 `returned`**。`events` 保存本命盘、所选星体、
 区间、事件模型、版本及每次本命后的命中。`returned` 保存地点、请求与有效排盘配置、
-来源记录及原始事件 TT，后者与归一后的 UTC、导出的 `ChartTimes` 分开。来源 TT 不要求
+计算溯源及源事件 TT，后者与归一后的 UTC、导出的 `ChartTimes` 分开。源事件 TT 不要求
 等于排盘计算导出的 TT，见[时刻转换](moments.md#从保留的精确命中建盘)。
 
 ## 阅读或比较返照盘
 
 结果是普通的 `MomentChart`，没有虚构的出生记录，已有命盘消费者可直接使用。
-本例中，返照月亮落入本命盘第八宫：
+本例中，返照月亮落入本命盘第八宫。
+
+`cross_chart_house_overlays` 的 `left_objects` 选择返照盘中要查落入本命盘宫位的对象；
+`right_objects=()` 跳过反向落宫。详见[双盘落宫](cross_aspects.md#查询对象落入另一张盘的哪一宫)。
 
 ```{doctest}
 >>> from astrology import (

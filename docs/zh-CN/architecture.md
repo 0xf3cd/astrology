@@ -8,7 +8,7 @@
 命盘使用现代热带黄道、地心坐标，也可不排盘，独立查阅所依据的知识。
 [精确行运命中](transits.md)则在 UTC 区间内搜索移动对象与固定源盘度数的相位。
 [移动对象对事件](moving_events.md)在同一 TT 计算两侧移动黄经，无需本命盘；
-具体适配层保留两侧来源记录。
+具体适配层保留两侧事件模型记录。
 
 [时刻盘](moments.md)使用显式时刻及地点，不使用出生记录。本命盘与时刻盘共用校验及具体的
 UTC/地点快照。固定时刻行运相位复用双盘几何，按移动速率对零固定侧速率判断局部运动；
@@ -32,7 +32,7 @@ src/astrology/
   chart.py          组合与不可变命盘结果
   _comparison.py    来源兼容性与已存命盘对象选择
   cross_aspects.py  静态比较给定命盘，保留双侧来源
-  event_records.py  共用的事件来源记录及显示错误
+  event_records.py  共用的事件模型记录及显示错误
   transits.py       移动对固定源盘的精确区间事件
   moving_events.py  有序移动对象对的精确相位
   returns.py        基于精确行运命中的本命后行星返照选择
@@ -67,8 +67,8 @@ docs/zh-CN/         对应的中文指南与说明
 它保留源盘，不为移动侧制造出生记录或宫位几何。
 
 `moving_events.py` 负责有序移动对象对选择、相对方向结果及主要相位查询组合。
-`event_records.py` 定义两类事件共用的 `TransitSource` 来源记录及 `EventDisplayError`。
-它们仍可通过既有的 `transits` 导入路径使用。
+`event_records.py` 定义两类事件共用的 `TransitSource` 事件模型记录及 `EventDisplayError`。
+`TransitSource` 和 `EventDisplayError` 仍可通过既有的 `transits` 导入路径使用。
 
 `returns.py` 负责只接纳本命盘、选择十个天体的返照规则。它委托 `transit_hits`，
 只保留严格晚于本命 TT 的命中，并在 `TransitHits` 中保留搜索溯源；建盘仍归

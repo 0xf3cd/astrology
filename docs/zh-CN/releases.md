@@ -15,7 +15,7 @@
 这项计算约定不表示每个星体都有已确立的返照解读传统。
 
 [`moving_aspect_events`](https://github.com/0xf3cd/astrology/blob/v0.6.0/docs/zh-CN/moving_events.md)
-不依赖本命盘，搜索有序的移动对象配对，保留双侧提供方记录、原生 TT 和相对运动。
+不依赖本命盘，搜索有序的移动对象配对，保留两侧事件模型记录、原始事件 TT 和相对运动。
 新月／满月查询使用相同的事件组合。配对顺序及月亮减太阳的月相约定仍明确保留。
 
 新增 `transit_hit_utc` 和 `moving_hit_utc`，将保留的行运／返照或移动配对命中的 TT

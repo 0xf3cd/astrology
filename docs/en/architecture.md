@@ -82,7 +82,7 @@ source chart without creating a moving-side birth record or house geometry.
 `moving_events.py` owns ordered moving-pair selection, relative-direction results
 and major-aspect query composition. `event_records.py` owns the `TransitSource`
 provider record and `EventDisplayError` shared by both event families.
-Their existing imports through `transits` remain available.
+`TransitSource` and `EventDisplayError` remain importable through `transits`.
 
 `returns.py` owns natal-only, ten-body return selection. It delegates to
 `transit_hits`, filters hits strictly after natal TT and retains the search
