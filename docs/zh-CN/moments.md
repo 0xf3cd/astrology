@@ -4,7 +4,7 @@
 
 用 `moment_chart` 为给定时刻与地点建盘，得到不含出生记录、也不推断地点的
 `MomentChart`。用 `transit_aspects` 比较该时刻盘的移动对象与已有本命盘的固定度数。
-搜索日月返照再建盘的用法，见[日月返照](returns.md)。
+搜索十体返照再建盘的用法，见[行星返照](returns.md)。
 本页示例按顺序续接。
 
 ## 按给定时刻建盘
@@ -34,7 +34,7 @@ True
 ('ARIES', 7)
 ```
 
-`moving.moment` 保存归一后的 UTC、地点及可选的来源事件 TT；`moving.times` 保存
+`moving.moment` 保存归一后的 UTC、地点及可选的源事件 TT；`moving.times` 保存
 计算所得的 JD(UT1) 与 JDE(TT)。位置、宫位、落点、盘内相位、配置及来源的含义见
 [结构化结果指南](records.md#查看结构化结果)。本例没有请求盘内相位。
 
@@ -90,7 +90,8 @@ True
 
 <!-- usage: chart.hit_moment -->
 
-把保留的 `TransitHit` 直接传给 `moment_chart`，无需导入上游转换器。
+把保留的 `TransitHit` 或[移动对象对 `MovingAspectHit`](moving_events.md)
+直接传给 `moment_chart`，无需导入上游转换器。
 显式给出的地点用于新盘的宫位计算：
 
 ```{doctest}
@@ -105,17 +106,23 @@ True
 '2024-03-22T17:40:34+00:00'
 ```
 
-`source_jde_tt` 保留来源事件的原始 JDE(TT)；`at_hit.times.jde_tt` 则来自转换后的 Python UTC
+`source_jde_tt` 保留源事件的原始 JDE(TT)；`at_hit.times.jde_tt` 则来自转换后的 Python UTC
 datetime 所计算的新快照。两者可能不同：上游固定闰秒表及 datetime 的微秒表示不保证精确逆变换。
 
 <!-- /usage: chart.hit_moment -->
 
-Python 不能表示插入的闰秒。在 1972 年首次闰秒阶跃附近，转换后的快照时刻可能比来源事件晚约
-一秒。在 1972 模型边界，来源时刻可能转换为早于 1972 的 UTC，此时抛出 `HistoricalTimeError`；
+Python 不能表示插入的闰秒。在 1972 年首次闰秒阶跃附近，转换后的快照时刻可能比源事件晚约
+一秒。在 1972 模型边界，源事件时刻可能转换为早于 1972 的 UTC，此时抛出 `HistoricalTimeError`；
 准入检查针对转换后的时刻。转换还会按 datetime 精度舍入，可能进位到下一日或下一年。
 所得 UTC 须满足快照有效域；处于较宽事件搜索域内的合法事件，不保证能计算完整命盘。
 转换或求值域失败抛出带有所请求宫制及可用上游诊断的 `ChartDomainError`。
 固定闰秒表在未来如何沿用偏移，见[行运时标限制](transits.md#限制与失败)。
+
+只显示保留命中的时刻而不提供地点或计算快照时，行运／返照命中使用 `transit_hit_utc`，
+移动对象对命中使用 `moving_hit_utc`。
+它们以 `EventDisplayError` 单独报告显示转换失败，包括上游 1972 年前的 UT1 替代值，
+与建盘错误分开。闰秒内部的实际显示行为见{ref}`事件 UTC 与表格 <event-display-zh-cn>`；
+显示 UTC 与导出的排盘 TT 都不替代源事件 TT。
 
 ## 使用已有消费者
 
@@ -144,7 +151,7 @@ True
 太阳 [sun] | 白羊座 2°36'04" | 7 | D
 ```
 
-时刻盘文本显示给定 UTC 和地点，有来源事件时另列 TT，不添加出生钟点、时区身份或 tzdata/fold
+时刻盘文本显示 UTC 和地点，有源事件时另列 TT，不添加出生钟点、时区身份或 tzdata/fold
 来源。`natal_lunar_phase` 仍只接纳本命盘；对时刻盘使用 `lunar_phase`，传入已存日月黄经。
 区间 `transit_hits` 的 `natal_objects` 命名固定参考侧的角色，即使源盘是时刻盘；保留的原
 epoch-policy 值在[行运指南](transits.md)中说明。

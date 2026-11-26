@@ -56,7 +56,7 @@ True
 passed in. You can read their original birth records, resolved instants, positions,
 requested and effective configuration, and calculation provenance.
 The result's `rules` and `combination` record the rules and orb combination used
-for this comparison. Neither chart's natal aspect rules or participants are inherited.
+for this comparison. It does not inherit either chart's own aspect rules or participants.
 
 ## Find houses in the other chart
 
@@ -108,7 +108,7 @@ select an object absent from that chart. Non-object values or non-sequence selec
 
 When calling `cross_chart_aspects`, use `left_objects` and `right_objects` to
 select objects from each chart independently. `None` selects all bodies and nodes
-in that chart, without axes, even if its natal aspects used only a subset.
+in that chart, without axes, even if its own aspects used only a subset.
 Objects follow the order of the chart's position records, not the selection argument.
 Every selected left object is paired with every selected right object. This
 includes same-named objects, such as the two Suns, and every combination of the
@@ -160,7 +160,7 @@ does not change the result.
 ## Select axes on each side
 
 To include axes, explicitly select any stored axis in `left_objects` or
-`right_objects`. The chart's natal axis selection does not affect this comparison.
+`right_objects`. The chart's own axis selection does not affect this comparison.
 Bodies and nodes keep their chart order, followed by selected axes in
 ASC/MC/DSC/IC order. Each chart supplies its actual axis fields, not substitute
 cusps or axes from the other chart. Axes can pair with axes, including same-named

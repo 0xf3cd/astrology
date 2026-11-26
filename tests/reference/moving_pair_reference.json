@@ -1,0 +1,405 @@
+{
+  "generated_utc": "2026-11-24T20:25:16.811820+00:00",
+  "source": {
+    "pyswisseph_version": "2.10.3.2",
+    "library_version": "2.10.03",
+    "requested_flags": 260,
+    "verified_returned_flags": 260,
+    "coordinates": "Apparent geocentric tropical longitude, true ecliptic/equinox of date",
+    "ephemeris": "Explicit Moshier plus speed; no ephemeris data-file fallback",
+    "time_scale": "TT; TT-UTC=69.184 seconds for these 2024-2025 inputs",
+    "separation": "second-minus-first",
+    "algorithm": "1/16- and 1/256-TT-day sign-change scans, bisection and relative-rate sign-change extrema. Numerical selected-window audit, not a complete event or tangency oracle; adjacent double sign changes inside a partition are not certified.",
+    "selection": "Eight fixed ordinary-crossing cases selected before native comparison; all retained",
+    "manual": "https://www.astro.com/swisseph/swephprg.htm",
+    "recipe_sha256": "e49e8622cbd60bc8af82c2ae37e4c18aaed25b139e227aeb5156370b08a071f3"
+  },
+  "cases": [
+    {
+      "name": "moon_sun_0",
+      "first": "moon",
+      "second": "sun",
+      "aspect_deg": 0.0,
+      "start_utc": "2024-01-01T00:00:00+00:00",
+      "end_utc": "2024-02-02T00:00:00+00:00",
+      "start_jde_tt": 2460310.500800741,
+      "end_jde_tt": 2460342.500800741,
+      "hits": [
+        {
+          "jde_tt": 2460320.9990060143,
+          "branch_deg": 0.0,
+          "first_longitude_deg": 290.7402347712138,
+          "second_longitude_deg": 290.7402347727219,
+          "first_rate_deg_per_tt_day": 14.685194394297438,
+          "second_rate_deg_per_tt_day": 1.0194233214281625,
+          "relative_rate_deg_per_tt_day": -13.665771072869276,
+          "direction": "decreasing",
+          "residual_deg": 1.5081127457960974e-09,
+          "time_tolerance_seconds": 37.87096953698184
+        }
+      ],
+      "relative_extrema": []
+    },
+    {
+      "name": "moon_sun_60",
+      "first": "moon",
+      "second": "sun",
+      "aspect_deg": 60.0,
+      "start_utc": "2024-01-01T00:00:00+00:00",
+      "end_utc": "2024-02-02T00:00:00+00:00",
+      "start_jde_tt": 2460310.500800741,
+      "end_jde_tt": 2460342.500800741,
+      "hits": [
+        {
+          "jde_tt": 2460316.3009650987,
+          "branch_deg": 60.0,
+          "first_longitude_deg": 225.9506321449361,
+          "second_longitude_deg": 285.9506321499721,
+          "first_rate_deg_per_tt_day": 12.771099977615455,
+          "second_rate_deg_per_tt_day": 1.019435929205426,
+          "relative_rate_deg_per_tt_day": -11.751664048410028,
+          "direction": "decreasing",
+          "residual_deg": 5.035985850554425e-09,
+          "time_tolerance_seconds": 44.03938011400363
+        },
+        {
+          "jde_tt": 2460325.366820615,
+          "branch_deg": -60.0,
+          "first_longitude_deg": 355.1915566863252,
+          "second_longitude_deg": 295.19155669201365,
+          "first_rate_deg_per_tt_day": 14.42923634747317,
+          "second_rate_deg_per_tt_day": 1.0187233600545123,
+          "relative_rate_deg_per_tt_day": -13.410512987418658,
+          "direction": "decreasing",
+          "residual_deg": 5.68843461223878e-09,
+          "time_tolerance_seconds": 38.591812295736695
+        }
+      ],
+      "relative_extrema": []
+    },
+    {
+      "name": "moon_sun_90",
+      "first": "moon",
+      "second": "sun",
+      "aspect_deg": 90.0,
+      "start_utc": "2024-01-01T00:00:00+00:00",
+      "end_utc": "2024-02-02T00:00:00+00:00",
+      "start_jde_tt": 2460310.500800741,
+      "end_jde_tt": 2460342.500800741,
+      "hits": [
+        {
+          "jde_tt": 2460313.646961853,
+          "branch_deg": 90.0,
+          "first_longitude_deg": 193.2452826433706,
+          "second_longitude_deg": 283.24528263886543,
+          "first_rate_deg_per_tt_day": 11.975174593365109,
+          "second_rate_deg_per_tt_day": 1.019245083687132,
+          "relative_rate_deg_per_tt_day": -10.955929509677977,
+          "direction": "decreasing",
+          "residual_deg": -4.50515358352277e-09,
+          "time_tolerance_seconds": 47.2379819113323
+        },
+        {
+          "jde_tt": 2460327.662298413,
+          "branch_deg": -90.0,
+          "first_longitude_deg": 27.52946041062444,
+          "second_longitude_deg": 297.5294604049734,
+          "first_rate_deg_per_tt_day": 13.742112590979314,
+          "second_rate_deg_per_tt_day": 1.0182317581527147,
+          "relative_rate_deg_per_tt_day": -12.7238808328266,
+          "direction": "decreasing",
+          "residual_deg": -5.651031642628368e-09,
+          "time_tolerance_seconds": 40.674382823894284
+        }
+      ],
+      "relative_extrema": []
+    },
+    {
+      "name": "moon_sun_120",
+      "first": "moon",
+      "second": "sun",
+      "aspect_deg": 120.0,
+      "start_utc": "2024-01-01T00:00:00+00:00",
+      "end_utc": "2024-02-02T00:00:00+00:00",
+      "start_jde_tt": 2460310.500800741,
+      "end_jde_tt": 2460342.500800741,
+      "hits": [
+        {
+          "jde_tt": 2460310.875015106,
+          "branch_deg": 120.0,
+          "first_longitude_deg": 160.42030792827023,
+          "second_longitude_deg": 280.42030792465465,
+          "first_rate_deg_per_tt_day": 11.820819694370352,
+          "second_rate_deg_per_tt_day": 1.0190106264483692,
+          "relative_rate_deg_per_tt_day": -10.801809067921983,
+          "direction": "decreasing",
+          "residual_deg": -3.6155825000605546e-09,
+          "time_tolerance_seconds": 47.91197444295892
+        },
+        {
+          "jde_tt": 2460330.082138802,
+          "branch_deg": -120.0,
+          "first_longitude_deg": 59.99277035700206,
+          "second_longitude_deg": 299.99277035797417,
+          "first_rate_deg_per_tt_day": 13.118885649436892,
+          "second_rate_deg_per_tt_day": 1.0176873851768824,
+          "relative_rate_deg_per_tt_day": -12.10119826426001,
+          "direction": "decreasing",
+          "residual_deg": 9.721361493575387e-10,
+          "time_tolerance_seconds": 42.7673349942959
+        },
+        {
+          "jde_tt": 2460340.7554217586,
+          "branch_deg": 120.0,
+          "first_longitude_deg": 190.84161692684341,
+          "second_longitude_deg": 310.8416169276279,
+          "first_rate_deg_per_tt_day": 11.834928428527423,
+          "second_rate_deg_per_tt_day": 1.0152622116446628,
+          "relative_rate_deg_per_tt_day": -10.81966621688276,
+          "direction": "decreasing",
+          "residual_deg": 7.844960236980114e-10,
+          "time_tolerance_seconds": 47.832898873760875
+        }
+      ],
+      "relative_extrema": []
+    },
+    {
+      "name": "moon_sun_180",
+      "first": "moon",
+      "second": "sun",
+      "aspect_deg": 180.0,
+      "start_utc": "2024-01-01T00:00:00+00:00",
+      "end_utc": "2024-02-02T00:00:00+00:00",
+      "start_jde_tt": 2460310.500800741,
+      "end_jde_tt": 2460342.500800741,
+      "hits": [
+        {
+          "jde_tt": 2460335.246659022,
+          "branch_deg": 180.0,
+          "first_longitude_deg": 125.24551780033082,
+          "second_longitude_deg": 305.24551780290574,
+          "first_rate_deg_per_tt_day": 12.20131196769973,
+          "second_rate_deg_per_tt_day": 1.0164708700097165,
+          "relative_rate_deg_per_tt_day": -11.184841097690015,
+          "direction": "decreasing",
+          "residual_deg": 2.574921609266312e-09,
+          "time_tolerance_seconds": 46.27119826556014
+        }
+      ],
+      "relative_extrema": []
+    },
+    {
+      "name": "mercury_sun_conjunctions",
+      "first": "mercury",
+      "second": "sun",
+      "aspect_deg": 0.0,
+      "start_utc": "2024-01-01T00:00:00+00:00",
+      "end_utc": "2025-01-01T00:00:00+00:00",
+      "start_jde_tt": 2460310.500800741,
+      "end_jde_tt": 2460676.500800741,
+      "hits": [
+        {
+          "jde_tt": 2460368.86390506,
+          "branch_deg": 0.0,
+          "first_longitude_deg": 339.24611831061884,
+          "second_longitude_deg": 339.24611831085156,
+          "first_rate_deg_per_tt_day": 1.8689624963449205,
+          "second_rate_deg_per_tt_day": 1.0042962733328857,
+          "relative_rate_deg_per_tt_day": -0.8646662230120348,
+          "direction": "decreasing",
+          "residual_deg": 2.32716956816148e-10,
+          "time_tolerance_seconds": 22.782432660985094
+        },
+        {
+          "jde_tt": 2460412.461153988,
+          "branch_deg": 0.0,
+          "first_longitude_deg": 22.539041444662875,
+          "second_longitude_deg": 22.539041444196965,
+          "first_rate_deg_per_tt_day": -0.7507188586829622,
+          "second_rate_deg_per_tt_day": 0.9811443331799306,
+          "relative_rate_deg_per_tt_day": 1.7318631918628928,
+          "direction": "increasing",
+          "residual_deg": -4.659099772652553e-10,
+          "time_tolerance_seconds": 11.374570516052366
+        },
+        {
+          "jde_tt": 2460476.190049243,
+          "branch_deg": 0.0,
+          "first_longitude_deg": 84.10157819810989,
+          "second_longitude_deg": 84.10157819823036,
+          "first_rate_deg_per_tt_day": 2.2000358461416725,
+          "second_rate_deg_per_tt_day": 0.9551807472626137,
+          "relative_rate_deg_per_tt_day": -1.2448550988790588,
+          "direction": "decreasing",
+          "residual_deg": 1.2046541542076739e-10,
+          "time_tolerance_seconds": 15.824492358780011
+        },
+        {
+          "jde_tt": 2460541.5827776557,
+          "branch_deg": 0.0,
+          "first_longitude_deg": 146.59329123809653,
+          "second_longitude_deg": 146.59329123741972,
+          "first_rate_deg_per_tt_day": -0.853386939246539,
+          "second_rate_deg_per_tt_day": 0.9617967594991624,
+          "relative_rate_deg_per_tt_day": 1.8151836987457015,
+          "direction": "increasing",
+          "residual_deg": -6.768061666662106e-10,
+          "time_tolerance_seconds": 10.852455326484156
+        },
+        {
+          "jde_tt": 2460584.3822906828,
+          "branch_deg": 0.0,
+          "first_longitude_deg": 188.1912749970795,
+          "second_longitude_deg": 188.19127499686252,
+          "first_rate_deg_per_tt_day": 1.774279192284524,
+          "second_rate_deg_per_tt_day": 0.9833712601262984,
+          "relative_rate_deg_per_tt_day": -0.7909079321582256,
+          "direction": "decreasing",
+          "residual_deg": -2.169713297917042e-10,
+          "time_tolerance_seconds": 24.90707097379201
+        },
+        {
+          "jde_tt": 2460650.5964896586,
+          "branch_deg": 0.0,
+          "first_longitude_deg": 254.45053707021643,
+          "second_longitude_deg": 254.4505370706849,
+          "first_rate_deg_per_tt_day": -1.3843695725719796,
+          "second_rate_deg_per_tt_day": 1.0153260826673354,
+          "relative_rate_deg_per_tt_day": 2.3996956552393147,
+          "direction": "increasing",
+          "residual_deg": 4.684750365413493e-10,
+          "time_tolerance_seconds": 8.209040991089955
+        }
+      ],
+      "relative_extrema": [
+        {
+          "jde_tt": 2460322.3057029927,
+          "distance_from_requested_branch_deg": 23.451767316429653
+        },
+        {
+          "jde_tt": 2460394.247254126,
+          "distance_from_requested_branch_deg": 18.552383631010976
+        },
+        {
+          "jde_tt": 2460440.3231064007,
+          "distance_from_requested_branch_deg": 26.190493818207372
+        },
+        {
+          "jde_tt": 2460513.6515555466,
+          "distance_from_requested_branch_deg": 26.920993759571857
+        },
+        {
+          "jde_tt": 2460558.6013048096,
+          "distance_from_requested_branch_deg": 18.053359047864802
+        },
+        {
+          "jde_tt": 2460630.8889495246,
+          "distance_from_requested_branch_deg": 22.40409919078519
+        },
+        {
+          "jde_tt": 2460669.799974275,
+          "distance_from_requested_branch_deg": 21.958323966852788
+        }
+      ]
+    },
+    {
+      "name": "jupiter_saturn_squares",
+      "first": "jupiter",
+      "second": "saturn",
+      "aspect_deg": 90.0,
+      "start_utc": "2024-01-01T00:00:00+00:00",
+      "end_utc": "2025-03-01T00:00:00+00:00",
+      "start_jde_tt": 2460310.500800741,
+      "end_jde_tt": 2460735.500800741,
+      "hits": [
+        {
+          "jde_tt": 2460542.4079482798,
+          "branch_deg": -90.0,
+          "first_longitude_deg": 77.45759023891549,
+          "second_longitude_deg": 347.4575902389046,
+          "first_rate_deg_per_tt_day": 0.14314137917716122,
+          "second_rate_deg_per_tt_day": -0.06921582950630648,
+          "relative_rate_deg_per_tt_day": -0.2123572086834677,
+          "direction": "decreasing",
+          "residual_deg": -1.0913936421275139e-11,
+          "time_tolerance_seconds": 192.8524124699907
+        },
+        {
+          "jde_tt": 2460669.417360737,
+          "branch_deg": -90.0,
+          "first_longitude_deg": 74.0234113334324,
+          "second_longitude_deg": 344.02341133356657,
+          "first_rate_deg_per_tt_day": -0.12093540760961244,
+          "second_rate_deg_per_tt_day": 0.06559004850004699,
+          "relative_rate_deg_per_tt_day": 0.18652545610965943,
+          "direction": "increasing",
+          "residual_deg": 1.3415046851150692e-10,
+          "time_tolerance_seconds": 219.56037987610193
+        }
+      ],
+      "relative_extrema": [
+        {
+          "jde_tt": 2460346.783961933,
+          "distance_from_requested_branch_deg": 29.19052526758145
+        },
+        {
+          "jde_tt": 2460605.205704107,
+          "distance_from_requested_branch_deg": 7.857380750543427
+        }
+      ]
+    },
+    {
+      "name": "mars_jupiter_conjunction",
+      "first": "mars",
+      "second": "jupiter",
+      "aspect_deg": 0.0,
+      "start_utc": "2024-07-01T00:00:00+00:00",
+      "end_utc": "2024-09-01T00:00:00+00:00",
+      "start_jde_tt": 2460492.500800741,
+      "end_jde_tt": 2460554.500800741,
+      "hits": [
+        {
+          "jde_tt": 2460537.1407911545,
+          "branch_deg": 0.0,
+          "first_longitude_deg": 76.67465551735076,
+          "second_longitude_deg": 76.67465551721828,
+          "first_rate_deg_per_tt_day": 0.6509266722938826,
+          "second_rate_deg_per_tt_day": 0.15399984726766186,
+          "relative_rate_deg_per_tt_day": -0.4969268250262207,
+          "direction": "decreasing",
+          "residual_deg": -1.3247358765511308e-10,
+          "time_tolerance_seconds": 94.58454974234873
+        }
+      ],
+      "relative_extrema": []
+    }
+  ],
+  "calibration": {
+    "calibrated_utc": "2026-11-24T20:26:05.187614+00:00",
+    "native_version": "1.1.1",
+    "sample_count": 696,
+    "time_count": 116,
+    "maximum_observed_angular_error_deg": {
+      "jupiter": 7.073725961959099e-05,
+      "mars": 6.468666414605195e-05,
+      "mercury": 3.093599480052944e-05,
+      "moon": 0.0014711932209934275,
+      "saturn": 4.744454827232403e-05,
+      "sun": 2.5606988629078842e-05
+    },
+    "angular_tolerance_deg": {
+      "jupiter": 0.000142,
+      "mars": 0.00013,
+      "mercury": 6.2e-05,
+      "moon": 0.002943,
+      "saturn": 9.5e-05,
+      "sun": 5.2e-05
+    },
+    "bound_recipe": "Twice the selected-epoch observed maximum, rounded upward to 0.000001 degree",
+    "time_tolerance": "max(2 seconds, 2*(first_bound+second_bound)/abs(reference_relative_rate)*86400)",
+    "relative_rate_floor_deg_per_tt_day": 0.1,
+    "time_tolerance_ceiling_seconds": 300,
+    "scope": "Weekly samples over 2024-01-01 to 2025-03-01 plus all hit times and +/-1 TT-day neighbors. Empirical acceptance bounds, not global accuracy bounds; timing errors within each recorded tolerance can pass. Shifted-time controls are comparator sanity checks, not mutation tests.",
+    "recipe_sha256": "e7a18eb6dbfd56e23fa8be7733ba02de53a9ed5ba9dce35b1ca2aa91ee7010b6"
+  }
+}

@@ -23,11 +23,13 @@ from tools.check import (
   check_package_files,
   check_sdist,
   check_wheel,
+  distributed_test_inputs,
   document_errors,
   run,
+  sdist_input_files,
 )
 
-SDIST_PATHS = (*("src/" + name for name in PACKAGE_FILES), *SDIST_FILES)
+SDIST_PATHS = (*("src/" + name for name in PACKAGE_FILES), *sdist_input_files(checker.ROOT))
 
 
 @pytest.mark.parametrize(
@@ -354,13 +356,19 @@ def test_main_keeps_required_validation_stages(
   assert ("distribution",) in commands
 
 
-@pytest.mark.parametrize("sdist_drift", [False, True])
+@pytest.mark.parametrize(
+  ("sdist_drift", "missing_test_input"), [(False, False), (True, False), (False, True)]
+)
 def test_distribution_keeps_dependency_install_and_both_consumer_modes(
-  tmp_path: Path, monkeypatch: pytest.MonkeyPatch, sdist_drift: bool
+  tmp_path: Path, monkeypatch: pytest.MonkeyPatch, sdist_drift: bool, missing_test_input: bool
 ) -> None:
   _package_tree(tmp_path, PACKAGE_FILES)
   (tmp_path / "pyproject.toml").write_text('[project]\nversion = "0.0.0"\n', encoding="utf-8")
   (tmp_path / "README.md").write_text("[Docs](https://example.org/)\n", encoding="utf-8")
+  if missing_test_input:
+    reference = tmp_path / "tests/reference/transit_reference.json"
+    reference.parent.mkdir(parents=True)
+    reference.write_text('{"synthetic": true}\n', encoding="utf-8")
   commands: list[tuple[str, ...]] = []
   contexts: list[tuple[Path, Mapping[str, str] | None]] = []
   validations: list[tuple[str, Path]] = []
@@ -381,10 +389,14 @@ def test_distribution_keeps_dependency_install_and_both_consumer_modes(
       artifacts = Path(command[-1])
       artifacts.mkdir(parents=True)
       with tarfile.open(artifacts / "astrology.tar.gz", "w:gz") as archive:
-        for name in SDIST_PATHS:
-          content = (
-            b"changed downstream" if sdist_drift and name == "src/astrology/dignities.py" else b""
-          )
+        names = (*("src/" + member for member in PACKAGE_FILES), *sdist_input_files(checker.ROOT))
+        for name in names:
+          if missing_test_input and name == "tests/reference/transit_reference.json":
+            continue
+          source = checker.ROOT / name
+          content = source.read_bytes() if source.is_file() else b""
+          if sdist_drift and name == "src/astrology/dignities.py":
+            content = b"changed downstream"
           member = tarfile.TarInfo("astrology/" + name)
           member.size = len(content)
           archive.addfile(member, BytesIO(content))
@@ -414,8 +426,9 @@ def test_distribution_keeps_dependency_install_and_both_consumer_modes(
   monkeypatch.setattr(checker, "run", capture)
   original_check_sdist = checker.check_sdist
 
-  def validate_sdist(sdist: Path) -> None:
-    original_check_sdist(sdist)
+  def validate_sdist(sdist: Path, *, source_root: Path) -> None:
+    assert source_root == tmp_path
+    original_check_sdist(sdist, source_root=source_root)
     validations.append(("sdist", sdist))
 
   monkeypatch.setattr(checker, "check_sdist", validate_sdist)
@@ -460,6 +473,11 @@ def test_distribution_keeps_dependency_install_and_both_consumer_modes(
     "check_missing_metadata",
     lambda environment, python, script: metadata_calls.append((environment, python, script)),
   )
+  if missing_test_input:
+    with pytest.raises(ValueError, match=r"tests/reference/transit_reference\.json"):
+      checker.check_distribution(tmp_path)
+    assert not validations
+    return
   if sdist_drift:
     with pytest.raises(ValueError, match="Wheel package member differs from the source"):
       checker.check_distribution(tmp_path)
@@ -574,7 +592,7 @@ def test_distribution_rejects_malformed_build_outputs(
 
   monkeypatch.setattr(checker, "ROOT", tmp_path)
   monkeypatch.setattr(checker, "run", capture)
-  monkeypatch.setattr(checker, "check_sdist", lambda _sdist: None)
+  monkeypatch.setattr(checker, "check_sdist", lambda _sdist, *, source_root: None)
   with pytest.raises(ValueError, match=message):
     checker.check_distribution(tmp_path)
 
@@ -621,18 +639,96 @@ def test_sdist_import_guard_resolves_both_paths_and_rejects_outside_imports(
     assert result.returncode == 0, result.stdout + result.stderr
 
 
+def test_input_discovery_matches_an_independently_listed_tree(tmp_path: Path) -> None:
+  inputs = (
+    "tests/test_top.py",
+    "tests/nested/test_extra.py",
+    "tests/reference/recipe.py",
+    "tests/reference/direct.json",
+    "tests/reference/direct.txt",
+    "tests/reference/nested/ref.json",
+    "tests/reference/nested/ref.txt",
+    "tests/consumer_cases/direct.py",
+    "tests/consumer_cases/nested/consumer.py",
+    "tools/check.py",
+    "tools/nested/extra.py",
+  )
+  decoys = (
+    "tests/nested/ignored.yaml",
+    "tests/reference/ignored.yaml",
+    "tools/nested/ignored.txt",
+    "tests/__pycache__/cached.pyc",
+    "tools/__pycache__/cached.pyc",
+  )
+  for name in (*inputs, *decoys):
+    path = tmp_path / name
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(name.encode())
+  assert distributed_test_inputs(tmp_path) == tuple(sorted(inputs))
+
+
+def _add_sdist_member(archive: tarfile.TarFile, name: str, content: bytes) -> None:
+  member = tarfile.TarInfo("astrology/" + name)
+  member.size = len(content)
+  archive.addfile(member, BytesIO(content))
+
+
 @pytest.mark.parametrize("missing", [None, *SDIST_PATHS])
 def test_sdist_resource_contents(tmp_path: Path, missing: str | None) -> None:
   sdist = tmp_path / "package.tar.gz"
   with tarfile.open(sdist, "w:gz") as archive:
     for name in SDIST_PATHS:
       if name != missing:
-        archive.addfile(tarfile.TarInfo("astrology/" + name), BytesIO())
+        _add_sdist_member(archive, name, (checker.ROOT / name).read_bytes())
   if missing is None:
     check_sdist(sdist)
   else:
     with pytest.raises(ValueError, match="Sdist is missing"):
       check_sdist(sdist)
+
+
+def test_sdist_test_input_bytes_match_the_checkout(tmp_path: Path) -> None:
+  changed = "tests/reference/transit_reference.json"
+  sdist = tmp_path / "package.tar.gz"
+  with tarfile.open(sdist, "w:gz") as archive:
+    for name in SDIST_PATHS:
+      content = b"changed" if name == changed else (checker.ROOT / name).read_bytes()
+      _add_sdist_member(archive, name, content)
+  with pytest.raises(ValueError, match=r"Sdist test input differs.*transit_reference\.json"):
+    check_sdist(sdist)
+
+
+@pytest.mark.parametrize(
+  "name",
+  ["tests/reference/new_input.json", "tests/nested/test_extra.py", "tools/nested/extra.py"],
+)
+def test_new_working_tree_input_is_required_and_compared(tmp_path: Path, name: str) -> None:
+  source_root = tmp_path / "checkout"
+  payload = b"new maintained input\n"
+  source = source_root / name
+  source.parent.mkdir(parents=True)
+  source.write_bytes(payload)
+  paths = (*("src/" + member for member in PACKAGE_FILES), *SDIST_FILES, name)
+  sdist = tmp_path / "package.tar.gz"
+
+  def write_sdist(*, include: bool = True, content: bytes = payload) -> None:
+    with tarfile.open(sdist, "w:gz") as archive:
+      for member in paths:
+        if member != name:
+          _add_sdist_member(archive, member, b"")
+        elif include:
+          _add_sdist_member(archive, member, content)
+
+  write_sdist()
+  check_sdist(sdist, source_root=source_root)
+  write_sdist(include=False)
+  with pytest.raises(ValueError) as missing:
+    check_sdist(sdist, source_root=source_root)
+  assert "Sdist is missing" in str(missing.value) and name in str(missing.value)
+  write_sdist(content=b"changed")
+  with pytest.raises(ValueError) as changed:
+    check_sdist(sdist, source_root=source_root)
+  assert "Sdist test input differs" in str(changed.value) and name in str(changed.value)
 
 
 @pytest.mark.parametrize(
@@ -692,12 +788,13 @@ def test_sdist_rejects_withdrawn_paths_even_if_relisted(
   sdist = tmp_path / "package.tar.gz"
   with tarfile.open(sdist, "w:gz") as archive:
     for name in SDIST_PATHS:
-      archive.addfile(tarfile.TarInfo("astrology/" + name), BytesIO())
+      _add_sdist_member(archive, name, (checker.ROOT / name).read_bytes())
   check_sdist(sdist)
   monkeypatch.setattr(checker, "SDIST_FILES", (*SDIST_FILES, member))
   with tarfile.open(sdist, "w:gz") as archive:
     for name in (*SDIST_PATHS, member):
-      archive.addfile(tarfile.TarInfo("astrology/" + name), BytesIO())
+      content = b"" if name == member else (checker.ROOT / name).read_bytes()
+      _add_sdist_member(archive, name, content)
   with pytest.raises(ValueError, match=f"withdrawn {feature}"):
     check_sdist(sdist)
 

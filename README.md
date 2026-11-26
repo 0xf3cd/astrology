@@ -13,7 +13,9 @@ the [guides](https://0xf3cd.github.io/astrology/docs/en/index.html) and
 
 The library provides:
 
-- [Solar and lunar returns](https://0xf3cd.github.io/astrology/docs/en/returns.html): find every event in an explicit interval, then build its chart at a supplied location.
+- [Moving-pair events](https://0xf3cd.github.io/astrology/docs/en/moving_events.html): find new/full moons and planetary aspects without a natal chart.
+- [Ten-body planetary returns](https://0xf3cd.github.io/astrology/docs/en/returns.html): find every post-natal event in an explicit interval, then build its chart at a supplied location.
+- [Event UTC and English/Chinese tables](https://0xf3cd.github.io/astrology/docs/en/transits.html#read-utc-and-format-event-tables), without choosing a display location or building a chart.
 - [Moment charts and fixed-instant transit-to-natal aspects](https://0xf3cd.github.io/astrology/docs/en/moments.html), including direct construction from a retained exact hit and bilingual text.
 - [Element/modality distributions and natal lunar phase](https://0xf3cd.github.io/astrology/docs/en/summaries.html).
 - [Traditional sign rulers, four statuses and dispositor chains](https://0xf3cd.github.io/astrology/docs/en/dignities.html).
@@ -156,7 +158,9 @@ To calculate aspects, supply orb rules in `aspects` and select participants with
 | Select objects, participants and orbs | [Configuration](https://0xf3cd.github.io/astrology/docs/en/configuration.html) |
 | Compare two charts | [Cross-chart aspects and house overlays](https://0xf3cd.github.io/astrology/docs/en/cross_aspects.html) |
 | Search an interval for exact transits | [Exact transit hits](https://0xf3cd.github.io/astrology/docs/en/transits.html) |
-| Find solar/lunar returns and build their charts | [Returns](https://0xf3cd.github.io/astrology/docs/en/returns.html) |
+| Find ten-body returns and build their charts | [Returns](https://0xf3cd.github.io/astrology/docs/en/returns.html) |
+| Find new/full moons or planetary aspects without a natal chart | [Moving-pair events](https://0xf3cd.github.io/astrology/docs/en/moving_events.html) |
+| Read event UTC and print English/Chinese tables | [Event display](https://0xf3cd.github.io/astrology/docs/en/transits.html#read-utc-and-format-event-tables) |
 
 ## First knowledge lookup
 
@@ -202,7 +206,7 @@ unrounded astronomy and named models.
 ## Later work
 
 - [Techniques and presentation](https://github.com/0xf3cd/astrology/milestone/2):
-  orb windows and other planetary returns, relationship charts, tradition-specific rules, additional
+  orb windows, relationship charts, tradition-specific rules, additional
   objects, and chart views.
 - [Advanced and historical research](https://github.com/0xf3cd/astrology/milestone/3):
   directions, progressions, uncertain birth times, historical inputs, spatial

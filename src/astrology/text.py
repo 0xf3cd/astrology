@@ -20,9 +20,12 @@ from astrology.knowledge.catalog import _configuration_name
 from astrology.knowledge.catalog import _current_name as _raw_current_name
 from astrology.knowledge.records import _LANGUAGES, Language
 from astrology.lunar_phase import LunarPhaseResult
+from astrology.moving_events import MovingAspectEvents, RelativeDirection, moving_hit_utc
 from astrology.objects import Axis, ChartObject
+from astrology.returns import _require_return_result
 from astrology.summaries import SignDistribution
 from astrology.transit_aspects import TransitAspects
+from astrology.transits import TransitDirection, TransitHits, transit_hit_utc
 from astrology.zodiac import (
   _ELEMENT_RULE_ID,
   _MODALITY_RULE_ID,
@@ -35,7 +38,7 @@ _HEADINGS = {
   "en": {
     "title": "Tropical geocentric natal chart",
     "moment_title": "Tropical geocentric moment chart",
-    "moment_utc": "Supplied UTC",
+    "moment_utc": "Moment UTC",
     "source_tt": "Source event JDE(TT)",
     "input": "Recorded clock / timezone",
     "utc": "Resolved UTC",
@@ -47,6 +50,8 @@ _HEADINGS = {
     "cusp": "House cusp",
     "aspects": "Aspects",
     "aspect_columns": "First | Second | Aspect | Branch | Deviation | Orb limit | Motion",
+    "no_aspect_rules": "No aspect rules were requested",
+    "no_aspect_hits": "No aspects matched the requested rules",
     "none": "None",
     "configuration": "Configuration",
     "houses": "Requested / effective house system",
@@ -67,7 +72,7 @@ _HEADINGS = {
   "zh-CN": {
     "title": "热带地心本命盘",
     "moment_title": "热带地心时刻盘",
-    "moment_utc": "给定的 UTC",
+    "moment_utc": "时刻 UTC",
     "source_tt": "来源事件 JDE(TT)",
     "input": "原始钟点 / 时区",
     "utc": "已解析的 UTC",
@@ -79,6 +84,8 @@ _HEADINGS = {
     "cusp": "宫头",
     "aspects": "相位",
     "aspect_columns": "第一对象 | 第二对象 | 相位 | 分支 | 偏差 | 容许度上限 | 运动",
+    "no_aspect_rules": "未请求相位规则",
+    "no_aspect_hits": "没有符合请求规则的相位",
     "none": "无",
     "configuration": "配置",
     "houses": "请求 / 实际宫制",
@@ -205,6 +212,64 @@ _COMPARISON_LABELS = {
     "static": "静态黄经比较，不使用速率。",
   },
 }
+_EVENT_LABELS = {
+  "en": {
+    "transit_title": "Exact transit hits",
+    "return_title": "Planetary returns",
+    "moving_title": "Exact moving-pair events",
+    "pairs": "Requested moving pairs (first, second)",
+    "aspects": "Requested aspects",
+    "relative_legend": "Relative direction and rate describe second minus first longitude.",
+    "moving_columns": "UTC | First moving object | Second moving object | Aspect | Branch | Relative direction | Relative rate (degrees/TT day) | JDE(TT)",
+    "empty_moving": "No exact moving-pair events in the supplied interval",
+    "utc_interval": "Supplied UTC interval [start, end)",
+    "tt_interval": "Converted TT interval [start, end)",
+    "models": "Event models",
+    "versions": "astrology / celestial-calendar versions",
+    "transit_columns": "UTC | Moving object | Fixed source | Aspect | Branch | Direction | JDE(TT)",
+    "return_columns": "UTC | Returning body | Direction | JDE(TT)",
+    "empty_transit": "No exact transit hits in the supplied interval",
+    "empty_return": "No returns in the supplied interval",
+  },
+  "zh-CN": {
+    "transit_title": "精确行运命中",
+    "return_title": "行星返照",
+    "moving_title": "精确移动对象对事件",
+    "pairs": "请求移动对象对（第一侧，第二侧）",
+    "aspects": "请求相位",
+    "relative_legend": "相对方向与速率按第二侧黄经减第一侧黄经定义。",
+    "moving_columns": "UTC | 第一侧移动对象 | 第二侧移动对象 | 相位 | 分支 | 相对方向 | 相对速率（度/TT 日） | JDE(TT)",
+    "empty_moving": "给定区间内没有精确移动对象对事件",
+    "utc_interval": "给定 UTC 区间 [start, end)",
+    "tt_interval": "转换后 TT 区间 [start, end)",
+    "models": "事件模型",
+    "versions": "astrology / celestial-calendar 版本",
+    "transit_columns": "UTC | 移动对象 | 固定源对象 | 相位 | 分支 | 方向 | JDE(TT)",
+    "return_columns": "UTC | 返照星体 | 方向 | JDE(TT)",
+    "empty_transit": "给定区间内没有精确行运命中",
+    "empty_return": "给定区间内没有返照",
+  },
+}
+_EVENT_DIRECTIONS = {
+  "en": {direction: direction.value for direction in TransitDirection},
+  "zh-CN": {
+    TransitDirection.INCREASING: "黄经增大",
+    TransitDirection.DECREASING: "黄经减小",
+    TransitDirection.TANGENT: "相切",
+  },
+}
+_RELATIVE_DIRECTIONS = {
+  "en": {
+    RelativeDirection.INCREASING: "separation increasing",
+    RelativeDirection.DECREASING: "separation decreasing",
+    RelativeDirection.TANGENT: "separation tangent",
+  },
+  "zh-CN": {
+    RelativeDirection.INCREASING: "角距增大",
+    RelativeDirection.DECREASING: "角距减小",
+    RelativeDirection.TANGENT: "相切",
+  },
+}
 
 
 def _dms(arcseconds: int) -> str:
@@ -281,7 +346,7 @@ def format_chart(chart: Chart, catalog: Catalog, *, language: Language = "en") -
   provenance are escaped for display; the chart values are unchanged.
 
   Natal output retains recorded birth/timezone provenance. A moment chart shows
-  supplied UTC/location and optional source-event TT without birth/timezone metadata.
+  its UTC/location and optional source-event TT without birth/timezone metadata.
 
   返回命盘位置、宫位、相位、配置及来源的文本表格。调用方须提供已加载的 Catalog；
   en 或 zh-CN 的名称及译文必须齐备且为当前版本，
@@ -289,7 +354,7 @@ def format_chart(chart: Chart, catalog: Catalog, *, language: Language = "en") -
   不改分类、宫位或运动状态；偏差显示为零时也保留原运动标签。
   chart/catalog 类型错误时抛出 TypeError。
   传入名称及来源中的非打印字符、反斜线和表格分隔符会转义显示，不改命盘中的值。
-  本命盘保留出生钟点及时区来源；时刻盘显示给定 UTC、地点及可选的来源事件 TT，
+  本命盘保留出生钟点及时区来源；时刻盘显示 UTC、地点及可选的源事件 TT，
   不显示出生或时区资料。
   """
   _require_chart(chart)
@@ -354,7 +419,9 @@ def format_chart(chart: Chart, catalog: Catalog, *, language: Language = "en") -
       )
     )
   if not chart.aspects:
-    lines.append(labels["none"])
+    lines.append(
+      labels["no_aspect_rules"] if not chart.requested.aspects else labels["no_aspect_hits"]
+    )
   requested = chart.requested
   participants = (
     labels["all"]
@@ -622,6 +689,160 @@ def format_cross_aspects(
     or [f"{headings['rule']}: {headings['none']}"]
   )
   lines.append(headings["display"])
+  return "\n".join(lines)
+
+
+def _event_inputs(
+  result: TransitHits | MovingAspectEvents,
+  catalog: Catalog,
+  language: Language,
+  result_type: type[TransitHits] | type[MovingAspectEvents],
+) -> None:
+  if type(result) is not result_type or type(catalog) is not Catalog:
+    raise TypeError(f"result and catalog must be {result_type.__name__} and Catalog values")
+  if type(language) is not str or language not in _LANGUAGES:
+    raise ValueError("language must be en or zh-CN")
+
+
+def _event_context(
+  result: TransitHits | MovingAspectEvents, catalog: Catalog, language: Language
+) -> list[str]:
+  labels = _EVENT_LABELS[language]
+  models = "; ".join(
+    f"{_name(source.moving_object, catalog, language)} [{source.moving_object.value}]: "
+    f"{source.model_kind}/{source.model_identity}"
+    for source in result.sources
+  )
+  return [
+    f"{labels['utc_interval']}: [{result.start_utc.isoformat()}, {result.end_utc.isoformat()})",
+    f"{labels['tt_interval']}: [{result.start_jde_tt!r}, {result.end_jde_tt!r})",
+    f"{labels['models']}: {models}",
+    f"{labels['versions']}: {result.astrology_version} / {result.celestial_version}",
+  ]
+
+
+def format_transit_hits(result: TransitHits, catalog: Catalog, *, language: Language = "en") -> str:
+  """Format retained exact hits with UTC and raw TT, roles, models and directions.
+
+  The table includes supplied UTC and converted TT bounds. Empty results do not
+  initialize native astronomy. Populated rows call transit_hit_utc and therefore
+  initialize only TT-to-civil conversion, never another search, houses or a chart.
+  Conversion rounds the day fraction to microseconds; the table then truncates
+  to whole seconds. Raw TT remains authoritative.
+
+  以 UTC 和原始 TT 显示保留的精确命中，列出对象角色、模型和方向。表中包含给定 UTC
+  与转换后 TT 区间。空结果不初始化原生天文；非空行调用 transit_hit_utc，仅初始化
+  TT 到民用时刻的转换，不重新搜索、计算宫位或建盘。转换先把日小数舍入到微秒，
+  表格再截断到整秒；原始 TT 仍是事件依据。
+  """
+  _event_inputs(result, catalog, language, TransitHits)
+  labels = _EVENT_LABELS[language]
+  lines = [labels["transit_title"], *_event_context(result, catalog, language), ""]
+  lines.append(labels["transit_columns"])
+  for hit in result.hits:
+    lines.append(
+      " | ".join(
+        (
+          transit_hit_utc(hit).isoformat(timespec="seconds"),
+          f"{_name(hit.moving_object, catalog, language)} [{hit.moving_object.value}]",
+          f"{_name(hit.natal_object, catalog, language)} [{hit.natal_object.value}]",
+          _name(hit.aspect, catalog, language),
+          _angle(hit.branch_deg, signed=True),
+          _EVENT_DIRECTIONS[language][hit.direction],
+          repr(hit.jde_tt),
+        )
+      )
+    )
+  if not result.hits:
+    lines.append(labels["empty_transit"])
+  return "\n".join(lines)
+
+
+def format_moving_events(
+  result: MovingAspectEvents,
+  catalog: Catalog,
+  *,
+  language: Language = "en",
+) -> str:
+  """Render both moving roles, relative motion, UTC and raw TT using supplied vocabulary.
+
+  Empty results are native-free. Populated rows use moving_hit_utc's conversion-only
+  path. UTC is displayed to whole seconds without changing raw-TT ordering.
+  Invalid result/catalog types raise TypeError; an unknown language raises ValueError.
+
+  用给定词汇显示两侧移动角色、相对运动、UTC 及原始 TT。空结果不调用原生库；
+  非空行仅用 moving_hit_utc 转换时刻。UTC 显示到整秒，不改变原始 TT 排序。
+  结果或目录类型无效抛 TypeError；语言无效抛 ValueError。
+  """
+  _event_inputs(result, catalog, language, MovingAspectEvents)
+  labels = _EVENT_LABELS[language]
+  pairs = "; ".join(
+    f"({_name(first, catalog, language)} [{first.value}], "
+    f"{_name(second, catalog, language)} [{second.value}])"
+    for first, second in result.pairs
+  )
+  lines = [
+    labels["moving_title"],
+    *_event_context(result, catalog, language),
+    f"{labels['pairs']}: {pairs}",
+    f"{labels['aspects']}: "
+    + ", ".join(_name(aspect, catalog, language) for aspect in result.aspects),
+    labels["relative_legend"],
+    "",
+    labels["moving_columns"],
+  ]
+  for hit in result.hits:
+    lines.append(
+      " | ".join(
+        (
+          moving_hit_utc(hit).isoformat(timespec="seconds"),
+          f"{_name(hit.first_object, catalog, language)} [{hit.first_object.value}]",
+          f"{_name(hit.second_object, catalog, language)} [{hit.second_object.value}]",
+          _name(hit.aspect, catalog, language),
+          _angle(hit.branch_deg, signed=True),
+          _RELATIVE_DIRECTIONS[language][hit.direction],
+          repr(hit.relative_rate_deg_per_tt_day),
+          repr(hit.jde_tt),
+        )
+      )
+    )
+  if not result.hits:
+    lines.append(labels["empty_moving"])
+  return "\n".join(lines)
+
+
+def format_return_hits(result: TransitHits, catalog: Catalog, *, language: Language = "en") -> str:
+  """Format a validated post-natal same-body return result in English or Chinese.
+
+  result must use a NatalChart. Its moving_objects and natal_objects must select
+  the same single Body, with conjunction as the only aspect and every hit strictly
+  later than natal TT. Other TransitHits shapes raise ValueError. Empty and
+  populated conversion effects match format_transit_hits.
+
+  以英文或中文显示已校验的本命后同星体返照结果。result 必须使用 NatalChart。
+  moving_objects 与 natal_objects 须选择同一个 Body，只搜索合相，且每个命中严格晚于
+  本命 TT。其他 TransitHits 形状抛 ValueError。空结果与非空结果的转换副作用同
+  format_transit_hits。
+  """
+  _event_inputs(result, catalog, language, TransitHits)
+  _require_return_result(result)
+  labels = _EVENT_LABELS[language]
+  lines = [labels["return_title"], *_event_context(result, catalog, language), ""]
+  lines.append(labels["return_columns"])
+  body = result.moving_objects[0]
+  for hit in result.hits:
+    lines.append(
+      " | ".join(
+        (
+          transit_hit_utc(hit).isoformat(timespec="seconds"),
+          f"{_name(body, catalog, language)} [{body.value}]",
+          _EVENT_DIRECTIONS[language][hit.direction],
+          repr(hit.jde_tt),
+        )
+      )
+    )
+  if not result.hits:
+    lines.append(labels["empty_return"])
   return "\n".join(lines)
 
 

@@ -156,3 +156,95 @@ and report the partial state. Finish the missing delivery from the verified file
 do not rebuild or upload replacements under the same version. A duplicate-file
 failure is not permission to enable `skip-existing`. Content changes require a
 new reviewed release version.
+
+## Mirror an accepted release to Gitee
+
+GitHub remains the source repository. Before the first mirror, the maintainer must
+select a public Gitee namespace/repository and verify its permissions, two-factor
+authentication, recovery readiness, fresh sign-in and Git/API clients. Repository
+creation, account settings and publication each require authorization.
+
+Use a clean checkout at the accepted commit with the matching package version.
+Retain the original files from its GitHub Release or formal workflow artifact
+outside the checkout, for example in the sibling directory below. Do not rebuild
+packages or regenerate a published manifest:
+
+```text
+release-files/
+  manifest.json
+  packages/
+    celestial_astrology-0.6.0-py3-none-any.whl
+    celestial_astrology-0.6.0.tar.gz
+```
+
+For a read-only preflight, replace the repository and SHA placeholders.
+`ACCEPTED_FULL_SHA` must be 40 lowercase hexadecimal characters. Use the accepted
+version in `major.minor.patch` form (three numeric components), shown here as
+`0.6.0`, and select the landing branch with `--branch`:
+
+```sh
+uv run --locked python tools/mirror.py check --version 0.6.0 --sha ACCEPTED_FULL_SHA --repository NAMESPACE/REPOSITORY --branch main --files ../release-files
+```
+
+`check` is anonymous and makes no remote writes. It verifies the GitHub tag and
+stable Release's uploaded assets,
+including each raw size and SHA-256, cross-checks the two distribution digests with
+PyPI, then checks the original manifest and archive/source agreement without
+installing or rebuilding. It also reads Gitee's repository, refs, release and
+attachments, rejecting the conflicts described below. A pass ends with
+`Read-only check passed: N/3 attachments; publication not performed`.
+`N/3` counts matching attachments already on Gitee; `0/3` is normal before the
+first publication.
+An older accepted release need not be the current GitHub main tip.
+
+After separate publication authorization, run the same command with `publish`
+instead of `check`. The operator supplies `GITEE_ACCESS_TOKEN` through the process
+environment for API writes. Configure your ordinary Git credentials for
+`https://gitee.com` separately before running it; Git prompting is disabled.
+Do not put credentials in a URL, command argument or retained log. Anonymous
+Git reads do not use those credentials. API writes use the fixed
+HTTPS Gitee origin, documented form/multipart token fields and no redirects.
+
+Only the branch selected by `--branch` and the accepted version tag may be written
+(`refs/heads/main` and `refs/tags/v0.6.0` in this example). Both must point to the
+accepted commit. An existing annotated tag is retained if it points to that commit.
+To update an existing Gitee branch, the tool must establish that its current commit
+is an ancestor of the accepted commit, so the update is a fast-forward.
+A branch already beyond the accepted commit, a divergent branch or unknown
+ancestry stops the run. This also applies when a newer release has advanced the
+branch before an older partial mirror is completed. Inspect the refs and decide
+how to resolve that state before rerunning; the tool does not force a branch back.
+
+An existing repository's default branch must match the selected landing branch.
+An empty repository may receive its first selected branch, but the tool reads
+back its default branch before creating a release. If it does not match, stop
+and obtain authorization to configure the default branch separately.
+No force push, all-ref mirror, webhook or automatic setting change is performed.
+
+The release body is the Chinese version section from the accepted Git object's
+`docs/zh-CN/releases.md`, excluding its `##` version heading and using absolute
+tagged guide links. The existing body must match that text apart from CRLF
+line endings. Matching release metadata and attachments are retained.
+More than three attachment records stop the run on count alone, before downloads.
+Within that bound, duplicate names, unexpected names or different downloaded
+bytes stop the run and identify the conflicting attachments by ID.
+Each original file must be no larger than 64 MiB. Missing files are uploaded
+from the verified originals.
+
+After a failed or timed-out write, the tool reads anonymous state without
+automatically retrying that write. An observed matching result is retained;
+unconfirmed state stops the run. Inspect the partial delivery before an explicit
+rerun, which inventories fresh state and adds only missing content from the
+original files. The tool never deletes conflicts or rolls back completed work.
+
+Anonymous attachment downloads allow only HTTPS `gitee.com` on the standard
+port, including redirects. An unknown download origin fails; investigate actual
+platform behavior during account acceptance rather than widening this policy
+automatically. No API credential is sent during readback.
+
+Record the accepted version/SHA, ref targets, notes, attachment IDs and anonymous
+download digests. Inspect the actual Gitee landing page and Chinese README
+selection, Chinese release rendering and source links. Verify all three anonymous
+downloads against the retained files. Record these results with the other
+publication checks. Close the release tracker and mirror issue only after all
+acceptance checks pass.

@@ -119,3 +119,69 @@ GitHub 自动生成的源码 ZIP／tar 是 git 快照，不是已发布的 sdist
 上传成功而 tag／Release／站点步骤失败时，保留成功上传的事实并报告部分完成状态。
 使用核验后的文件完成剩余交付，不重建，也不在同一版本下上传替代品。
 重复文件报错不能成为启用 `skip-existing` 的理由；内容变化需要新的、经过审阅的发行版本。
+
+## 将接受的发行镜像到 Gitee
+
+GitHub 仍是源码正本。首次镜像前，维护者须选定公开的 Gitee 命名空间／仓库，核验权限、
+双因素认证、恢复准备、全新登录及 Git／API 客户端。创建仓库、修改账户设置与发布均须获授权。
+
+使用接受的提交对应的干净 checkout，包版本须一致。从其 GitHub Release 或正式工作流制品中
+保留原文件，放在 checkout 外，例如以下同级目录。不重建包，也不重新生成已发布的清单：
+
+```text
+release-files/
+  manifest.json
+  packages/
+    celestial_astrology-0.6.0-py3-none-any.whl
+    celestial_astrology-0.6.0.tar.gz
+```
+
+只读预检命令如下，替换仓库及 SHA 占位符。`ACCEPTED_FULL_SHA` 须为 40 个小写十六进制字符。
+版本须为接受的版本，采用三个数字分量组成的 `major.minor.patch` 格式，此处以 `0.6.0` 为例；
+用 `--branch` 选择着陆分支：
+
+```sh
+uv run --locked python tools/mirror.py check --version 0.6.0 --sha ACCEPTED_FULL_SHA --repository NAMESPACE/REPOSITORY --branch main --files ../release-files
+```
+
+`check` 使用匿名读取，不写远端。它核验 GitHub tag 及稳定 Release 的
+已上传附件，包括各文件原始大小和 SHA-256，再用 PyPI 交叉核对两份分发文件的摘要，
+然后检查原清单及归档与源码一致，不安装、不重建。它也读取 Gitee 仓库、ref、Release 和附件，
+发现下述冲突时失败。通过时末行输出
+`Read-only check passed: N/3 attachments; publication not performed`。
+`N/3` 表示 Gitee 上已有且相符的附件数量；首次发布前出现 `0/3` 是正常结果。
+接受的旧发行不必仍是 GitHub main 的当前尖端。
+
+另获发布授权后，将同一命令的 `check` 换成 `publish`。操作者通过进程环境提供 API 写入所需的
+`GITEE_ACCESS_TOKEN`。运行前须另行配置平常访问 `https://gitee.com` 所用的 Git 凭据，
+因为 Git 交互提示已禁用。凭据不得放进 URL、命令参数或保留日志。匿名 Git 读取不使用这些凭据。
+API 写入使用固定的 HTTPS Gitee 来源、文档规定的表单／multipart token 字段，并拒绝重定向。
+
+只允许写 `--branch` 选定的分支及接受版本的 tag，本例为 `refs/heads/main` 和 `refs/tags/v0.6.0`。
+两者均须指向接受的提交；已有附注 tag 若指向该提交则保留。
+更新已有 Gitee 分支前，工具须确认其当前提交是接受提交的祖先，确保更新为快进。
+若分支已超出接受的提交、发生分叉或祖先关系未知，工具停止。
+新版已推进分支后再补旧版的部分镜像，同样受此限制。
+重跑前先检查 ref 并决定如何处理；工具不会强制退回分支。
+
+已有仓库的默认分支须匹配选定的着陆分支。空仓库可接收首个选定分支，
+但创建 Release 前工具会回读默认分支；不符时停止，另获授权后单独配置默认分支。
+工具不强推、不镜像全部 ref、不创建 webhook，也不自动改设置。
+
+Release 正文取自接受的 Git 对象中 `docs/zh-CN/releases.md` 的中文版本小节，
+不含其 `##` 版本标题，使用指向 tag 的绝对指南链接。
+已有正文除 CRLF 换行差异外须与该文字相同；相符的元数据和附件保留。
+附件记录超过三条时，仅凭数量即停止，不进入下载。
+在此数量范围内，重名、意外文件名或下载字节不同均停止运行，并用附件 ID 标出冲突对象。
+每个原文件不得超过 64 MiB，缺失文件从已核验的原文件上传。
+
+写入失败或超时后，工具匿名回读，不自动重试该写入。观察到相符结果则保留；
+状态未确认则停止。显式重跑前先检查部分交付，重跑重新盘点远端，只从原文件补齐缺失内容。
+工具不删除冲突，也不回滚已完成的工作。
+
+匿名附件下载及其重定向只允许标准端口上的 HTTPS `gitee.com`。未知来源会失败；
+账户验收时应查明实际平台行为，不自动放宽政策。回读不发送 API 凭据。
+
+记录接受的版本／SHA、ref 目标、说明、附件 ID 和匿名下载摘要。检查实际 Gitee 首页及中文 README
+选择、中文发行说明渲染和源码链接，并将三份匿名下载与保留文件核对。
+将这些结果与其他发布检查一并记录，全部验收通过后再关闭发行追踪单和镜像 issue。

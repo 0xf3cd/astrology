@@ -34,6 +34,7 @@ from astrology import (
   load_catalog,
   moment_chart,
   natal_lunar_phase,
+  sign_ruler,
   transit_hits,
 )
 
@@ -43,9 +44,22 @@ CONFIG = ChartConfig(HouseSystem.WHOLE_SIGN, tuple(Body), ())
 
 
 @pytest.mark.parametrize("mode", [(), ("-O",)])
-def test_supplied_moment_consumers_remain_native_and_time_data_free(mode: tuple[str, ...]) -> None:
-  program = Path("tests/consumer_cases/moments_isolation.py").read_text(encoding="utf-8")
-  subprocess.run((sys.executable, *mode, "-c", program), check=True, capture_output=True, text=True)
+@pytest.mark.parametrize("external_cwd", [False, True])
+def test_supplied_moment_consumers_remain_native_and_time_data_free(
+  mode: tuple[str, ...], external_cwd: bool, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+  if external_cwd:
+    monkeypatch.chdir(tmp_path)
+  program = (Path(__file__).parent / "consumer_cases/moments_isolation.py").read_text(
+    encoding="utf-8"
+  )
+  subprocess.run(
+    (sys.executable, *mode, "-c", program),
+    check=True,
+    capture_output=True,
+    text=True,
+    cwd=Path(__file__).parents[1],
+  )
 
 
 def _hit(jde_tt: float) -> TransitHit:
@@ -256,9 +270,20 @@ def test_hit_domain_does_not_promise_snapshot_admission() -> None:
     moment_chart(_hit(source), SITE, CONFIG)
 
 
-def test_poles_and_out_of_snapshot_domain_are_not_silently_substituted() -> None:
-  with pytest.raises(ChartDomainError):
-    moment_chart(NOW, Location(90, 0), CONFIG)
+@pytest.mark.parametrize("latitude", [90.0, -90.0])
+def test_polar_moment_location_uses_chart_neutral_diagnostic(latitude: float) -> None:
+  with pytest.raises(ChartDomainError, match="Chart latitude") as caught:
+    moment_chart(NOW, Location(latitude, 0), CONFIG)
+  assert str(caught.value) == (
+    "Chart latitude must be strictly inside ±90 degrees for house geometry"
+  )
+  assert caught.value.house_system is CONFIG.house_system
+  assert caught.value.operation is None
+  assert caught.value.recorded is None
+  assert caught.value.upstream_message is None
+
+
+def test_out_of_snapshot_domain_is_not_silently_substituted() -> None:
   with pytest.raises(ChartDomainError):
     moment_chart(datetime(2200, 1, 1, tzinfo=UTC), SITE, CONFIG)
 
@@ -287,39 +312,67 @@ def test_existing_consumers_accept_the_genuine_moment_result(recorded_chart: Nat
     assert cross_chart_aspects(first, second, rules).chart_left is first
     assert cross_chart_house_overlays(first, second).chart_right is second
   assert len(HouseRulers(chart).houses) == 12
-  assert Dispositors(chart, (Body.SUN,)).chart is chart
+  dispositors = Dispositors(chart, (Body.SUN,))
+  assert dispositors.chart is chart
+  placements = {placement.identity: placement for placement in chart.placements}
+  expected_path = [Body.SUN]
+  for _ in range(3):
+    expected_path.append(sign_ruler(placements[expected_path[-1]].sign))
+  assert expected_path == [Body.SUN, Body.SATURN, Body.JUPITER, Body.VENUS]
+  assert dispositors.chains[Body.SUN] == tuple(expected_path)
+  assert dispositors.cycles == ((Body.VENUS, Body.JUPITER),)
   assert chart_sign_distribution(chart, objects=(Body.SUN,)).total == 1
   with pytest.raises(TypeError):
     natal_lunar_phase(cast(Any, chart))
   result = transit_hits(
     chart,
     start_utc=NOW,
-    end_utc=NOW + timedelta(days=1),
-    moving_objects=(Body.SUN,),
+    end_utc=NOW + timedelta(days=30),
+    moving_objects=(Body.MERCURY,),
     natal_objects=(Body.SUN,),
     aspects=(MajorAspect.CONJUNCTION,),
   )
   assert result.chart is chart
   assert result.epoch_policy == "fixed_natal_degree_against_moving_of_date_longitude"
+  assert len(result.hits) == 1
+  hit = result.hits[0]
+  sun = next(position for position in chart.positions if position.identity is Body.SUN)
+  assert hit.moving_object is Body.MERCURY
+  assert hit.natal_object is Body.SUN
+  assert hit.aspect is MajorAspect.CONJUNCTION
+  assert hit.branch_deg == 0
+  assert hit.query_longitude_deg == pytest.approx(sun.longitude_deg, abs=1e-12)
+  assert hit.longitude_deg == pytest.approx(sun.longitude_deg, abs=1e-8)
+  assert hit.jde_tt == pytest.approx(2460331.8488620035, abs=1e-9)
+  assert result.start_jde_tt < hit.jde_tt < result.end_jde_tt
+  assert hit.direction is TransitDirection.INCREASING
 
 
 @pytest.mark.parametrize(
-  "language,title,source_label,excluded",
+  "language,title,utc_label,source_label,excluded",
   [
-    ("en", "moment chart", "Source event JDE(TT)", ("Recorded clock", "tzdata package", "fold")),
-    ("zh-CN", "时刻盘", "来源事件 JDE(TT)", ("原始钟点", "tzdata 包", "fold")),
+    (
+      "en",
+      "moment chart",
+      "Moment UTC",
+      "Source event JDE(TT)",
+      ("Recorded clock", "tzdata package", "fold"),
+    ),
+    ("zh-CN", "时刻盘", "时刻 UTC", "来源事件 JDE(TT)", ("原始钟点", "tzdata 包", "fold")),
   ],
 )
 def test_moment_text_does_not_fabricate_birth_or_timezone_provenance(
-  language: Any, title: str, source_label: str, excluded: tuple[str, ...]
+  language: Any, title: str, utc_label: str, source_label: str, excluded: tuple[str, ...]
 ) -> None:
   chart = moment_chart(_hit(2460392.2373059206), SITE, CONFIG)
   text = format_chart(chart, load_catalog(), language=language)
   assert title in text
-  assert chart.moment.utc.isoformat() in text
+  assert f"{utc_label}: {chart.moment.utc.isoformat()}" in text
   assert str(chart.moment.source_jde_tt) in text
   assert source_label in text
   assert all(word not in text for word in excluded)
   direct = moment_chart(NOW, SITE, CONFIG)
   assert direct.moment.source_jde_tt is None
-  assert source_label not in format_chart(direct, load_catalog(), language=language)
+  direct_text = format_chart(direct, load_catalog(), language=language)
+  assert f"{utc_label}: {direct.moment.utc.isoformat()}" in direct_text
+  assert source_label not in direct_text

@@ -7,6 +7,7 @@ import hashlib
 import json
 import subprocess
 import sys
+from dataclasses import replace
 from datetime import UTC, date, datetime, time, timedelta, timezone
 from pathlib import Path
 from typing import Any, NoReturn, cast
@@ -38,6 +39,7 @@ from astrology import (
   cross_chart_aspects,
   cross_chart_house_overlays,
   format_chart,
+  house_of,
   load_catalog,
   moment_chart,
   natal_chart,
@@ -49,7 +51,12 @@ from astrology import (
 from astrology.celestial import transit_interval
 
 REFERENCE = Path(__file__).parent / "reference" / "return_reference.json"
+PLANETARY_REFERENCE = Path(__file__).parent / "reference" / "planetary_return_reference.json"
+PLANETARY_OBSERVATIONS = (
+  Path(__file__).parent / "reference" / "planetary_return_native_observations.json"
+)
 CASES: list[dict[str, Any]] = json.loads(REFERENCE.read_text())["cases"]
+PLANETARY_CASES: list[dict[str, Any]] = json.loads(PLANETARY_REFERENCE.read_text())["cases"]
 SITE = Location(0, 0)
 CONFIG = ChartConfig(HouseSystem.WHOLE_SIGN, (Body.SUN, Body.MOON), ())
 START = datetime(2024, 1, 1, tzinfo=UTC)
@@ -69,35 +76,63 @@ def _search(chart: NatalChart, body: Body = Body.MOON) -> TransitHits:
 
 
 @pytest.mark.parametrize("mode", [(), ("-O",)])
-def test_import_knowledge_and_rejections_do_not_initialize_native(mode: tuple[str, ...]) -> None:
-  program = Path("tests/consumer_cases/returns_isolation.py").read_text(encoding="utf-8")
-  subprocess.run((sys.executable, *mode, "-c", program), check=True, capture_output=True, text=True)
+@pytest.mark.parametrize("external_cwd", [False, True])
+def test_import_knowledge_and_rejections_do_not_initialize_native(
+  mode: tuple[str, ...], external_cwd: bool, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+  if external_cwd:
+    monkeypatch.chdir(tmp_path)
+  program = (Path(__file__).parent / "consumer_cases/returns_isolation.py").read_text(
+    encoding="utf-8"
+  )
+  subprocess.run(
+    (sys.executable, *mode, "-c", program),
+    check=True,
+    capture_output=True,
+    text=True,
+    cwd=Path(__file__).parents[1],
+  )
 
 
-@pytest.mark.parametrize("body", [Body.SUN, Body.MOON])
-def test_same_body_conjunction_query_is_delegated_once_unchanged(
+@pytest.mark.parametrize("body", list(Body))
+def test_same_body_conjunction_query_is_delegated_once_then_filtered_by_raw_tt(
   natal: NatalChart, body: Body, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-  expected = transit_hits(
-    natal,
+  chart = natal_chart(
+    prepare_natal_input(
+      BirthRecord(
+        natal.resolved.record.birth_date,
+        natal.resolved.record.birth_time,
+        FixedOffset(timedelta(0)),
+        SITE,
+      )
+    ),
+    ChartConfig(HouseSystem.WHOLE_SIGN, (body,), ()),
+  )
+  explicit = transit_hits(
+    chart,
     start_utc=START,
     end_utc=END,
     moving_objects=(body,),
     natal_objects=(body,),
     aspects=(MajorAspect.CONJUNCTION,),
   )
+  expected = replace(
+    explicit, hits=tuple(hit for hit in explicit.hits if hit.jde_tt > chart.times.jde_tt)
+  )
   calls: list[tuple[NatalChart, dict[str, Any]]] = []
 
-  def delegated(chart: NatalChart, **kwargs: Any) -> TransitHits:
-    calls.append((chart, kwargs))
-    return expected
+  def delegated(source: NatalChart, **kwargs: Any) -> TransitHits:
+    calls.append((source, kwargs))
+    return explicit
 
   monkeypatch.setattr(returns_module, "transit_hits", delegated)
-  result = _search(natal, body)
-  assert result is expected
+  result = _search(chart, body)
+  assert result == expected
+  assert result.chart is chart
   assert calls == [
     (
-      natal,
+      chart,
       {
         "start_utc": START,
         "end_utc": END,
@@ -120,22 +155,12 @@ def test_actual_results_equal_the_explicit_query(natal: NatalChart, body: Body) 
     natal_objects=(body,),
     aspects=(MajorAspect.CONJUNCTION,),
   )
-  assert result == explicit
+  assert result == replace(
+    explicit, hits=tuple(hit for hit in explicit.hits if hit.jde_tt > natal.times.jde_tt)
+  )
   assert result.chart is natal and result.moving_objects == result.natal_objects == (body,)
   assert result.aspects == (MajorAspect.CONJUNCTION,)
   assert result.celestial_version == natal.provenance.celestial_version
-
-
-@pytest.mark.parametrize("body", [body for body in Body if body not in (Body.SUN, Body.MOON)])
-def test_other_planets_rejected_before_delegation(
-  natal: NatalChart, body: Body, monkeypatch: pytest.MonkeyPatch
-) -> None:
-  def forbidden(*args: Any, **kwargs: Any) -> NoReturn:
-    pytest.fail("An unsupported return reached the general search")
-
-  monkeypatch.setattr(returns_module, "transit_hits", forbidden)
-  with pytest.raises(ValueError, match="SUN or MOON"):
-    _search(natal, body)
 
 
 @pytest.mark.parametrize("body", [None, True, "sun", 0, LunarNode.MEAN_ASCENDING])
@@ -152,13 +177,15 @@ def test_moment_chart_is_not_a_natal_return_source(natal: NatalChart) -> None:
     _search(cast(NatalChart, natal.resolved.record))
 
 
-def test_selected_luminary_must_exist_in_the_natal_chart() -> None:
+@pytest.mark.parametrize("body", [Body.MOON, Body.MARS])
+def test_selected_body_must_exist_in_the_natal_chart(body: Body) -> None:
   chart = natal_chart(
     prepare_natal_input(BirthRecord(date(2000, 2, 29), time(12), FixedOffset(timedelta(0)), SITE)),
     ChartConfig(HouseSystem.WHOLE_SIGN, (Body.SUN,), ()),
   )
-  with pytest.raises(ValueError, match="available"):
-    _search(chart, Body.MOON)
+  with pytest.raises(ValueError, match="available") as raised:
+    _search(chart, body)
+  assert "natal_objects" not in str(raised.value)
 
 
 @pytest.mark.parametrize(
@@ -226,6 +253,49 @@ def test_empty_return_interval_retains_search_context(natal: NatalChart) -> None
   assert result.sources[0].moving_object is Body.MOON
 
 
+def test_exact_natal_hit_is_excluded_but_distinct_provider_events_remain(natal: NatalChart) -> None:
+  birth = natal.resolved.utc
+  explicit = transit_hits(
+    natal,
+    start_utc=birth,
+    end_utc=birth + timedelta(days=1),
+    moving_objects=(Body.SUN,),
+    natal_objects=(Body.SUN,),
+    aspects=(MajorAspect.CONJUNCTION,),
+  )
+  assert any(hit.jde_tt == natal.times.jde_tt for hit in explicit.hits)
+  result = return_hits(natal, Body.SUN, start_utc=birth, end_utc=birth + timedelta(days=1))
+  assert result.hits == tuple(hit for hit in explicit.hits if hit.jde_tt > natal.times.jde_tt)
+  assert all(hit.jde_tt > natal.times.jde_tt for hit in result.hits)
+
+
+def test_birth_inclusive_pluto_root_residual_is_not_merged() -> None:
+  birth = datetime(1975, 1, 9, 21, 17, 41, tzinfo=UTC)
+  chart = natal_chart(
+    prepare_natal_input(BirthRecord(birth.date(), birth.time(), FixedOffset(timedelta(0)), SITE)),
+    ChartConfig(HouseSystem.WHOLE_SIGN, (Body.PLUTO,), ()),
+  )
+  result = return_hits(
+    chart,
+    Body.PLUTO,
+    start_utc=birth - timedelta(days=1),
+    end_utc=birth + timedelta(days=1),
+  )
+  assert len(result.hits) == 1
+  assert (result.hits[0].jde_tt - chart.times.jde_tt) * 86400 == pytest.approx(0.002414, abs=1e-6)
+
+
+def test_pre_natal_hits_do_not_become_returns(natal: NatalChart) -> None:
+  result = return_hits(
+    natal,
+    Body.MOON,
+    start_utc=datetime(2000, 2, 1, tzinfo=UTC),
+    end_utc=datetime(2000, 2, 28, tzinfo=UTC),
+  )
+  assert result.hits == ()
+  assert result.sources[0].moving_object is Body.MOON
+
+
 @pytest.mark.parametrize("case", CASES, ids=lambda case: case["name"])
 def test_independent_return_times_and_same_model_root_residuals(case: dict[str, Any]) -> None:
   birth = datetime.fromisoformat(case["birth_utc"])
@@ -253,6 +323,71 @@ def test_independent_return_times_and_same_model_root_residuals(case: dict[str, 
     assert abs((actual_longitude - natal_longitude + 180) % 360 - 180) < 1e-6
     assert abs((hit.longitude_deg - hit.query_longitude_deg + 180) % 360 - 180) < 1e-6
     assert hit.moving_object is hit.natal_object is body
+
+
+@pytest.mark.parametrize("case", PLANETARY_CASES, ids=lambda case: case["name"])
+def test_independent_planetary_return_references(case: dict[str, Any]) -> None:
+  reference = json.loads(PLANETARY_REFERENCE.read_text())
+  birth = datetime.fromisoformat(case["birth_utc"])
+  body = Body(case["body"])
+  chart = natal_chart(
+    prepare_natal_input(BirthRecord(birth.date(), birth.time(), FixedOffset(timedelta(0)), SITE)),
+    ChartConfig(HouseSystem.WHOLE_SIGN, (body,), ()),
+  )
+  result = return_hits(
+    chart,
+    body,
+    start_utc=datetime.fromisoformat(case["start_utc"]),
+    end_utc=datetime.fromisoformat(case["end_utc"]),
+  )
+  natal_longitude = next(p.longitude_deg for p in chart.positions if p.identity is body)
+  angular_tolerance = reference["calibration"]["angular_tolerance_deg"][body.value]
+  natal_model_difference = (natal_longitude - case["natal_longitude_deg"] + 180) % 360 - 180
+  assert abs(natal_model_difference) < angular_tolerance
+  assert len(result.hits) == len(case["hits"]) > 0
+  for hit, independent in zip(result.hits, case["hits"], strict=True):
+    assert hit.jde_tt > chart.times.jde_tt
+    assert abs(hit.jde_tt - independent["jde_tt"]) * 86400 < independent["time_tolerance_seconds"]
+    assert hit.direction.value == independent["direction"]
+    assert hit.query_longitude_deg == natal_longitude % 360
+    actual_longitude = native.positions((native.Target(body.value),), hit.jde_tt)[0].longitude_deg
+    same_backend_residual = (actual_longitude - natal_longitude + 180) % 360 - 180
+    assert abs(same_backend_residual) < 1e-6
+    assert abs((hit.longitude_deg - hit.query_longitude_deg + 180) % 360 - 180) < 1e-6
+    assert hit.moving_object is hit.natal_object is body
+
+
+@pytest.mark.parametrize("case", PLANETARY_CASES, ids=lambda case: case["name"])
+def test_every_body_return_builds_a_chart_with_comparison_content(case: dict[str, Any]) -> None:
+  birth = datetime.fromisoformat(case["birth_utc"])
+  body = Body(case["body"])
+  config = ChartConfig(HouseSystem.WHOLE_SIGN, (body,), ())
+  chart = natal_chart(
+    prepare_natal_input(BirthRecord(birth.date(), birth.time(), FixedOffset(timedelta(0)), SITE)),
+    config,
+  )
+  events = return_hits(
+    chart,
+    body,
+    start_utc=datetime.fromisoformat(case["start_utc"]),
+    end_utc=datetime.fromisoformat(case["end_utc"]),
+  )
+  moving = moment_chart(events.hits[0], SITE, config)
+  position = next(p for p in moving.positions if p.identity is body)
+  overlays = cross_chart_house_overlays(moving, chart, left_objects=(body,), right_objects=())
+  assert len(overlays.placements) == 1
+  placement = overlays.placements[0]
+  assert placement.identity is body
+  assert placement.house == house_of(position.longitude_deg, chart.houses.cusps_deg)
+  rules = (AspectRule(MajorAspect.CONJUNCTION, 1),)
+  comparison = cross_chart_aspects(
+    moving, chart, rules, left_objects=(body,), right_objects=(body,)
+  )
+  assert len(comparison.hits) == 1
+  assert comparison.hits[0].left_object is comparison.hits[0].right_object is body
+  fixed = transit_aspects(moving, chart, rules, moving_objects=(body,), natal_objects=(body,))
+  assert len(fixed.hits) == 1
+  assert fixed.hits[0].moving_object is fixed.hits[0].natal_object is body
 
 
 @pytest.mark.parametrize("body", [Body.SUN, Body.MOON])
@@ -283,13 +418,47 @@ def test_reference_provenance_counts_and_recipe_are_pinned() -> None:
   assert reference["source"]["library_version"] == "2.10.03"
   assert reference["source"]["time_scale"].startswith("TT")
   assert reference["calibration"]["fixture_time_tolerance_seconds"] == {"sun": 5, "moon": 30}
-  recipe = Path("tools/fetch_return_reference.py")
+  recipe = Path(__file__).parents[1] / "tools" / "fetch_return_reference.py"
   assert hashlib.sha256(recipe.read_bytes()).hexdigest() == reference["source"]["recipe_sha256"]
   counts = {case["name"]: len(case["hits"]) for case in CASES}
   assert len(counts) == 9 and counts["year_end_sun_2024-01-01"] == 2
   assert counts["leap_birth_moon_2024-01-01"] == 3
   assert any(case["natal_longitude_deg"] > 359.999999 for case in CASES)
   assert any(case["natal_longitude_deg"] < 1e-6 for case in CASES)
+
+
+def test_planetary_reference_provenance_counts_recipes_and_observations() -> None:
+  reference = json.loads(PLANETARY_REFERENCE.read_text())
+  assert reference["source"]["pyswisseph_version"] == "2.10.3.2"
+  assert reference["source"]["library_version"] == "2.10.03"
+  assert (
+    reference["source"]["requested_flags"]
+    == reference["source"]["verified_calculation_flags"]
+    == 260
+  )
+  assert len(PLANETARY_CASES) == 11
+  assert sum(len(case["hits"]) for case in PLANETARY_CASES) == 16
+  assert {case["body"] for case in PLANETARY_CASES if case["name"].startswith("post_natal_")} == {
+    body.value for body in Body
+  }
+  triple = next(case for case in PLANETARY_CASES if case["name"] == "mercury_retrograde_triple")
+  assert [hit["direction"] for hit in triple["hits"]] == ["increasing", "decreasing", "increasing"]
+  assert all(
+    hit["jde_tt"] > case["birth_jde_tt"] for case in PLANETARY_CASES for hit in case["hits"]
+  )
+  fetch = Path(__file__).parents[1] / "tools" / "fetch_planetary_return_reference.py"
+  calibrate = Path(__file__).parents[1] / "tools" / "calibrate_planetary_return_reference.py"
+  assert hashlib.sha256(fetch.read_bytes()).hexdigest() == reference["source"]["recipe_sha256"]
+  assert (
+    hashlib.sha256(calibrate.read_bytes()).hexdigest()
+    == reference["calibration"]["calibration_recipe_sha256"]
+  )
+  assert (
+    hashlib.sha256(PLANETARY_OBSERVATIONS.read_bytes()).hexdigest()
+    == reference["calibration"]["native_observations_sha256"]
+  )
+  assert reference["calibrated_utc"] > reference["generated_utc"]
+  assert "adjacent double crossings" in reference["source"]["algorithm"]
 
 
 def test_return_location_only_changes_local_geometry_and_consumers(
@@ -366,6 +535,23 @@ def test_missing_location_and_unavailable_houses_do_not_change_the_event(natal: 
   assert events.hits[0] is event and events.chart is natal
 
 
+def test_provider_valid_solar_return_retains_raw_tt_when_chart_is_out_of_domain(
+  natal: NatalChart,
+) -> None:
+  events = return_hits(
+    natal,
+    Body.SUN,
+    start_utc=datetime(2200, 1, 1, tzinfo=UTC),
+    end_utc=datetime(2201, 1, 1, tzinfo=UTC),
+  )
+  assert len(events.hits) == 1
+  event = events.hits[0]
+  with pytest.raises(ChartDomainError, match="Civil year 2200"):
+    moment_chart(event, SITE, CONFIG)
+  assert events.hits[0] is event
+  assert event.jde_tt > natal.times.jde_tt
+
+
 def test_return_knowledge_preserves_sources_translations_and_editorial_states() -> None:
   catalog = load_catalog()
   entry = catalog.entry("entry.solar_lunar_returns")
@@ -377,6 +563,9 @@ def test_return_knowledge_preserves_sources_translations_and_editorial_states() 
   assert entry.prerequisite_status.value == "complete"
   assert entry.output_eligibility.value == "reference_only"
   assert entry.chart_applicability == "not_assessed"
+  assert set(entry.concept_ids) == {f"body.{body.value}" for body in Body} | {"aspect.conjunction"}
+  assert "ten-body project convention" in entry.statement.en
+  assert "root-adjacent" in entry.limits.en
   citations = catalog.citations(entry.identifier)
   assert len(citations) == 5
   assert all(source.verification.value == "verified" for _, source in citations)
@@ -396,6 +585,7 @@ def test_installed_return_observations_capture_supplied_results_without_calculat
   from tools.installed_check import (
     acceptance_chart,
     acceptance_moments,
+    acceptance_moving_events,
     acceptance_returns,
     acceptance_transits,
     calculation_observations,
@@ -405,22 +595,42 @@ def test_installed_return_observations_capture_supplied_results_without_calculat
   transits = acceptance_transits(chart)
   moments = acceptance_moments(chart, transits)
   returns = acceptance_returns(chart)
+  moving_case = acceptance_moving_events()
 
   def forbidden(*args: Any, **kwargs: Any) -> NoReturn:
     pytest.fail("Observation serialization performed a new native calculation")
 
-  for name in ("snapshot", "transit_events", "transit_source", "moment_utc", "transit_interval"):
+  for name in (
+    "snapshot",
+    "transit_events",
+    "transit_source",
+    "moment_utc",
+    "transit_interval",
+    "moving_events",
+    "moving_interval",
+  ):
     monkeypatch.setattr(adapter, name, forbidden)
-  values = json.loads(calculation_observations(chart, transits, moments, returns, load_catalog()))
+  values = json.loads(
+    calculation_observations(chart, transits, moments, returns, load_catalog(), moving_case)
+  )
+  assert values["moving_events"]["search"] == repr(moving_case[0])
+  assert values["moving_events"]["chart"]["moment"] == repr(moving_case[1].moment)
+  assert "Exact moving-pair events" in values["moving_events"]["text"]["en"]
+  assert "Exact transit hits" in values["transit_table"]["en"]
+  assert "精确行运命中" in values["transit_table"]["zh-CN"]
   assert len(values["returns"]) == 2
   for (events, moving), observed in zip(returns, values["returns"], strict=True):
     assert observed["search"] == repr(events)
+    assert "Planetary returns" in observed["event_table"]["en"]
+    assert "行星返照" in observed["event_table"]["zh-CN"]
+    assert repr(events.hits[0].jde_tt) in observed["event_table"]["en"]
     assert observed["chart"]["moment"] == repr(moving.moment)
     assert observed["chart"]["requested"] == repr(moving.requested)
     assert observed["text"]["en"].startswith("Tropical geocentric moment chart")
     assert observed["text"]["zh-CN"].startswith("热带地心时刻盘")
     assert set(observed) == {
       "search",
+      "event_table",
       "chart",
       "comparison",
       "overlays",

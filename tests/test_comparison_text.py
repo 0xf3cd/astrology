@@ -374,5 +374,10 @@ def test_supplied_comparisons_and_text_block_effects_after_inputs_are_ready(
   source = (Path(__file__).parent / "consumer_cases/comparison_text_isolation.py").read_text(
     encoding="utf-8"
   )
-  completed = subprocess.run([sys.executable, *mode, "-c", source], capture_output=True, text=True)
+  completed = subprocess.run(
+    [sys.executable, *mode, "-c", source],
+    capture_output=True,
+    text=True,
+    cwd=Path(__file__).parents[1],
+  )
   assert completed.returncode == 0, completed.stdout + completed.stderr

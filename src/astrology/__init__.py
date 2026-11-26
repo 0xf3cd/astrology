@@ -60,6 +60,7 @@ from astrology.dignities import (
   essential_dignities,
   sign_ruler,
 )
+from astrology.event_records import EventDisplayError, TransitSource
 from astrology.house_overlays import (
   CrossChartHouseOverlays,
   HouseOverlay,
@@ -68,6 +69,14 @@ from astrology.house_overlays import (
 from astrology.houses import house_of
 from astrology.knowledge import Catalog, load_catalog
 from astrology.lunar_phase import LunarPhaseResult, LunationType, lunar_phase
+from astrology.moving_events import (
+  MovingAspectEvents,
+  MovingAspectHit,
+  MovingEventDomainError,
+  RelativeDirection,
+  moving_aspect_events,
+  moving_hit_utc,
+)
 from astrology.objects import Axis
 from astrology.returns import return_hits
 from astrology.summaries import (
@@ -82,8 +91,11 @@ from astrology.text import (
   format_house_overlays,
   format_house_rulers,
   format_lunar_phase,
+  format_moving_events,
+  format_return_hits,
   format_sign_distribution,
   format_transit_aspects,
+  format_transit_hits,
 )
 from astrology.transit_aspects import TransitAspectHit, TransitAspects, transit_aspects
 from astrology.transits import (
@@ -91,7 +103,7 @@ from astrology.transits import (
   TransitDomainError,
   TransitHit,
   TransitHits,
-  TransitSource,
+  transit_hit_utc,
   transit_hits,
 )
 from astrology.zodiac import (
@@ -132,6 +144,7 @@ __all__ = [
   "EclipticPosition",
   "EffectiveConfiguration",
   "Element",
+  "EventDisplayError",
   "FixedOffset",
   "HistoricalTimeError",
   "HouseOverlay",
@@ -148,12 +161,16 @@ __all__ = [
   "Modality",
   "MomentChart",
   "MomentInput",
+  "MovingAspectEvents",
+  "MovingAspectHit",
+  "MovingEventDomainError",
   "NatalChart",
   "NodeDefinition",
   "NonexistentBirthTimeError",
   "ObjectOrb",
   "OrbCombination",
   "Placement",
+  "RelativeDirection",
   "ResolvedBirth",
   "Sign",
   "SignDistribution",
@@ -179,13 +196,18 @@ __all__ = [
   "format_house_overlays",
   "format_house_rulers",
   "format_lunar_phase",
+  "format_moving_events",
+  "format_return_hits",
   "format_sign_distribution",
   "format_transit_aspects",
+  "format_transit_hits",
   "house_of",
   "load_catalog",
   "lunar_phase",
   "modality_of",
   "moment_chart",
+  "moving_aspect_events",
+  "moving_hit_utc",
   "natal_chart",
   "natal_lunar_phase",
   "prepare_natal_input",
@@ -196,6 +218,7 @@ __all__ = [
   "sign_of",
   "sign_ruler",
   "transit_aspects",
+  "transit_hit_utc",
   "transit_hits",
   "truncate_display",
 ]

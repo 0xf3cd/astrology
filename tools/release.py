@@ -234,7 +234,7 @@ def inspect_distributions(
   """
   packages = _packages(directory, identity)
   sdist, wheel = packages / identity.sdist_name, packages / identity.wheel_name
-  check_sdist(sdist)
+  check_sdist(sdist, source_root=root)
   check_wheel(wheel, identity.version, source_root=root)
   tracked = _git(root, "ls-files", "-z").split("\0")
   sources: dict[str, bytes] = {}

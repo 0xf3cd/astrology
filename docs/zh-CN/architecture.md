@@ -7,11 +7,14 @@
 [结果](records.md)及[知识](knowledge.md)指南；另可[静态比较两张源盘的交叉相位](cross_aspects.md)。
 命盘使用现代热带黄道、地心坐标，也可不排盘，独立查阅所依据的知识。
 [精确行运命中](transits.md)则在 UTC 区间内搜索移动对象与固定源盘度数的相位。
+[移动对象对事件](moving_events.md)在同一 TT 计算两侧移动黄经，无需本命盘；
+具体适配层保留两侧事件模型记录。
 
 [时刻盘](moments.md)使用显式时刻及地点，不使用出生记录。本命盘与时刻盘共用校验及具体的
 UTC/地点快照。固定时刻行运相位复用双盘几何，按移动速率对零固定侧速率判断局部运动；
 其给定来源及结果的构造仍不加载原生天文。
-[日月返照](returns.md)选择对本命盘的同星体合相事件，再复用时刻盘入口，按显式地点建盘。
+[行星返照](returns.md)选择十个天体中任一星体在本命后的同星体合相事件，再复用时刻盘入口，
+按显式地点建盘。
 
 ## 结构组织
 
@@ -29,8 +32,10 @@ src/astrology/
   chart.py          组合与不可变命盘结果
   _comparison.py    来源兼容性与已存命盘对象选择
   cross_aspects.py  静态比较给定命盘，保留双侧来源
+  event_records.py  共用的事件模型记录及显示错误
   transits.py       移动对固定源盘的精确区间事件
-  returns.py        基于精确行运命中的日月返照选择
+  moving_events.py  有序移动对象对的精确相位
+  returns.py        基于精确行运命中的本命后行星返照选择
   transit_aspects.py 固定时刻移动对本命的几何与局部运动
   house_overlays.py 给定命盘之间的双向落宫
   lunar_phase.py    有向日月弧及具名月相类型
@@ -54,15 +59,20 @@ docs/zh-CN/         对应的中文指南与说明
 `objects.py` 定义天体、交点和四轴的标识。其中一组类型只接纳天体和交点，
 相位和双盘落宫使用的类型还接纳四轴。
 天文适配层负责把这些标识映射到天文计算目标，文本层负责从传入目录中查询名称。
-`chart.py` 为本命相位、静态双盘相位和双盘落宫提取所选对象的已存黄经，
-`_comparison.py` 则为两种双盘比较检查坐标约定是否一致、对象选择是否合法，也校验行运的本命目标选择。
+`chart.py` 定义已存命盘结果，并拥有图表领域调用方共用的天体和交点落点选择。
+`_comparison.py` 负责源盘兼容性检查，以及比较类查询中可包含四轴的对象选择；`transit_aspects.py`
+就是固定时刻相位使用这些源盘检查的一个例子。各模块仍定义自己接纳的对象集合与组合政策。
 
 `transits.py` 将适配层独立黄经事件查询与所选本命度数、`aspects.py` 的相位分支组合。
 它保留源盘，不为移动侧制造出生记录或宫位几何。
 
-`returns.py` 负责只接纳本命盘、只选择日月的返照规则，委托 `transit_hits` 后原样返回
-`TransitHits`；建盘仍归 `moment_chart`。同时保留两者即可保存参考搜索及所选盘的地点／配置，
-无需单独的返照结果类型。
+`moving_events.py` 负责有序移动对象对选择、相对方向结果及主要相位查询组合。
+`event_records.py` 定义两类事件共用的 `TransitSource` 事件模型记录及 `EventDisplayError`。
+`TransitSource` 和 `EventDisplayError` 仍可通过既有的 `transits` 导入路径使用。
+
+`returns.py` 负责只接纳本命盘、选择十个天体的返照规则。它委托 `transit_hits`，
+只保留严格晚于本命 TT 的命中，并在 `TransitHits` 中保留搜索溯源；建盘仍归
+`moment_chart`。同时保留两者即可保存参考搜索及所选盘的地点／配置，无需单独的返照结果类型。
 
 `dignities.py` 定义星座守护表，以及由此推导的宫主星和定位星结果。
 这些操作读取给定命盘的已有落点，不初始化天文库。
@@ -74,9 +84,11 @@ docs/zh-CN/         对应的中文指南与说明
 ## 副作用边界
 
 包导入、知识查询、分类、摘要及给定命盘的比较都不初始化原生天文库。
-`natal_chart`、`moment_chart` 和 `transit_hits` 仅在调用时加载天文适配层。
-`return_hits` 校验来源及星体后委托 `transit_hits`。`resolve_birth_time` 读取时区数据，
-`load_catalog` 读取包内知识；格式化函数使用调用方传入的目录，不执行资源 I/O。
+`natal_chart`、`moment_chart`、`transit_hits` 和 `moving_aspect_events` 仅在调用时加载天文适配层。
+`return_hits` 校验来源及星体后委托 `transit_hits`。`transit_hit_utc`、`moving_hit_utc` 与非空事件表延迟使用
+TT 到民用时刻的转换，不搜索事件或建盘；空事件表与普通字段读取仍不初始化原生天文。
+`resolve_birth_time` 读取时区数据，`load_catalog` 读取包内知识；格式化函数使用调用方传入的
+目录，不读取目录资源。
 [隔离检查](contributing.md#运行检查)验证这些边界。
 
 ## 出生资料与时间

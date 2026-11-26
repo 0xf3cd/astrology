@@ -2,13 +2,17 @@
 
 [English](../en/transits.md) · [文档](index.md) · [API](reference.md)
 
-`transit_hits` 在 UTC 区间内搜索所选对象与已有本命盘的全部精确相位，返回 `TransitHits`。
-结果保留原盘、搜索输入、模型溯源及每次穿越或接触。命中时刻为 JDE(TT)，即 TT 时标的儒略日，
-不是 UTC 钟点。
+`transit_hits` 在给定 UTC 区间内搜索所选对象与已有命盘的全部精确相位，区间转为 TT 后
+判断事件归属，返回 `TransitHits`。结果保留原盘、搜索输入、模型溯源及每次穿越或接触。
+命中时刻为 JDE(TT)，即 TT 时标的儒略日，不是 UTC 钟点。
 
-只接纳本命盘及日月的便捷入口 `return_hits`，以及选择命中和地点后建盘的用法，见[日月返照](returns.md)。
+只接纳本命盘及十个天体身份的便捷入口 `return_hits`，以及选择命中和地点后建盘的用法，
+见[行星返照](returns.md)。
 
 ## 搜索一个区间
+
+(event-provider-zh-cn)=
+本文的「事件来源」指所选 celestial-calendar 黄经事件搜索实现。
 
 固定源盘也可以是 `MomentChart`；`natal_objects` 命名固定参考侧的角色，不是出生输入类型。
 两种来源的黄经约定相同，因此 `TransitHits.epoch_policy` 均保留
@@ -50,19 +54,57 @@ mercury conjunction sun 2460437.45999 increasing +0.812
 
 <!-- /usage: transits.hits -->
 
-显示普通 UTC 钟点时，可将 `jde_to_utc` 返回的民用字段转为有时区的 `datetime`。
-`fraction` 是当天已过时间占 UTC 日的比例：
+(event-display-zh-cn)=
+## 读取 UTC 并输出事件表
+
+用 `transit_hit_utc` 读取无需地点的 UTC 时刻，用 `format_transit_hits` 输出英文或中文表。
+表中保留移动对象与固定源对象的角色、相位及有向分支、方向、原始 TT，以及模型和版本背景：
 
 ```{doctest}
->>> from celestial_calendar import jde_to_utc
->>> civil = jde_to_utc(result.hits[0].jde_tt)
->>> displayed = datetime(civil.year, civil.month, civil.day, tzinfo=UTC) + timedelta(days=civil.fraction)
+>>> from astrology import format_transit_hits, load_catalog, transit_hit_utc
+>>> displayed = transit_hit_utc(result.hits[0])
+>>> displayed.isoformat(timespec="microseconds")
+'2024-03-22T17:40:34.047537+00:00'
 >>> displayed.isoformat(timespec="seconds")
 '2024-03-22T17:40:34+00:00'
+>>> catalog = load_catalog()
+>>> print(format_transit_hits(result, catalog, language="zh-CN"))
+精确行运命中
+给定 UTC 区间 [start, end): [2024-03-01T00:00:00+00:00, 2024-06-01T00:00:00+00:00)
+转换后 TT 区间 [start, end): [2460370.500800741, 2460462.500800741)
+事件模型: 水星 [mercury]: position_source/3
+astrology / celestial-calendar 版本: 0.6.0 / 1.1.1
+<BLANKLINE>
+UTC | 移动对象 | 固定源对象 | 相位 | 分支 | 方向 | JDE(TT)
+2024-03-22T17:40:34+00:00 | 水星 [mercury] | 太阳 [sun] | 合相 | 0°00'00" | 黄经增大 | 2460392.2373059206
+2024-04-14T02:40:38+00:00 | 水星 [mercury] | 太阳 [sun] | 合相 | 0°00'00" | 黄经减小 | 2460414.612359507
+2024-05-06T23:01:13+00:00 | 水星 [mercury] | 太阳 [sun] | 合相 | 0°00'00" | 黄经增大 | 2460437.459988502
 ```
 
-仍应保留原始 `jde_tt` 作为事件时刻；这里只显示到秒，会损失精度。从 UTC 转为 TT 再转回时，
-上游不保证在闰秒及 1972 年模型交界处还原原始民用字段，Python `datetime` 也不能表示闰秒。
+三种时刻各有职责：`start_utc` 与 `end_utc` 是给定的民用端点，`start_jde_tt` 与
+`end_jde_tt` 决定搜索归属，每个导出的 UTC 只用于显示。原始 `jde_tt` 仍是事件依据。
+转换为 `datetime` 时把日内比例舍入到微秒，表格再截断而非四舍五入到整秒。显示会损失精度，
+但不改变命中或其顺序。
+
+上游使用固定闰秒偏移表，表尾之后保留最后偏移，不预测未来闰秒。Python `datetime` 无法表示
+闰秒，从 UTC 转为 TT 再转回也不保证还原原民用字段。在 2016 年闰秒边界，从 JDE(TT)
+`2457754.5` 起算的直接 TT 偏移 +68.400、+69.100、+69.200 秒，分别显示为
+`2017-01-01T00:00:00.215991+00:00`、`00:00:00.916007+00:00` 和
+`00:00:00.015987+00:00`。显示因此可能进入次年、重复同一秒、逆转顺序，或看似落在给定
+UTC 区间之外；区间归属、排序和分类仍由原始 TT 决定。紧邻闰秒开始边界、分别位于其两侧
+的两个可表示 JDE(TT) 浮点数，也可能显示为不同民用日期。
+
+上游转换器接纳 `[1867522.5, 13689325.5)` 内的 JDE(TT)。显示还要求转换后民用日期不早于
+1972-01-01，并且 Python `datetime` 能表示该值（截至 9999 年，含舍入进位）。
+转换得到上游 1972 年前的 UT1 替代值时，`transit_hit_utc` 抛 `EventDisplayError`，不把该值
+标成普通 UTC。范围及 Python datetime 构造失败也使用这个显示专用错误，保留来源 TT、操作、
+上游错误文本及原异常。原生 `CelestialError` 保持不变。1972 年模型交界处及闰秒步进都不是
+精确可逆转换。
+
+空命中结果的格式化会给出有意义的空表，不初始化原生天文。非空表格逐行延迟调用
+`jde_to_utc`，不重新搜索，不调用 `utc_to_jde`，不计算宫位、建盘或使用建盘专用的
+`moment_utc`。包导入和字段读取仍不初始化原生天文。`format_return_hits` 还会校验
+`NatalChart` 上本命后的同星体结果，见{ref}`行星返照 <return-tables-zh-cn>`。
 
 ## 选择目标与相位
 
@@ -102,6 +144,7 @@ mercury conjunction sun 2460437.45999 increasing +0.812
 将每颗移动天体的单次实测耗时等量外推到所有本命目标和分支，这样的一年请求约需一小时；
 没有对完整请求计时。耗时取决于目标、区间、机器和负载，不应由这些样本假定耗时随区间长度线性增长。
 
+(event-provenance-zh-cn)=
 ## 读取和保留结果
 
 ```{doctest}
@@ -117,6 +160,7 @@ True
 
 `('position_source', 3)` 是本次水星搜索实际使用的上游模型键；
 `result.sources[0].model_description` 提供其名称及说明。
+表格以 `model_kind/model_identity` 的形式显示这个模型键，本例为 `position_source/3`。
 
 `start_jde_tt` 与 `end_jde_tt` 保留转换后的搜索区间。每个 `TransitSource` 保存实际移动模型、
 事件域端点、最长区间及上游说明。结果还保留 astrology 版本及明确的时间、位置参考系和历元政策。

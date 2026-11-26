@@ -526,7 +526,12 @@ def test_supplied_transit_values_are_native_free(mode: tuple[str, ...]) -> None:
   code = (Path(__file__).parent / "consumer_cases/transits_isolation.py").read_text(
     encoding="utf-8"
   )
-  completed = subprocess.run([sys.executable, *mode, "-c", code], capture_output=True, text=True)
+  completed = subprocess.run(
+    [sys.executable, *mode, "-c", code],
+    capture_output=True,
+    text=True,
+    cwd=Path(__file__).parents[1],
+  )
   assert completed.returncode == 0, completed.stdout + completed.stderr
 
 

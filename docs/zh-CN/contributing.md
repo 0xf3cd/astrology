@@ -83,22 +83,27 @@ Python 分词单测不能证明浏览器行为。
 天文适配层留到计算时才加载，不导入开发检查模块。
 功能 PR 将领域断言留在测试中，不加入安装包验证程序；打包一致性由源码与 wheel 的字节核对及检查值文件验证。
 
+sdist 检查从工作树枚举测试和工具输入：`tests/**/*.py`、`tools/**/*.py`、`tests/reference/` 中的 JSON／TXT 文件，
+以及 `tests/consumer_cases/` 中的 Python 文件。
+这些模式与 `MANIFEST.in` 一致，未跟踪的匹配文件也包含在内，不读取 Git 元数据。
+每个输入都必须出现在归档中，并与 checkout 中的字节一致。
+
 固定的新进程输入保存在 `tests/consumer_cases/`。测试将其文本传入 `python [-O] -c`，
-让仓库根目录保留在 `sys.path` 中，供程序从 `tools` 导入。
+并以仓库根目录作为子进程 cwd，因此即使 pytest 从其他目录启动，程序也能从 `tools` 导入。
 
 Sphinx 只发现根目录的两个 README 和 `docs/` 下的源文档。虚拟环境应放在 `docs/` 之外：
 该目录内任意位置的源文档都是文档输入，与它同级的目录则不是。上述源文档中的警告仍会使严格构建失败。
 
 <!-- usage: contributing.checks -->
 
-按上面的 `uv sync` 从本仓安装开发包，分发名／版本为 `celestial-astrology`／`0.5.0`，
+按上面的 `uv sync` 从本仓安装开发包，分发名／版本为 `celestial-astrology`／`0.6.0`，
 Python 导入名仍为 `astrology`。PyPI 的 `astrology` 是另一个无关项目，
 不是本库。可以这样确认装的是哪个包、哪个版本：
 
 ```{doctest}
 >>> from importlib.metadata import version
 >>> version("celestial-astrology")
-'0.5.0'
+'0.6.0'
 ```
 
 <!-- /usage: contributing.checks -->
@@ -132,6 +137,25 @@ doctrees、缓存及其他构建控制文件不进入站点成品。检查所有
 
 ## 正确性
 
+分两步重生成 `tests/reference/moving_pair_reference.json`。
+先用 Swiss/Moshier 生成独立候选，不导入 astrology 或其原生后端：
+
+```sh
+uv run --no-project --python 3.11 --with pyswisseph==2.10.3.2 python tools/fetch_moving_reference.py --output <candidates-path>
+```
+
+再将候选及采样黄经与原生后端比较。该步骤将夹具写入 `<fixture-path>`，
+将原生事件数值及比较对照写入 `<observations-path>`：
+
+```sh
+uv run --locked python tools/calibrate_moving_reference.py --candidates <candidates-path> --output <fixture-path> --observations <observations-path>
+```
+
+比较时测量各天体在相同时刻的黄经误差；每次命中的时间容差使用两侧角误差界及相对速率。
+夹具的 `source.algorithm` 说明采样限度。
+真实原生接触的构造与合成的公开主要相位接触，分别在
+`tests/test_moving_events.py` 及 `tests/test_moving_display.py` 中测试。
+
 `tests/reference/return_reference.json` 的返照夹具使用 pyswisseph 2.10.3.2 / Swiss 2.10.03
 独立计算的本命黄经及 TT 穿越时刻，显式采用 Moshier 加速率标志 260。重生成时不导入项目或
 其原生天文后端，也不改项目依赖：
@@ -146,6 +170,25 @@ uv run --no-project --python 3.11 --with pyswisseph==2.10.3.2 python tools/fetch
 精确端点重合。样例覆盖近零度、闰日出生及 2024 公历年内两次日返照。部分重叠窗口包含重复
 事件，不算独立观测。配方散列将夹具绑定到生成器。可选参考环境不增加运行时或锁定依赖；
 仓内不分发 Swiss 代码或星历文件。
+
+另设 `tests/reference/planetary_return_reference.json`，含覆盖十体的 11 个本命后案例、
+16 次命中，包括水星三次穿越。独立生成器使用相同的钉版 Swiss/Moshier 版本及标志，
+不导入 astrology 或 celestial-calendar：
+
+```sh
+uv run --no-project --python 3.11 --with pyswisseph==2.10.3.2 python tools/fetch_planetary_return_reference.py --output <candidates-path>
+uv run --locked python tools/calibrate_planetary_return_reference.py --candidates <candidates-path> --output <fixture-path> --observations <observations-path>
+```
+
+第二条命令执行同后端组合与校准，不生成独立参考。夹具钉住两份配方及原生观察文件的散列，
+分别记录生成与校准时间。69.184 秒的 TT−UTC 偏移仅适用于其中 2022–2026 年的民用输入。
+夹具的 `source.algorithm` 说明独立搜索及其限度。
+
+逐命中时间容差为 `max(2 seconds, 2 * angular_tolerance_deg / abs(reference_rate) * 86400)`，
+角度界来自下述已有的 1,830 点行运校准。慢星体的时间容差可达数小时，
+因此测试另要求产品的同后端角度残差在 1e-6 度内；这项残差不是独立天文证据。
+十体建盘及比较内容断言放在领域测试中。安装消费者实际生成中英文行运及返照表，
+并对照同一修订的观察值，检查打包一致性。
 
 `tests/reference/transit_reference.json` 的行运夹具通过 `pyswisseph==2.10.3.2` 显式选择
 Moshier 星历，不使用 Swiss/JPL 数据文件。可选生成器

@@ -9,9 +9,9 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from types import MappingProxyType
 
-from astrology.chart import Chart, NatalChart, Placement, _require_chart
+from astrology.chart import Chart, NatalChart, Placement, _selected_placements
 from astrology.lunar_phase import LunarPhaseResult, lunar_phase
-from astrology.objects import AstronomicalObject, Body, _is_astronomical_object
+from astrology.objects import AstronomicalObject, Body
 from astrology.zodiac import Element, Modality, element_of, modality_of
 
 
@@ -103,19 +103,7 @@ def chart_sign_distribution(
   按源盘顺序统计显式选择的已有落点。不推断默认统计对象。None、字符串、其他枚举
   或错误的命盘类型抛出 TypeError；空选择、重复选择或缺失对象抛出 ValueError。源盘不变，不补算缺失对象。
   """
-  _require_chart(chart)
-  if not isinstance(objects, Sequence) or isinstance(objects, (str, bytes)):
-    raise TypeError("objects must be a sequence")
-  selected = tuple(objects)
-  if any(not _is_astronomical_object(identity) for identity in selected):
-    raise TypeError("objects must contain Body or LunarNode values")
-  if not selected or len(set(selected)) != len(selected):
-    raise ValueError("objects must be nonempty and contain no duplicate identities")
-  available = {p.identity for p in chart.placements}
-  missing = [identity.value for identity in selected if identity not in available]
-  if missing:
-    raise ValueError(f"Objects unavailable in chart: {', '.join(missing)}")
-  return sign_distribution([p for p in chart.placements if p.identity in selected])
+  return sign_distribution(_selected_placements(chart, objects))
 
 
 def natal_lunar_phase(chart: NatalChart) -> LunarPhaseResult:

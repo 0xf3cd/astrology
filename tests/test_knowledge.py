@@ -124,6 +124,7 @@ def test_query_contracts(catalog: Catalog) -> None:
     "entry.essential_dignities",
     "entry.dispositor_chains",
     "entry.transit_hits",
+    "entry.moving_aspect_events",
     "entry.moment_charts",
     "entry.transit_aspects",
     "entry.solar_lunar_returns",
@@ -176,7 +177,10 @@ def test_source_layers_and_four_independent_states(catalog: Catalog) -> None:
   assert "not a guarantee" in catalog.variant(entry.rule_ids[0]).limits.en
 
 
-def test_ashmand_groups_have_names_sources_and_separate_states(catalog: Catalog) -> None:
+def test_ashmand_groups_have_names_sources_and_separate_states(
+  catalog: Catalog,
+  project_version: str,
+) -> None:
   from astrology import AshmandSignGroup, Sign, ashmand_sign_group
 
   expected_names = ("至点星座", "分点星座", "固定星座", "双体星座")
@@ -197,7 +201,7 @@ def test_ashmand_groups_have_names_sources_and_separate_states(catalog: Catalog)
   assert sum(source.identifier == "source.ptolemy.ashmand1822" for _, source in citations) == 4
   citation, implementation = citations[-1]
   assert implementation.identifier == "source.astrology"
-  assert implementation.url.endswith("/v0.5.0")
+  assert implementation.url.endswith(f"/v{project_version}")
   assert "ashmand_sign_group" in citation.locator
   assert (
     "not independent astronomical corroboration, historical corroboration"
@@ -645,11 +649,7 @@ def test_retired_identity_variants_keep_their_concepts(catalog: Catalog, identif
     else ()
   )
   assert tuple(v.identifier for v in catalog.list_variants(concept_id=concept_id)) == (
-    *(
-      ("rule.project.solar_lunar_returns",)
-      if concept.configuration in (Body.SUN, Body.MOON)
-      else ()
-    ),
+    *(("rule.project.solar_lunar_returns",) if concept.configuration in tuple(Body) else ()),
     *expected,
     "rule.project.dispositor_chains",
   )
@@ -704,6 +704,7 @@ def test_retained_rule_ids_and_order(catalog: Catalog) -> None:
     "rule.project.moment_charts",
     "rule.project.transit_aspects",
     "rule.project.exact_transit_hits",
+    "rule.project.moving_aspect_events",
   ]
   for identifier, configuration in expected:
     variant = catalog.variant(identifier)
@@ -717,6 +718,7 @@ def test_retained_rule_ids_and_order(catalog: Catalog) -> None:
 
 def test_cross_policy_is_independently_retrievable_without_chart_applicability(
   catalog: Catalog,
+  project_version: str,
 ) -> None:
   entry = catalog.entry("entry.cross_aspect_evaluation")
   assert entry.rule_ids[0] == "rule.project.cross_aspect_evaluation"
@@ -728,7 +730,7 @@ def test_cross_policy_is_independently_retrievable_without_chart_applicability(
   assert entry.chart_applicability == "not_assessed"
   citation, source = catalog.citations(entry.identifier)[0]
   assert source.identifier == "source.astrology"
-  assert source.url.endswith("/v0.5.0")
+  assert source.url.endswith(f"/v{project_version}")
   assert "src/astrology/cross_aspects.py" in citation.locator
   assert source.verification is SourceVerification.VERIFIED
   assert citation.excerpt is None
@@ -737,7 +739,10 @@ def test_cross_policy_is_independently_retrievable_without_chart_applicability(
   assert "one shared instant" in catalog.variant("rule.project.aspect_motion").definition.en
 
 
-def test_overlay_policy_has_release_source_and_separate_editorial_states(catalog: Catalog) -> None:
+def test_overlay_policy_has_release_source_and_separate_editorial_states(
+  catalog: Catalog,
+  project_version: str,
+) -> None:
   entry = catalog.entry("entry.cross_house_overlays")
   rule = catalog.variant("rule.project.cross_house_overlays")
   expected_ids = {f"house.{system.value}" for system in HouseSystem} | {
@@ -753,8 +758,8 @@ def test_overlay_policy_has_release_source_and_separate_editorial_states(catalog
   assert entry.chart_applicability == "not_assessed"
   citation, source = catalog.citations(entry.identifier)[0]
   assert source.identifier == "source.astrology"
-  assert source.url == "https://github.com/0xf3cd/astrology/tree/v0.5.0"
-  assert "v0.5.0" in source.edition
+  assert source.url == f"https://github.com/0xf3cd/astrology/tree/v{project_version}"
+  assert f"v{project_version}" in source.edition
   assert entry in catalog.filter_entries(source_id=source.identifier)
   assert source.verification is SourceVerification.VERIFIED
   assert citation.excerpt is None
@@ -772,10 +777,13 @@ def test_overlay_policy_has_release_source_and_separate_editorial_states(catalog
   assert rule.definition.status("zh-CN") is TranslationStatus.CURRENT
 
 
-def test_release_implementation_source_and_node_test_locator(catalog: Catalog) -> None:
+def test_release_implementation_source_and_node_test_locator(
+  catalog: Catalog,
+  project_version: str,
+) -> None:
   source = catalog.source("source.astrology")
-  assert source.url == "https://github.com/0xf3cd/astrology/tree/v0.5.0"
-  assert "v0.5.0" in source.edition
+  assert source.url == f"https://github.com/0xf3cd/astrology/tree/v{project_version}"
+  assert f"v{project_version}" in source.edition
   citation = catalog.entry("entry.node_definitions").citations[1]
   assert citation.source_id == source.identifier
   assert "tests/test_reference.py" in citation.locator
@@ -825,6 +833,7 @@ def test_project_source_consolidation_preserves_lineage_and_citation_coverage(
     "cross_house_overlays": 1,
     "axis_aspects": 1,
     "transit_hits": 1,
+    "moving_aspect_events": 1,
     "transit_aspects": 1,
     "dispositor_chains": 1,
   }

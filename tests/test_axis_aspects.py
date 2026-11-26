@@ -10,6 +10,7 @@ from collections.abc import Callable
 from dataclasses import replace
 from datetime import date, time, timedelta
 from enum import StrEnum
+from pathlib import Path
 from typing import Any, cast, get_args
 
 import pytest
@@ -502,7 +503,12 @@ if len(result.hits) != 1 or load_catalog().concept('axis.ascendant').configurati
 if 'celestial_calendar' in sys.modules or 'astrology.celestial' in sys.modules:
   raise RuntimeError('native astronomy initialized')
 """
-  result = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True)
+  result = subprocess.run(
+    [sys.executable, "-c", code],
+    capture_output=True,
+    text=True,
+    cwd=Path(__file__).parents[1],
+  )
   assert result.returncode == 0, result.stdout + result.stderr
 
 
@@ -534,7 +540,9 @@ def test_whole_sign_axes_are_not_cusps_and_nonzero_roundoff_is_not_exact() -> No
   assert opposite.motion is AspectMotion.INDETERMINATE
 
 
-def test_axis_entry_has_a_release_implementation_source_and_no_chart_assessment() -> None:
+def test_axis_entry_has_a_release_implementation_source_and_no_chart_assessment(
+  project_version: str,
+) -> None:
   catalog = load_catalog()
   entry = catalog.entry("entry.axis_aspects")
   assert set(entry.concept_ids) == {f"axis.{axis.value}" for axis in Axis}
@@ -543,5 +551,5 @@ def test_axis_entry_has_a_release_implementation_source_and_no_chart_assessment(
   citation, source = catalog.citations(entry.identifier)[0]
   assert citation.source_id == "source.astrology"
   assert source.url is not None
-  assert source.url.endswith("v0.5.0")
+  assert source.url.endswith(f"/v{project_version}")
   assert "objects.py: Axis" in citation.locator

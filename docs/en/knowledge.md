@@ -29,11 +29,11 @@ True
 >>> [rule.identifier for rule in catalog.list_variants(concept_id="body.sun")]
 ['rule.project.solar_lunar_returns', 'rule.lilly1647.essential_dignities', 'rule.project.dispositor_chains']
 >>> [rule.identifier for rule in catalog.list_variants(concept_id="body.uranus")]
-['rule.project.dispositor_chains']
+['rule.project.solar_lunar_returns', 'rule.project.dispositor_chains']
 >>> catalog.filter_entries(concept_id="body.sun")[0].identifier
 'entry.solar_lunar_returns'
 >>> len(catalog.filter_sources(verification=SourceVerification.VERIFIED))
-14
+15
 >>> print(catalog.entry("entry.cross_aspect_evaluation").statement.text("en"))
 Static major cross aspects compare two supplied natal or moment results with distinct left/right endpoints and preserve both complete sources, without a motion field.
 >>> print(catalog.variant("rule.project.cusp_ownership").definition.text("en"))
@@ -131,9 +131,10 @@ The catalog currently includes:
 - [Traditional sign rulers and four statuses](dignities.md) from William Lilly's
   *Christian Astrology* (1647), with short primary-scan excerpts and a generated
   sign table.
-- [Solar and lunar return definitions](returns.md), with short original quotations,
-  separate translations, different location practices and explicit project conventions
-  in `entry.solar_lunar_returns`.
+- [Planetary return definitions](returns.md), with short original quotations,
+  separate translations, different location practices and the ten-body project
+  convention under the stable ID `entry.solar_lunar_returns`. The entry records
+  the convention's sources and limits.
 
 Configuration entries link to the enum members the program uses; rule descriptions
 link to their implementations. House systems, node definitions and aspect angles

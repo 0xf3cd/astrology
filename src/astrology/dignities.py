@@ -11,10 +11,10 @@ from enum import StrEnum
 from types import MappingProxyType
 from typing import Final, cast
 
-from astrology.chart import Chart, Placement, _require_chart
+from astrology.chart import Chart, Placement, _require_chart, _selected_placements
 from astrology.config import Body
 from astrology.houses import _require_house_number
-from astrology.objects import AstronomicalObject, _is_astronomical_object
+from astrology.objects import AstronomicalObject
 from astrology.zodiac import _SIGNS, Sign, sign_of
 
 _RULE_ID: Final = "rule.lilly1647.essential_dignities"
@@ -199,19 +199,9 @@ class Dispositors:
   missing_rulers: Mapping[AstronomicalObject, Body] = field(init=False, hash=False)
 
   def __init__(self, chart: Chart, objects: Sequence[AstronomicalObject]) -> None:
-    _require_chart(chart)
-    if not isinstance(objects, Sequence) or isinstance(objects, (str, bytes)):
-      raise TypeError("objects must be a sequence")
-    selected = tuple(objects)
-    if any(not _is_astronomical_object(identity) for identity in selected):
-      raise TypeError("objects must contain Body or LunarNode values")
-    if not selected or len(set(selected)) != len(selected):
-      raise ValueError("objects must be nonempty and contain no duplicate identities")
-    placements = {p.identity: p for p in chart.placements}
-    missing = [identity.value for identity in selected if identity not in placements]
-    if missing:
-      raise ValueError(f"Objects unavailable in chart: {', '.join(missing)}")
-    roots = tuple(identity for identity in placements if identity in selected)
+    selected = _selected_placements(chart, objects)
+    placements = {placement.identity: placement for placement in chart.placements}
+    roots = tuple(placement.identity for placement in selected)
     order = {identity: index for index, identity in enumerate(placements)}
 
     edges: dict[AstronomicalObject, Body] = {}

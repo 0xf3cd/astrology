@@ -5,7 +5,7 @@
 Use `moment_chart` for a supplied instant and location. It returns a `MomentChart`,
 with no birth record or inferred location. Use `transit_aspects` to compare that
 moment's moving objects with an existing natal chart's frozen degrees.
-For solar or lunar return searches followed by chart construction, see [returns](returns.md).
+For ten-body return searches followed by chart construction, see [returns](returns.md).
 The examples on this page continue in order.
 
 ## Calculate at an instant
@@ -102,7 +102,8 @@ common-epoch conversion or a simultaneous spatial-angle claim.
 
 <!-- usage: chart.hit_moment -->
 
-Pass a retained `TransitHit` directly to `moment_chart`; no upstream converter
+Pass a retained `TransitHit` or [moving-pair `MovingAspectHit`](moving_events.md)
+directly to `moment_chart`; no upstream converter
 import is needed. The explicit location determines the new chart's houses:
 
 ```{doctest}
@@ -135,6 +136,14 @@ failures raise `ChartDomainError` with the requested house system and available
 upstream diagnostics. See the [transit time limits](transits.md#limits-and-failures)
 for the fixed leap table's future-offset behavior.
 
+To display a retained hit without a location or snapshot, use `transit_hit_utc`
+for a transit/return hit, or `moving_hit_utc` for a moving-pair hit.
+Their `EventDisplayError` reports display-conversion failures separately
+from chart errors, including a pre-1972 UT1 substitute. See
+[event UTC and tables](transits.md#read-utc-and-format-event-tables) for the actual
+leap-interior display behavior; neither display UTC nor derived chart TT replaces
+the source event TT.
+
 ## Use existing consumers
 
 Comparisons, house overlays, house rulers, dispositors, sign distributions,
@@ -163,8 +172,8 @@ Tropical geocentric moment chart
 Sun [sun] | Aries 2°36'04" | 7 | D
 ```
 
-Moment text shows supplied UTC/location and, when present, source-event TT; it
-does not add a recorded birth clock, timezone identity or tzdata/fold provenance.
+Moment-chart text shows the chart's UTC and location, plus source-event TT when present.
+It does not add a recorded birth clock, timezone identity or tzdata/fold provenance.
 `natal_lunar_phase` remains natal-specific; use `lunar_phase` with a moment chart's
 stored Sun/Moon longitudes. For interval `transit_hits`, `natal_objects` names the
 fixed-reference role even when the supplied source is a moment chart; the existing

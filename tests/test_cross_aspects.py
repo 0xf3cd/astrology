@@ -544,5 +544,10 @@ def test_fresh_process_comparison_blocks_native_time_and_metadata_calls(
   source = (Path(__file__).parent / "consumer_cases/cross_aspects_isolation.py").read_text(
     encoding="utf-8"
   )
-  result = subprocess.run([sys.executable, *mode, "-c", source], capture_output=True, text=True)
+  result = subprocess.run(
+    [sys.executable, *mode, "-c", source],
+    capture_output=True,
+    text=True,
+    cwd=Path(__file__).parents[1],
+  )
   assert result.returncode == 0, result.stdout + result.stderr

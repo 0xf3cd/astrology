@@ -2,6 +2,48 @@
 
 [简体中文](../zh-CN/releases.md) · [Documentation](index.md) · [Release procedure](releasing.md)
 
+## 0.6.0
+
+This version adds returns for all ten existing bodies, exact moving-pair events,
+and UTC readout with English/Chinese event tables.
+Package index: [PyPI](https://pypi.org/project/celestial-astrology/0.6.0/).
+
+### Returns, moving pairs and event display
+
+[`return_hits`](https://github.com/0xf3cd/astrology/blob/v0.6.0/docs/en/returns.md)
+extends the existing Sun/Moon workflow to Mercury through Pluto. It retains every
+post-natal same-body conjunction in the requested interval, including recrossings.
+Pass a chosen hit to `moment_chart` with an explicit location and configuration.
+This calculation convention does not establish interpretive traditions for every body.
+
+[`moving_aspect_events`](https://github.com/0xf3cd/astrology/blob/v0.6.0/docs/en/moving_events.md)
+searches ordered moving pairs without a natal chart, retaining both provider
+records, raw event TT and relative motion. New/full-moon queries use the same event
+composition. Pair order and the Moon-minus-Sun phase convention remain explicit.
+
+New `transit_hit_utc` and `moving_hit_utc` functions convert a retained
+transit/return or moving-pair hit's TT to a timezone-aware UTC `datetime`.
+The [event tables](https://github.com/0xf3cd/astrology/blob/v0.6.0/docs/en/transits.md)
+format retained transit/return and moving-pair results with supplied vocabulary,
+without another search, location or house calculation. Pre-1972 UT1 substitutes,
+range failures and Python `datetime` construction failures raise `EventDisplayError`;
+native `CelestialError` propagates unchanged. Python `datetime` cannot
+represent leap seconds; leap-boundary display can repeat or reverse civil time
+without changing the authoritative TT ordering.
+
+### Release mirroring and source records
+
+The [release procedure](https://github.com/0xf3cd/astrology/blob/v0.6.0/docs/en/releasing.md)
+adds an explicit Gitee mirror command. It verifies the accepted source and the
+original wheel, sdist and `manifest.json`, copies the Chinese release notes,
+and checks the published result anonymously.
+The `source.astrology` catalog record now cites the v0.6.0 release tree.
+
+Python 3.11–3.14, platform minimums and exact runtime pins remain unchanged:
+`celestial-calendar==1.1.1` and `tzdata==2026.5`.
+Orb windows, window-boundary UTC and window tables are deferred to
+[#94](https://github.com/0xf3cd/astrology/issues/94); they do not block this release.
+
 ## 0.5.0
 
 This version adds moment charts, fixed-instant transit-to-natal aspects with

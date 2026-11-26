@@ -1,6 +1,6 @@
-"""Exact moving-to-fixed-source aspects over a modern UTC interval.
+"""Exact moving-to-fixed-source aspects in converted TT intervals.
 
-在现代 UTC 区间内搜索移动对象与固定源盘黄经的精确相位。
+在转换后的 TT 区间内搜索移动对象与固定源盘黄经的精确相位。
 """
 
 from __future__ import annotations
@@ -13,8 +13,8 @@ from typing import Final, Literal, get_args
 
 from astrology._comparison import _selection_for_chart
 from astrology._distribution import installed_version
-from astrology._validation import finite_number
-from astrology.aspects import _branches, aspect_angle
+from astrology._validation import finite_number, nonempty_text
+from astrology.aspects import _branches, _selected_aspects, aspect_angle
 from astrology.birth import _normalize_utc
 from astrology.chart import (
   _POSITION_FRAME,
@@ -24,6 +24,8 @@ from astrology.chart import (
   _selected_longitudes,
 )
 from astrology.config import MajorAspect
+from astrology.event_records import EventDisplayError as EventDisplayError
+from astrology.event_records import TransitSource as TransitSource
 from astrology.objects import (
   AstronomicalObject,
   Body,
@@ -99,57 +101,6 @@ def _moving(values: Sequence[AstronomicalObject]) -> tuple[AstronomicalObject, .
   return result
 
 
-def _aspects(values: Sequence[MajorAspect]) -> tuple[MajorAspect, ...]:
-  if not isinstance(values, Sequence) or isinstance(values, (str, bytes)):
-    raise TypeError("aspects must be a sequence of MajorAspect values")
-  result = tuple(values)
-  if any(type(value) is not MajorAspect for value in result):
-    raise TypeError("aspects must contain only MajorAspect values")
-  if not result or len(set(result)) != len(result):
-    raise ValueError("aspects must be nonempty and must not repeat identities")
-  return tuple(sorted(result, key=aspect_angle))
-
-
-def _text(value: str, name: str) -> None:
-  if type(value) is not str or not value.strip():
-    raise ValueError(f"{name} must be a nonempty plain string")
-
-
-@dataclass(frozen=True, slots=True)
-class TransitSource:
-  """One moving object's effective model and bounded event window.
-
-  Bounds and maximum span are in JDE(TT) and TT days. Descriptions are copied from
-  the upstream; these implementation windows are not astronomical accuracy bounds.
-
-  一个移动对象实际使用的模型及有界事件求值窗口。端点为 JDE(TT)，最长区间以 TT 日计。
-  说明文字复制自上游；实现求值窗口不是天文精度界。
-  """
-
-  moving_object: AstronomicalObject
-  model_kind: str
-  model_identity: int
-  model_description: str
-  domain_start_jde_tt: float
-  domain_end_jde_tt: float
-  maximum_span_tt_days: float
-  capability_description: str
-
-  def __post_init__(self) -> None:
-    if not _is_astronomical_object(self.moving_object):
-      raise TypeError("moving_object must be a Body or LunarNode")
-    if type(self.model_kind) is not str or self.model_kind != "position_source":
-      raise ValueError("model_kind must be position_source")
-    if type(self.model_identity) is not int or self.model_identity <= 0:
-      raise ValueError("model_identity must be a positive integer")
-    _text(self.model_description, "model_description")
-    _text(self.capability_description, "capability_description")
-    for name in ("domain_start_jde_tt", "domain_end_jde_tt", "maximum_span_tt_days"):
-      object.__setattr__(self, name, finite_number(getattr(self, name), name))
-    if self.domain_start_jde_tt >= self.domain_end_jde_tt or self.maximum_span_tt_days <= 0:
-      raise ValueError("Event domain and maximum span must be nonempty and positive")
-
-
 @dataclass(frozen=True, slots=True)
 class TransitHit:
   """One queried aspect branch and its unchanged native event values.
@@ -192,6 +143,33 @@ class TransitHit:
       raise ValueError("branch_deg does not belong to the selected aspect")
     if not 0 <= self.query_longitude_deg < 360:
       raise ValueError("query_longitude_deg must be within [0, 360)")
+
+
+def transit_hit_utc(hit: TransitHit) -> datetime:
+  """Convert a retained hit's TT to an aware display datetime, without a chart or location.
+
+  This lazily initializes only upstream TT-to-civil conversion. It performs no event
+  search, house calculation or chart-specific moment_utc conversion. A converted
+  civil date before 1972-01-01 is the upstream UT1 substitute and raises
+  EventDisplayError. Other conversion/range failures retain their cause; native
+  CelestialError propagates unchanged. The hit and its raw TT are unchanged.
+
+  Display is not a new event authority. At leap boundaries it can repeat a second,
+  enter the next day/year or reverse order; Python datetime cannot represent a leap
+  second. Membership, ordering and classification continue to use hit.jde_tt.
+
+  将保留命中的 TT 转为带时区的显示 datetime，无需建盘或地点。仅延迟初始化上游 TT
+  到民用时刻的转换，不重新搜索事件、计算宫位或调用建盘专用的 moment_utc。转换所得
+  民用日期早于 1972-01-01 时属于上游 UT1 替代值，抛 EventDisplayError；其他转换或
+  范围失败保留异常因果链，原生 CelestialError 直接向外抛出。命中及其原始 TT 不变。
+  显示值不是新的事件依据：闰秒边界可能重复一秒、进入次日或次年，或逆转顺序，Python
+  datetime 无法表示闰秒。区间归属、排序和分类仍使用 hit.jde_tt。
+  """
+  if type(hit) is not TransitHit:
+    raise TypeError("hit must be a TransitHit")
+  from astrology.celestial import event_utc
+
+  return event_utc(hit.jde_tt)
 
 
 @dataclass(frozen=True, slots=True)
@@ -247,7 +225,7 @@ class TransitHits:
     natal = _selection_for_chart(self.chart, self.natal_objects, "natal_objects")
     if not natal:
       raise ValueError("natal_objects must not be empty")
-    aspects = _aspects(self.aspects)
+    aspects = _selected_aspects(self.aspects)
     for name, value in (("moving_objects", moving), ("natal_objects", natal), ("aspects", aspects)):
       object.__setattr__(self, name, value)
     for name, member_type in (("sources", TransitSource), ("hits", TransitHit)):
@@ -271,7 +249,7 @@ class TransitHits:
       if self.end_jde_tt - self.start_jde_tt > source.maximum_span_tt_days:
         raise ValueError("TT interval exceeds a retained event-source span")
     for name in ("celestial_version", "astrology_version"):
-      _text(getattr(self, name), name)
+      nonempty_text(getattr(self, name), name)
     for name, expected in (
       ("position_frame", _POSITION_FRAME),
       ("time_policy", _TIME_POLICY),
@@ -321,7 +299,7 @@ def transit_hits(
   natal_objects: Sequence[ChartObject],
   aspects: Sequence[MajorAspect],
 ) -> TransitHits:
-  """Find every exact selected moving-to-fixed-source branch in [start_utc, end_utc).
+  """Find exact moving-to-fixed branches in the TT interval converted from UTC bounds.
 
   Endpoints must be aware built-in datetimes at or after 1972-01-01 UTC. Selections
   and aspects are explicit, nonempty and unique; moving bodies/nodes need not be
@@ -329,7 +307,7 @@ def transit_hits(
   UTC is converted upstream; the half-open search is capped at 3660 TT days and
   each selected provider's event domain. A failed query aborts the whole result.
   Domain/span rejections raise TransitDomainError; native computation failures
-  propagate unchanged. Native astronomy is loaded only by this calculation call.
+  propagate unchanged. The search lazily initializes native astronomy.
   Hits are ordered by TT time, moving order, natal source order, aspect angle,
   then negative before positive branch. Raw event values, including tangent rates,
   are preserved, with times reported as multiples of 2^-30 day. Coordinate/source
@@ -340,12 +318,12 @@ def transit_hits(
   role. Its stored degrees remain fixed regardless of the source input kind.
   TransitHits.epoch_policy retains its existing value for both source kinds.
 
-  搜索 [start_utc, end_utc) 内所选移动对象与固定源盘黄经的全部精确分支。
+  在给定 UTC 端点转换后的 TT 区间内，搜索移动对象与固定源盘黄经的全部精确分支。
   端点须为有时区的内建 datetime，归一为 UTC 后不早于 1972-01-01。对象及相位须显式、非空且
   不重复；移动天体或交点不必出现在本命盘中，本命四轴须显式选择。不使用容许度。
   上游将 UTC 转为 TT；半开搜索区间最长 3660 TT 日，并受每个所选事件来源的域限制。
   任一查询失败即整次失败。域或区间拒绝抛 TransitDomainError；原生计算失败保持原异常。
-  只有此计算调用才加载原生天文。按 TT 时刻、移动对象顺序、本命源盘顺序、相位角升序及
+  此搜索调用延迟加载原生天文。按 TT 时刻、移动对象顺序、本命源盘顺序、相位角升序及
   负分支在前排序。保留原值，包括相切速率；报告时刻为 2^-30 日的整数倍。
   坐标及来源详情分别见 rule.project.exact_transit_hits 和 entry.transit_hits；
   已安装分发包元数据缺失时抛出 importlib.metadata.PackageNotFoundError。
@@ -360,7 +338,7 @@ def transit_hits(
   natal = _selection_for_chart(chart, natal_objects, "natal_objects")
   if not natal:
     raise ValueError("natal_objects must not be empty")
-  selected_aspects = _aspects(aspects)
+  selected_aspects = _selected_aspects(aspects)
 
   from astrology.celestial import (
     celestial_version,

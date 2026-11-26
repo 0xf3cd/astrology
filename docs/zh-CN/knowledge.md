@@ -27,11 +27,11 @@ True
 >>> [rule.identifier for rule in catalog.list_variants(concept_id="body.sun")]
 ['rule.project.solar_lunar_returns', 'rule.lilly1647.essential_dignities', 'rule.project.dispositor_chains']
 >>> [rule.identifier for rule in catalog.list_variants(concept_id="body.uranus")]
-['rule.project.dispositor_chains']
+['rule.project.solar_lunar_returns', 'rule.project.dispositor_chains']
 >>> catalog.filter_entries(concept_id="body.sun")[0].identifier
 'entry.solar_lunar_returns'
 >>> len(catalog.filter_sources(verification=SourceVerification.VERIFIED))
-14
+15
 >>> print(catalog.entry("entry.cross_aspect_evaluation").statement.text("zh-CN"))
 静态主要交叉相位比较两张给定本命盘或时刻盘结果，区分左右端点并保留双侧完整来源，不设运动字段。
 >>> print(catalog.variant("rule.project.cusp_ownership").definition.text("zh-CN"))
@@ -113,8 +113,8 @@ True
 - Ashmand 1822 年版中的四组星座分类，以及相关书目、摘录和中文译文。
 - [传统星座守护与四种状态](dignities.md)：依据 William Lilly（威廉·利利）的
   《Christian Astrology》（1647），含原扫描本短引文及生成的星座表。
-- [日月返照定义](returns.md)：`entry.solar_lunar_returns` 保留原文短引、分开的译文、
-  不同地点实践及显式的项目约定。
+- [行星返照定义](returns.md)：稳定 ID `entry.solar_lunar_returns` 保留原文短引、分开的译文、
+  不同地点实践及十体项目约定。条目记录这项约定的来源和限度。
 
 配置项链接到程序实际使用的枚举成员；规则说明链接到对应的实现。
 宫制、月交点定义和相位角各有说明，写明采用哪种定义及其限制。

@@ -112,8 +112,15 @@ calculation; it does not import development checks. Feature PRs keep domain
 assertions in tests, not the installed-package check; packaging agreement uses
 source-to-wheel bytes and observation files.
 
+The sdist check enumerates test and tool inputs from the working tree: `tests/**/*.py`,
+`tools/**/*.py`, JSON/TXT files under `tests/reference/`, and Python files under
+`tests/consumer_cases/`. Their patterns match
+`MANIFEST.in`, so untracked matching files are included without reading Git metadata.
+Every input must be present in the archive with the same bytes as the checkout.
+
 Fixed fresh-process inputs live in `tests/consumer_cases/`. Tests pass their text
-to `python [-O] -c` so the repository root stays on `sys.path` for imports from `tools`.
+to `python [-O] -c` and run the child with the repository root as its cwd, so imports
+from `tools` work even when pytest starts in another directory.
 
 Sphinx discovers only the two root READMEs and sources under `docs/`. Keep virtual
 environments outside `docs/`: sources anywhere under that directory are documentation
@@ -123,14 +130,14 @@ fail the strict build.
 <!-- usage: contributing.checks -->
 
 Install this development package from the checkout using `uv sync` above. Its
-distribution name/version is `celestial-astrology` / `0.5.0`; the Python import
+distribution name/version is `celestial-astrology` / `0.6.0`; the Python import
 remains `astrology`. The unrelated
 PyPI project `astrology` is not this library. Confirm the installed package and version:
 
 ```{doctest}
 >>> from importlib.metadata import version
 >>> version("celestial-astrology")
-'0.5.0'
+'0.6.0'
 ```
 
 <!-- /usage: contributing.checks -->
@@ -175,6 +182,28 @@ silent substitutions, and factories whose return type depends on hidden state.
 
 ## Correctness
 
+Regenerate `tests/reference/moving_pair_reference.json` in two steps.
+First generate independent candidates with Swiss/Moshier, without importing
+astrology or its native backend:
+
+```sh
+uv run --no-project --python 3.11 --with pyswisseph==2.10.3.2 python tools/fetch_moving_reference.py --output <candidates-path>
+```
+
+Then compare those candidates and sampled longitudes with the native backend.
+This writes the fixture to `<fixture-path>` and the native event values and
+comparison controls to `<observations-path>`:
+
+```sh
+uv run --locked python tools/calibrate_moving_reference.py --candidates <candidates-path> --output <fixture-path> --observations <observations-path>
+```
+
+The comparison measures each body's longitude error at matching times. Each event's
+time tolerance uses both bodies' angular bounds and their relative rate.
+The fixture's `source.algorithm` describes its sampling limits. Real native contact
+construction and synthetic public major-aspect contacts are tested separately
+in `tests/test_moving_events.py` and `tests/test_moving_display.py`.
+
 Return fixtures in `tests/reference/return_reference.json` use independently
 calculated natal degrees and TT crossings from pyswisseph 2.10.3.2 / Swiss 2.10.03,
 explicit Moshier plus speed flags 260. Regenerate them without project/native
@@ -194,6 +223,32 @@ two solar returns within calendar 2024. Some overlapping windows repeat events;
 they are not independent observations. The recipe hash binds the fixture to its
 generator. This optional reference environment adds no runtime or locked dependency;
 Swiss code and ephemeris files are not distributed here.
+
+The separate `tests/reference/planetary_return_reference.json` adds 11 post-natal
+cases and 16 hits covering all ten bodies, including three Mercury crossings.
+Its independent generator uses the same pinned Swiss/Moshier versions and flags,
+without importing astrology or celestial-calendar:
+
+```sh
+uv run --no-project --python 3.11 --with pyswisseph==2.10.3.2 python tools/fetch_planetary_return_reference.py --output <candidates-path>
+uv run --locked python tools/calibrate_planetary_return_reference.py --candidates <candidates-path> --output <fixture-path> --observations <observations-path>
+```
+
+The second command performs same-backend composition and calibration, not
+independent reference generation. The fixture pins both recipe hashes and the
+native-observation hash and records generation and calibration times separately.
+Its 69.184-second TT−UTC offset applies only to the 2022–2026 civil inputs.
+The fixture's `source.algorithm` describes the independent search and its limits.
+
+Each hit's time tolerance is
+`max(2 seconds, 2 * angular_tolerance_deg / abs(reference_rate) * 86400)`,
+using the existing 1,830-point transit calibration below. Slow-body time
+tolerances can be hours. Tests
+therefore separately check the product's same-backend angular residual within
+1e-6 degree; that residual is not independent astronomical evidence. Ten-body
+chart/comparison assertions belong in domain tests. Installed consumers exercise
+actual bilingual transit and return tables and compare same-revision observations
+for packaging agreement.
 
 Transit fixtures in `tests/reference/transit_reference.json` use explicitly selected
 Moshier ephemeris calculations through `pyswisseph==2.10.3.2`, not Swiss/JPL data
